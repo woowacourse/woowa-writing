@@ -1,5 +1,3 @@
-# ✍ 우와 글쓰기
+# ✍ 새양의 우와 글쓰기
 
-| 레벨 | 글 보기                                                            |
-| ---- | ------------------------------------------------------------------ |
-| 1    | [링크](https://github.com/geoje/woowa-writing/blob/main/level1.md) |
+### [레벨1️⃣ 글 바로가기](https://github.com/geoje/woowa-writing/blob/main/level1.md) / [PR 바로가기](https://github.com/woowacourse/woowa-writing/pull/48)
