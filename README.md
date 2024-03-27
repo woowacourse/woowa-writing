@@ -1,12 +1,12 @@
 # 낙천과 긍정 사이
 
-![유연성 강화 운동.jpg](%EC%9C%A0%EC%97%B0%EC%84%B1%20%EA%B0%95%ED%99%94%20%EC%9A%B4%EB%8F%99.jpg)
+<img src="https://github.com/jinuemong/woowa-writing/blob/level-1/%EC%9C%A0%EC%97%B0%EC%84%B1%20%EA%B0%95%ED%99%94%20%EC%9A%B4%EB%8F%99.jpg?raw=true" width="50%">
 
 우아한테크코스 유연성 강화 운동에서 목표를 위와 같이 작성했다.
 
 물론 여전히 긍정 + 긍정은 무조건 긍정이다.
 
-![무한긍정.png](%EB%AC%B4%ED%95%9C%EA%B8%8D%EC%A0%95.png)
+<img src="https://github.com/jinuemong/woowa-writing/blob/level-1/%EB%AC%B4%ED%95%9C%EA%B8%8D%EC%A0%95.png?raw=true" width="20%">
 
 무한 긍정 역시 긍정에 수렴할까?
 
@@ -41,7 +41,7 @@
 낙천은 스트레스를 `잘될 것이야`라는 관점으로 바라본다.
 
 낙관은 스트레스를 경험을 통해서 극복하려 한다.
-
+정
 이는 책임의 차이로 이어진다.
 
 CEO 심리학에는 낙천적인 사람보다 낙관적인 사람을 중용하라는 말이 있다.
