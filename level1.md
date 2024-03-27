@@ -1,13 +1,15 @@
 ## 성괴가 되자!
 
-엄마에게 "성괴가 되고 싶다"고 말했던 적이 있다. "수연아.. 쌍수 했으면 됐지 또 어딜 고치려고 그러니;" 라며 답했다.
+엄마에게 "성괴가 되고 싶다"고 말했던 적이 있다.
+
+"수연아.. 쌍수 했으면 됐지 또 어딜 고치려고 그러니;" 라며 답했다.
 
 "엄마... 성형 괴물 아니고 성장하는 괴물^^"
 
 맞다! 내 꿈은 성괴이다. 성형 괴물 아니고 성장하는 괴물! 남과 비교하는 것이 아닌 어제의 나와 비교하면서 조금씩 성장해 가고 싶다.
 
 <div style="display:flex; justify-content: center; margin-bottom:20px">
-  <img src="./image/talk.jpg" style="height:80px;">
+  <img src="./image/talk.jpg">
 </div>
 
 인생을 물 흘러가듯이 살아서 그리 열정적으로 살지 않았다. 늘 요행을 바라고 일단 닥치면 생각해 보자는 마인드여서 인생이 계획대로 됐던 적이 없다. 당연히 우테코 합격도 계획에 없던 일이다. 하지만 오히려 좋다~ 열정Girl~로 살 수 있게 해줄 좋은 기회일지도^^
@@ -24,7 +26,7 @@
 
 정말 미쳐~버리겠다~ 우테코에는 스윗한 사람이 너무 많다^^ 하찮은 질문에도 성심성의껏 답변해 주는 멋있는 크루들이 많다. 이젠 하다못해 리뷰어에게 반해버렸다ㅋㅋ
 
-<div style="display:flex; justify-content: center; margin-bottom:20px">
+<div style="width:100%; display:flex; justify-content: center; margin-bottom:20px">
   <img src="./image/leejaeyong.png" style="width: 350px"/>
 </div>
 페어 중 한 명은 오히려 질문에 대한 답을 말로 설명하면서 본인도 배워가는게 있다고 했다. 아니..... 이러니 안 반할 수가 있나?? 그리고 다른 페어는 직접 종합장을 꺼내며 이해를 시키겠다는 신념 하나로 그림을 그리며 열띤 설명을 펼쳤다. 이 정도면 우테코 뽑는 기준이 다정함 일 수도...^^ 무튼 사소하지만 이런 말 한마디, 행동 하나가 쌓이고 쌓여서 큰 힘이 된다.
@@ -34,7 +36,7 @@
 
 그동안 질문을 하면서 느꼈던 건데 모르는 걸 말로 잘 전달하는 게 중요하고, 확실히 혼자 찾아서 공부하는 것보다는 질문을 통해서 그 답변을 들었을 때, 훨씬 기억에 오래 남고 이해가 잘돼는 걸 몸소 느낄 수 있었다. 우테코 크루 덕에 뻔뻔하게 물어볼 용기를 조금은?! 얻은 것 같다! 참말로 고맙다!
 
-<div style="display:flex; justify-content: center;">
+<div style="width:100%; display:flex; justify-content: center;">
   <img src="./image/leejaeyong2.png" style="height: 230px">
 </div>
 
