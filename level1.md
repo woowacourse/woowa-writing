@@ -75,4 +75,4 @@
 >
 > "내가 좋아하는 판 위에서 수를 놓으며 대국을 이어나가는 일은 꽤나 즐거운 일이 아닌가" - 윤성현(악어)
 
-<img src=".idea/images/미생.png">
+<img src=".idea/images/MI_SAENG.png">
