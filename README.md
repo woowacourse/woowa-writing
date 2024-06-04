@@ -10,4 +10,4 @@
 
 ### 우린 낭만이란 배를 타고 떠나갈 거야
 
-[바로가기▶️](https://github.com/lurgi/woowa-writing/blob/main/level2.md)
+[바로가기▶️](https://github.com/lurgi/woowa-writing/blob/temp/level2.md)
