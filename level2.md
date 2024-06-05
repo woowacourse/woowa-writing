@@ -106,7 +106,7 @@
 <div style="display: flex; justify-content: space-between;">
   <img src="./assets/come-1.jpeg" alt="come-1" style="width: 33%;">
   <img src="./assets/come-2.jpeg" alt="come-2" style="width: 33%;">
-   <img src="./assets/come-3.jpeg" alt="come-3" style="width: 33%;">
+  <img src="./assets/come-3.jpeg" alt="come-3" style="width: 33%;">
 </div>
 
 제가 생각한 목표 시간에 도착하려면 적어도 6시 30분에는 일어나야 해서 달라진 수면 패턴에 적응하느라 캠퍼스에 도착하고나서도 졸기도하고 아예 자기도 했어요.
@@ -275,16 +275,18 @@ ex) 시모와 해리의 페어프로그래밍
 
 사진을 잘 찍지는 못하지만, 산책을 다니며 찍었던 사진들도 공유해 봅니다. 😊
 
-<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
-  <img src="./assets/forest-1.jpg" alt="forest-1" style="width: 100%;">
-  <img src="./assets/forest-2.jpg" alt="forest-2" style="width: 100%;">
-  <img src="./assets/forest-3.jpg" alt="forest-3" style="width: 100%;">
-  <img src="./assets/forest-4.jpg" alt="forest-4" style="width: 100%;">
-  <img src="./assets/forest-5.jpg" alt="forest-5" style="width: 100%;">
-  <img src="./assets/forest-6.jpg" alt="forest-6" style="width: 100%;">
+<div style="display: flex; justify-content: space-between;">
+  <img src="./assets/forest-1.jpg" alt="forest-1" style="width: 33%;">
+  <img src="./assets/forest-2.jpg" alt="forest-2" style="width: 33%;">
+  <img src="./assets/forest-3.jpg" alt="forest-3" style="width: 33%;">
 </div>
-<div style="display: flex; margin-top: 10px;">
+<br/>
+<div style="display: flex; justify-content: space-between;">
+<img src="./assets/forest-4.jpg" alt="forest-4" style="width: 33%;">
+  <img src="./assets/forest-5.jpg" alt="forest-5" style="width: 33%;">
+  <img src="./assets/forest-6.jpg" alt="forest-6" style="width: 33%;">
 </div>
+
 레벨 2의 끝자락인 지금, 제가 유강스 조원들이나 다른 크루들에게 자주 하는 말이 있습니다.
 
 > _**"개발이 나의 일상 자체가 되는 것이 아니라, 일상 속에 개발이 있었으면 합니다."**_
