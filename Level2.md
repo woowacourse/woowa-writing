@@ -13,7 +13,9 @@
 
 <br/>
 
-![슬리퍼 기념사진](image.png)
+<p align="center">
+  <img src="./image.png" alt="슬리퍼 기념 사진" style="{width: 250px; height: 250px; margin: auto}"/>
+</p>
 
 <br/>
 
