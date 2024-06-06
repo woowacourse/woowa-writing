@@ -14,7 +14,7 @@
 <br/>
 
 <p align="center">
-  <img src="./image.png" alt="슬리퍼 기념 사진" style="{width: 250px; height: 250px; margin: auto}"/>
+  <img src="https://github.com/llqqssttyy/woowa-writing/blob/llqqssttyy/image.png" alt="슬리퍼 기념 사진" style="{width: 250px; height: 250px;}"/>
 </p>
 
 <br/>
