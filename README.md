@@ -6,4 +6,4 @@
 [level1](level1.md)
 
 #### 레벨 2 - 개발자가 되고 싶은 이유
-[level2](leve2.md)
+[level2](level2)
