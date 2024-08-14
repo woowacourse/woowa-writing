@@ -1,15 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="ddd22b73-c7b2-4a46-9143-0cc44a8c1ae8" name="Changes" comment="docs : 레벨 1 글쓰기 수정">
-      <change afterPath="$PROJECT_DIR$/level2.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/woowa-writing.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/level1.md" afterDir="false" />
-    </list>
+    <list default="true" id="b361c305-5260-41b7-97f1-442f5f0f2022" name="Changes" comment="docs : 레벨 1 글쓰기 수정" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -33,15 +25,33 @@
   }
 }</component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\2001y\Desktop\linirinilinrin\DEV\Woowa_Tech_Course\woowa-writing" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\2001y\Desktop\linirinilinrin\DEV\Woowa_Tech_Course\woowa-writing\.idea" />
       <recent name="C:\Users\2001y\Desktop\linirinilinrin\DEV\Woowa_Tech_Course\woowa-writing" />
     </key>
   </component>
+  <component name="RunManager">
+    <configuration default="true" type="JetRunConfigurationType">
+      <module name="woowa-writing" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
+      <module name="woowa-writing" />
+      <option name="filePath" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+  </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="ddd22b73-c7b2-4a46-9143-0cc44a8c1ae8" name="Changes" comment="" />
+      <changelist id="b361c305-5260-41b7-97f1-442f5f0f2022" name="Changes" comment="" />
       <created>1711411644906</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
