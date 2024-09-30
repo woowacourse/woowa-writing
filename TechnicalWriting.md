@@ -19,14 +19,16 @@ MySQL은 세계에서 가장 널리 사용되는  오픈 소스 관계형 데�
 
 *그림 1 DB-Engines Ranking*
 
+<br>
+
 ### 1.1. MySQL의 주요 기능
 
 MySQL은 빠르고 신뢰할 수 있으며, 확장성과 사용의 용이성을 제공한다. 다음은 MySQL의 주요 기능이다.
 
--      **멀티스레딩 지원**: MySQL은 커널 스레드를 사용하여 여러 CPU를 효율적으로 사용할 수 있다.
--      **트랜잭션 및 비트랜잭션 스토리지 엔진**: 다양한 스토리지 엔진을 제공하여 유연한 데이터 처리 기능을 지원한다.
--      **확장성**: 수십억 개의 데이터 행과 수십만 개의 테이블을 관리할 수 있어 대규모 데이터베이스 지원에 적합하다.
--      **다양한 연결 옵션**: TCP/IP 소켓, Unix 도메인 소켓 등 다양한 연결 방식을 통해 폭넓은 환경에서 사용할 수 있다.
+- **멀티스레딩 지원**: MySQL은 커널 스레드를 사용하여 여러 CPU를 효율적으로 사용할 수 있다.
+- **트랜잭션 및 비트랜잭션 스토리지 엔진**: 다양한 스토리지 엔진을 제공하여 유연한 데이터 처리 기능을 지원한다.
+- **확장성**: 수십억 개의 데이터 행과 수십만 개의 테이블을 관리할 수 있어 대규모 데이터베이스 지원에 적합하다.
+- **다양한 연결 옵션**: TCP/IP 소켓, Unix 도메인 소켓 등 다양한 연결 방식을 통해 폭넓은 환경에서 사용할 수 있다.
 
 <br>
 
@@ -46,11 +48,11 @@ PostgreSQL은 이러한 ORDBMS의 특성을 활용하여, 데이터를 유연하
 
 PostgreSQL은 복잡한 데이터 워크로드를 안전하게 저장할 수 있는 다양한 기능을 제공한다. 다음은 PostgreSQL의 주요 기능이다.
 
--      **고급 데이터 유형:** JSON, 배열, 사용자 정의 데이터 타입을 지원한다.
--      **트랜잭션 처리:** ACID 준수로 안정적인 데이터 무결성을 보장한다.
--      **확장성:** 대규모 데이터 처리에 적합하며, 다양한 복제 및 샤딩 옵션을 제공한다.
--      **고급 쿼리 기능**: 서브쿼리, 윈도우 함수, CTE(Common Table Expressions) 지원한다.
--      **사용자 정의 함수:** 다양한 프로그래밍 언어로 함수 작성할 수 있다.
+- **고급 데이터 유형:** JSON, 배열, 사용자 정의 데이터 타입을 지원한다.
+- **트랜잭션 처리:** ACID 준수로 안정적인 데이터 무결성을 보장한다.
+- **확장성:** 대규모 데이터 처리에 적합하며, 다양한 복제 및 샤딩 옵션을 제공한다.
+- **고급 쿼리 기능**: 서브쿼리, 윈도우 함수, CTE(Common Table Expressions) 지원한다.
+- **사용자 정의 함수:** 다양한 프로그래밍 언어로 함수 작성할 수 있다.
 
 <br>
 
@@ -61,6 +63,8 @@ PostgreSQL은 복잡한 데이터 워크로드를 안전하게 저장할 수 있
 ![](https://i.imgur.com/H5KSqN8.png)
 
 *그림 2 JetBrains에서 진행한 설문 조사 (모든 응답자)*
+
+<br>
 
 심지어 전문 개발자만 투표한 결과는 PostgreSQL 46.48%, MySQL 45.68%로 PostgreSQL가 1위 자리를 차지했다. 두 DBMS 중에 무엇을 선택할지 고민하기 전에 이들의 공통점과 차이점을 살펴보자.
 
@@ -74,8 +78,7 @@ PostgreSQL은 복잡한 데이터 워크로드를 안전하게 저장할 수 있
 
 MySQL과 PostgreSQL 중 하나를 선택하는 고민은 두 데이터베이스가 여러 공통점을 가지고 있으며, 그 사용 방식이 유사하기 때문에 발생한다. 따라서 먼저 이들의 공통점을 살펴보자.
 
-·        관계형 데이터베이스 관리 시스템이다. 공통 열값을 통해 서로 관련된 테이블에 데이터를 저장한다.
-
+- 관계형 데이터베이스 관리 시스템이다. 공통 열값을 통해 서로 관련된 테이블에 데이터를 저장한다.
 - 구조화된 쿼리 언어(SQL)를 인터페이스로 사용하여 데이터를 읽고 편집할 수 있다.
 - 오픈 소스이며 강력한 개발자 커뮤니티 지원 제공한다.
 - 데이터 백업, 복제 및 액세스 제어 기능이 내장되어 있다.
@@ -238,27 +241,30 @@ MySQL의 읽기 성능을 평가하는 데 유용하며, 응답 시간이 짧고
 
 *그림 4 ‘지난 12개월 동안 어떤 데이터베이스를 사용하셨나요?’ 설문 결과*
 
+<br>
+
 그럼 이제 어떤 상황에서 어떤 SQL이 더 적절한지 일반적인 사용 사례와 함께 이야기하려고 한다.
 
+<br>
 
 ### 4.1. MySQL이 더 적합한 상황
 
 MySQL을 사용해야 하는 상황은 다음과 같다.
 
--      스토리지 엔진 유연성: 다양한 스토리지 엔진을 지원하여 여러 테이블 유형의 데이터를 유연하게 관리할 수 있다.
--      속도와 안정성: 단순한 구조로 높은 속도와 안정성을 제공한다. 특히 읽기 전용 작업에 탁월하지만, 복잡한 쿼리가 많은 경우 PostgreSQL이 더 적합할 수 있다.
--      사용 용이성: 설정이 간편하고, 경험 있는 관리자를 찾기 쉽다. 다양한 도구와 함께 사용자 친화적인 환경을 제공한다.
--      간단한 솔루션 필요 시: 기술적 복잡성이 낮고, 빠른 구축이 필요한 경우 MySQL이 적합하다.
+- 스토리지 엔진 유연성: 다양한 스토리지 엔진을 지원하여 여러 테이블 유형의 데이터를 유연하게 관리할 수 있다.
+- 속도와 안정성: 단순한 구조로 높은 속도와 안정성을 제공한다. 특히 읽기 전용 작업에 탁월하지만, 복잡한 쿼리가 많은 경우 PostgreSQL이 더 적합할 수 있다.
+- 사용 용이성: 설정이 간편하고, 경험 있는 관리자를 찾기 쉽다. 다양한 도구와 함께 사용자 친화적인 환경을 제공한다.
+- 간단한 솔루션 필요 시: 기술적 복잡성이 낮고, 빠른 구축이 필요한 경우 MySQL이 적합하다.
 
 ### 4.2. PostgreSQL이 더 적합한 상황
 
 PostgreSQL을 사용해야 하는 상황은 다음과 같다.
 
--      ORDBMS 필요 시: 객체 지향 프로그래밍과 관계형 데이터베이스의 결합을 통해 복잡한 데이터 구조를 처리할 수 있다.
--      복잡한 읽기-쓰기 작업: 유효성 검사가 필요한 복잡한 읽기-쓰기 작업을 수행할 때 적합하다.
--      초대형 데이터베이스 관리: 데이터베이스 크기에 제한이 없으며, 페타바이트(PB) 단위의 데이터를 처리할 수 있다.
--      MVCC 지원: 다중 버전 동시성 제어(MVCC)를 통해 여러 사용자가 동시에 안전하게 데이터를 읽고 쓸 수 있다.
--      ACID 준수: 모든 트랜잭션에서 데이터 무결성을 보장하며, ACID 규정을 완벽하게 준수한다.
+- ORDBMS 필요 시: 객체 지향 프로그래밍과 관계형 데이터베이스의 결합을 통해 복잡한 데이터 구조를 처리할 수 있다.
+- 복잡한 읽기-쓰기 작업: 유효성 검사가 필요한 복잡한 읽기-쓰기 작업을 수행할 때 적합하다.
+- 초대형 데이터베이스 관리: 데이터베이스 크기에 제한이 없으며, 페타바이트(PB) 단위의 데이터를 처리할 수 있다.
+- MVCC 지원: 다중 버전 동시성 제어(MVCC)를 통해 여러 사용자가 동시에 안전하게 데이터를 읽고 쓸 수 있다.
+- ACID 준수: 모든 트랜잭션에서 데이터 무결성을 보장하며, ACID 규정을 완벽하게 준수한다.
 
 <br>
 
@@ -290,14 +296,13 @@ PostgreSQL을 사용해야 하는 상황은 다음과 같다.
 
 ## 6. 참고
 
-Oracle docs - [https://docs.oracle.com/cd/E17952_01/mysql-5.7-en/what-is-mysql.html](https://docs.oracle.com/cd/E17952_01/mysql-5.7-en/what-is-mysql.html)
-PostgreSQL: Up and Running, 3rd Edition
-PostgreSQL docs -  [https://www.postgresql.org/about/](https://www.postgresql.org/about/)
-ORDBMS란 - [https://database.guide/what-is-an-ordbms/](https://database.guide/what-is-an-ordbms/)
-AWS : PostgreSQL과 MySQL 비교 - [https://aws.amazon.com/ko/compare/the-difference-between-mysql-vs-postgresql/](https://aws.amazon.com/ko/compare/the-difference-between-mysql-vs-postgresql/)
-Integrate.io : PostgreSQL과 MySQL 비교 - [https://www.integrate.io/ko/blog/postgresql-vs-mysql-which-one-is-better-for-your-use-case-ko/](https://www.integrate.io/ko/blog/postgresql-vs-mysql-which-one-is-better-for-your-use-case-ko/)
-DB-Engines Ranking - [https://db-engines.com/en/ranking](https://db-engines.com/en/ranking)
-Stackoverflow DB 관련 설문 조사 -  
-[https://survey.stackoverflow.co/2022/?utm_source=results#most-popular-technologies-database](https://survey.stackoverflow.co/2022/?utm_source=results#most-popular-technologies-database)
-Jetbrains DB 관련 설문 조사 - [https://www.jetbrains.com/lp/devecosystem-2022/databases/](https://www.jetbrains.com/lp/devecosystem-2022/databases/)
+Oracle docs - [https://docs.oracle.com/cd/E17952_01/mysql-5.7-en/what-is-mysql.html](https://docs.oracle.com/cd/E17952_01/mysql-5.7-en/what-is-mysql.html)   
+PostgreSQL: Up and Running, 3rd Edition   
+PostgreSQL docs -  [https://www.postgresql.org/about/](https://www.postgresql.org/about/)   
+ORDBMS란 - [https://database.guide/what-is-an-ordbms/](https://database.guide/what-is-an-ordbms/)   
+AWS : PostgreSQL과 MySQL 비교 - [https://aws.amazon.com/ko/compare/the-difference-between-mysql-vs-postgresql/](https://aws.amazon.com/ko/compare/the-difference-between-mysql-vs-postgresql/)   
+Integrate.io : PostgreSQL과 MySQL 비교 - [https://www.integrate.io/ko/blog/postgresql-vs-mysql-which-one-is-better-for-your-use-case-ko/](https://www.integrate.io/ko/blog/postgresql-vs-mysql-which-one-is-better-for-your-use-case-ko/)   
+DB-Engines Ranking - [https://db-engines.com/en/ranking](https://db-engines.com/en/ranking)   
+Stackoverflow DB 관련 설문 조사 - [https://survey.stackoverflow.co/2022/?utm_source=results#most-popular-technologies-database](https://survey.stackoverflow.co/2022/?utm_source=results#most-popular-technologies-database)   
+Jetbrains DB 관련 설문 조사 - [https://www.jetbrains.com/lp/devecosystem-2022/databases/](https://www.jetbrains.com/lp/devecosystem-2022/databases/)   
 
