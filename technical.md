@@ -443,3 +443,13 @@ module.exports = {
 3. 어떻게 커스터마이징하는가?
 
 ESLint를 더욱 잘 알고 사용하기 위해 직접 조사해보면서, 동작 원리에 대해서도 이해할 수 있게 되었습니다. 또한, ESLint가 등장하게된 배경에 대해서도 깊게 고민해볼 수 있었습니다. 이 글을 통해 ESLint를 단순히 사용하기보다 이해하고 사용하고 싶은 개발자에게 도움이 되었으면 좋겠습니다.
+
+### 참고자료
+
+- ESLint 공식문서 - https://eslint.org
+- Airbnb Style Guide - https://github.com/airbnb/javascript
+- ESLint GitHub - https://github.com/eslint/eslint
+- ESpree GitHub - https://github.com/eslint/js/tree/main/packages/espree
+- eslint-plugin-react npm - https://www.npmjs.com/package/eslint-plugin-react
+- eslint-plugin-react GitHub - https://github.com/jsx-eslint/eslint-plugin-react
+- AST Explorer - https://astexplorer.net
