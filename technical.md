@@ -49,7 +49,7 @@ public class DataSourceConfig {
 
 위의 작업을 완료한 후, RDS로 DataSource를 변경하는 작업을 진행했습니다.<br>
 그리고 여기에서 다음과 같은 문제가 발생했습니다.
-![img.png](img.png)
+![](image/img.png)
 우리보다 앞서 같은 문제로 고생했던 타 팀원 덕분에, OSIV 설정을 비활성화하면 해결할 수 있음을 알 수 있었습니다.
 ``` yaml
 spring.jpa.open-in-view=false
@@ -66,10 +66,10 @@ OSIV(Open Session In View)는 JPA/Hibernate에서 사용되는 개념으로, 영
 ### 3.2 OSIV의 목적
 
 스프링 컨테이너는 **트랜잭션 범위의 영속성 컨텍스트 전략**을 기본으로 사용합니다. 그리고 같은 트랜잭션 안에서는 항상 같은 영속성 컨텍스트에 접근합니다.
-![img_3.png](img_3.png)
+![img_3.png](image/img_3.png)
 
 스프링 프레임워크를 사용한다면 보통 비즈니스 로직을 시작하는 Service 계층에 `@Transactional` 어노테이션을 선언하여 트랜잭션을 시작합니다. 그리고 서비스 계층이 끝나는 시점에 트랜잭션이 종료되면서 영속성 컨텍스트도 함께 종료됩니다.
-![img_4.png](img_4.png)
+![img_4.png](image/img_4.png)
 
 따라서 조회한 엔티티는 Service와 Repository 계층에서는 영속성 컨텍스트에서 관리되면서 영속 상태를 유지하지만, Presentation 계층(Controller, View)에서는 준영속 상태가 됩니다. 즉, Presentation 계층에서는 더 이상 영속성 컨텍스트의 기능을 사용할 수 없습니다. 그리고 지연 로딩 기능이 동작하지 않는다는 점은 문제가 되기도 합니다.
 
@@ -80,7 +80,7 @@ Presentation 계층에서 지연 로딩으로 설정된 연관된 엔티티를 �
 ### 3.3 OSIV의 동작 원리
 
 가장 단순한 구현 방법은 클라이언트의 요청이 들어오자마자 서블릿 필터나 스프링 인터셉터에서 트랜잭션을 시작 및 마치는 것입니다. 이를 요청 당 트랜잭션 방식의 OSIV라고 합니다.
-![img_5.png](img_5.png)
+![img_5.png](image/img_5.png)
 
 이로 인해, 트랜잭션이 종료된 후에도 영속성 컨텍스트 내의 엔티티에 접근할 수 있고 지연 로딩을 포함한 다양한 JPA 연산이 가능해집니다. 이 방식은 Service 계층처럼 비즈니스 로직 실행 시 데이터가 변경되는 것이 아닌 Presentation 계층에서 데이터를 잠깐 변경했을 때 실제 데이터베이스까지 변경이 반영된다는 문제점이 있습니다. 그렇기 때문에 최근에는 거의 사용하지 않는 방법입니다.
 
@@ -95,7 +95,7 @@ Presentation 계층에서 지연 로딩으로 설정된 연관된 엔티티를 �
 앞서 설명했던 요청 당 트랜잭션 방식의 OSIV는 Presentation 계층에서 데이터를 변경할 수 있다는 문제를 스프링 프레임워크가 제공하는 OSIV에서 어느정도 해결되었습니다.
 
 스프링 프레임워크가 제공하는 OSIV는 “비즈니스 계층에서 트랜잭션을 사용하는 OSIV”입니다.
-![img_6.png](img_6.png)
+![img_6.png](image/img_6.png)
 
 이들은 HTTP 요청이 들어올 때 영속성 컨텍스트를 열고, 요청이 끝날 때까지 이를 유지합니다. 이로 인해, 영속성 컨텍스트 내의 엔티티에 접근할 수 있고 지연 로딩을 포함한 다양한 JPA 연산이 가능해집니다. 트랜잭션의 범위는 영속성 컨텍스트의 다르게 서비스 계층에서 시작되고, 종료됩니다.
 
@@ -121,7 +121,7 @@ GRANT SELECT ON reader_db.* TO 'staccato'@'%';
 FLUSH PRIVILEGES;
 ```
 실제로 컨테이너에 접속해서 아래와 같이 권한 설정이 되었음을 확인했습니다.
-![img_8.png](img_8.png)
+![img_8.png](image/img_8.png)
 이를 기반으로 로컬 환경을 설정하여 문제 상황을 재현했습니다.
 ``` yaml
 ## application.yml
@@ -245,12 +245,12 @@ public MemoryIdResponse createMemory(MemoryRequest memoryRequest, Member member)
 인증을 시도할 때, `extractFromToken()`을 통해 Member의 정보를 조회합니다.
 따라서, 해당 메서드가 호출될 때에는 Reader Database로 connection이 획득됩니다.
 
-![img_9.png](img_9.png)
+![img_9.png](image/img_9.png)
 해당 메서드가 종료될 때, 트랜잭션이 종료되면서 영속성 컨텍스트 또한 종료됩니다.
 
 이후, `createMemory()`를 호출되면, 새로운 트랜잭션이 시작됨과 동시에 앞서와는 별개의 영속성 컨텍스트가 생성됩니다. 해당 메서드에서는 Writer Database로 connection을 획득합니다.
 
-![img_7.png](img_7.png)
+![img_7.png](image/img_7.png)
 마찬가지로 메서드가 종료되면서 트랜잭션이 종료됨과 동시에 영속성 컨텍스트 또한 종료됩니다.
 
 OSIV가 비활성화되어있다면, Presentation 계층에서는 영속성 컨텍스트가 유지되지 않습니다.<br>
@@ -260,13 +260,13 @@ OSIV가 비활성화되어있다면, Presentation 계층에서는 영속성 컨�
 특정 Member의 권한으로 새로운 Memory 생성을 시도하면, `ArgumentResolver`에 의해 인증 작업이 수행됩니다. <br>
 인증을 시도할 때, `extractFromToken()`을 통해 Member의 정보를 조회합니다.
 따라서, 해당 메서드가 호출될 때에는 Reader Database로 connection이 획득됩니다.
-![img_10.png](img_10.png)
+![img_10.png](image/img_10.png)
 해당 메서드가 종료될 때 트랜잭션은 종료되지만, 영속성 컨텍스트는 종료되지 않습니다.
 
 즉, **사용 중이던 Reader DB에 대한 Connection이 반환되지 않습니다.**
 
 따라서 이후에 `createMemory()`를 호출되었을 때 기존의 영속성 컨텍스트를 재사용함에 따라 들고 있는 Connection을 그대로 재사용합니다.
-![img_11.png](img_11.png)
+![img_11.png](image/img_11.png)
 그 과정에서 insert 작업을 Reader DB에 시도하게 되면서, 권한 문제로 인하여 작업을 실패하게 됩니다.
 
 ### 5.5 결과
