@@ -1,6 +1,6 @@
 # 절대 안 까먹는 Pass by Value과 Pass by Reference
 
-Java는 메서드의 결과가 어떤 영향을 미치는지 헷갈릴 때가 있다. 
+Java는 메서드의 결과가 어떤 영향을 미치는지 헷갈릴 수 있다. 
 아래 Java 언어의 `main()` 메서드를 실행했을 때 결과를 예측해보자.
 ```java
 class Person {
@@ -114,7 +114,7 @@ Value after function call: 10
 
 ![img.png](img/pass-by-value-call-stack-reclaimed.png)
 
-이후 메서드가 반환되면 `process()` 메서드가 할당된 메모리가 소멸된다. 
+이후 메서드가 반환되면 `process()` 메서드가 할당된 메모리가 해제된다. 
 그렇기에 `process()` 메서드의 결과가 `parameter`에 반영되지 않았다.
 
 이러한 매개변수 전달 방식을 값에 의한 전달이라 한다.
@@ -123,7 +123,7 @@ Value after function call: 10
 ## 참조에 의한 전달(Pass by Reference)
 
 참조에 의한 전달(Pass by Reference)은 주소 값을 전달하여 동일한 데이터에 대해 여러 변수 이름을 사용한다. 
-때문에 값을 수정하면 원본의 데이터도 함께 수정된다.
+때문에 값을 수정하면 원본 데이터도 함께 수정된다.
 
 코드로 예시를 들어보자.
 ```cpp
@@ -180,12 +180,10 @@ Java는 어떤 방식으로 매개변수를 전달할까?
 > When the method or constructor is invoked (§15.12), the values of the actual argument expressions **_initialize newly created parameter variables_**, each of the declared type, before execution of the body of the method or constructor.
 > </br> \- JLS(Java Language Specification) ch 8.4.1
 
-JLS(Java Language Specification)는 Java가 값에 의한 전달(Pass by Value)임을 명시하고 있다.
-
+JLS(Java Language Specification)에 따르면 Java는 값에 의한 전달(Pass by Value)임을 명시하고 있다.
 
 하지만 Java에는 기본적으로 원시 타입과 참조 타입이 존재한다. 
 두 타입이 어떻게 값에 의한 전달(Pass by Value)를 사용하는지 이해하려면 Java의 메모리 할당 방식을 먼저 알아야 한다.
-
 
 ## Java 메모리 할당
 Java의 메모리 할당은 Java의 가상머신인 JVM의 메모리 구조를 기반으로 이루어진다.
@@ -204,8 +202,8 @@ public class MemoryEx {
         boolean isDaon = true;
         String name = "daon";
         String[] array = new String[2];
-        array[1] = new String("daon");
-        array[2] = "jamsil";
+        array[0] = new String("daon");
+        array[1] = "jamsil";
     }
 }
 ```
