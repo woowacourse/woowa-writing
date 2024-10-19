@@ -1,4 +1,4 @@
-# Java가 매개변수를 넘겨주는 방법
+# 절대 안 까먹는 Pass by Value과 Pass by Reference
 
 Java는 메서드의 결과가 어떤 영향을 미치는지 헷갈릴 때가 있다. 
 아래 Java 언어의 `main()` 메서드를 실행했을 때 결과를 예측해보자.
