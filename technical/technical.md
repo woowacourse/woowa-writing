@@ -85,7 +85,8 @@ Paging라이브러리를 활용했을 때의 **장점**은 다음과 같다.
 - 새로고침 및 재시도 기능을 포함하여 오류 처리를 기본으로 지원한다.
 
 
-***Paging 라이브러리의 흐름은 아래와 같다.***
+***Paging 라이브러리의 흐름은 아래와 같다.***  
+
 <img src="https://velog.velcdn.com/images/yunsuk0328/post/d1573498-179b-4ff3-bd37-b6fca0d2f41d/image.png" width="600" height="200">
 
 
