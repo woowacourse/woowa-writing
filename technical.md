@@ -421,7 +421,7 @@ CloudFront를 사용하면 이미지 파일을 더욱 빠르고 안전하게 제
 
 추가적으로 이미지 파일 관리에 있어 비용 절감을 위해 S3 스토리지 클래스를 적절하게 선택하거나, CloudFront의 캐싱 정책을 최적화하는 등의 방법도 고려해볼 수 있다. 또한, 보안을 더욱 강화하기 위해 지리적 제한이나 WAF 통합을 통한 공격 방어도 함께 고민할 필요가 있다.
 
-## 5. 참고
+## 7. 참고
 
 1. [Amazon S3 공식 문서](https://docs.aws.amazon.com/s3/): Amazon S3에 대한 기본 개념과 다양한 기능을 다룬 공식 문서이다. S3 버킷 설정, 객체 저장, 보안 옵션, 스토리지 클래스 등에 대해 더 깊이 있게 학습할 수 있다.
 2. [Amazon CloudFront 공식 문서](https://docs.aws.amazon.com/cloudfront/): Amazon CloudFront의 기본 개념과 설정 방법을 다룬 공식 문서이다. CloudFront와 S3를 통합하는 방법, 캐싱 정책, HTTPS 설정 등 세부적인 설정 방법에 대해 학습할 수 있다.
