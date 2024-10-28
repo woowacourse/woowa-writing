@@ -372,6 +372,127 @@ viewLifecycleOwner.lifecycleScope.launch {
 }
 ```
 
+## Paging을 사용할 때 상태변경
+
+**상태변경 처리 전**  
+
+<img src="https://velog.velcdn.com/images/yunsuk0328/post/b1fb1494-72bf-4d8b-96e0-5a1e997616f0/image.gif" width="250">
+
+남은 인원이 2명인 공동구매에 참여하고 홈 화면으로 돌아왔을 때 그대로 2명이 남았다고 뜬다.
+
+
+**상태변경 처리 후**  
+
+<img src="https://velog.velcdn.com/images/yunsuk0328/post/7d65eb73-cd3d-4eab-bf61-99f54d3988a0/image.gif" width="250">
+남은 인원이 2명인 공동구매에 참여하고 홈 화면으로 돌아왔을 때, 1명이 남았다고 상태가 바뀐 것을 볼 수 있다.
+
+
+위와 같이 공동구매에 참여한 후, 홈으로 돌아왔을 때 사용자가 직접 새로고침하지 않아도 상태가 자동으로 반영되게 하고 싶었다.
+
+가장 간단한 방법은 참여 시 전체 게시물 목록을 다시 불러와 업데이트하는 것이지만, 이 방식은 매번 전체 게시글을 로드해야 해 오버헤드가 커지고, 게시물의 최상단으로 이동하게 되어 UX 측면에서도 좋지 않다.
+
+따라서, 상태가 변화한 게시물의 상태만 업데이트해주어야 하고 아래와 같은 흐름으로 구현을 해주었다.
+
+#### 구현 흐름
+게시물 상세 화면: DetailFragment
+홈 화면: HomeFragment
+
+1. 참여 시 DetailFragment에서 해당 게시물의 id를 HomeFragment로 넘겨준다.
+2. id를 ViewModel로 넘기고 ViewModel에서 업데이트된 게시물들의 정보를 liveData로 저장한다.
+3. HomeFragment에서 해당 정보를 observe하고 있고, 변화가 있을 시 업데이트된 게시물들의 정보를 PagingDataAdapter로 보낸다.
+4. PagingDataAdapter snapshot으로 현재 로드된 데이터들을 가져와 업데이트된 게시물 정보와 비교하여 상태가 바뀐것이 있다면 해당 게시물의 position을 찾아 notifyItemChanged(position)을 통해 update 해준다.
+
+한 단계씩 코드를 통해 자세히 살펴보도록 하자.
+
+### 1단계
+
+```kotlin
+// DetailViewModel
+private val _updatedPostId: MutableLiveData<Long> = MutableLiveData()
+val updatedPostId: LiveData<Long> get() = _updatedPostId
+
+						(중략)
+
+_updatedPostId.value = postId
+````
+DetailViewModel에서 위와 같은 프로퍼티를 가지고 있고 공동구매 참여시 해당 게시물의 id값을 할당해준다.
+
+```kotlin
+// DetailFragment
+viewModel.updatedPostId.observe(viewLifecycleOwner) {
+	setFragmentResult(DETAIL_BUNDLE_KEY, bundleOf(UPDATED_POST_ID_KEY to it))
+}     
+```        
+DetailFragment에서 위 liveData를 ovserve하고 있고 `setFragmentResult`를 통해 id를 전달합니다.
+
+### 2단계
+
+```kotlin
+// HomeFragment
+setFragmentResultListener(DetailFragment.DETAIL_BUNDLE_KEY) { _, bundle ->
+	viewModel.fetchUpdatedPost(bundle.getLong(DetailFragment.UPDATED_POST_ID_KEY))
+}
+
+// HomeViewModel
+private val _updatedPost: MutableSingleLiveData<MutableList<Post>> = MutableSingleLiveData(mutableListOf())
+val updatedPost: SingleLiveData<MutableList<Post>> get() = _updatedPost
+
+. . .
+
+fun fetchUpdatedPost(postId: Long) {
+    viewModelScope.launch {
+        when (val result = postRepository.fetchPost(postId)) {
+
+					(중략)
+
+            is Result.Success -> {
+                val updatedPosts = _updatedPost.getValue() ?: mutableListOf()
+                updatedPosts.add(result.data)
+                _updatedPost.setValue(updatedPosts)
+            }
+        }
+    }
+}
+```
+위와 같은 로직으로 id를 ViewModel로 넘기고 ViewModel에서 업데이트된 게시물들의 정보를 liveData로 저장한다.
+
+바로 Adpater로 넘기지 않은 이유는 ViewModel에 캐싱해둠으로써 configuration change에 대응하기 위함이다.
+
+### 3, 4단계
+```kotlin
+// HomeFragment
+viewModel.updatedPost.observe(viewLifecycleOwner) {
+	postAdapter.addUpdatedItem(it.toList())
+}
+
+// PagingDataAdapter
+class PostAdapter() : PagingDataAdapter<Post, PostiewHolder>(postComparator) {
+
+    private var updatedPosts: List<Post> = emptyList()
+    
+						(중략)
+
+    fun addUpdatedItem(updatedPosts: List<Post>) {
+        this.updatedPosts = updatedPosts
+        updatedPosts.forEach { post ->
+            val position = findPositionByPostID(post)
+            if (position != -1) {
+                notifyItemChanged(position)
+            }
+        }
+    }
+
+
+    private fun findPositionByPostID(post: Post) =
+        snapshot().items.indexOfFirst { it.id == post.id }
+}
+
+```
+
+앞서 설명한 바와 같이 상태가 바뀐 게시물을 찾아서 `notifyItemChanged`해줌으로써 상태를 변경시켜준다.
+
+
+
 
 # 무조건 라이브러리를 사용하는 것이 좋을까?
 
