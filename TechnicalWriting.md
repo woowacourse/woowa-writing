@@ -1,5 +1,47 @@
 # TanStack Query
 
+# 도입부
+
+API 요청으로 받아오는 서버 상태를 관리하는 데 어려움을 겪지 않으셨나요? 아래의 예시 코드처럼 해당 상태를 관리하기 위하여 data 상태뿐만 아니라 loading 상태와 error 상태를 따로 두어 관리하는 탓에 장황해진 코드를 보며 불편함을 느끼지는 않으셨나요? 또한 해당 코드가 상태별로 필요함에 따라 같은 형태의 코드가 반복되는 것을 보고서 불편함을 느끼지는 않으셨나요? 이를 해결하기 위하여 TanStack Query를 배우려고 했을 겁니다.
+
+```tsx
+import React, { useState, useEffect } from 'react';
+
+function UserComponent({ userId }) {
+  const [user, setUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const response = await fetch(`https://api.example.com/users/${userId}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch user');
+        }
+        const data = await response.json();
+        setUser(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchUser();
+  }, [userId]);
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
+  if (!user) return null;
+
+  return <div>{user.name}</div>;
+```
+
+그러나 초보자의 경우 코드를 읽는 것도 힘든데 해당 문서가 영어로 되어있는 탓에 심리적 장벽이 높아 학습하는데 거부감이 들었을 겁니다. 또한, 문서를 봐도 와닿지 않는 용어들이 많고 훅이나 상태들이 너무 많아 무엇이 중요한지에 대해 구분해야 하는 점에서 어려움을 겪었을 겁니다. 실제 본인 또한 학습하는데 해당 어려움을 겪으며 긴 시간이 걸렸었고 그때마다 중요한 부분들에 대해서 한글로 작성된 친절한 문서가 있다면 얼마나 좋을까? 라는 생각을 하곤 했습니다. 이러한 생각을 바탕으로 TanStack Query를 처음 써보기 위하여 학습하는 개발자들에게 도움을 주기 위하여 문서를 작성했습니다.
+
 # **TanStack Query란?**
 
 ---
