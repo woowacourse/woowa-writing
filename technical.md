@@ -102,7 +102,7 @@ ssh -i [key-file-name.pem] ubuntu@[ip.address]
 
 국내에서 꽤나 큰 업체인 호스팅케이알도 좋지만 `API` 제공이 되는지 여부 검색할 필요도 없는 강력한 이유가 바로 `DNS Performance` 였습니다.
 
-아래 사이트에서 확인되는 것으로 `Cloudflare` 는 굉장히 전국 권에서 꽤나 좋은 성능을 보유한 업체로써 `DNS Resolve` 나 `DNS Propagation` 등에서 빠른 속도를 자랑하며 `DDSN` 에 필요한 레코드 변경 `API` 도 제공해주고 있었습니다.
+아래 사이트에서 확인되는 것으로 `Cloudflare` 는 굉장히 전국 권에서 꽤나 좋은 성능을 보유한 업체로써 `DNS Resolve` 나 `DNS Propagation` 등에서 빠른 속도를 자랑하며 `DDNS` 에 필요한 레코드 변경 `API` 도 제공해주고 있었습니다.
 
 https://www.dnsperf.com/
 ![](https://velog.velcdn.com/images/chch1213/post/f58d168c-7462-4f09-80d7-73f474c26f72/image.png)
@@ -171,19 +171,19 @@ EC2 가 재부팅 되어도 항상 같은 `Public IP Address` 를 유지할 수 
 >
 > You pay an hourly rate for each public IPv4 address used by your AWS account. The bill is calculated in one-second increments, with a minimum of 60 seconds. The price is the same whether the public IPv4 address is in-use public IPv4 addresses that is associated with an AWS resource you own, or an idle public IPv4 addresses in your AWS account not associated with any AWS resources.<br> > **Hourly charge** for In-use Public IPv4 Address **$0.005** > **Hourly charge** for Idle Public IPv4 Address **$0.005**
 
-하지만 나와있다 시피 시간당 $0.005 의 비용이 지불되며, 이는 **30일 기준 $3.6** 이므로 `t4g.nano` 급 인스턴스 하나 비용이다.
+하지만 나와있다 시피 시간당 $0.005 의 비용이 지불되며, 이는 **30일 기준 $3.6** 이므로 `t4g.nano` 급 인스턴스 하나 비용입니다.
 
-다른 방법 없을까? 🤔
+다른 방법 없을까요? 🤔
 
 ### Case 2. DDNS with Cloudflare API
 
 EC2 의 `Public IP Address` 가 변경되는 시점은 딱 한가지 **부팅될 때** 이다.
-그럼 부팅될 때 도메인의 IP 를 알맞게 바꿔주면 되지 않을까? 라는 의문이 생기고 이를 해결하기 위해 아래 2가지가 필요하다.
+그럼 부팅될 때 도메인의 IP 를 알맞게 바꿔주면 되지 않을까? 라는 의문이 생기고 이를 해결하기 위해 아래 2가지가 필요합니다.
 
 - DNS 업체의 **변경 요청 API**
-- **부팅될 때** API 요청 하기
+- **부팅될 때** API 요청
 
-`Cloudflare` 를 선택한 이유 중 하나가 첫번째를 위함이고, 두번째는 `cron` 이란 리눅스 자체 프로그램으로 해결이 가능하다.
+`Cloudflare` 를 선택한 이유 중 하나가 첫번째를 위함이고, 두번째는 `cron` 이란 리눅스 자체 프로그램으로 해결이 가능합니다.
 
 > #### 그럼 무조건 `Case 2` 가 좋은가?
 >
