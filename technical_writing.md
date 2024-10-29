@@ -94,7 +94,8 @@ Query did not return a unique result: 10 results were returned
 
 이는 `findByNameAndLatitudeAndLongitude` 메서드가 동일한 장소를 10개 모두 반환하기 때문입니다.
 실제로 DB를 확인해보면 다음과 같이 중복된 장소가 10개 저장된 것을 확인할 수 있습니다:
-![](https://i.imgur.com/gMbzkiW.png)
+
+<img src="https://i.imgur.com/gMbzkiW.png" width="600" />
 <br>
 <br>
 
@@ -394,7 +395,9 @@ int saveWithoutDuplication(String name, String lat, String lng);
 
 실제로 테스트를 진행해본 결과, 데드락이나 unique 충돌 없이 동시성 문제를 효과적으로 해결한 것을 확인할 수 있었습니다.
 
-![](https://i.imgur.com/VtZbxuH.png)
+<img src="https://i.imgur.com/VtZbxuH.png" width="600" />
+<br>
+<br>
 
 native 쿼리를 사용해야 한다는 점은 단점일 수 있지만, 트레이드오프를 고려했을 때 이 단점은 충분히 감수할 수 있을 만큼 장점이 많습니다.
 
