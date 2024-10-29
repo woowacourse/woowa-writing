@@ -43,6 +43,9 @@
         ).orElseGet(() -> placeRepository.save(planRequest.toPlace()));
     }
 ```
+<br>
+<br>
+
 
 `findByNameAndLatitudeAndLongitude` 메소드는 다음과 같이 정의되어 있습니다:
 
@@ -82,6 +85,8 @@ public interface PlaceRepository extends JpaRepository<Place, Long> {
 ```
 
 위 테스트에서, 10개의 스레드가 동시에 `getPlace`를 호출한 후 `findByNameAndLatitudeAndLongitude` 메소드로 해당 장소가 저장되었는지 확인해보면 다음과 같은 예외가 발생합니다:
+<br>
+<br>
 
 ```
 Query did not return a unique result: 10 results were returned
@@ -90,6 +95,8 @@ Query did not return a unique result: 10 results were returned
 이는 `findByNameAndLatitudeAndLongitude` 메서드가 동일한 장소를 10개 모두 반환하기 때문입니다.
 실제로 DB를 확인해보면 다음과 같이 중복된 장소가 10개 저장된 것을 확인할 수 있습니다:
 ![](https://i.imgur.com/gMbzkiW.png)
+<br>
+<br>
 
 이는 **여러 스레드**에서 동시에 `getPlace` 메소드를 호출하면, 모든 스레드에서 `findByNameAndLatitudeAndLongitude`가 빈 `Optional`을 반환하면서 각 스레드가 동시에 `save`를 호출하여 중복 저장되는 것이었습니다.
 
@@ -115,6 +122,8 @@ S 락은 **SELECT** 문에서 사용됩니다. S 락을 명시적으로 걸고 �
 ```sql
 SELECT * FROM place WHERE ... FOR SHARE;
 ```
+<br>
+<br>
 
 참고로 `FOR SHARE`를 붙이지 않은 일반적인 `SELECT` 문은 아무런 락을 걸지 않고 데이터를 조회합니다.
 이 경우 다른 트랜잭션에서 락을 걸어 둔 상태에서도 데이터를 읽을 수 있습니다.
@@ -134,6 +143,9 @@ X 락은 주로 `INSERT`, `UPDATE`, `DELETE` 같은 **쓰기 작업**을 수행�
 ```sql
 SELECT * FROM place WHERE ... FOR UPDATE;
 ```
+<br>
+<br>
+
 
 `FOR UPDATE`를 사용하면 해당 데이터를 읽어오는 동시에 X 락이 걸려, 다른 트랜잭션에서 S 락 또는 X 락을 획득하지 못하도록 방지할 수 있습니다.
 <br>
@@ -200,6 +212,8 @@ public interface PlaceRepository extends JpaRepository<Place, Long> {
     Optional<Place> findByNameAndLatitudeAndLongitude(String name, String lat, String lng);
 }
 ```
+<br>
+<br>
 
 이렇게 설정하면 10개의 스레드가 동시에 `findByNameAndLatitudeAndLongitude`를 호출하더라도, X 락은 하나의 스레드만 획득하게 되고 나머지 9개 스레드는 락을 얻지 못한 상태에서 대기하게 됩니다.
 
@@ -214,6 +228,8 @@ public interface PlaceRepository extends JpaRepository<Place, Long> {
 ```sql
 create index place_idx on place(name, latitude, longitude);
 ```
+<br>
+<br>
 
 
 이후 테스트를 진행해 보니, 데드락이 발생했습니다. 
@@ -248,6 +264,8 @@ insert into place(created_at, name, latitude, longitude)
   
 rollback;
 ```
+<br>
+<br>
 
 MySQL의 락은 트랜잭션이 **커밋**되거나 **롤백**될 때 해제되므로, 먼저 트랜잭션을 시작했습니다.
 
@@ -259,10 +277,14 @@ MySQL의 락은 트랜잭션이 **커밋**되거나 **롤백**될 때 해제되�
 ```sql
 SELECT * FROM performance_schema.data_locks;
 ```
+<br>
+<br>
 
 결과는 다음과 같았습니다:
 
 ![](https://i.imgur.com/BVkfm8r.png)
+<br>
+<br>
 
 
 두 트랜잭션이 `X, GAP` 락을 동시에 획득한 것을 볼 수 있습니다.
@@ -330,6 +352,8 @@ PK 인덱스를 스캔할 때 모든 범위를 스캔하여 전체에 락을 걸
 하지만 테이블이 비어 있는 경우에는 데드락이 발생할 수 있습니다. PK 인덱스를 스캔해도 결과가 나오지 않게 되며, 이때 Supremum pseudo-record X 락이 걸리면서 여러 트랜잭션이 동시에 획득할 수 있게 됩니다:
 
 ![](https://i.imgur.com/fB6J4zc.png)
+<br>
+<br>
 
 따라서 데드락이 발생하게 됩니다.
 <br>
@@ -341,15 +365,43 @@ PK 인덱스를 스캔할 때 모든 범위를 스캔하여 전체에 락을 걸
 그렇다면 인덱스 없이 X 락을 걸면 동시성 문제가 해결된 것일까요? 
 테이블이 비어 있는 경우에는 인덱스가 없더라도 데드락이 발생할 수 있지만, 실제 프로덕션 환경에서 테이블이 비어 있을 확률은 매우 낮기 때문에 이는 큰 고려 대상이 아닙니다.
 
-인덱스 없이 X 락을 걸면 동시성 문제는 해결할 수 있지만, 이로 인해 해당 컬럼에 인덱스를 더 이상 걸 수 없다는 제약이 생기게 됩니다. 이는 큰 단점이라고 생각했습니다. 또한, SELECT ... FOR UPDATE는 동시성이 매우 떨어지는 방식이기 때문에 성능 저하 문제도 발생할 수 있습니다.
+인덱스 없이 X 락을 걸면 동시성 문제는 해결할 수 있지만, 이로 인해 해당 컬럼에 인덱스를 더 이상 걸 수 없다는 제약이 생기게 됩니다. unique 를 걸게되면 인덱스가 생성되기 때문에, 해당 컬럼들에 대해 unique 제약 조건도 걸 수 없게 됩니다. 이는 큰 단점이라고 생각했습니다. 
+
+또한, SELECT ... FOR UPDATE는 동시성이 매우 떨어지는 방식이기 때문에 성능 저하 문제도 발생할 수 있습니다.
+<br>
+<br>
 
 따라서 다른 방식을 모색하면서 unique 제약 조건을 설정하고 충돌 시 재시도하는 방법이나, READ UNCOMMITTED와 함께 애플리케이션 레벨에서 synchronized를 사용하는 방법을 고려해 보았지만, 두 방식 모두 우아하지 않다고 생각했습니다.
 <br>
 <br>
 <br>
 
+# 우아한 해결 방법 - `INSERT IGNORE`
+다른 방법들을 모색하던 중 INSERT IGNORE에 대해 알게 되었습니다. 이 쿼리는 중복된 unique key 또는 primary key를 삽입하려고 할 때 해당 삽입을 무시하고 에러를 발생시키지 않는 쿼리입니다.
 
+이 방식을 사용하면 추가적인 락을 걸지 않고, unique 제약 조건이 충돌해도 롤백 및 재시도가 필요 없기 때문에 성능 저하를 방지할 수 있습니다. 또한 트랜잭션 격리 수준을 낮추지 않아도 되기 때문에 데이터의 정합성도 여전히 유지할 수 있습니다.
 
+JPQL이나 QueryDSL에서는 직접 지원하지 않기 때문에, 다음과 같이 native 쿼리를 사용해야 합니다:
+
+```java
+@Modifying(clearAutomatically = true)  
+@Transactional  
+@Query(value = "INSERT IGNORE INTO place (name, latitude, longitude) VALUES (:name, :latitude, :longitude)", nativeQuery = true)
+int saveWithoutDuplication(String name, String lat, String lng);
+```
+<br>
+<br>
+
+실제로 테스트를 진행해본 결과, 데드락이나 unique 충돌 없이 동시성 문제를 효과적으로 해결한 것을 확인할 수 있었습니다.
+
+![](https://i.imgur.com/VtZbxuH.png)
+
+native 쿼리를 사용해야 한다는 점은 단점일 수 있지만, 트레이드오프를 고려했을 때 이 단점은 충분히 감수할 수 있을 만큼 장점이 많습니다.
+
+따라서 `INSERT IGNORE` 를 이용해 동시성 문제를 해결하였습니다.
+<br>
+<br>
+<br>
 
 # 참고 자료
 [1] https://dev.mysql.com/doc/refman/8.4/en/innodb-locking.html
