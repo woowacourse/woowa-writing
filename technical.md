@@ -35,9 +35,9 @@
 
 ![](https://velog.velcdn.com/images/chch1213/post/eacf6fac-ce97-449b-b74a-cbbdfb509628/image.png)
 
-EC2 생성 시 주요한 사항으로 보아야 하는 것은 운영체제, RAM, 스토리지 용량 이라고 생각합니다.
+EC2 생성 시 주요한 사항으로 보아야 하는 것은 운영체제, RAM, 스토리지 용량 입니다.
 
-최근 생성할 때 보니 `macOS` 나 `Windows` 도 지원하던데 당연히 라이센스 비용으로 가격이 비쌀테고, 익숙하고 서버관리에 용의한 `Ubuntu` 를 선택하게 되었습니다.
+`macOS` 나 `Windows` 도 있지만 라이센스 비용이 비쌀테고, 저렴하고 서버관리에 용의한 `Ubuntu` 를 선택하는 것이 좋습니다.
 
 ![](https://velog.velcdn.com/images/chch1213/post/469405c8-b39d-45b4-8c68-9e532b72b1cc/image.png)
 
