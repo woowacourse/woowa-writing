@@ -23,9 +23,9 @@
     - Work
     - WorkRequest
   - WorkManager의 동작 방식
-  - WorkManager를 사용하며 맞닥트린 문제들
-    - 동일한 tag를 가진 작업 중 가장 최근에 완료된 작업을 찾기
-    - WorkManager에 너무 많은 작업이 쌓이면 어떻게 될까
+- WorkManager의 한계점
+  - Foreground Service + AlarmManager 마이그레이션
+  - Foreground Service + AlarmManager의 단점 보완하기
 - 참고 자료
 
 <br>
@@ -127,7 +127,7 @@ Foreground Service는 많은 기기 리소스를 사용할 수 있기 때문에,
 
 백그라운드 작업 도입 과정을 설명하기 전에, 우리 앱은 어떤 앱인지와 어떤 기능을 백그라운드 작업으로 실행하려고 하는지를 말해야 할 것 같다.  
 먼저 우리 앱 오디를 한마디로 정의하자면 “원만한 친구 사이를 위한 약속 지킴이 서비스"다.  
-앱 기능 중 “사용자 위치 현황” 기능이 있다.  
+앱 기능 중 “도착 현황” 기능이 있다.  
 
 
 <img width="300" alt="image" src="https://github.com/user-attachments/assets/b6b127be-16f9-43d3-9375-082bba33ac6e">  <img width="300" alt="image" src="https://github.com/user-attachments/assets/cc616d76-4816-449a-8f5c-74082f18792b">  
@@ -209,6 +209,8 @@ class EtaWorker(context: Context, workerParameters: WorkerParameters) :
 - `WorkRequest`의 id, 상태 등을 담고 있는 클래스다.
 - `ENQUEUED`, `RUNNING`, `SUCCEEDED`, `FAILED`, `BLOCKED`, `CANCELLED`의 6개 State를 가진다.
 
+<br>
+
 ### WorkManager의 동작 방식
 <img width="800" alt="image" src="https://github.com/user-attachments/assets/9f6fd7db-d8ee-4925-a08a-7ff95d1a5acc">  
 
@@ -217,14 +219,122 @@ class EtaWorker(context: Context, workerParameters: WorkerParameters) :
 3. WorkManager에 WorkRequest를 `enqueue()`한다.  
 4. WorkManager에서 id 또는 tag로 작업 결과를 받아온다.  
 
-### WorkManager를 사용하며 맞닥트린 문제들
-#### 동일한 tag를 가진 작업 중 가장 최근에 완료된 작업을 찾기
-#### WorkManager에 너무 많은 작업이 쌓이면 어떻게 될까
+우리 서비스에서는 아래와 같은 Flow로 구성되어 있다.
+1. 사용자가 약속에 참여한다.
+2. Worker가 약속 시간 30분 전에 수행될 수 있도록 큐에 등록한다.
+3. 약속 시간 30분 전애 Worker가 실행되어, 서버와 폴링 방식으로 통신한다.
+   3-1. 사용자가 도착 현황 화면에 진입하면, Worker의 가장 최근 결과값을 `LiveData`로 받아온다.
+4. 약속 시간이 지나면 Worker를 중단한다.
+
+## WorkManager의 한계점
+WorkManager로 기능을 개발하고 앱을 테스트하며, 예상치 못한 버그가 발생했다. 예약한 시간에 작업이 제대로 수행되지 않았다.
+그런데 작업이 수행되지 않는 상황과 되지 않는 상황을 명확히 정의할 수 없었다. 
+큐에 여러 작업이 쌓이면, 불규칙적으로 작업이 수행되지 않았다.
+
+<br>
+
+<img width="903" alt="스크린샷 2024-10-29 오후 4 40 52" src="https://github.com/user-attachments/assets/550273a6-006c-47bb-81da-fdb63c996f9e">
 
 
+WorkManager에서 스케줄링할 수 있는 작업의 개수를 지정할 수 있는 `setMaxSchedulerLimit()` 함수가 있다.  
+[안드로이드 공식 문서](https://developer.android.com/reference/androidx/work/Configuration.Builder#setMaxSchedulerLimit(kotlin.Int))에 따르면, 최대 작업의 개수는 50개다.
+
+<br>
+
+이를 해결하기 위해 아래와 같은 방식을 시도해 보았다. 결과적으로는 모두 실패다.    
+한 약속 당 적은 수의 Worker를 생성해서 예약한 시간이 Worker가 실행된다고 해도, 약 30분 동안 폴링 작업을 수행해야 하기 때문에 Worker가 중간에 취소되는 문제가 있었다.   
+WorkManager는 신속하게 처리되어야 하거나 일정 주기마다 처리되어야 하는 작업, 몇 분 안에 끝나는 짧은 작업에 적합하도록 설계되어 있다.   
+리팩터링 과정은 [노션 페이지](https://sly-face-106.notion.site/eta-cc11715e571d42e5b4153cbcc6d0ca77?pvs=74)에 자세히 정리해 두었으니, 궁금하신 분들은 참고해도 좋다.   
+
+- 한 약속 당 10초 간격의 모든 폴링 작업을 WorkManager 큐에 쌓아둔다.
+- 한 약속 당 하나의 Worker를 WorkManager 큐에 쌓아둔다. 하나의 Worker가 실행되면 그 안에서 10초 간격으로 폴링 작업을 수행한다.
+- WorkManager와 AlarmManager를 함께 사용한다.
+
+<br>
+
+### Foreground Service + AlarmManager 마이그레이션
+결국 해당 기능이 Foreground Service에서 동작할 수 있도록 마이그레이션했다.   
+위에서 말했듯, Foreground Service로 수행하는 작업은 우선순위가 높다.   
+
+Foreground Service는 특정 시간에 Service를 시작할 수 있도록 예약하는 기능이 없기 때문에, AlarmManager를 함께 사용했다.   
+마이그레이션 후 Flow는 아래와 같다.   
+1. 사용자가 약속에 참여한다.
+2. AlarmManager에 약속 시간 30분 전 Service 시작 Alarm을 예약한다.
+3. AlarmManager에 약속 시간 이후 Service 중단 Alarm을 예약한다.
+4. 약속 시간 30분 전에 작업이 Foreground Service가 실행되어, 서버와 폴링 방식으로 통신한다.
+5. 약속 시간이 지나면 Foreground Service가 중단된다.
+
+<br>
+
+### Foreground Service + AlarmManager의 단점 보완하기
+AlarmManager는 WorkManager에 비해 개발자가 더 고려해야 할 사항들이 많다. 최대한 WorkManager를 사용하는 것과 기능적 차이가 없도록 구현하고자 노력했다.    
+AlarmManager의 단점에는 어떤 것이 있고, 어떻게 보완했는지 알아보자.   
+
+1. 작업 결과를 LiveData로 받아와 비동기적으로 UI 데이터 갱신하기    
+
+WorkManager에는 Worker가 각각 있고, 이 Worker에 대한 결과를 LiveData나 Flow로 가져올 수 있었다.   
+반면에 AlarmManager는 작업 결과를 따로 저장하지 않는다.   
+작업이 수행될 때마다 결과를 저장하기 위해, 안드로이드 로컬 데이터베이스 중 하나인 Room을 사용했다.   
+```kotlin
+@Dao
+interface MateEtaInfoDao {
+    @Upsert
+    suspend fun upsert(mateEtaInfoEntity: MateEtaInfoEntity)
+
+    @Query("SELECT mate_etas FROM eta_info WHERE meetingId = :meetingId")
+    fun getMateEtas(meetingId: Long): LiveData<List<MateEta>>
+}
+```
+결과를 저장하고 가져오는 Dao 코드 중 일부다.   
+upsert()를 통해 하나의 약속에 해당하는 작업 수행 결과를 저장한다.   
+getMateEtas()를 통해 하나의 약속에 해당하는 작업 수행 결과를 가져온다. 이 때, 반환타입이 LiveData<T> 형태다.   
+반환타입을 LiveData나 Flow로 감싸면, Room 내부적으로 비동기적으로 데이터를 갱신한다.  
+사용자에게 보여지는 화면에서도 비동기적으로 데이터를 갱신할 수 있었다.  
+
+2. 로그아웃 시 Alarm을 제거하기 
+로그아웃 시에는 AlarmManager에 예약된 Alarm들이 수행되지 않아야 한다.  
+이미 앱에서 로그아웃을 한 상태인데, 로그인 후 이용할 수 있는 기능을 위한 예약을 수행할 필요가 없기 때문이다.   
+
+```kotlin
+        fun logout() {
+            viewModelScope.launch {
+                matesEtaRepository.clearEtaReservation(isReservationPending = true)
+            }
+        }
+
+        fun loginWithKakao(context: Context) {
+            viewModelScope.launch {
+                loginRepository.login(context)
+                    .onSuccess {
+                        // ...
+                        matesEtaRepository.reserveAllEtaReservation()
+                    }
+            }
+        }
+```
+로그아웃 시 AlarmManager에 예약된 Alarm을 모두 삭제했다.  
+이후 재로그인 했을 때는 정상적으로 Alarm이 수행되어야 하므로, 완전히 삭제하지는 않고 Room에 저장해둔 Alarm들을 다시 AlarmManager에 등록하는 과정을 거쳤다.  
+
+하지만 이 방식에도 한계점이 있다. 하나의 기기에서 로그아웃 하고 다른 계정으로 다시 로그인했을 때, 이전 계정의 Alarm들이 수행된다는 것이다.  
+개선하기 위해서는 서버에 사용자 별 Alarm들을 저장해두고, 로그인 시마다 사용자의 Alarm을 서버에서 받아올 수 있겠다.  
+물론 폴링 작업과 백그라운드 예약을 개선하기 위해서는, 서버와 웹 소켓으로 통신하는 방식이 최선일 것이다.  
+
+
+3. 탈퇴 시 Alarm을 제거하기 
+로그아웃과 마찬가지로 탈퇴 시에도 AlarmManager에 예약된 Alarm들이 수행되지 않아야 한다.  
+하지만 로그아웃과 다른 점은, 재로그인 했을 때도 Alarm이 수행될 수 없다.
+탈퇴 시에는 Room에 저장해둔 Alarm까지 삭제하는 방식으로 구현했다.
+
+<br>
 
 # 마무리 하며
-안드로이드 백그라운드 작업 종류에서 말했듯이, 안드로이드는 우선순위가 높은 백그라운드 작업과 우선순위가 낮은 백그라운드 작업이 있다. 내가 개발해야 하는 기능은 항상 실행되어야 할, 우선순위가 높은 백그라운드 작업이었다. 하지만 WorkManager는 상황에 따라 지연될 수 있는 백그라운드 작업에 적합한 API다. 즉, 적절하지 않은 API를 선택했고 그래서 예약한 시간에 작업이 실행되지 않는 문제가 발생했다. 개발 마감일에 쫓기느라, 백그라운드 작업 API를 꼼꼼히 비교하지 않고 선택한 점이 아쉽다.
+안드로이드 백그라운드는 배터리 수명을 최적화하기 위해서 제약 사항이 많다.  
+글 초반에 말했듯이 우선순위가 높은 백그라운드 작업과 우선순위가 낮은 백그라운드 작업이 있다/
+
+내가 개발해야 하는 기능은 항상 실행되어야 할, 우선순위가 높은 백그라운드 작업이었다.
+하지만 WorkManager는 상황에 따라 지연될 수 있는 백그라운드 작업에 적합한 API다.  
+즉, 적절하지 않은 API를 선택했고 그래서 예약한 시간에 작업이 실행되지 않는 문제가 발생했다.
+개발 마감일에 쫓기느라 백그라운드 작업 API를 꼼꼼히 비교하지 않고 선택한 점이 아쉽고, 상황에 따라 적절한 백그라운드 API를 사용해야 함을 몸소 느꼈다.
 
 # 참고 자료
 https://developer.android.com/develop/background-work/services?hl=ko  
