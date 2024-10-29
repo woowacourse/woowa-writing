@@ -31,15 +31,19 @@
 
 ## OAuth란?
 
-### OAuth란 무엇인가? 애플리케이션과 서드파티 서비스 간의 안전한 소통
+### OAuth란 무엇인가: 애플리케이션과 서드파티 서비스 간의 안전한 소통
 
-애플리케이션이 다른 서비스에 안전하게 접근하기 위해서는 사용자의 비밀번호를 직접 사용하지 않고, 안전한 방식으로 권한을 위임받을 필요가 있습니다. OAuth는 바로 이 문제를 해결하는 표준 프로토콜입니다.
+서드파티 서비스란 `제3자(다른 회사)가 제공하는 서비스`를 의미합니다.
+
+예를 들어, 우리가 만든 애플리케이션이 퍼스트 파티 서비스라면, 다른 회사(제3자)에서 만든 기능을 가져와 우리 애플리케이션에 붙여 사용하는 것을 서드파티 서비스 사용이라고 합니다. 구글 로그인, 네이버 지도, 결제 서비스 같은 기능들이 대표적인 서드파티 서비스입니다.
+
+우리 애플리케이션이 이런 외부 서비스에 안전하게 접근하려면, 사용자 비밀번호를 직접 사용하는 대신, 안전한 방식으로 권한을 위임받을 필요가 있습니다. 이때, OAuth가 바로 이러한 문제를 해결해 주는 표준 프로토콜입니다.
 
 <br>
 
 **OAuth는 무엇을 해결할까요?**
 
-OAuth는 사용자의 민감한 자격 증명 정보(예: 비밀번호)를 직접 취급하지 않고도 서드파티 서비스에 안전하게 접근할 수 있게 해줍니다. 이를 통해 애플리케이션은 사용자를 대신하여 다양한 서비스의 리소스에 접근할 수 있습니다.
+OAuth는 사용자의 민감한 자격 증명 정보(비밀번호 등)를 직접 취급하지 않고도 서드파티 서비스에 안전하게 접근할 수 있게 해줍니다. 이를 통해 애플리케이션은 사용자를 대신하여 다양한 서비스의 리소스에 접근할 수 있습니다.
 
 대표적인 예로, 여러분이 Facebook 계정으로 다양한 웹사이트에 로그인하거나, Google Drive에 있는 파일을 다른 애플리케이션에서 접근할 수 있게 하는 방법이 있습니다.
 
@@ -47,7 +51,7 @@ OAuth는 사용자의 민감한 자격 증명 정보(예: 비밀번호)를 직�
 
 **OAuth의 핵심 개념**
 
-사용자는 애플리케이션이 자신의 정보를 접근할 수 있도록 일부 권한만 위임하는 액세스 위임을 합니다. 이때 비밀번호를 제공할 필요는 없습니다. OAuth는 애플리케이션이 사용자를 대신해 서드파티 API와 통합하는 방법을 제공합니다.
+사용자는 애플리케이션이 자신의 정보를 접근할 수 있도록 일부 권한만 위임하는 `액세스 위임`을 합니다. 이때 비밀번호를 제공할 필요는 없습니다. OAuth는 애플리케이션이 사용자를 대신해 서드파티 API와 통합하는 방법을 제공합니다.
 
 대표적인 예로 소셜 로그인이나, 클라우드 저장소 접근 등이 있습니다. 사용자가 음악 스트리밍 서비스에서 Spotify 계정을 연결할 때, Spotify의 로그인 정보를 해당 서비스에 직접 제공하지 않고, OAuth를 통해 Spotify 계정의 음악 라이브러리에 접근할 수 있게 됩니다.
 
@@ -114,9 +118,9 @@ Resource Server는 말 그대로 리소스를 보유한 서버입니다. 주로 
 
 > 누가 권한을 확인하고 발급할까?
 
-Authorization Server는 사용자를 인증하고, 액세스 토큰을 발급해주는 역할을 합니다. 예를 들어, Github OAuth를 사용할 때, 사용자가 Github 계정으로 로그인하면 Authorization Server가 사용자가 제대로 인증되었는지 확인하고, 액세스 토큰을 발급해줍니다.
+Authorization Server는 백엔드에서 관리하는 서버로 사용자를 인증하고, 액세스 토큰을 발급해주는 역할을 합니다. 예를 들어, Github OAuth를 사용할 때, 사용자가 Github 계정으로 로그인하면 Authorization Server가 사용자가 제대로 인증되었는지 확인하고, 액세스 토큰을 발급해줍니다.
 
-참고: 어떤 경우에는 클라이언트가 Authorization Server 없이 바로 Resource Server에 접근할 수 있는 경우도 있습니다.
+참고: 어떤 경우에는 Client가 Authorization Server 없이 바로 Resource Server에 접근할 수 있는 경우도 있습니다.
 
 <br>
 
@@ -124,7 +128,7 @@ Authorization Server는 사용자를 인증하고, 액세스 토큰을 발급해
 
 > 권한을 부여받은 열쇠
 
-Access Token은 클라이언트가 리소스 서버에 접근할 수 있도록 부여받는 토큰입니다. 이 토큰은 보통 짧은 유효 기간을 가지고 있으며, 클라이언트가 리소스 서버에 API 요청을 보낼 때 **헤더(Header)**에 포함시켜 보냅니다. 예를 들어, Github API에 요청을 보낼 때 이 토큰을 사용해 사용자 정보를 불러옵니다.
+Access Token은 Client나 Authorization Server가 리소스 서버에 접근할 수 있도록 부여받는 토큰입니다. 이 토큰은 보통 짧은 유효 기간을 가지고 있으며, Client가 서버에 API 요청을 보낼 때 `헤더(Header)`에 포함시켜 보냅니다. 예를 들어, Github API에 요청을 보낼 때 이 토큰을 사용해 사용자 정보를 불러옵니다.
 
 <br>
 
@@ -134,14 +138,20 @@ Access Token은 클라이언트가 리소스 서버에 접근할 수 있도록 �
 
 Refresh Token은 Access Token이 만료된 후, 새로운 Access Token을 발급받을 때 사용하는 토큰입니다. 일반적으로 Access Token보다 더 긴 유효 기간을 가지고 있으며, 사용자가 다시 로그인하지 않고도 새로운 Access Token을 받을 수 있게 해줍니다.
 
+만약 Refresh Token도 만료되면 사용자는 재로그인을 하여 다시 인증을 받아야 합니다.
+
 <br>
 <br>
 
 ## OAuth 로그인 과정
 
-Authorization Server가 없는 경우에는 Client가 사용자의 자격 증명(아이디, 비밀번호)을 사용해 직접 Resource Server에 접근하여 데이터를 요청하고 응답을 받습니다.
+**❌ Authorization Server가 없는 경우**
 
-Authorization Server가 있는 경우에는 Authorization Server를 통해 Access Token을 발급받고, 이후 Access Token을 사용해 Resource Server에 직접 접근하여 데이터를 요청하고 응답을 받습니다. 그 응답 받은 데이터를 Authorization Server가 Client에 전달합니다.
+Client가 사용자의 자격 증명(아이디, 비밀번호)을 사용해 직접 Resource Server에 접근하여 데이터를 요청하고 응답을 받습니다.
+
+**⭕ Authorization Server가 있는 경우**
+
+Authorization Server를 통해 Access Token을 발급받고, 이후 Access Token을 사용해 Resource Server에 직접 접근하여 데이터를 요청하고 응답을 받습니다. 그 응답 받은 데이터를 Authorization Server가 Client에 전달합니다.
 
 <br>
 <br>
@@ -154,26 +164,20 @@ Authorization Server가 있는 경우에는 Authorization Server를 통해 Acces
 
 <br>
 
-❗ 참고
+**❗ 참고**
 
-```
-현재 서비스에서는 Authorization Server에 사용자 정보를 저장해야 하기 때문에
-Authorization Server가 Resource Server로부터 발급받은 Access Token으로 User Info를 받은 후
+현재 저희 서비스에서는 Authorization Server에 사용자 정보를 저장해야 하기 때문에  
+Authorization Server가 Resource Server로부터 발급받은 Access Token으로 User Info를 받은 후  
+Authorization Server가 자체 생성한 Access Token과 Refresh Token, 그리고 응답 받은 User Info를 Client에게 넘겨줍니다.
 
-Authorization Server가 자체 생성한 Access Token과 Refresh Token,
-그리고 응답 받은 User Info를 Client에게 넘겨줍니다.
-```
+따라서 Frontend 개발자가 해야할 일은  
+`Resource Server로부터 발급 받은 Code를 Authorization Server에 보내는 일`입니다.  
+다음은 Frontend 개발자가 할 일에 관한 구현 과정입니다. (React로 구현)
 
-```
-따라서 Frontend 개발자가 해야할 일은
-Resource Server로부터 발급 받은 Code를 Authorization Server에 보내는 일입니다.
-다음은 Frontend 개발자가 할 일에 관한 구현 과정입니다. (React로 구현합니다.)
-
-1. OAuth application 등록하고 client_id 랑 client_secrets 값 발급
-2. 사용자를 로그인 시켜서 임시 토큰이라고 할 수 있는 code 값 얻기
-3. code값을 이용하여 Authorization Server에 로그인 요청
-4. Authorization Server가 준 Access Token, Refresh Token, User Info 저장
-```
+1\. OAuth application 등록하고 client_id 랑 client_secrets 값 발급  
+2\. 사용자를 로그인 시켜서 임시 토큰이라고 할 수 있는 code 값 얻기  
+3\. code값을 이용하여 Authorization Server에 로그인 요청  
+4\. Authorization Server가 준 Access Token, Refresh Token, User Info 저장
 
 <br>
 <br>
@@ -195,14 +199,14 @@ Application name
 
 Homepage URL
 
-- 서비스 URL, 개발 중이므로 `http://localhost:3000`를 넣었습니다.
+- 서비스 URL
 - 이 URL도 본인이 식별할 수 있는 URL이면 됩니다.
 
-Authorization callback URL
+Authorization callback URL (📢중요)
 
 - 미리 callback 페이지를 만들어두면 좋습니다.
-- 개발 중이므로 `http://localhost:3000/callback`을 넣었습니다.
-- 배포 시에는 배포한 url을 넣으면 됩니다.
+- 서비스 URL의 콜백 페이지 주소를 넣으면 됩니다.
+- ex) `http://localhost:3000/callback`
 
 ![3](https://github.com/user-attachments/assets/174c5cc5-6a9a-4232-9612-84c75497e1aa)
 
@@ -221,7 +225,7 @@ Client secrets
 
 - 절대 유출되면 안 되는 정보이므로 처음 발급받을 때 이후로는 깃허브에서도 확인을 할 수 없습니다.
 - Authorization Server에서 Resource Server로 api를 요청할 때 사용합니다.
-- Authorization Server는 서브 모듈에 Client secrets를 저장합니다.
+- Authorization Server는 보안된 환경(서브 모듈)에 Client secrets를 저장합니다.
 
 ![4](https://github.com/user-attachments/assets/9beee5dc-8cd8-4981-b431-82f4b140239d)
 
@@ -241,7 +245,7 @@ Client secrets
 ### 3. Github OAuth로 리다이렉트
 
 - Resource Owner(사용자)에게 인증을 요청합니다.
-- 발급 받은 client_id와 백엔드와 정한 scope로 Github OAuth URL를 생성합니다.
+- 발급 받은 `client_id`와 백엔드와 정한 `scope`로 Github OAuth URL를 생성합니다.
 
 ![7](https://github.com/user-attachments/assets/09940612-5417-43e0-a7cb-34aac53b14fc)
 
@@ -259,11 +263,7 @@ const App = () => {
     window.open(githubAuthUrl, "_self");
   };
 
-  return (
-    <>
-      <button onClick={handleLogin}>로그인</button>
-    </>
-  );
+  return <button onClick={handleLogin}>로그인</button>
 };
 
 export default App;
@@ -288,31 +288,33 @@ export default App;
 
 <br>
 
-4\. 로그인 post 요청을 받은 Authorization Server는 client_id, client_secrets, code를 이용하여 Resource Server에 [access Token을 요청](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps)합니다.
+4\. 로그인 post 요청을 받은 Authorization Server는 Client ID, Client secrets, code를 이용하여 Resource Server에 [Access Token을 요청](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps)합니다.
 
 ![1000](https://github.com/user-attachments/assets/b85d482d-64b3-4c64-9845-38eab699e4dc)
 
 <br>
 
-5\. Authorization Server는 발급 받은 access Token을 header에 담아서 Resource Server에 [user Info를 요청](https://docs.github.com/ko/rest/users/users?apiVersion=2022-11-28)합니다.
+5\. Authorization Server는 발급 받은 Access Token을 header에 담아서 Resource Server에 [User Info를 요청](https://docs.github.com/ko/rest/users/users?apiVersion=2022-11-28)합니다.
 
 ![1001](https://github.com/user-attachments/assets/705b911f-a2b4-4bf7-869e-2665a9aec7ae)
 
 <br>
 
-6\. Authorization Server는 자체 생성한 access Token, refresh Token 그리고 Resource Server로 부터 받은 user Info를 Client에 넘겨줍니다.
+6\. Authorization Server는 자체 생성한 Access Token, Refresh Token 그리고 Resource Server로 부터 받은 User Info를 Client에 넘겨줍니다.
 
 <br>
 
-7\. Client는 이를 기기에 저장한 후 access Token을 header에 담아서 api를 요청하는 데에 사용합니다.
+7\. Client는 이를 기기에 저장한 후 Access Token을 header에 담아서 api를 요청하는 데에 사용합니다.
 
 ![9](https://github.com/user-attachments/assets/7c294a7b-c2e4-4fd6-8451-26a1b1df349a)
 
 <br>
 
-**Callback 페이지 코드**
+**<mark style='background-color: #fff5b1'>Callback 페이지 코드</mark>**
 
-Frontend 개발자가 할 일은 1, 2, 3, 7번 입니다. 4, 5, 6번은 Backend 개발자가 Authorization Server와 Resource Server 사이에서 데이터를 주고 받는 코드를 작성하면 됩니다.
+Frontend 개발자가 할 일은 1, 2, 3, 7번 입니다.
+
+4, 5, 6번은 Backend 개발자가 Authorization Server와 Resource Server 사이에서 데이터를 주고 받는 코드를 작성하면 됩니다.
 
 ```tsx
 // 1. Callback 페이지 (Github 로그인을 하면 자동으로 넘어옵니다)
@@ -367,13 +369,13 @@ export default CallbackPage;
 
 2\. Client는 이 code로 Authorization Server에 `로그인 post` 요청을 합니다.
 
-3\. Authorization Server는 client ID, client secrets, code를 이용하여 Resource Server에 access Token을 요청합니다.
+3\. Authorization Server는 Client ID, Client secrets, code를 이용하여 Resource Server에 Access Token을 요청합니다.
 
-4\. Authorization Server는 발급 받은 access Token을 header에 담아서 Resource Server에 user Info를 요청합니다.
+4\. Authorization Server는 발급 받은 Access Token을 header에 담아서 Resource Server에 User Info를 요청합니다.
 
-5\. Authorization Server는 자체 생성한 access Token, refresh Token과 Resource Server로 부터 받은 user Info를 Client에 넘겨줍니다.
+5\. Authorization Server는 자체 생성한 access Token, refresh Token과 Resource Server로 부터 받은 User Info를 Client에 넘겨줍니다.
 
-6\. Client는 이를 기기에 저장한 후 access Token을 header에 담아서 api를 요청하는 데에 사용합니다.
+6\. Client는 이를 기기에 저장한 후 Access Token을 header에 담아서 api를 요청하는 데에 사용합니다.
 
 <br>
 <br>
@@ -384,7 +386,7 @@ export default CallbackPage;
 
 <br>
 
-**refresh Token이 만료됐을 때**
+**🕓 refresh Token이 만료됐을 때**
 
 1\. Client는 localStorage를 clear합니다.
 
@@ -392,11 +394,11 @@ export default CallbackPage;
 
 <br>
 
-**로그아웃을 눌렀을 때**
+**🖱 로그아웃을 눌렀을 때**
 
 1\. Client는 localStorage를 clear한 후 `로그아웃 post`를 요청합니다.
 
-2\. Authorization Server는 로그아웃 post를 요청 받으면 DB에 있는 refresh Token을 삭제합니다.
+2\. Authorization Server는 로그아웃 post를 요청 받으면 DB에 있는 Refresh Token을 삭제합니다.
 
 <br>
 <br>
@@ -411,14 +413,10 @@ export default CallbackPage;
 
 <br>
 
-**로그아웃 코드**
+**<mark style='background-color: #fff5b1'>로그아웃 코드</mark>**
 
 ```tsx
-import { useNavigate } from "react-router-dom";
-
 const LogoutPage = () => {
-  const navigate = useNavigate();
-
   const handleLogoutClick = async () => {
     try {
       await postLogout(); // 로그아웃 요청
@@ -428,11 +426,7 @@ const LogoutPage = () => {
     }
   };
 
-  return (
-    <>
-      <button onClick={handleLogoutClick}>로그아웃</button>
-    </>
-  );
+  return <button onClick={handleLogoutClick}>로그아웃</button>;
 };
 
 export default LogoutPage;
