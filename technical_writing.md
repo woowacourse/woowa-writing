@@ -6,11 +6,12 @@
 예를 들어, 같은 데이터에 대해 동시에 접근하려는 트랜잭션 간의 충돌이나 데드락(교착 상태)이 대표적인 문제입니다.
 이러한 동시성 이슈는 데이터의 일관성을 깨뜨릴 뿐만 아니라, 애플리케이션의 성능 저하와 사용자의 불편으로 이어질 수 있습니다.
 
-이 글에서는 MySQL의 락 메커니즘과 트랜잭션 격리 수준을 바탕으로 동시성 문제를 이해하고, 실제로 제가 겪었던 '존재하지 않는 레코드'에 대한 동시성 문제를 해결한 경험을 공유하려고 합니다.
+이 글에서는 MySQL의 락 메커니즘을 바탕으로 동시성 문제를 이해하고, 실제로 제가 겪었던 '존재하지 않는 레코드'에 대한 동시성 문제를 해결한 경험을 공유하려고 합니다.
 
 저의 경험을 통해 동시성 이슈를 해결할 때 주의해야 할 점들과 문제 해결의 다양한 접근 방식을 공유함으로써, 여러분도 비슷한 문제를 겪을 때 조금 더 수월하게 해결해 나갈 수 있기를 바랍니다.
 
 그럼, 동시성 이슈의 기본 개념부터 시작해보겠습니다.
+<br>
 <br>
 
 # 동시성 이슈란?
@@ -23,6 +24,7 @@
 만약 DB나 어플리케이션에서 동시성 문제를 제대로 처리하지 않으면, A와 B 둘 다 같은 자리에 대해 예매를 성공하는 문제가 발생할 수 있습니다.
 
 이러한 이유로 개발자는 동시성 문제를 잘 처리할 수 있어야 합니다.
+<br>
 <br>
 
 # 문제 발생 상황
@@ -52,6 +54,7 @@ public interface PlaceRepository extends JpaRepository<Place, Long> {
 ```
 
 이 메소드는 DB에 해당 장소가 존재하면 해당 장소를 반환하고, 존재하지 않을 경우 새로 저장한 후 반환하는 방식으로 동작합니다.
+<br>
 <br>
 
 ## 문제 재현
@@ -95,6 +98,8 @@ Query did not return a unique result: 10 results were returned
 
 왜 데드락이 발생했는지 살펴보기 전에, 먼저 MySQL에서 제공해주는 S/X 락에 대해 간략하게 설명하겠습니다.
 <br>
+<br>
+<br>
 
 # MySQL에서의 락 - S락/X락
 
@@ -105,7 +110,7 @@ S 락(공유 락)은 **읽기 락**이라고도 불리며, 여러 트랜잭션�
 예를 들어, 트랜잭션 A가 S 락을 획득한 상태에서도 트랜잭션 B가 동일한 데이터에 대해 S 락을 추가로 획득할 수 있습니다.
 이렇게 S 락은 트랜잭션 간에 **공유**가 가능하기 때문에, 여러 트랜잭션이 동시에 데이터를 읽을 수 있도록 허용됩니다.
 
-S 락은 주로 **SELECT** 문에서 사용됩니다. S 락을 명시적으로 걸고 싶을 때는 다음과 같이 `SELECT ... FOR SHARE`를 사용하면 됩니다:
+S 락은 **SELECT** 문에서 사용됩니다. S 락을 명시적으로 걸고 싶을 때는 다음과 같이 `SELECT ... FOR SHARE`를 사용하면 됩니다:
 
 ```sql
 SELECT * FROM place WHERE ... FOR SHARE;
@@ -113,6 +118,7 @@ SELECT * FROM place WHERE ... FOR SHARE;
 
 참고로 `FOR SHARE`를 붙이지 않은 일반적인 `SELECT` 문은 아무런 락을 걸지 않고 데이터를 조회합니다.
 이 경우 다른 트랜잭션에서 락을 걸어 둔 상태에서도 데이터를 읽을 수 있습니다.
+<br>
 <br>
 
 ## X 락 (**Exclusive Lock)**
@@ -130,6 +136,8 @@ SELECT * FROM place WHERE ... FOR UPDATE;
 ```
 
 `FOR UPDATE`를 사용하면 해당 데이터를 읽어오는 동시에 X 락이 걸려, 다른 트랜잭션에서 S 락 또는 X 락을 획득하지 못하도록 방지할 수 있습니다.
+<br>
+<br>
 <br>
 
 # S 락을 걸어보자
@@ -149,6 +157,7 @@ public interface PlaceRepository extends JpaRepository<Place, Long> {
 }
 ```
 <br>
+<br>
 
 ## 데드락 발생
 
@@ -158,15 +167,27 @@ public interface PlaceRepository extends JpaRepository<Place, Long> {
 Exception in thread "pool-3-thread-4" org.springframework.dao.CannotAcquireLockException: could not execute statement [Deadlock found when trying to get lock; try restarting transaction] [insert into place (created_at,deleted_at,google_place_id,latitude,longitude,modified_at,name) values (?,?,?,?,?,?,?)]; SQL [insert into place (created_at,deleted_at,google_place_id,latitude,longitude,modified_at,name) values (?,?,?,?,?,?,?)]
 ```
 
-이 문제는 10개의 스레드가 동시에 `getPlace` 메서드를 호출하여 `findByNameAndLatitudeAndLongitude`를 수행할 때, 모두 S 락을 획득한 데서 비롯되었습니다.
-이후 각 스레드가 `save` 메서드를 호출하려고 할 때 X 락을 요청하지만, 이미 다른 스레드가 S 락을 걸고 있기 때문에 X 락을 획득할 수 없는 상황이 발생한 것입니다.
+지금부터 데드락이 발생한 원인을 살펴보겠습니다.
 
-즉, **10개의 스레드가 모두 S 락을 획득한 상태에서 서로 X 락을 기다리는 교착 상태(데드락)가 발생**하여 모든 스레드가 대기하는 상황에 빠진 것입니다.
+> `(name, latitude, longitude)` 컬럼에 인덱스가 설정되어 있는지에 따라 데드락의 원인이 다소 달라집니다. 인덱스가 없는 경우 테이블 전체(정확히는 기본 키(PK) 인덱스 전체)에 락이 걸리며, 인덱스가 있는 경우 갭 락이 발생하게 됩니다.
+> 
+> 우선 지금은 S 락이 공유 가능하다는 특징만 알고 있어도 충분하므로, 갭 락에 대해서는 뒤에서 설명드리겠습니다.
+
+
+위의 상황에서 10개의 스레드가 동시에 `getPlace` 메서드를 호출하면, `findByNameAndLatitudeAndLongitude`를 통해 각 스레드가 S 락을 동시에 획득합니다.
+
+이후 각 스레드가 `save` 메서드를 호출하여 X 락을 요청하지만, 이미 다른 스레드들이 S 락을 보유하고 있어 X 락을 획득할 수 없는 상태가 됩니다.
+
+즉, **10개의 스레드가 모두 S 락을 획득한 채 서로 X 락을 기다리는 데드락에 빠져, 모든 스레드가 대기하는 상황이 발생한 것입니다.**
+
+<br>
+<br>
 <br>
 
-# 그렇다면 X 락을 걸어보자
+# 그렇다면 X 락을 걸어보자 (인덱스가 없는 상황)
+앞에서 여러 스레드가 동시에 S 락을 획득하면서 데드락이 발생하는 상황을 확인했습니다. 그렇다면 만약 SELECT 시 X 락을 걸게 된다면 결과는 어떻게 될까요?
 
-조회에 X 락을 거는 것은 동시성이 많이 떨어지기 때문에 조심해서 사용해야 하지만, 일단 현재 문제를 해결할 수 있는지 확인하기 위해 X 락을 걸어 보았습니다:
+조회 시 X 락을 거는 것은 동시성을 크게 저하시킬 수 있어 신중히 사용해야 하지만, 현재 문제를 해결할 수 있는지 확인하기 위해 X 락을 설정해 보았습니다:
 
 ```java
 public interface PlaceRepository extends JpaRepository<Place, Long> {
@@ -176,11 +197,24 @@ public interface PlaceRepository extends JpaRepository<Place, Long> {
 }
 ```
 
-처음부터 `findByNameAndLatitudeAndLongitude`를 수행할 때 X 락을 걸면 데드락이 발생하지 않을 것이라 예상했기 때문이었습니다.
-X 락은 공유가 불가능하기 때문에 트랜잭션 하나씩만 락을 획득할 것이라 생각했기 때문입니다.
+이렇게 설정하면 10개의 스레드가 동시에 `findByNameAndLatitudeAndLongitude`를 호출하더라도, X 락은 하나의 스레드만 획득하게 되고 나머지 9개 스레드는 락을 얻지 못한 상태에서 대기하게 됩니다.
 
-## 또 다시 데드락 발생
-하지만 테스트 코드를 돌려보니 이번에도 데드락이 발생했습니다.
+이후 X 락을 획득한 스레드는 `save` 메서드를 호출할 때 다른 스레드가 추가적인 락을 걸지 않았기 때문에 저장에 성공할 수 있습니다. commit 시에는 X 락이 해제되고, 대기 중인 다른 스레드 중 하나가 X 락을 얻게 되어 데드락이 발생하지 않게 됩니다.
+
+(테이블이 비어져 있는 상황에서는 데드락이 발생하는데, 해당 내용은 뒤에서 자세히 설명합니다.)
+<br>
+<br>
+
+## 인덱스를 걸면 데드락이 발생한다
+우선 `(name, latitude, longitude)` 컬럼에 다음과 같이 인덱스를 추가했습니다:
+```sql
+create index place_idx on place(name, latitude, longitude);
+```
+
+
+이후 테스트를 진행해 보니, 데드락이 발생했습니다. 
+분명 X 락은 동시에 획득할 수 없다고 했는데, 왜 이런 문제가 생겼을까요?
+
 
 > 결론부터 말하자면, **존재하지 않는 레코드에 대해 락을 걸 때** 발생한 문제였습니다. 
 > `SELECT ... FOR UPDATE` 문을 실행할 때 스캔되는 인덱스의 결과가 없는 경우 MySQL은 갭 락이나 supremum pseudo-record X 락을 거는데, 해당 락은 서로 다른 트랜잭션이 동시에 획득 가능해서 발생한 문제였습니다.
@@ -222,6 +256,9 @@ SELECT * FROM performance_schema.data_locks;
 
 ![](https://i.imgur.com/LFzPV70.png)
 
+두 트랜잭션이 supremum pseudo-record X 락을 동시에 획득한 것을 볼 수 있습니다.
+
+<br>
 <br>
 
 ### 락은 인덱스와 밀접한 관계가 있다.
@@ -229,17 +266,17 @@ SELECT * FROM performance_schema.data_locks;
 
 이를 위해서는 먼저 락과 인덱스 사이의 관계를 이해해야 합니다.
 
-MySQL 공식 문서를 보면, SQL 은 S/X 락을 걸 때 레코드 단위로 락을 건다고 나와 있습니다.
+MySQL 공식 문서[1]를 보면, SQL 은 S/X 락을 걸 때 레코드 단위로 락을 건다고 나와 있습니다.
 좀 더 정확하게 설명하면, **SQL 문을 실행할 때 스캔되는 모든 인덱스 레코드에 락을 겁니다.**
 
-그런데 만약 SQL 문을 실행할 때 인덱스의 레코드를 단 하나도 스캔하지 못한다면 어떻게 될까요? 
+
+하지만 SQL 문 실행 시 인덱스의 레코드를 단 하나도 스캔하지 못한다면 어떻게 될까요? 이 경우 MySQL은 팬텀 리드를 방지하기 위해 갭 락(또는 Supremum pseudo-record X 락)을 걸게 됩니다.
+
+(참고로, READ COMMITTED 이하의 격리 수준에서는 인덱스의 레코드를 하나도 스캔하지 못할 때 갭 락을 걸지 않습니다.)
 
 
-현재 place 테이블은 테스트를 위해 비어져 있는 상황이었고, PK 를 제외하고는 어떠한 인덱스도 걸려 있지 않은 상황이었습니다.
-
-이 상황에서 `SELECT * FROM place WHERE ... FOR UPDATE` 를 실행하면 PK 인덱스를 스캔하는데, 현재 테이블이 비어 있기 때문에 인덱스 스캔 결과로 어떠한 레코드도 나오지 않게 됩니다.
-
-이때 MySQL은 supremum pseudo-record X 락을 겁니다.
+해당 락에 대해 자세히 살펴보도록 하겠습니다.
+<br>
 <br>
 
 ### 갭 락과 Supremum pseudo-record X 락
@@ -258,4 +295,42 @@ supremum pseudo-record X 락은 InnoDB 인덱스에서 **가장 큰 레코드보
 앞에서 본 것 처럼 갭 락은 특정 레코드 **앞의 간격**(gap)에 대해서만 잠금을 걸 수 있기 때문에, 인덱스에서 **가장 큰 레코드 이후의 간격에는 갭 락을 걸 수 없습니다**.  
 
 따라서, 인덱스의 **가장 큰 레코드 이후의 값 삽입을 제어하기 위해** `Supremum pseudo-record X 락`을 사용합니다.
+<br>
+<br>
 
+
+### 갭 락과 Supremum pseudo-record X 락은 공유가 가능하다.
+문제는 갭 락과 Supremum pseudo-record X 락이 서로 공유할 수 있다는 점입니다. 
+MySQL 공식 문서[1]에 따르면, 갭 락의 주 목적은 데이터를 삽입하는 것을 방지하는 것이기 때문에 서로 충돌하지 않고 공유가 가능합니다.
+
+따라서 X 락을 걸어도 인덱스에 해당 레코드가 없다면 갭 락이 걸리게 되고, 이 갭 락은 여러 트랜잭션이 동시에 획득할 수 있어 데드락이 발생한 것입니다.
+
+
+앞에서 보았듯이 `(name, latitude, longitude)` 컬럼에 인덱스가 없으면 데드락이 발생하지 않습니다.
+이는 인덱스가 없는 경우 PK 인덱스를 스캔하기 때문입니다.
+
+PK 인덱스를 스캔할 때 모든 범위를 스캔하여 전체에 락을 걸기 때문에 여러 트랜잭션이 동시에 획득할 수 없게되어 데드락이 발생하지 않습니다.
+
+
+하지만 테이블이 비어 있는 경우에는 데드락이 발생할 수 있습니다. PK 인덱스를 스캔해도 결과가 나오지 않게 되며, 이때 Supremum pseudo-record X 락이 걸리면서 여러 트랜잭션이 동시에 획득할 수 있게 됩니다. 따라서 데드락이 발생하게 됩니다.
+<br>
+<br>
+<br>
+
+
+# 그렇다면 인덱스 없이 X 락을 걸면 해결인 것일까?
+그렇다면 인덱스 없이 X 락을 걸면 동시성 문제가 해결된 것일까요? 
+테이블이 비어 있는 경우에는 인덱스가 없더라도 데드락이 발생할 수 있지만, 실제 프로덕션 환경에서 테이블이 비어 있을 확률은 매우 낮기 때문에 이는 큰 고려 대상이 아닙니다.
+
+인덱스 없이 X 락을 걸면 동시성 문제는 해결할 수 있지만, 이로 인해 해당 컬럼에 인덱스를 더 이상 걸 수 없다는 제약이 생기게 됩니다. 이는 큰 단점이라고 생각했습니다. 또한, SELECT ... FOR UPDATE는 동시성이 매우 떨어지는 방식이기 때문에 성능 저하 문제도 발생할 수 있습니다.
+
+따라서 다른 방식을 모색하면서 unique 제약 조건을 설정하고 충돌 시 재시도하는 방법이나, READ UNCOMMITTED와 함께 애플리케이션 레벨에서 synchronized를 사용하는 방법을 고려해 보았지만, 두 방식 모두 우아하지 않다고 생각했습니다.
+<br>
+<br>
+<br>
+
+
+
+
+# 참고 자료
+[1] https://dev.mysql.com/doc/refman/8.4/en/innodb-locking.html
