@@ -226,7 +226,7 @@ yarn add @emotion/styled
 
 각 라이브러리의 역할은 다음과 같습니다.
 
-- `emotion`: 핵심 CSS-in-JS 기능을 제공하며, css 함수와 CSS prop을 통해 동적 스타일링을 할 수 있게 해줍니다.
+- `emotion`: 핵심 CSS-in-JS 기능을 제공하며, css 함수와 CSS prop을 사용하여 동적 스타일링을 할 수 있게 해줍니다.
 - `emotion/styled`: styled API를 사용해 재사용 가능한 styled 컴포넌트를 정의하고, 컴포넌트 단위로 스타일링을 할 수 있게 해줍니다.
 
 두 패키지를 모두 사용해서 기본적으로는 styled 컴포넌트로 스타일링하되, 필요한 경우 css를 사용해 동적으로 스타일링합니다.
@@ -248,8 +248,7 @@ emotion 설치 이후에, `tsconfig.json`에 다음을 추가합니다. Emotion 
 
 Emotion 라이브러리를 사용하는 컴포넌트마다 `/** @jsxImportSource @emotion/react */` pragma(전처리 명령)를 파일 최상단에 입력해야 한다는 불편함이 있었습니다.
 
-`/** @jsx jsx */`를 통해 컴파일 전처리 단계에서 JSX 문법을 `React.createElement` 대신 JSX로 해석해야 Emotion이 정상적으로 작동하게 해줍니다.
-Babel 설정을 통해 Emotion을 자동으로 처리하도록 구성했습니다.
+해당 전처리 명령은 JSX 코드를 변환할 때, Babel 트랜스파일러에게 React의 `createElement`함수가 아닌 Emotion의 `jsx` 함수를 사용하라고 알려주는 역할을 합니다. Babel 설정 파일을 수정하여 Emotion을 자동으로 처리하도록 구성했습니다.
 
 먼저 필요한 Babel 패키지를 설치합니다.
 
@@ -408,7 +407,7 @@ yarn add -D stylelint stylelint-order stylelint-config-clean-order @stylelint/po
 }
 ```
 
-이제 명령어를 통해 코드에 StyleLint를 적용할 수 있게 되었습니다. 하지만 코드를 저장할 때마다 자동으로 적용되게 하고 싶다면 VSCode 추가 설정을 할 수 있습니다. 과정은 다음과 같습니다.
+이제 스크립트를 실행하여 코드에 StyleLint를 적용할 수 있게 되었습니다. 하지만 코드를 저장할 때마다 자동으로 적용되게 하고 싶다면 VSCode 추가 설정을 할 수 있습니다. 과정은 다음과 같습니다.
 
 1. VSCode에서 StyleLint 확장 프로그램을 설치합니다.
 2. `.vscode/setting.json`에서 다음의 설정을 추가합니다.
@@ -501,7 +500,7 @@ root.render(
 );
 ```
 
-명령어를 통해 개발 서버가 정상적으로 동작하는 것을 확인할 수 있습니다.
+스크립트를 실행하여 개발 서버가 정상적으로 동작하는 것을 확인할 수 있습니다.
 
 ## 마치며
 
