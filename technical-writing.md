@@ -35,6 +35,8 @@
 잘못된 API를 선택하면 앱의 성능이 저하되어 배터리가 소모되고, 사용자 기기 전체의 성능이 저하될 수 있다. 경우에 따라 Play Store에 앱이 등록되지 않을 수도 있다.  
 일단 백그라운드 작업의 종류에는 어떤 것이 있는지, 백그라운드 작업을 구현할 수 있는 API 중에는 어떤 것이 있는지 살펴보자.  
 
+<br>
+
 ### 안드로이드 백그라운드 작업 종류
 <img width="808" alt="image" src="https://github.com/user-attachments/assets/f4e0e105-0902-4024-a256-46a4f35adb4a">
 
@@ -58,6 +60,8 @@ Exact 백그라운드 작업은 정확한 시간에 실행되어야 하는 작�
 
 #### Foreground Service
 지속적으로 유저에게 작업 상황을 보여줘야하는 작업이다. 백그라운드에서 실행되면서도 알림을 통해 사용자에게 작업 진행 상황을 알려야 한다.  
+
+<br>
 
 ### 안드로이드 백그라운드 API
 안드로이드에서 제공하는 백그라운드 작업을 수행할 수 있는 API는 여러가지가 있다. 여기서는 가장 일반적으로 사용하는 `Service`, `JobScheduler`, `AlarmManager`, `WorkManager`를 간단히 소개하려고 한다.  
@@ -87,6 +91,8 @@ Service를 사용하면서 주의할 점은, 기본적으로 안드로이드의 
 #### WorkManager
 지속적인 작업에 권장되는 API다. 앱이 다시 시작되거나 기기가 재부팅될 때 예약된 작업이 사라지지 않고 남아있다.  
 대부분의 백그라운드 작업은 지속적인 작업이므로 구글에서 가장 권장하는 백그라운드 처리 API다.  
+
+<br>
 
 ### 상황에 따른 백그라운드 API 선택하기
 안드로이드 공식 문서에서는 아래와 같이 백그라운드 작업에 고려할 두 가지 시나리오를 정의하고 있다.
@@ -120,6 +126,7 @@ Foreground Service는 많은 기기 리소스를 사용할 수 있기 때문에,
 <img width="300" alt="image" src="https://github.com/user-attachments/assets/40cc6a4a-d74f-4133-94c6-76c41ea519be">  
 
 <br>
+<br>
 
 ## 우리 팀의 이야기
 ### 어떤 기능을 백그라운드 작업으로 실행하려고 하는가
@@ -136,6 +143,7 @@ Foreground Service는 많은 기기 리소스를 사용할 수 있기 때문에,
 이 기능은 약속 시간 30분 전부터 약속 시간 당일까지 활성화된다. 또한 사용자 위치를 기반으로 도착 예정 시간 등을 계산하고 있다.  
 즉, 약속 시간 30분 전부터 사용자의 위치 정보를 서버에게 10초 간격으로 계산해야 했다. 또한 약속에 참여한 모든 사용자의 현황을 확인해야 하기 때문에, 앱을 사용하고 있지 않아도 이 작업이 수행되어야 한다.  
 
+<br>
 
 ### 왜 `WorkManager를` 선택했는가
 위에서 말했듯이 약속에 참여한 사용자들끼리 하나의 정보를 공유하는 기능이다. 즉, 약속에 참여한 사용자들끼리 정보의 간극이 없는 것이 가장 중요하다.  
@@ -154,6 +162,8 @@ Foreground Service는 많은 기기 리소스를 사용할 수 있기 때문에,
 - 한 번 또는 반복적으로 작업을 예약할 수 있다.
 - 작업에 실패하면 다시 시도하는 백오프 정책을 지원한다.
 - [작업 체이닝](https://developer.android.com/topic/libraries/architecture/workmanager/how-to/chain-work)이 가능하여 작업을 순차적으로 처리할 수 있다.
+
+<br>
 
 ### WorkManager의 구성요소
 #### WorkManager
@@ -219,6 +229,8 @@ class EtaWorker(context: Context, workerParameters: WorkerParameters) :
 3. WorkManager에 WorkRequest를 `enqueue()`한다.  
 4. WorkManager에서 id 또는 tag로 작업 결과를 받아온다.  
 
+<br>
+
 우리 서비스에서는 아래와 같은 Flow로 구성되어 있다.
 1. 사용자가 약속에 참여한다.
 2. Worker가 약속 시간 30분 전에 수행될 수 있도록 큐에 등록한다.
@@ -226,10 +238,12 @@ class EtaWorker(context: Context, workerParameters: WorkerParameters) :
    3-1. 사용자가 도착 현황 화면에 진입하면, Worker의 가장 최근 결과값을 `LiveData`로 받아온다.
 4. 약속 시간이 지나면 Worker를 중단한다.
 
+<br>
+
 ## WorkManager의 한계점
 WorkManager로 기능을 개발하고 앱을 테스트하며, 예상치 못한 버그가 발생했다. 예약한 시간에 작업이 제대로 수행되지 않았다.
 그런데 작업이 수행되지 않는 상황과 되지 않는 상황을 명확히 정의할 수 없었다. 
-큐에 여러 작업이 쌓이면, 불규칙적으로 작업이 수행되지 않았다.
+큐에 여러 작업이 쌓이면, 불규칙적으로 작업이 수행되지 않았다.
 
 <br>
 
@@ -270,7 +284,9 @@ Foreground Service는 특정 시간에 Service를 시작할 수 있도록 예약
 AlarmManager는 WorkManager에 비해 개발자가 더 고려해야 할 사항들이 많다. 최대한 WorkManager를 사용하는 것과 기능적 차이가 없도록 구현하고자 노력했다.    
 AlarmManager의 단점에는 어떤 것이 있고, 어떻게 보완했는지 알아보자.   
 
-1. 작업 결과를 LiveData로 받아와 비동기적으로 UI 데이터 갱신하기    
+<br>
+
+1. **작업 결과를 LiveData로 받아와 비동기적으로 UI 데이터 갱신하기**    
 
 WorkManager에는 Worker가 각각 있고, 이 Worker에 대한 결과를 LiveData나 Flow로 가져올 수 있었다.   
 반면에 AlarmManager는 작업 결과를 따로 저장하지 않는다.   
@@ -286,12 +302,14 @@ interface MateEtaInfoDao {
 }
 ```
 결과를 저장하고 가져오는 Dao 코드 중 일부다.   
-upsert()를 통해 하나의 약속에 해당하는 작업 수행 결과를 저장한다.   
-getMateEtas()를 통해 하나의 약속에 해당하는 작업 수행 결과를 가져온다. 이 때, 반환타입이 LiveData<T> 형태다.   
+`upsert()`를 통해 하나의 약속에 해당하는 작업 수행 결과를 저장한다.   
+`getMateEtas()`를 통해 하나의 약속에 해당하는 작업 수행 결과를 가져온다. 이 때, 반환타입이 LiveData<T> 형태다.   
 반환타입을 LiveData나 Flow로 감싸면, Room 내부적으로 비동기적으로 데이터를 갱신한다.  
 사용자에게 보여지는 화면에서도 비동기적으로 데이터를 갱신할 수 있었다.  
 
-2. 로그아웃 시 Alarm을 제거하기 
+<br>
+
+2. **로그아웃 시 Alarm을 제거하기**    
 로그아웃 시에는 AlarmManager에 예약된 Alarm들이 수행되지 않아야 한다.  
 이미 앱에서 로그아웃을 한 상태인데, 로그인 후 이용할 수 있는 기능을 위한 예약을 수행할 필요가 없기 때문이다.   
 
@@ -319,8 +337,9 @@ getMateEtas()를 통해 하나의 약속에 해당하는 작업 수행 결과를
 개선하기 위해서는 서버에 사용자 별 Alarm들을 저장해두고, 로그인 시마다 사용자의 Alarm을 서버에서 받아올 수 있겠다.  
 물론 폴링 작업과 백그라운드 예약을 개선하기 위해서는, 서버와 웹 소켓으로 통신하는 방식이 최선일 것이다.  
 
+<br>
 
-3. 탈퇴 시 Alarm을 제거하기 
+3. **탈퇴 시 Alarm을 제거하기**   
 로그아웃과 마찬가지로 탈퇴 시에도 AlarmManager에 예약된 Alarm들이 수행되지 않아야 한다.  
 하지만 로그아웃과 다른 점은, 재로그인 했을 때도 Alarm이 수행될 수 없다.
 탈퇴 시에는 Room에 저장해둔 Alarm까지 삭제하는 방식으로 구현했다.
@@ -335,6 +354,8 @@ getMateEtas()를 통해 하나의 약속에 해당하는 작업 수행 결과를
 하지만 WorkManager는 상황에 따라 지연될 수 있는 백그라운드 작업에 적합한 API다.  
 즉, 적절하지 않은 API를 선택했고 그래서 예약한 시간에 작업이 실행되지 않는 문제가 발생했다.
 개발 마감일에 쫓기느라 백그라운드 작업 API를 꼼꼼히 비교하지 않고 선택한 점이 아쉽고, 상황에 따라 적절한 백그라운드 API를 사용해야 함을 몸소 느꼈다.
+
+<br>
 
 # 참고 자료
 https://developer.android.com/develop/background-work/services?hl=ko  
