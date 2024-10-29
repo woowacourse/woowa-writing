@@ -262,9 +262,10 @@ SELECT * FROM performance_schema.data_locks;
 
 결과는 다음과 같았습니다:
 
-![](https://i.imgur.com/LFzPV70.png)
+![](https://i.imgur.com/BVkfm8r.png)
 
-두 트랜잭션이 supremum pseudo-record X 락을 동시에 획득한 것을 볼 수 있습니다.
+
+두 트랜잭션이 `X, GAP` 락을 동시에 획득한 것을 볼 수 있습니다.
 
 <br>
 <br>
@@ -326,7 +327,11 @@ PK 인덱스를 스캔할 때 모든 범위를 스캔하여 전체에 락을 걸
 <br>
 
 
-하지만 테이블이 비어 있는 경우에는 데드락이 발생할 수 있습니다. PK 인덱스를 스캔해도 결과가 나오지 않게 되며, 이때 Supremum pseudo-record X 락이 걸리면서 여러 트랜잭션이 동시에 획득할 수 있게 됩니다. 따라서 데드락이 발생하게 됩니다.
+하지만 테이블이 비어 있는 경우에는 데드락이 발생할 수 있습니다. PK 인덱스를 스캔해도 결과가 나오지 않게 되며, 이때 Supremum pseudo-record X 락이 걸리면서 여러 트랜잭션이 동시에 획득할 수 있게 됩니다:
+
+![](https://i.imgur.com/fB6J4zc.png)
+
+따라서 데드락이 발생하게 됩니다.
 <br>
 <br>
 <br>
