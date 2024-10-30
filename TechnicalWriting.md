@@ -124,29 +124,29 @@ MySQL은 대부분의 스토리지 엔진에서 ACID 규정 준수를 제공하�
 
 #### 동시성 제어
 
-다중 버전 동시성 제어(MVCC)는 레코드의 중복 사본을 생성하여 동일한 데이터를 병렬로 안전하게 읽고 업데이트할 수 있게 하는 고급 데이터베이스 기능입니다. MVCC를 통해 여러 사용자가 데이터 무결성을 손상시키지 않고 동일한 데이터를 동시에 읽고 수정할 수 있습니다.
+다중 버전 동시성 제어(MVCC)는 레코드의 중복 사본을 생성하여 동일한 데이터를 병렬로 안전하게 읽고 업데이트할 수 있게 하는 고급 데이터베이스 기능입니다. MVCC를 통해 여러 사용자가 데이터 무결성을 손상시키지 않고 동일한 데이터를 동시에 읽고 수정할 수 있습니다.   
 
-PostgreSQL은 동시 트랜잭션을 허용하는 MVCC 기능을 구현한 최초의 DBMS입니다. 최신 버전의 MySQL도 MVCC를 지원하지만, 일반적으로 MVCC에서 PostgreSQL이 더 우수한 성능을 보입니다.
+PostgreSQL은 동시 트랜잭션을 허용하는 MVCC 기능을 구현한 최초의 DBMS입니다. 최신 버전의 MySQL도 MVCC를 지원하지만, 일반적으로 MVCC에서 PostgreSQL이 더 우수한 성능을 보입니다.   
 
 #### 인덱스 유형
 
-데이터베이스는 인덱스를 사용하여 데이터를 더 빠르게 검색합니다. 자주 액세스하는 데이터를 다른 데이터와 다르게 정렬하고 저장하도록 데이터베이스 관리 시스템을 구성함으로써, 빠른 검색이 가능해집니다.
+데이터베이스는 인덱스를 사용하여 데이터를 더 빠르게 검색합니다. 자주 액세스하는 데이터를 다른 데이터와 다르게 정렬하고 저장하도록 데이터베이스 관리 시스템을 구성함으로써, 빠른 검색이 가능해집니다.   
 
 MySQL은 B-트리 및 R-트리 인덱싱을 지원하여 계층적으로 인덱스된 데이터를 저장합니다. 반면, PostgreSQL은 트리, 표현식 인덱스, 부분 인덱스, 해시 인덱스 등 다양한 인덱스 유형을 제공하여 데이터베이스 성능 요구 사항을 세밀하게 조정할 수 있는 옵션을 더 많이 제공합니다.
 
 #### 데이터 유형
 
-MySQL은 순수 관계형 데이터베이스로, 표준 데이터 유형만을 지원합니다. 이에 비해 PostgreSQL은 객체 관계형 데이터베이스로, 데이터를 속성을 가진 객체로 저장할 수 있습니다. 이러한 객체는 Java 및 .NET과 같은 여러 프로그래밍 언어에서 일반적으로 사용되는 데이터 유형이며, 상위-하위 관계 및 상속과 같은 개념을 지원합니다.
-
-PostgreSQL은 데이터베이스 개발자에게 더 직관적인 경험을 제공하며, 배열 및 XML과 같은 추가 데이터 유형도 지원합니다.
+MySQL은 순수 관계형 데이터베이스로, 표준 데이터 유형만을 지원합니다. 이에 비해 PostgreSQL은 객체 관계형 데이터베이스로, 데이터를 속성을 가진 객체로 저장할 수 있습니다. 이러한 객체는 Java 및 .NET과 같은 여러 프로그래밍 언어에서 일반적으로 사용되는 데이터 유형이며, 상위-하위 관계 및 상속과 같은 개념을 지원합니다.   
+ 
+PostgreSQL은 데이터베이스 개발자에게 더 직관적인 경험을 제공하며, 배열 및 XML과 같은 추가 데이터 유형도 지원합니다.   
 
 #### 트리거 지원
 
-트리거는 데이터베이스 관리 시스템에서 특정 이벤트가 발생할 때 자동으로 실행되는 저장 프로시저입니다.
+트리거는 데이터베이스 관리 시스템에서 특정 이벤트가 발생할 때 자동으로 실행되는 저장 프로시저입니다.   
 
-MySQL에서는 `INSERT`, `UPDATE`, `DELETE` 문에 대해 `_AFTER_` 및 `_BEFORE_` 트리거만 사용할 수 있습니다. 즉, 사용자가 데이터를 수정하기 전이나 후에 트리거가 실행됩니다.
+MySQL에서는 `INSERT`, `UPDATE`, `DELETE` 문에 대해 `_AFTER_` 및 `_BEFORE_` 트리거만 사용할 수 있습니다. 즉, 사용자가 데이터를 수정하기 전이나 후에 트리거가 실행됩니다.   
 
-반면, PostgreSQL은 `_INSTEAD OF_` 트리거를 지원하여 함수를 사용해 복잡한 SQL 문을 실행할 수 있는 유연성을 제공합니다.
+반면, PostgreSQL은 `_INSTEAD OF_` 트리거를 지원하여 함수를 사용해 복잡한 SQL 문을 실행할 수 있는 유연성을 제공합니다.   
 
 <br>
 
@@ -207,35 +207,35 @@ PostgreSQL을 사용해야 하는 상황은 다음과 같습니다.
 
 ### 처리 작업에 따른 선택 기준
 
-- 주로 처리해야 할 작업이 읽기 작업인가? - MySQL
-- 주로 처리해야 할 작업이 복잡한 읽기-쓰기 작업인가? - postgreSQL
+- 주로 처리해야 할 작업이 읽기 작업인가? - MySQL   
+- 주로 처리해야 할 작업이 복잡한 읽기-쓰기 작업인가? - postgreSQL   
 
 ### 데이터베이스 규모에 따른 선택 기준
 
-- 다루어야 할 데이터베이스의 크기가 상대적으로 작은 데이터 세트를 다루는가? - MySQL
-- 다루어야 할 데이터베이스의 크기가 초대형인가? - PostgreSQL
+- 다루어야 할 데이터베이스의 크기가 상대적으로 작은 데이터 세트를 다루는가? - MySQL   
+- 다루어야 할 데이터베이스의 크기가 초대형인가? - PostgreSQL   
 
 ### 우선순위에 따른 선택 기준
 
-- 속도와 유연성을 더 중시하는가? - MySQL
-- 트랜잭션 처리에서 높은 ACID 준수가 중요한가? – PostgreSQL
+- 속도와 유연성을 더 중시하는가? - MySQL   
+- 트랜잭션 처리에서 높은 ACID 준수가 중요한가? – PostgreSQL   
 
 ### 기타 고려 사항
 
-- 설정 및 관리가 쉽고 이해도가 높은 더 간단한 데이터베이스가 필요한가? - MySQL
-- 데이터베이스에서 객체 지향적인 접근 방식을 사용할 필요가 있는가? - PostgreSQL
+- 설정 및 관리가 쉽고 이해도가 높은 더 간단한 데이터베이스가 필요한가? - MySQL   
+- 데이터베이스에서 객체 지향적인 접근 방식을 사용할 필요가 있는가? - PostgreSQL   
 
 <br>
 
 ## 6. 참고
 
-Oracle docs - [https://docs.oracle.com/cd/E17952_01/mysql-5.7-en/what-is-mysql.html](https://docs.oracle.com/cd/E17952_01/mysql-5.7-en/what-is-mysql.html)
-PostgreSQL: Up and Running, 3rd Edition
-PostgreSQL docs -  [https://www.postgresql.org/about/](https://www.postgresql.org/about/)
-ORDBMS란 - [https://database.guide/what-is-an-ordbms/](https://database.guide/what-is-an-ordbms/)
-AWS : PostgreSQL과 MySQL 비교 - [https://aws.amazon.com/ko/compare/the-difference-between-mysql-vs-postgresql/](https://aws.amazon.com/ko/compare/the-difference-between-mysql-vs-postgresql/)
-Integrate.io : PostgreSQL과 MySQL 비교 - [https://www.integrate.io/ko/blog/postgresql-vs-mysql-which-one-is-better-for-your-use-case-ko/](https://www.integrate.io/ko/blog/postgresql-vs-mysql-which-one-is-better-for-your-use-case-ko/)
-DB-Engines Ranking - [https://db-engines.com/en/ranking](https://db-engines.com/en/ranking)
+Oracle docs - [https://docs.oracle.com/cd/E17952_01/mysql-5.7-en/what-is-mysql.html](https://docs.oracle.com/cd/E17952_01/mysql-5.7-en/what-is-mysql.html)   
+PostgreSQL: Up and Running, 3rd Edition   
+PostgreSQL docs -  [https://www.postgresql.org/about/](https://www.postgresql.org/about/)   
+ORDBMS란 - [https://database.guide/what-is-an-ordbms/](https://database.guide/what-is-an-ordbms/)   
+AWS : PostgreSQL과 MySQL 비교 - [https://aws.amazon.com/ko/compare/the-difference-between-mysql-vs-postgresql/](https://aws.amazon.com/ko/compare/the-difference-between-mysql-vs-postgresql/)    
+Integrate.io : PostgreSQL과 MySQL 비교 - [https://www.integrate.io/ko/blog/postgresql-vs-mysql-which-one-is-better-for-your-use-case-ko/](https://www.integrate.io/ko/blog/postgresql-vs-mysql-which-one-is-better-for-your-use-case-ko/)   
+DB-Engines Ranking - [https://db-engines.com/en/ranking](https://db-engines.com/en/ranking)   
 Stackoverflow DB 관련 설문 조사 -  
-[https://survey.stackoverflow.co/2022/?utm_source=results#most-popular-technologies-database](https://survey.stackoverflow.co/2022/?utm_source=results#most-popular-technologies-database)
-Jetbrains DB 관련 설문 조사 - [https://www.jetbrains.com/lp/devecosystem-2022/databases/](https://www.jetbrains.com/lp/devecosystem-2022/databases/)
+[https://survey.stackoverflow.co/2022/?utm_source=results#most-popular-technologies-database](https://survey.stackoverflow.co/2022/?utm_source=results#most-popular-technologies-database)   
+Jetbrains DB 관련 설문 조사 - [https://www.jetbrains.com/lp/devecosystem-2022/databases/](https://www.jetbrains.com/lp/devecosystem-2022/databases/)   
