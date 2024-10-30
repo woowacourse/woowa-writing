@@ -381,6 +381,7 @@ app:layout_constrainedWidth="true"로 설정을 꼭 해주어야 제대로 조�
 
 Sealed Class는 컴파일 시점에서 모든 하위 클래스를 알고 있기 때문에, 타입 안정성을 보장할 수 있고 when을 사용하여 Sealed Class의 모든 경우에 대한 처리가 이루어지며, 새로운
 ViewType이 추가되면 when 표현식에서 누락된 타입에 대해 컴파일 오류가 발생해 바로 수정할 수 있으므로 sealed class를 사용하여 ViewType을 지정해줍니다.
+저는 추가 기능 요구 사항으로 채팅의 날짜에 대한 ViewType을 추가해야했기 때문에, 현재는 UiModel을 만들어서 관리해주고 있습니다!
 
 ``` kotlin
 sealed class ChatViewType {
