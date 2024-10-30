@@ -648,6 +648,12 @@ queryClient.invalidateQueries();
 queryClient.invalidateQueries({ queryKey: ["todos"] });
 ```
 
+# 마무리
+
+지금까지 TanStack Query에 대해서 알아보았습니다. TanStack Query를 통해 서버 상태를 보다 쉽고 효율적으로 가져오고, 캐싱하며, 동기화 및 업데이트한다는 것을 알게 되었습니다. 또한, 핵심 개념 3가지에 대해 살펴보며 해당 개념의 속성 및 반환값에 대해서 알아보았습니다. 이번 기회를 통해 TanStack Query를 처음 써보는 개발자들이 더 쉽게 시작하는 계기가 되었으면 합니다. 이후 작업하면서 필요한 부분에 대해서는 공식 문서를 찾아보기를 권합니다. 기본적인 이해를 바탕으로 공식 문서를 살펴보면 처음 시작할 때보다 훨씬 쉽게 시작할 수 있을 것으로 기대합니다. 끝으로 TanStack Query의 핵심으로 마무리하겠습니다. `TanStack Query는 리액트 등에서 비동기(서버) 상태를 관리하는 강력한 도구이다.`
+
+![image.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/f17aaf97-c334-4865-afbc-d7711240ea7b/3eb1773a-9fd8-425a-9021-89ef670ba23a/image.png)
+
 ### 참고자료
 
 ---
