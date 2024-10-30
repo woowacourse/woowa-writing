@@ -1,4 +1,4 @@
-#Foreground Service
+# Foreground Service
 
 앱을 만들다 보면, 사용자가 앱을 쓰고 있지 않은 상황에서도 무언가 동작해야 하는 상황이 있다.
 
