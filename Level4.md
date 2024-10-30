@@ -1,22 +1,22 @@
 
 # 패스키(Passkey)란 무엇인가
 
-패스키(Passkey)는 로그인 시 패스워드 없이 등록된 기기를 이용하여 인증하는 인증 방식이다.
+패스키(Passkey)는 사이트에 로그인 할 때 패스워드 없이 가지고 있는 기기(핸드폰, 노트북 등)를 이용하여 인증하는 방식이다.
 
-구글에 로그인 할 때 아래처럼 기기에 등록된 계정에 로그인하기 위해 지문을 요청하는 작업이 나타나는데 이를 구현하게 하는 것이 패스키의 역할이다.
+구글에 로그인 할 때 아래처럼 기기에 등록된 계정에 로그인하기 위해 지문을 요청하는 작업이 나타나는데 이를 구현하는 것이 패스키의 역할이다.
 
 <div align="center">
   <img src="images/passkey-1.png" alt="votmzl" width="25%"> 
   <p style="text-align: center;">그림 1 - 구글 로그인 시 나타나는 패스키</p> 
 </div>
 
-패스키는 웹사이트의 패스워드를 외우고 있지 않아도 기기가 안전하게 관리하고 간편하게 인증할 수 있는 장점이 있다.
+패스키는 웹사이트의 패스워드를 외우지 않아도 되어 편하고 암호가 기기 안에 안전하게 관리되고 있는 장점이 있다.
 
-우리는 패스키가 나오기 전까진 회원 인증을 위해 아이디와 패스워드를 기억하며 로그인해왔다.
+패스키가 나오기 전까진 회원 인증을 위해 아이디와 패스워드를 기억하며 로그인해왔다.
 
-이로 인해 사이트가 달라도 같은 아이디와 비밀번호를 사용하는 경우가 많았는데, 어느 한 사이트에서 회원 아이디와 비밀번호가 유출되면 다른 사이트도 똑같이 피해를 볼 수 있었다.
+이로 인해 사이트가 달라도 같은 아이디와 비밀번호를 사용하는 경우가 많았었는데, 어느 한 사이트에서 회원 아이디와 비밀번호가 유출되는 상황이 발생하면 다른 사이트도 똑같이 피해를 볼 수 있었다.
 
-FIDO alliance 따르면 패스워드로 인한 피해는 아래와 같이 나타났다고 한다. 패스키는 이처럼 패스워드 사용을 감소시키기 위해 개발된 메커니즘이다.
+FIDO alliance 따르면 패스워드로 인한 피해는 아래와 같이 나타났다고 한다. 이처럼 패스워드로 인한 피해가 증가하는 상황에서 패스워드 사용을 감소시키기 위해 개발된 것이 패스키이다.
 
 <div align="center">
   <img src="images/passkey-2.png" alt="votmzl" width="100%"> 
@@ -33,9 +33,7 @@ FIDO alliance 따르면 패스워드로 인한 피해는 아래와 같이 나타
 2. 패스키 검증 과정
 ```
 
-패스키를 사용하기 위해선 사이트에서 회원 계정에 패스키로 인증할 기기를 등록해야 한다.
-
-이후 회원이 로그인 할 때 기기에 등록된 패스키를 이용하여 인증할 수 있다.
+패스키를 사용하기 위해선 해당 사이트에 패스키 기기를 등록해야 한다. 이후 회원이 로그인 할 때 기기에 등록된 패스키를 이용하여 인증할 수 있다.
 
 ### 패스키 등록
 
@@ -50,7 +48,7 @@ FIDO alliance 따르면 패스워드로 인한 피해는 아래와 같이 나타
 
 `challenge`: 패스키 등록 정보가 중간에 변조되었는지 검증하기 위한 난수. 클라이언트는 challenge를 기기안에 있는 개인키로 암호화 한 후 서버에 전달한다. 이후 서버는 클라이언트가 전달한 공개키로 복호화 하여 패스키 등록 정보가 변조되었는지 확인할 수 있다.
 
-`비대칭키`: 암호화하는 키와 복호화 하는키가 다른 키 쌍 개인키로 암호화 한 정보는 공개키로만 복호화가 가능하고 공개키로 암호화 한 정보는 개인키로만 복호화가 가능한 특징이 존재한다. SSL의 암호화 키 전달이나 전자서명에 사용된다.
+`비대칭키`: **암호화하는 키와 복호화 하는키가 다른 키 쌍**을 말한다. 개인키로 암호화 한 정보는 공개키로만 복호화가 가능하고 공개키로 암호화 한 정보는 개인키로만 복호화가 가능한 특징이 존재한다. SSL의 암호화 키 교환이나 전자서명에 사용된다.
 
 ### 패스키 검증
 
@@ -61,11 +59,11 @@ FIDO alliance 따르면 패스워드로 인한 피해는 아래와 같이 나타
   <p style="text-align: center;">그림 4 - 패스키 검증 과정</p>
 </div>
 
-`인증 횟수 정보`: 패스키는 같은 기기 정보를 복사하여 기기 인증을 악용하는 것을 방지하고자 인증 횟수를 갱신할 수 있다. 인증 횟수 정보는 클라이언트 측에서 계산한 후 서버에 전달되는데 만일 기기를 복재한 후 인증하고자 한다면 인증 횟수가 현 기기와 차이가 날경우 인증하지 못하도록 방지할 수 있다.
+`인증 횟수 정보`: 패스키는 같은 기기 정보를 복사하여 기기 인증을 악용하는 것을 방지하기 위해 인증 횟수를 갱신한다. 인증 횟수 정보는 클라이언트 측에서 계산한 후 서버에 전달 되는데 만약 기기를 복재한 후 인증하고자 한다면 인증 횟수가 현 기기와 차이가 날경우 오류가 발생하여 인증을 거부할 수 있다.
 
 ## 패스키 구현
 
-패스키는 Web Authentication API(WebAuthn)을 사용하여 구현이 가능하다. webAuthn은 FIDO2 기반 인증을 구현하기 위한 웹 표준 기술이다. 패스키는 쉽게 말해서 FIDO2 기반 인증 기술을 구현한 구현체라고 생각하면 된다.
+패스키는 Web Authentication API(WebAuthn)을 사용하여 구현이 가능하다. webAuthn은 FIDO2 기반 인증을 구현하기 위한 웹 표준 기술이다. 즉 패스키는 FIDO2 기반 인증 기술을 구현한 구현체라고 생각하면 된다.
 
 언어별로 WebAuthn 라이브러리를 지원하는 목록은 [passkeys.dev에서 확인 가능하다.](https://passkeys.dev/docs/tools-libraries/libraries/) 
 
@@ -82,7 +80,7 @@ implementation("com.yubico:webauthn-server-core:2.5.3")
 
 #### CredentialRepository 구현
 
-추가한 후에는 패스키 등록 정보를 저장하기 위한 저장소인 `CredentialRepository`를 구현해야 한다. 구현하기 쉽게 하기 위해 InMemory기반 저장소로 아래와 같이 구현하였다. 
+추가한 후 패스키 등록 정보를 저장하기 위한 저장소인 `CredentialRepository`를 구현해야 한다. 구현하기 쉽게 하기 위해 InMemory기반 저장소로 아래와 같이 구현하였다. 
 
 ``` java
 
@@ -173,14 +171,15 @@ public class InMemoryCredentialRepository implements CredentialRepository {
 
 #### RelyParty 설정
 
-패스키 등록 및 검증을 위해선 `RelyingParty`를 설정해야 하는데 `RelyingParty`의 역할은 아래와 같다.
+패스키 등록 및 검증을 위해선 `RelyingParty`를 설정해야 한다. `RelyingParty`의 역할은 아래와 같다.
 
 ``` 
 1. 요청값 검증을 위한 challenge 및 암호화 알고리즘 스팩 정보 생성
 2. 패스키를 등록 및 검증할 사이트 정보 전달
 3. 클라이언트가 전달한 요청값들을 검증
 ```
-클라이언트에게 보낼 임의의 challenge값을 생성하거나 암호화 알고리즘 스팩 전달하고 클라이언트가 패스키 등록 및 인증을 하기 위한 요청값들을 검증하는 역할을 한다. `RelyingParty`를 설정하기 위해선 위의 `CredentialRepository`를 반드시 등록해줘야 한다.
+
+클라이언트에게 보낼 임의의 challenge값을 생성하거나 암호화 알고리즘 스팩을 전달하고 클라이언트가 패스키 등록 및 인증을 하기 위한 요청값들을 검증하는 역할을 한다. `RelyingParty`를 설정하기 위해선 위의 `CredentialRepository`를 반드시 등록해야 한다.
 
 ``` java
     @Bean
@@ -193,7 +192,7 @@ public class InMemoryCredentialRepository implements CredentialRepository {
         // CredentialRepository 인스턴스 생성
         return RelyingParty.builder()
                 .identity(rpIdentity)
-                .credentialRepository(inMemoryCredentialRepository)
+                .credentialRepository(inMemoryCredentialRepository) // CredentialRepository 등록
                 .origins(Set.of("https://www.fromitive.site"))
                 .build();
     }
@@ -204,8 +203,8 @@ public class InMemoryCredentialRepository implements CredentialRepository {
 패스키를 등록하기 위해선 아래의 순서대로 요청해야 한다.
 
 ```
-1. 등록할 계정 식별 정보 서버에 전달(/register/requset)
-  - 서버는 계정 식별 정보를 바탕으로 RelyingParty를 이용해 challenge 요청 값 생성
+1. 등록할 계정 정보를 서버에 전달(/register/requset)
+  - 서버는 계정 정보를 바탕으로 RelyingParty를 이용해 challenge 요청 값 생성
   - 요청 값은 재사용을 위해 세션에 저장
 2. 클라이언트는 서버가 전달한 값을 이용해 패스키 정보 생성
 3. 패스키 정보를 서버에 전달(/register/finish)
@@ -213,7 +212,7 @@ public class InMemoryCredentialRepository implements CredentialRepository {
   - 성공적으로 검증하면 패스키 정보를 CredentialRepository에 저장
 ```
 
-처음에 클라이언트가 패스키 등록 요청을 위해 `GET /register/request?userName=`을 요청한다. 이에 서버는 클라이언트의 인증 정보를 검증하기 위한 설정 정보 `PublicKeyCredentialCreationOptions`를 생성후 세션에 저장하고 전송한다.
+처음 클라이언트가 패스키 등록 요청을 위해 `GET /register/request?userName=`을 요청한다. 이에 서버는 클라이언트의 인증 정보를 검증하기 위한 설정 정보인 `PublicKeyCredentialCreationOptions`를 생성한 후 세션에 저장하고 클라이언트에게 응답한다.
 
 ``` java
 @GetMapping("/register/request")
@@ -275,8 +274,8 @@ public class InMemoryCredentialRepository implements CredentialRepository {
 패스키를 검증하기 위해선 아래의 순서대로 요청해야 한다.
 
 ```
-1. 인증 요청할 계정 식별 정보를 서버에 전달(/assert/requset)
-  - 서버는 인증할 식별 정보를 바탕으로 challenge를 생성
+1. 인증 요청할 계정 정보를 서버에 전달(/assert/requset)
+  - 서버는 인증할 계정 정보를 바탕으로 challenge를 생성
   - challenge 정보는 검증을 위해 세션에 저장 후 클라이언트에게 전달
 2. 클라이언트는 전달받은 challenge 정보를 바탕으로 패스키를 인증
 3. 서버는 전달 받은 패스키 인증 정보 검증
@@ -331,7 +330,10 @@ public class InMemoryCredentialRepository implements CredentialRepository {
     }
 ```
 
-구현된 패스키 예제는 [fromitive 깃허브](https://github.com/fromitive/passkey-example)에서 확인이 가능하다.
+구체적인 패스키 소스코드는 [fromitive 깃허브](https://github.com/fromitive/passkey-example)에서 확인이 가능하다.
+
+> [!WARNING]  
+> 소스코드 예제를 그대로 프로젝트에 사용하면 안됩니다. 패스키를 구현하기만 했을 뿐 등록을 위한 선행 인증과정이 없기 때문에 회원 정보만 알면 본인이 가지고 있는 기기가 아니더라도 인증이 가능하기 때문에 보안에 취약합니다. 
 
 
 ## 구현한 패스키 실행
@@ -367,7 +369,7 @@ SSL이 적용된 서버에 접속하면 아래와 같이 등록할 수 있는 �
 
 ## 패스키 구현 시 주의할 점
 
-위의 예제에서 봤듯이 패스키는 여러개의 기기를 등록할 수 있으므로 등록에 관한 로직은 사용자 인증을 진행한 후(전통적인 아이디 패스워드 혹은 식별 정보 등) 해당 사용자를 신뢰할 수 있을 때 등록 기능을 사용할 수 있도록 해야한다.
+위의 예제에서 봤듯이 패스키는 여러개의 기기를 등록할 수 있으므로 등록에 관한 로직은 인가된 사용자만 사용할 수 있게 해야 한다. 즉 패스키를 사용하기 위해선 회원 본인 인증이 선행되어야 등록할 수 있다.
 
 만일 등록한 기기를 더이상 사용하지 못하거나 기기 변경으로 인해 인증에 실패할 경우 다른 인증 방식 또한 제공받아야 한다. 이를 fallback이라고 한다.
 
