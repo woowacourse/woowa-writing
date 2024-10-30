@@ -36,53 +36,50 @@ CD는 아래의 두 가지 자동화 과정을 포함합니다. 요약하자면,
 
 ## GitHub Actions 소개
 
-GitHub Actions는 GitHub 사용자라면 누구나 무료로 이용 가능한 빌드, 테스트 및 배포 플랫폼입니다. 코드 저장소와 동일한 환경에서 CI/CD 파이프라인을 만들 수 있게 도와주지요. 다른 여러 도구들에 비해 GitHub Actions가 가지는 이점은 다음과 같습니다.
+GitHub Actions는 GitHub에서 제공하는 무료 CI/CD 플랫폼입니다. 코드 저장소와 통합된 환경에서 빌드, 테스트, 배포 파이프라인을 만들 수 있도록 도와주지요. 다른 여러 도구들에 비해 GitHub Actions가 가지는 이점은 다음과 같습니다.
 
-1. GitHub 저장소와의 연계가 간편합니다. 별도의 외부 서비스 연동 없이 GitHub 안에서 모든 것이 이루어집니다.
-2. 프로젝트 환경과 특성에 맞는 최적화된 파이프라인을 쉽게 만들 수 있습니다. YAML 형식의 파일 만으로 원하는 작업을 트리거 조건과 함께 세세하게 설정할 수 있습니다.
-3. 무료입니다. 개인 혹은 소규모의 팀 프로젝트를 운영할 때 비용 부담 없이 사용할 수 있습니다.
+1. 원활한 GitHub 통합: 외부 서비스 연동 없이 GitHub 환경 내에서 완결된 파이프라인 구성
+2. 유연한 워크플로우: YAML 파일만으로 프로젝트에 최적화된 트리거 조건과 작업 설정 가능
+3. 무료 사용: 개인 및 소규모 팀 프로젝트에 적합한 비용 효율성
 
 ### 주요 용어 및 개념
 
-도구를 쓸 때 가장 중요한 것은 그 도구가 제공하는 고유의 언어에 익숙해지는 것입니다. 우선, GitHub Actions에서 사용되는 주요 용어와 개념을 간단히 짚고 넘어가겠습니다. 아래 이미지를 함께 참고하면서 살펴주세요.
+GitHub Actions를 효과적으로 활용하기 위한 핵심 개념들을 먼저 살펴보겠습니다. 아래의 다이어그램 이미지를 함께 참고해주세요.
 
 ![GitHub Actions Workflow Diagram](assets/images/TechWriting/workflow-diagram.png)
 (이미지 출처 : spacelift.io)
 
 #### Workflow
 
-**하나 이상의 Job을 실행할 수 있는 자동화 된 작업의 단위**입니다. 해당 GitHub 저장소의 Actions 탭에서 정의한 특정 이벤트가 발생했을 때 실행됩니다. 이때 실행 조건으로 설정할 이벤트의 종류는 여러분이 정하실 수 있습니다. 이를테면, 특정 브랜치에 새로운 코드가 Push 되거나 Pull Request가 생성되었을 때와 같은 조건을 붙일 수 있겠지요.
-
-Workflow는 YAML 형식의 파일을 통해 정의할 수 있습니다. 프로젝트의 `root` 경로를 기준으로 `.github/workflows/` 경로에 해당 파일을 위치시키면, 위에서 설정한 트리거 조건이 실행되었을 때 GitHub의 Actions 탭에 자동으로 등록됩니다.
+**자동화된 작업의 기본 단위**로, 하나 이상의 Job으로 구성됩니다. GitHub 저장소의 특정 이벤트(예: push, pull request)에 의해 트리거되며, `.github/workflows/` 디렉토리 내의 YAML 파일로 정의됩니다.
 
 하나의 Workflow는 하나 이상의 Job과, Job 내부의 개별 태스크를 의미하는 하나 이상의 Step들로 구성됩니다. Job과 Step의 개념에 대해서는 아래에서 다시 소개해 드리겠습니다.
 
 #### Event
 
-위에서 설명드렸던, **Workflow의 실행 조건에 해당하는 이벤트**입니다. 소스 코드의 변경(`push`)이나 신규 PR(`pull request`) 또는 Issue(`issue`)의 발생 등 GitHub의 저장소 혹은 브랜치에서 발생하는 다양한 이벤트를 Workflow의 트리거 조건으로 설정할 수 있습니다.
+**Workflow의 트리거 조건**입니다. 코드 push, pull request 생성, issue 등록 등 GitHub 저장소에서 발생하는 다양한 이벤트를 지정할 수 있습니다.
 
 #### Job
 
-**실행되어야 할 각 작업 단계(Step)들의 모음**을 의미합니다. GitHub Actions는 각각의 Job에게 각기 다른 하나씩의 Runner 인스턴스를 할당하여 실행하도록 조정합니다. 모든 Job이 각기 다른 인스턴스 환경에서 실행되기 때문에, Job을 구성할 때엔 실행 환경과 의존성을 함께 명시해 주셔야 합니다.
+**실행되어야 할 각 작업 단계(Step)들의 실행 단위**입니다. 각 Job은 독립된 Runner 인스턴스에서 실행됩니다. 따라서 Job을 구성할 때엔 실행 환경과 의존성을 명시적으로 정의해주셔야 합니다. Job은 다음과 같은 특징을 가집니다:
 
-하나의 Workflow 안에 정의된 Job들은, 서로 간의 의존성 문제가 없다면 동시에 병렬 실행되기도 합니다. 만약 실행 순서를 꼭 지정해야 하는 Workflow라면, 각각의 Job에 다른 Job에 대한 의존성 정보를 추가하여 이를 구현할 수도 있습니다.
+- 의존성이 없는 Job들은 병렬 실행 가능
+- Job 간 의존성 설정을 통해 실행 순서 제어 가능
 
 #### Step
 
-**하나의 Job 안에 포함된 개별적인 실행 프로세스**를 의미합니다. 개별적인 쉘 명령어(shell command)나 특정 애플리케이션의 CLI 명령어(CLI command)를 이 단계에 추가할 수 있습니다. 프론트엔드 엔지니어라면 익숙할 `npm install`, `npm run build`와 같은 명령어도 이러한 단계에 포함됩니다. 필요하다면 GitHub나 사용자 커뮤니티에서 제공하는, 여러 Step들의 조합으로 이루어진 Action을 가져와 실행하도록 만들 수도 있습니다.
-
-일반적으로는, 만약 하나의 Step이라도 실패한다면 해당 Step이 포함된 Job이 그대로 종료됩니다. 만약 특정 Step이 실패하더라도 전체 Job이 계속해서 실행되어야 한다면, 해당 Step에 `continue-on-error: true`를 선언하여 이 문제를 방지할 수 있습니다.
+**Job 내부의 개별 실행 프로세스**입니다. 쉘 명령어(`npm install`, `npm run build` 등) 또는 Action을 이 단계에 추가하여 실행할 수 있습니다. 기본적으로 하나의 Step이 실패하면 해당 Job이 중단됩니다. 필요하다면 `continue-on-error: true` 옵션으로 이를 방지할 수 있습니다.
 
 #### Action
 
-**여러 Step들을 조합하여 일종의 명령어 세트를 만든 것**입니다. 예를 들어, Runner 인스턴스 안에 `Node.js`를 설치해야 한다고 가정합시다. 이때 필요한 단계별 쉘 명령어들을 조합하여 하나의 Action으로 정의할 수 있는 것입니다. 이렇게 정의한 Action은 다른 Workflow에도 재사용할 수 있습니다. 즉, 프론트엔드 엔지니어링에서 흔히 표현하는 '재사용 가능한 컴포넌트'의 개념으로 접근하면 좋습니다.
+**여러 Step들을 조합하여 만든 작업 단위**입니다. 이렇게 정의한 Action은 여러 Workflow에서 재사용 가능합니다. 프론트엔드의 재사용 가능한 컴포넌트와 유사한 개념으로 접근할 수 있겠습니다.
 
 #### Runner
 
-**Workflow를 통해 설계한 자동화 흐름을 실제로 실행시켜 주는 인스턴스**입니다. GitHub Actions에서는 두 종류의 Runner 인스턴스가 지원됩니다. GitHub가 호스팅하는 **GitHub-hosted Runner**, 그리고 사용자가 직접 호스팅하여 관리하는 **Self-hosted Runner**가 그것입니다.
+**Workflow를 실행하는 실행 환경**입니다. GitHub에서는 아래의 두 가지 유형을 지원합니다:
 
-- **GitHub-hosted Runner** : GitHub Actions가 기본적으로 지원하는 인스턴스입니다. 별도의 설정 없이 Workflow 파일의 `jobs.<job_id>.runs-on`에 원하는 `Workflow label`값을 넣는 것만으로도 손쉽게 사용할 수 있습니다. 현재 [Ubuntu Linux, Windows, macOS가 지원]됩니다.
-- **Self-hosted Runner** : [사용자가 직접 제어하는 클라우드 환경의 VM 인스턴스를 GitHub Actions용 Runner로 활용하는 방법]도 있습니다. 관리의 번거로움이 있지만, 인스턴스 활용 측면에서 더 많은 자율성을 얻을 수 있습니다.
+- **GitHub-hosted Runner**: GitHub가 제공하는 기본 실행 환경(Ubuntu Linux, Windows, macOS)
+- **Self-hosted Runner**: 사용자가 직접 관리하는 실행 환경으로, 더 높은 커스터마이징이 가능
 
 ## React 애플리케이션을 위한 CI/CD Workflow 작성
 
