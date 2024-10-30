@@ -47,7 +47,7 @@ public class Club {
           (중략)
             .
 ```
-OneToMany의 기본 로딩 전략은 LAZY이며, 반갑개 백엔드 팀의 JPA 연관 관계 컨벤션은 특별한 이유가 없는 한 **지연 로딩(LAZY)**을 기본으로 사용합니다. API 응답에 필요한 연관된 엔티티는 Repository 계층에서 Join Fetching 또는 EntityGraph를 통해 명시적으로 로드하기로 했습니다.
+OneToMany의 기본 로딩 전략은 LAZY이며, 반갑개 백엔드 팀의 JPA 연관 관계 컨벤션은 특별한 이유가 없는 한 **지연 로딩(LAZY)** 을 기본으로 사용합니다. API 응답에 필요한 연관된 엔티티는 Repository 계층에서 Join Fetching 또는 EntityGraph를 통해 명시적으로 로드하기로 했습니다.
 
 따라서, MVC 단계 요구사항 중 "내가 참여한 모임 리스트" API를 개발하기 위해 다음과 같은 JPQL을 사용하게 됐습니다.
 
