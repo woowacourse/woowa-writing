@@ -9,7 +9,7 @@
 - broadcasting 및 intent 수신과 같은 어플리케이션 수준의 작업에 대한 up-call을 허용
      - ex) startActivity, bindService
 
-## Context 생성 원리 
+## Context 초기화 과정
 
 위의 설명과 같이, `context`는 추상 클래스이기 때문에 구현체가 필요합니다.
 
@@ -97,6 +97,11 @@ public class ContextThemeWrapper extends ContextWrapper {
 
     // ...
 
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(newBase);
+    }
+
 }
 
 public class ContextWrapper extends Context {
@@ -136,12 +141,12 @@ private Activity performLaunchActivity(ActivityClientRecord r, Intent customInte
 
         // ...
 
-        ContextImpl appContext = createBaseContextForActivity(r);
+        ContextImpl appContext = createBaseContextForActivity(r); // ActivityContext
         Activity activity = null;
 
 
         try {
-            Application app = r.packageInfo.makeApplicationInner(false, mInstrumentation);
+            Application app = r.packageInfo.makeApplicationInner(false, mInstrumentation); // ApplicationContext
 
             // ...
 
@@ -161,9 +166,23 @@ private Activity performLaunchActivity(ActivityClientRecord r, Intent customInte
 - 엄밀히 따지면 `ZygoteInit`에서 프로세스가 시작되지만, 메인 Looper가 ActivityThread에서 초기화되므로 어플리케이션의 시작점과 같은 표현이라 생각합니다.
 
 
-### `ApplicationContext`
+### 정리
+Context가 생성되는 과정을 정리하면 다음과 같습니다.
 
-그리고 지금부터, `applicatonContext`가 어떻게 생성되는지 뜯어보겠습니다.
+1. 액티비티 luanch 시, `ActivityThread#performLaunchActivity` 실행
+    - ActivityContext 생성합니다.
+    - 새로 생성된, 혹은 캐시된 ApplicationContext를 가져옵니다.
+2. `Activity#attach` 실행
+    - mApplication 프로퍼티 초기화
+3. `ContextThemeWrapper#attachBaseContext` 실행
+4. `ContextWrapper#attachBaseContext` 실행
+    - mBase 프로퍼티 초기화
+
+
+
+## ApplicationContext 생성 원리
+
+그리고 지금부터, `ApplicatonContext`가 어떻게 생성되는지 자세히 뜯어보겠습니다.
 
 우선은 함수가 호출되는 순서를 먼저 설명하겠습니다.
 
@@ -188,7 +207,7 @@ public static void main(String[] args) {
 }
 ```
 
-`ActivityThread` 내부에서 `thread.attach(false, startSeq)`를 통해 `applicationContext`가 초기화되고 생성됩니다.
+`ActivityThread` 내부에서 `thread.attach(false, startSeq)`를 통해 `ApplicationContext`가 초기화되고 생성됩니다.
 
 ```
 @UnsupportedAppUsage
@@ -211,12 +230,12 @@ private void attach(boolean system, long startSeq) {
 
 ```
 
-`attach` 메서드 내부를 보면, `attachApplication` 메서드를 통해 초기화하고 있습니다.
+`attach` 메서드 내부에서, `attachApplication` 메서드를 통해 초기화하고 있습니다.
 이렇게 코드를 따라가면, `ActivityManagerService`와 `ApplicationThread`에 도달하여 `applicationContext`를 초기화합니다.
 
 이에 대한 자세한 내용은, 주제에서 벗어나기 때문에 추후에 다른 문서에서 다루도록 하겠습니다.
 
-그 후 `ApplicationThread`를 통해 Handler로 메시지를 받아, 메시지의 데이터를 이용해 `handleBindApplication`메서드를 통해 `application`을 생성합니다.
+그 후 `ApplicationThread`를 통해 Handler로 메시지를 받아, 메시지의 데이터를 이용해 `handleBindApplication`메서드를 통해 `Application`을 생성합니다.
 
 ```
 @UnsupportedAppUsage
@@ -240,24 +259,25 @@ public static Application currentApplication() {
 
 ```
 
+### 정리
+
 위의 로직 순서를 정리하면 다음과 같습니다.
 
-1. `ActivityThread#main` 메서드의 thread.attach(false, startSeq) 실행
-    - ApplicationContext를 초기화하고 싱글톤으로 생성
-        - ActivityManager.getService() 를 통해 `ActivityManagerService` 를 가져옴
-        - `attachApplication` 메서드 실행
+1. `ActivityThread#main` 메서드 내부에서 thread.attach(false, startSeq) 실행
+2. `ActivityThread#attach` 메서드 실행
+    - ActivityManager.getService() 를 통해 `ActivityManagerService` 를 가져옴
+    - `ActivityManagerService#attachApplication` 메서드 실행
 
-2. `ActivityManagerService#attachApplicaton` 실행
+3. `ActivityManagerService#attachApplicaton` 실행
     - 어플리케이션 데이터를 가져와서 `AppliactionContext` 생성
         - `attachApplicationLocked` 메서드에서 어플리케이션 데이터를 가져오고, `ApplicationThread`에 전달합니다.
         - `ApplicationThread#bindApplication` 메서드 파라미터를 통해 들어온 데이터들를 `AppBundle`로 랩핑합니다.
         - `Handler`를 통해 랩핑한 데이터를 전달합니다.
 
-3. `ActivityThread#handleBindApplication` 실행 
-    - Handler를 통해 전달받은 데이터를 이용해 `applicationContext` 생성
+4. `ActivityThread#handleBindApplication` 실행 
+    - Handler를 통해 전달받은 데이터를 이용해 `ApplicationContext`를 싱글톤으로 초기화합니다.
 
-
-이제, `ApplicationContext`를 초기화하는 과정을 자세히 뜯어보겠습니다.
+그렇다면, `ApplicationContext`를 생성하기 위해 어떤 정보가 필요할까요?
 
 ```
 private void handleBindApplication(AppBindData data) {
@@ -294,6 +314,8 @@ private Application makeApplicationInner(boolean forceDefaultAppClass,
 
 makeApplication 메서드에서는 `ContextImpl#createAppContext`를 이용해 ContextImpl 객체를 생성하고 application을 생성하고 있습니다.
 
+이때, 기존에 생성한 application이 있다면, 새로 생성하지 않고 기존 객체를 반환합니다.
+
 ContextImpl 내부를 보면
 
 ```
@@ -314,30 +336,16 @@ class ContextImpl extends Context {
         mPackageInfo = packageInfo;
     }
 
-    @Override
-    public Context createApplicationContext(ApplicationInfo application, int flags)
-            throws NameNotFoundException {
-        LoadedApk pi = mMainThread.getPackageInfo(application, mResources.getCompatibilityInfo(),
-                flags | CONTEXT_REGISTER_PACKAGE);
-        if (pi != null) {
-            ContextImpl c = new ContextImpl(this, mMainThread, pi, ContextParams.EMPTY,
-                    mAttributionSource.getAttributionTag(),
-                    mAttributionSource.getNext(),
-                    null, mToken, new UserHandle(UserHandle.getUserId(application.uid)),
-                    flags, null, null);
+    static ContextImpl createAppContext(ActivityThread mainThread, LoadedApk packageInfo) {
+        return createAppContext(mainThread, packageInfo, null);
+    }
 
-            final int displayId = getDisplayId();
-            final Integer overrideDisplayId = mForceDisplayOverrideInResources
-                    ? displayId : null;
-
-            c.setResources(createResources(mToken, pi, null, overrideDisplayId, null,
-                    getDisplayAdjustments(displayId).getCompatibilityInfo(), null));
-            if (c.mResources != null) {
-                return c;
-            }
-        }
-
-        // ...
+    static ContextImpl createAppContext(ActivityThread mainThread, LoadedApk packageInfo, String opPackageName) {
+        if (packageInfo == null) throw new IllegalArgumentException("packageInfo");
+        ContextImpl context = new ContextImpl(null, mainThread, packageInfo, ContextParams.EMPTY, null, null, null, null, null, 0, null, opPackageName);
+        context.setResources(packageInfo.getResources());
+        context.mContextType = isSystemOrSystemUI(context) ? CONTEXT_TYPE_SYSTEM_OR_SYSTEM_UI : CONTEXT_TYPE_NON_UI;
+        return context;
     }
 }
 ```
@@ -364,7 +372,7 @@ public Application newApplication(ClassLoader cl, String className, Context cont
 이렇게 newApplication 메서드를 통해 application 객체를 생성하고 applicationContext를 초기화 합니다.
 
 
-### `ActivityContext`
+## ActivityContext 생성 원리
 
 그렇다면, `ActivityContext`와 `ApplicatonContext`는 어떻게 다를까요?
 
@@ -410,3 +418,12 @@ static ContextImpl createActivityContext(ActivityThread mainThread,
 마지막으로, ContextWrapper 본래의 클래스를 그대로 사용하여 별도의 객체를 생성하고 있습니다.
 
 이러한 부분 때문에 ActivityContext와 ApplicationContext 간의 차이가 발생합니다.
+
+## ApplicationContext vs ActivityContext
+
+그렇다면, 각각의 Context는 어떠한 상황에서 쓰는게 적절할까요?
+
+공식문서에서는 `regiesterReceiver`와 어떻게 상호작용 하는지를 예시를 들며 설명하고 있습니다.
+
+- 만약 `ActivityContext`를 이용해 사용한다면, 그 receiver는 해당 activity 내에 종속됩니다. 이것은, activity가 destroy 되기 전까지는 receiver 등록이 해지되지 않는다는 것을 의미합니다. 만약 그렇게 하지 않으면, 프레임워크는 activity를 제거하고 오류를 기록하면서 누수된 registration을 정리합니다. 
+- 만약 `ApplicationContext`를 사용한다면, 어플리케이션의 전역적인 상태에 종속되게 됩니다. registration이 자동으로 취소되지 않으므로, 특정 컴포넌트가 아닌 정적 데이터와 연결된 경우에 필요합니다.
