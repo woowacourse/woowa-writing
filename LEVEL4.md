@@ -136,22 +136,22 @@ DB가 외부 시스템보다 더 오래 걸리는 것은 불가능하다는 말�
 ![image](https://github.com/user-attachments/assets/08911228-5e97-4b3f-b3a4-457724cd87c3)
 
 실패한 테스트를 보고 수정한 코드입니다.
-가정을 없애고 name, age, postion 각각에 await가 있는 것을 볼 수 있습니다.
+가정을 없애고 name, age, poistion 각각에 await가 있는 것을 볼 수 있습니다.
 이제 테스트가 통과합니다.
 
 <br>
 
 ![image](https://github.com/user-attachments/assets/98e88ff5-2be6-475a-8d39-d4617a0778d5)
 
-그런데 아직 남아있는 문제점이 있습니다. 테스트를 돌리면 delay만큼 오래걸린다는 점입니다.
+그런데 아직 남아있는 문제점이 있습니다. 테스트를 돌리면 delay만큼 오래 걸린다는 점입니다.
 
-이런한 테스트 코드가 늘어나면 테스트 돌리는 시간이 기하급수적으로 증가할 것입니다.
+이러한 테스트 코드가 늘어나면 테스트 돌리는 시간이 기하급수적으로 증가할 것입니다.
 
 이러한 문제를 코틀린 코루틴 테스트 라이브러리를 사용하면 해결할 수 있습니다.
 
 <br>
 
-코틀린 코루틴 테스트 라이브러리 적용시
+코틀린 코루틴 테스트 라이브러리 적용 시
 ![image](https://github.com/user-attachments/assets/69b5ef55-c2c8-4d30-a031-16dbf35343f5)
 
 <br>
@@ -162,7 +162,7 @@ DB가 외부 시스템보다 더 오래 걸리는 것은 불가능하다는 말�
 
 ![image](https://github.com/user-attachments/assets/4ec82a74-6178-459a-8bda-1a17dd753bcb)
 
-코틀린 코루틴 테스트 라이브러리의 가장 최신 버전인 1.9.0 기준으로 설명드리겠습니다.
+코틀린 코루틴 테스트 라이브러리의 가장 최신 버전인 1.9.0 기준으로 설명하겠습니다.
 
 <br>
 
@@ -170,7 +170,7 @@ DB가 외부 시스템보다 더 오래 걸리는 것은 불가능하다는 말�
 
 ![image](https://github.com/user-attachments/assets/c930c1f4-780d-48fe-8eb2-2f0e8c23c11b)
 
-테스트 코드를 보시면 runTest 블록안에 코드들이 있는 것을 볼 수 있습니다. 
+테스트 코드를 보시면 runTest 블록 안에 코드들이 있는 것을 볼 수 있습니다. 
 
 결론부터 말하자면 runTest는 테스트 환경 가상 시간 위에서 돌아가기 때문에 delay를 스킵할 수 있습니다.
 
@@ -181,7 +181,7 @@ DB가 외부 시스템보다 더 오래 걸리는 것은 불가능하다는 말�
 ![image](https://github.com/user-attachments/assets/4d8f0342-32cd-4dd6-a233-142a7c01e152)
 
 runTest 구조입니다. runTest는 코루틴 테스트 목적으로 만들어진 특별한 코루틴 빌더입니다.
-테스트 코드를 실행하고 자동으로 딜레이 스킵합니다. 또한 처리되지 않은 예외 핸들링을 할 수 있고 TimeOut도 설정 할 수 있습니다.
+테스트 코드를 실행하고 자동으로 딜레이 스킵합니다. 또한 처리되지 않은 예외 핸들링을 할 수 있고 TimeOut도 설정할 수 있습니다.
 
 runTest는 TestScope을 가지고 있고 TestScope은 TestDispatcher를 가지고 있습니다.
 그리고 TestDispatcher는 TestCoroutineScheduler에 의존하고 있습니다.
@@ -196,7 +196,7 @@ TestDispatcher의 구현체로는 StadradTestDispather, UnconfinedTestDispather�
 왜냐하면 테스트 환경에서 시간의 흐름을 일관되게 제어하기 위해서입니다.
 
 TestDispatcher의 딜레이는 TestCoroutineScheulder에 의해 컨트롤 됩니다.
-실제 시간만큼 기다리는 DefaultDelay 대신  디스패처가 가진 scheduleResumeAfterDelay 함수를 호출하니다.
+실제 시간만큼 기다리는 DefaultDelay 대신 디스패처가 가진 scheduleResumeAfterDelay 함수를 호출합니다.
 
 <br>
 
@@ -215,7 +215,7 @@ TestCoroutineScheduler에 연결되어 있다는 것을 제외하면 특별한 �
 
 자식 코루틴들이 실행되기 전에 assertEquals 코드가 실행되기 때문입니다.
 
-테스트를 성공하게 하려면가상 시간을 조작해야 합니다.
+테스트를 성공하게 하려면 가상 시간을 조작해야 합니다.
 
 세 가지 메서드를 사용하여 가상 시간을 조작할 수 있습니다.
 
@@ -233,7 +233,7 @@ runcurrent() 메서드는 현재 큐에 있는 모든 코루틴을 즉시 실행
 ![image](https://github.com/user-attachments/assets/02537a45-9c6b-417e-bb9e-c809bfe7ea11)
 
 - advanceTimeBy(delayTimeMillis: Long)
-    - advanceTimeBy는 지정된 시간만큼 가상 시간을 진행시킵니다. 이 시간 동안 지연된 코루틴이 실행됩니다.
+    - advanceTimeBy는 지정된 시간만큼 가상 시간을 진행합니다. 이 시간 동안 지연된 코루틴이 실행됩니다.
 
 ![image](https://github.com/user-attachments/assets/749a8676-cd9a-458c-9ab2-c6cbc495e7d5)
 
@@ -261,7 +261,7 @@ UnconfinedTestDispatcher는 코루틴을 즉시 실행하기 때문에, 테스�
 ## 요약
 코틀린 코루틴 테스트하는 방법에 대해 알아봤습니다.
 
-runTest를 사용하면 편리하게 코틀린 코루틴 테스트를 사용할 수 있지만 잘 알고 어떻게 테스트할지 고민하고 사용하는것도 중요합니다.
+runTest를 사용하면 편리하게 코틀린 코루틴 테스트를 사용할 수 있지만 잘 알고 어떻게 테스트할지 고민하고 사용하는 것도 중요합니다.
 
 <br>
 
