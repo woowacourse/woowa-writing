@@ -2,16 +2,16 @@
 
 '테스트 실패해요.'
 
-땅콩 프로젝트에서는 `LocalDateTime.now()`로 현재 시간을 가져오는 비즈니스 로직이 있습니다. 단위 테스트를 작성하고 자신있게 Pull Request를 올렸지만 CI에서 테스트가 실패하고 말았습니다. 테스트를 실행할 때마다 현재 시간이 달라져 어느 시점부터 완전히 실패하는 테스트가 되었기 때문이었습니다.
+땅콩 프로젝트는 `LocalDateTime.now()`로 현재 시간을 가져와서 비교하는 비즈니스 로직이 있습니다. 단위 테스트를 작성하고 자신있게 Pull Request를 올렸지만 CI에서 테스트가 실패했습니다. 테스트를 실행할 때마다 현재 시간이 달라져 어느 시점부터 완전히 실패하는 테스트가 되었기 때문이었습니다.
 
 좋은 단위 테스트는 [F.I.R.S.T 원칙](https://howtodoinjava.com/best-practices/first-principles-for-good-tests/)을 따릅니다. 하지만 제가 구현한 테스트는 반복 가능한 테스트, 즉 **Repeatable** 원칙을 만족하지 못하고 있었습니다.
 
-현재 시간과 같은 랜덤 요소를 제어하는 것은 테스트에서 매우 중요합니다. 저는 단순히 '랜덤한 시간 제어하기'를 넘어 두 가지도 함께 고민했습니다.
+현재 시간과 같은 랜덤 요소를 제어하는 것은 테스트에서 매우 중요합니다. 저는 '랜덤한 시간을 제어해서 반복 가능한 테스트 만들기'를 넘어 두 가지도 함께 고민했습니다.
 
 1. 테스트 가독성 높이기
 2. 다른 팀원들도 테스트에서 쉽게 시간 제어하기
 
-위 고민을 해결하기 위해 어떤 시도를 했는지, 마지막으로 어노테이션 하나로 시간을 어떻게 제어했는지 소개드리고자 합니다.
+위 고민을 해결하기 위해 어떤 시도를 했는지, 그리고 어노테이션 하나로 시간을 어떻게 제어했는지 소개드리고자 합니다.
 
 ## 테스트에서 시간을 어떻게 제어하면 좋을까?
 
@@ -72,9 +72,9 @@ class TimeControllerTest {
 
 테스트를 실행하면 고정된 시간을 잘 반환하고 있습니다. 문제를 해결했나 싶었지만 MockedStatic은 스레드 로컬로 동작하기 때문에 문제점이 있습니다.
 
-리소스를 해제하지 않으면 같은 스레드를 재사용하는 테스트에 영향을 줄 수 있습니다. 그래서 try-with-resources 구문을 사용하거나 close()를 명시적으로 호출해서 **항상 리소스를 해제**해야 합니다.
+리소스를 해제하지 않으면 MockedStatic이 스레드에 활성 상태로 남아있게 되고, 같은 스레드를 재사용하는 다른 테스트에 영향을 줄 수 있습니다. 그래서 try-with-resources 구문을 사용하거나 `close()`를 명시적으로 호출해서 **항상 리소스를 해제**해야 합니다.
 
-[@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)](https://docs.spring.io/spring-boot/reference/testing/spring-boot-applications.html)을 사용하는 테스트는 테스트와 별도의 스레드에서 실행되기 때문에 스레드 로컬로 처리되는 MockedStatic이 반영되지 않습니다. 땅콩은 컨트롤러 테스트로 RestAssured와 WebEnvironment.RANDOM_PORT를 사용하기 때문에 이 방식으로는 문제를 해결할 수 없었습니다.
+[@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)](https://docs.spring.io/spring-boot/reference/testing/spring-boot-applications.html)을 사용하면 HTTP 클라이언트가 테스트와 별도의 스레드에서 실행되기 때문에 스레드 로컬로 처리되는 MockedStatic이 반영되지 않습니다. 땅콩은 컨트롤러 테스트로 RestAssured와 WebEnvironment.RANDOM_PORT를 사용하기 때문에 이 방식으로는 문제를 해결할 수 없습니다.
 
 ```java
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -110,7 +110,7 @@ class TimeControllerTest {
 
 <img src="./images/mockStatic_RestAssured.png" width=900>
 
-실제로 테스트를 해보면 서로 다른 스레드에서 실행되어서 모킹이 적용되지 않음을 확인할 수 있습니다.
+실제로 테스트를 해보면 서로 다른 스레드에서 실행되어 모킹이 적용되지 않음을 확인할 수 있습니다.
 
 ### 2. LocalDateTime을 래핑하는 클래스
 
@@ -124,7 +124,7 @@ public class LocalDateTimeWrapper {
 }
 ```
 
-LocalDateTime을 한 번 감싸는 래핑 클래스를 생성해서 테스트 더블로 대체하는 방법입니다.
+LocalDateTime을 한 번 감싸는 래핑 클래스를 생성해서 테스트 더블을 사용하는 방법입니다.
 
 ```java
 @Service
@@ -241,13 +241,13 @@ public class TimeServiceTest {
 }
 ```
 
-테스트에서는 Clock을 MockBean으로 주입하고 현재 시간을 만들어낼 때 사용하는 Instant와 Zone을 원하는 값으로 반환합니다.
+테스트에서는 Clock을 MockBean으로 주입하고 현재 시간을 만들어낼 때 사용하는 Instant를 원하는 값으로 반환합니다.
 
 **주의할 점**은 Instant에 작성한 시간을 Zone에 따라 변환하기 때문에 Zone을 UTC로 반환하지 않으면 `LocalDateTime.now(clock)`에서 예상하지 않은 값이 리턴됩니다.
 
 <img src="./images/clock_mocking.png" width=900>
 
-테스트를 실행하면 고정된 시간을 반환하고 있습니다. 하지만 Clock을 사용하는 테스트마다 모킹하는 보일러플레이트 코드를 작성해야 하는 점이 번거롭습니다.
+테스트를 실행하면 고정된 시간을 반환하고 있습니다. 하지만 Clock을 사용하는 테스트마다 모킹하는 보일러플레이트 코드를 작성해야 하는 점이 매우 번거롭습니다.
 
 `@TestConfiguration`을 사용하면 **고정된 Clock 객체**를 primary bean으로 등록해서 테스트 전역으로 Clock을 제어할 수 있습니다. 테스트 더블의 Fake 방법입니다.
 
@@ -276,16 +276,16 @@ public class TimeServiceTest {
     }
 }
 ```
-`@Import`로 TestConfiguration 설정을 적용하면 고정된 Clock 객체를 사용합니다. 반복되는 보일러플레이트 코드가 모두 사라졌습니다!
+`@Import`로 설정을 적용하면 고정된 Clock 객체를 사용합니다. 반복되는 보일러플레이트 코드가 모두 사라졌습니다!
 
-## 커스텀 어노테이션으로 Clock 객체를 모킹할 수 없을까?
+## 커스텀 어노테이션으로 현재 시간을 제어할 수 없을까?
 
-`@TestConfiguration`을 사용해서 Clock bean을 전역으로 모킹했지만 테스트를 작성할 때 여전히 불편함이 있었습니다.
+`@TestConfiguration`을 사용해서 Clock bean을 전역으로 제어했지만 테스트를 작성할 때 여전히 불편함이 있었습니다.
 1. 매 번 TestConfiguration에 고정된 시간을 확인하면서 테스트를 작성해야 함 ('시간 언제로 고정되어 있었지?')
 2. 테스트를 유연하게 작성하기 어려움 ('이 테스트에서는 다른 시간으로 고정해야 하는데...')
 3. 테스트에서 데이터를 왜 x시간으로 저장했는지 한 번에 읽히지 않음 ('이 테스트는 왜 x시간으로 저장하지?')
 
-### JUnit 5의 extension 사용하기
+### JUnit 5의 extension 사용
 `@TestConfiguration`의 불편함을 극복하기 위해서 extension 기능을 활용했습니다. JUnit 5부터 도입된 extension은 테스트 라이프사이클의 다양한 단계에 특정 동작을 확장할 수 있는 기능입니다.
 
 extension 중애서 라이프사이클 콜백을 사용하면 테스트 전, 후로 메서드를 실행할 수 있습니다. 실행 순서는 다음과 같습니다.
@@ -349,7 +349,7 @@ public class FixedClockExtension implements BeforeEachCallback {
 ```
 FixedClock은 후에 설명할 커스텀 어노테이션입니다. 리플렉션으로 테스트 메서드나 테스트 클래스를 읽어서 `@FixedClock` 어노테이션을 찾습니다. 이 때 메서드에 작성된 어노테이션이 클래스에 작성된 어노테이션보다 우선하게 됩니다. Application Context에 존재하는 Clock bean을 찾아서 어노테이션에 작성된 날짜와 시간으로 모킹합니다.
 
-### 커스텀 어노테이션
+### 커스텀 어노테이션 생성
 ```java
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
@@ -364,7 +364,7 @@ public @interface FixedClock {
 테스트에서 사용할 커스텀 어노테이션입니다.
 extension은 `@ExtendWith` 어노테이션을 작성하면 적용됩니다. 여기서는 `@FixedClock` 어노테이션에 포함시켰기 때문에 `@FixedClock`을 사용하면 extension이 자동으로 동작하게 됩니다.
 
-### 테스트에 적용하기
+### 테스트 적용
 ```java
 @SpyBean(Clock.class)
 @FixedClock(date = "2025-01-01", time = "00:00:00")
@@ -390,28 +390,27 @@ Clock 객체는 테스트 클래스에서 실제 객체 또는 mock 객체로 �
 
 <img src="./images/fixed_clock_class.png" width=900>
 
-첫 번째 테스트는 클래스 레벨에 있는 `@FixedClock`을 반환합니다.
+첫 번째 테스트는 클래스 레벨에 있는 `@FixedClock`의 현재 시간을 반환합니다.
 
 <img src="./images/fixed_clock_method.png" width=900>
 
-두 번째 테스트는 메서드 레벨에 있는 `@FixedClock`을 반환합니다.
+두 번째 테스트는 메서드 레벨에 있는 `@FixedClock`의 현재 시간을 반환합니다.
 
 >`@SpyBean` 어노테이션은 클래스 또는 필드에서만 사용할 수 있습니다. 만약 `@FixedClock`을 클래스에서만 사용할 수 있도록 제한하면 `@SpyBean(Clock.class)`도 `@FixedClock`에 포함시킬 수 있습니다. <br>
 > 현재 구현은 `@FixedClock`을 메서드에서도 사용할 수 있기 때문에 어노테이션이 메서드 레벨에만 사용됐을 경우 `@SpyBean`이 동작하지 않아 예외가 발생합니다.
 
+이제 `@FixedClock` 어노테이션만 명시하면 어노테이션에 작성한 날짜, 시간으로 현재 시간을 반환할 수 있게 되었습니다!
 
+## 마치며
+지금까지 테스트에서 현재 시간을 제어하는 여러가지 방법과 어노테이션을 사용해서 제어하는 방법까지 알아보았습니다. 땅콩은 어노테이션 기반 제어 방법을 적용해서 세 가지의 장점을 얻을 수 있었습니다.
+1. 어노테이션 하나만 사용하면 현재 시간을 쉽게 제어할 수 있다.
+2. 각 테스트마다 독립적으로 고정된 시간을 사용하여 유연하게 테스트를 작성할 수 있다.
+3. 고정된 시간이 무엇인지 명시함으로써 가독성을 높일 수 있다.
 
-어노테이션만 명시하면 어노테이션에 작성한 날짜, 시간으로 현재 시간을 리턴하게 되었습니다
-
-어노테이션 기반 현재 시간 제어의 3가지 장점
-1. 각 테스트마다 개발자 고유의 고정된 시간을 사용할 수 있음
-2. 각 테스트마다 독립적으로 고정된 시간을 사용하여 유연하게 테스트를 작성할 수 있음
-3. 고정된 시간이 무엇인지 명시함으로써 가독성 증가
-
+다양한 방법을 비교해보고 자신 또는 팀에 맞는 방법을 선택하는 것이 중요하다고 생각합니다. 많이 부족한 글이지만 저와 비슷한 고민을 했던 개발자분들에게 조금이나마 도움이 되었으면 좋겠습니다. 감사합니다.
 
 ## 레퍼런스
-
 - https://www.baeldung.com/mockito-mock-static-methods
 - https://github.com/mockito/mockito/issues/1013
-- https://docs.oracle.com/javase/8/docs/api/java/time/LocalDate.html#now-java.time.Clock-
+- https://docs.oracle.com/javase/8/docs/api/java/time/LocalDateTime.html#now-java.time.Clock-
 - https://www.baeldung.com/junit-5-extensions
