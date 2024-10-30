@@ -289,6 +289,16 @@ yarn add -D eslint @typescript-eslint/parser @typescript-eslint/eslint-plugin es
 yarn add -D prettier eslint-config-prettier eslint-plugin-prettier
 ```
 
+각 라이브러리의 역할은 다음과 같습니다.
+
+- `eslint`: 코드의 스타일을 일관되게 유지하고, 잠재적인 오류를 찾는 린팅 도구입니다.
+- `@typescript-eslint/parser`: 타입스크립트 코드를 분석하고, ESLint가 타입스크립트 문법을 이해할 수 있도록 도와주는 파서(parser)입니다.
+- `@typescript-eslint/eslint-plugin`: 타입스크립트 코드에 대해 구체적인 ESLint 규칙을 정의하고 적용할 수 있게 해주는 플러그인입니다.
+- `eslint-plugin-react`: 리액트 코드에 대해 권장되는 스타일과 규칙을 적용할 수 있도록 도와주는 리액트 전용 ESLint 플러그인입니다.
+- `eslint-plugin-react-hooks`: 리액트 훅(Hooks) 사용 시, 권장되는 규칙을 강제하여 리액트 훅의 올바른 사용을 보장하는 플러그인입니다.
+- `eslint-plugin-import`: 모듈 import/export 문에 대해 일관된 코드 스타일과 최적화를 지원하는 플러그인입니다.
+- `eslint-plugin-react-refresh`: 리액트의 Fast Refresh 기능을 지원하는 ESLint 플러그인으로, 주로 개발 환경에서 코드 변경 시 컴포넌트를 빠르게 업데이트할 수 있도록 도와줍니다.
+
 ### 설정 파일 작성
 
 ESLint 설정 파일인 `.eslintrc.cjs`를 작성합니다.
@@ -407,7 +417,7 @@ yarn add -D stylelint stylelint-order stylelint-config-clean-order @stylelint/po
 }
 ```
 
-이제 스크립트를 실행하여 코드에 StyleLint를 적용할 수 있게 되었습니다. 하지만 코드를 저장할 때마다 자동으로 적용되게 하고 싶다면 VSCode 추가 설정을 할 수 있습니다. 과정은 다음과 같습니다.
+이제 스크립트를 실행하여 코드에 StyleLint를 적용할 수 있게 되었습니다. 만약 코드를 저장할 때마다 자동으로 적용되게 하고 싶다면 다음과 같이 VSCode 추가 설정을 할 수 있습니다.
 
 1. VSCode에서 StyleLint 확장 프로그램을 설치합니다.
 2. `.vscode/setting.json`에서 다음의 설정을 추가합니다.
@@ -423,11 +433,11 @@ yarn add -D stylelint stylelint-order stylelint-config-clean-order @stylelint/po
 }
 ```
 
-이제 저장할 때마다 CSS-in-JS에서도 자동으로 포맷팅이 가능합니다.
+이제 타입스크립트로 작성된 스타일 파일도 자동으로 포맷팅 할 수 있게 되었습니다.
 
 ## 10. MSW 세팅
 
-백엔드에서 API를 제공하기 전까지 자체적으로 개발하기 위해 MSW를 설치합니다.
+백엔드에서 API를 제공하기 전까지 프론트엔드 단에서 개발을 이어나가기 위해 MSW를 설치합니다.
 
 ### 설치
 
@@ -461,6 +471,7 @@ yarn add -D @testing-library/react @testing-library/jest-dom @testing-library/us
 
 ## 12. 시작 파일 작성
 
+마지막으로 시작 파일을 작성해서 개발 환경이 잘 구축되었는지 확인해보겠습니다.
 먼저, 클라이언트가 직접 접근할 수 있는 public 폴더를 만들고 `index.html`을 작성합니다.
 
 ```html
