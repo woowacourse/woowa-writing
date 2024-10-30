@@ -62,7 +62,7 @@
 
 # 3. 실습 - 이미지 캐시
 
-> 자세한 코드는 [실습 깃허브 주소](아직 push 안함!)에서 확인할 수 있습니다!
+> 자세한 코드는 [실습 깃허브 주소](https://github.com/murjune/Image-Cache-Sample)에서 확인할 수 있습니다!
 
 ![img_1.png](img_1.png)
 
@@ -226,7 +226,7 @@ lruCache() 팩토리 함수를 통해 `LRUCache` 를 생성하였습니다.
 - `sizeOf` 는 캐시에 저장될 데이터 `하나`의 크기를 계산하는 람다입니다.
 
 만약, 캐시에 추가된 Bitmap 의 `byteCount` 가 `1024` 보다 크다면, `1KB` 단위로 캐시에 저장됩니다.
-lruCache() 의 사용법이 궁금하시다면 [lruCache 학습테스트](아직 없음) 를 참고해주세요!
+lruCache() 의 사용법이 궁금하시다면 [lruCache 학습테스트](https://github.com/murjune/Image-Cache-Sample/blob/step4-lru-cache/app/src/test/java/sample/image/cache/LRUCacheStudyTest.kt) 를 참고해주세요!
 
 > 왜 `maxMemory / 8` 로 설정했을까요? 🤔
 > 
@@ -283,7 +283,9 @@ private fun manageDiskCacheSize() {
 
 하지만, 이번 글을 통해 캐시를 직접 구현해보면서 캐시의 동작 원리를 이해하시는 것이 추후 우리의 서비스에 효율적인 캐시 전략을 선택하고 적용하는 데 도움이 될 것입니다! 🚀
 
-감사합니다! 🌹
+감사합니다! 🌹  
+
+[실습 코드 깃허브 주소](https://github.com/murjune/Image-Cache-Sample)
 
 # 참고 문헌
 
