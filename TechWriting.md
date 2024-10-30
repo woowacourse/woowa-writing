@@ -211,7 +211,7 @@ Workflow가 실행될 때마다 의존성 설치가 반복된다면 불필요한
 
 ### CD 단계의 Workflow 작성
 
-현재 크루루는 AWS 환경에서 서비스를 운영하고 있습니다. 이처럼 퍼블릭 클라우드 인프라 환경에서 우리 프로젝트에 특화된 CD를 구현하려면 정말 많은 사전 작업이 필요합니다. 이 글의 목적은 GitHub Actions를 이용한 Workflow 예시를 소개하는 것이므로, 목적과 무관한 사전 작업 내용들은 과감히 생략하겠습니다. 여기서는 **빌드된 애플리케이션을 별다른 설정 없이 GitHub Pages에 곧바로 배포한다는 가정** 하에 Workflow 작성을 이어가도록 하겠습니다.
+크루루는 현재 AWS 환경에서 서비스를 운영하고 있습니다. 하지만 클라우드 환경에서의 CD 구현은 IAM 설정, 네트워크 및 인프라 구축 등 복잡한 사전 작업이 필요합니다. 이 글의 목적은 GitHub Actions 워크플로우 자체에 초점을 맞추는 것이므로, 별도의 인프라 설정 없이 바로 배포가 가능한 GitHub Pages를 예시로 사용하겠습니다.
 
 #### 새로운 Job 구성
 
@@ -221,7 +221,7 @@ deploy-to-gh-pages:
   runs-on: ubuntu-22.04
 ```
 
-배포를 위한 새로운 Job을 위와 같이 정의합니다. 이때 `needs: run-test-pr-opened`라는 문구를 이용하여, `deploy-to-gh-pages` Job이 앞서 정의한 `run-test-pr-opened` Job이 성공적으로 완료된 이후에 실행되도록 만듭니다.
+배포를 위한 새로운 Job을 정의합니다. `needs` 키워드를 통해 이전 테스트 Job(`run-test-pr-opened`)의 성공적인 완료를 전제 조건으로 설정합니다.
 
 #### 배포 단계별 작업 설정
 
@@ -244,13 +244,17 @@ steps:
       publish_branch: gh-pages
 ```
 
-`run-test-pr-opened` Job과 동일하게 저장소 체크아웃부터 실행한 뒤, 배포할 파일을 Artifact로부터 다운로드 받습니다. 이때 Artifact 이름을 반드시 이전 단계의 Job에서 생성한 것과 같은 이름(`fe-dev-dist`)으로 지정해야 합니다.
+배포 프로세스는 다음의 세 단계로 진행됩니다.
 
-마지막으로 커뮤니티 액션(`peaceiris/actions-gh-pages@v4`)을 이용하여 GitHub Pages로의 배포를 진행합니다. 이렇게 설정한다면, GitHub Pages가 기본적으로 사용하는 `gh-pages`로 빌드된 파일이 배포될 것입니다.
+1. 저장소 체크아웃
+2. 이전 Job에서 생성한 빌드 파일(`fe-dev-dist`) 다운로드
+3. GitHub Pages 배포 (`peaceiris/actions-gh-pages@v4` 커뮤니티 액션 활용)
+
+이렇게 설정하면 빌드된 파일이 GitHub Pages의 기본 브랜치인 `gh-pages`에 자동으로 배포됩니다.
 
 ### CI/CD Workflow 최종본
 
-이렇게 하여 작성한 CI/CD Workflow YAML 파일의 최종본은 다음과 같습니다. 파일 최상단에 Workflow의 이름을 추가한 부분에 유의해 주세요.
+위와 같은 과정을 거쳐 작성한 CI/CD Workflow YAML 파일의 최종본은 다음과 같습니다. 파일 최상단에 Workflow의 이름을 추가한 부분에 유의해 주세요.
 
 ```YAML
 name: FE/CI-CD - Development 테스트, 빌드 및 배포
@@ -331,7 +335,9 @@ jobs:
 
 ### CI/CD 실행 결과 확인
 
-위와 같이 작성한 YAML 파일을 프로젝트 루트 경로의 `./github/workflows/` 안에 `fe-ci-cd.yaml`로 저장하여 `fe/develop` 브랜치에 올리면 모든 작업이 끝납니다. 이제 `fe/develop` 브랜치에 `push` 이벤트가 발생할 때마다 이 CI/CD Workflow가 동작하게 될 것입니다. 실행 결과는 프로젝트 브랜치의 Actions 탭에서 아래 스크린샷과 같이 확인하실 수 있습니다.
+이렇게 작성한 YAML 파일을 `./github/workflows/` 경로에 `fe-ci-cd.yaml`로 저장하여 `fe/develop` 브랜치에 올리면 모든 작업이 끝납니다. 이제 `fe/develop` 브랜치에 `push` 이벤트가 발생할 때마다 이 Workflow가 동작하게 될 것입니다.
+
+실행 결과는 프로젝트 브랜치의 Actions 탭에서 아래 스크린샷과 같이 확인하실 수 있습니다.
 
 ![크루루 FE CI/CD Workflow 실행 결과 내역](assets/images/TechWriting/cruru-fe-ci-cd-history.png)
 
