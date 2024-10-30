@@ -3,15 +3,15 @@
 반려견 친구 찾기 및 사회화 장려 앱 "반갑개"의 모임(Club) 도메인의 기능을 개발하는 단계에서 마주쳤던 문제에 대해 공유하는 글입니다.
 Spring boot 3.3.x / Hibernate 6.x / MYSQL 8.x 이상 버전 기준으로 작성되었습니다.
 ### 문서 주제
-다중 ToMany 연관관계를 포함한 JPA Entity N+1 해결하기
+다중 ToMany 연관관계를 포함한 JPA 엔티티 N+1 해결하기
 
 ### 대상 독자
 Join Fetching의 동작 과정을 이해하고 싶은 개발자.
 MultipleBagFetchException을 해결하고자 하는 개발자.
 
 ### 배경지식
-+ 간단한 SQL Query 및 DML을 이해할 수 있는 개발자.
-+ JPA Entity, 연관 관계, JPQL 등 기본적인 지식을 알고 있는 개발자.
++ 간단한 SQL 쿼리 및 DML을 이해할 수 있는 개발자.
++ JPA 엔티티, 연관 관계, JPQL 등 기본적인 지식을 알고 있는 개발자.
 + N+1문제를 알고 있는 개발자.
 + Fetch Join, EntityGraph 등을 사용해 본 개발자
 
@@ -19,7 +19,7 @@ MultipleBagFetchException을 해결하고자 하는 개발자.
 # 문제 상황
 
 
-반갑개의 모임(Club) Entity는 모임에 참여한 회원(ClubMember), 모임에 참여한 강아지(ClubPet)을 OneToMany 연관 관계를 가지고 있습니다. 
+반갑개의 모임(Club) 엔티티는 모임에 참여한 회원(ClubMember), 모임에 참여한 강아지(ClubPet)을 OneToMany 연관 관계를 가지고 있습니다. 
 
 ```java
 @Entity
@@ -76,7 +76,7 @@ OneToMany의 기본 로딩 전략은 LAZY이며, 반갑개 백엔드 팀의 JPA 
 List<Club> findAllByParticipatingMemberId(@Param("memberId") Long memberId);
 ```
 
-위 JPQL 사용하는 Service의 테스트를 작성하던 중 다음과 같은 예외가 발생했습니다.
+위 JPQL 사용하는 서비스의 테스트를 작성하던 중 다음과 같은 예외가 발생했습니다.
 
 ![image](tech-write-img/1.PNG)
 
@@ -105,13 +105,13 @@ List<Club> findAllByParticipatingMemberId(@Param("memberId") Long memberId);
 ```
 
 여전히 **MultipleBagFetchException** 이라는 예외가 발생합니다.  
-사실 EntityGraph의 경우 기본 로딩 전략을 즉시 로딩으로 전환하고, 내부적으로 Fetch Join(Left Outer Join)을 사용하여 연관 Entity를 한꺼번에 가져오게 됩니다.  
+사실 EntityGraph의 경우 기본 로딩 전략을 즉시 로딩으로 전환하고, 내부적으로 Fetch Join(Left Outer Join)을 사용하여 연관 엔티티를 한꺼번에 가져오게 됩니다.  
 따라서, **cannot simultaneously fetch multiple bags** 라는 상황은 변함이 없습니다. 
 
 ### 문제 상황 분석
 
 그렇다면 MultipleBagFetchException은 어떤 예외 일지 알아보겠습니다.  
-실제 반갑개의 Club Entity는 복잡도가 있기 때문에 다음과 같은 간략화 된 Club Entity를 통해 문제 상황을 재연하도록 하겠습니다.  
+실제 반갑개의 Club 엔티티는 복잡도가 있기 때문에 다음과 같은 간략화 된 Club 엔티티를 통해 문제 상황을 재연하도록 하겠습니다.  
 
 ```java
 @Entity
@@ -147,7 +147,7 @@ public class Club {
 
 ```
 
-Spring Data JPA를 통해 ClubRepository를 생성 후 @DataJpaTest로 Club Entity에 관한 findAll()을 테스트 해보았습니다.
+Spring Data JPA를 통해 ClubRepository를 생성 후 @DataJpaTest로 Club 엔티티에 관한 findAll()을 테스트 해보았습니다.
 ```java
 @Repository
 public interface ClubRepository extends JpaRepository<Club,Long> {
@@ -259,9 +259,9 @@ query 실행 시 위 처럼 동일한 Club(= 동일한 PK) 가 참여 중인 회
   + Hibernate의 Bag은 Java List로 매핑된다.
   + @OneToMany 등 Java List 연관 관계는 실제 데이터베이스에서 Cartesian product이 발생할 수 있다.
 
-즉, 현재 예시에서 참여 중인 회원과 참여 중인 강아지를 Fetch 할 경우, 중복되는 Entity가 (참여 중인 회원 X 참여 중인 강아지)만큼 나올 수 있게 된다는 의미입니다.  
-JPA의 영속성 컨텍스트는 기본적으로  특정 ID를 가진 엔티티가 하나만 존재하도록 보장하는 유일성을 가지고 있습니다. 그리고 영속성 컨텍스트에 저장된 Entity는 ID를 기준으로 관리되므로, 중복된 ID를 가진 레코드가 반환되면, 첫 번째 레코드만 영속성 컨텍스트에 저장되고, 나머지는 동일한 인스턴스로 간주합니다.  
-이 과정에서 여러 개의 Bag을 fetch 할 경우 **순서가 정해지지 않고 무수히 많은 동일 ID를 가진 Entity를 Hibernate가 올바르게 매핑 할 수 없게 됨을 알 수 있습니다.**  
+즉, 현재 예시에서 참여 중인 회원과 참여 중인 강아지를 Fetch 할 경우, 중복되는 엔티티가 (참여 중인 회원 X 참여 중인 강아지)만큼 나올 수 있게 된다는 의미입니다.  
+JPA의 영속성 컨텍스트는 기본적으로  특정 ID를 가진 엔티티가 하나만 존재하도록 보장하는 유일성을 가지고 있습니다. 그리고 영속성 컨텍스트에 저장된 엔티티는 ID를 기준으로 관리되므로, 중복된 ID를 가진 레코드가 반환되면, 첫 번째 레코드만 영속성 컨텍스트에 저장되고, 나머지는 동일한 인스턴스로 간주합니다.  
+이 과정에서 여러 개의 Bag을 fetch 할 경우 **순서가 정해지지 않고 무수히 많은 동일 ID를 가진 엔티티를 Hibernate가 올바르게 매핑 할 수 없게 됨을 알 수 있습니다.**  
 그 외에도 쿼리 성능 저하, 데이터 중복으로 인한 일관성이 떨어지는 등의 여러 문제가 발생하게 됩니다.  
 
 # 해결방법
@@ -294,7 +294,7 @@ JPA의 영속성 컨텍스트는 기본적으로  특정 ID를 가진 엔티티�
 
 ### Batch Size 활용
 
-MultipleBagFetchException이 발생하게 된 경위는 연관 Entity의 N+1 문제를 해결하는 과정에서 발생된 문제입니다.  
+MultipleBagFetchException이 발생하게 된 경위는 연관 엔티티의 N+1 문제를 해결하는 과정에서 발생된 문제입니다.  
 @BatchSize 또는 default_batch_fetch_size 설정을 통해 N+1문제를 Where 절의 IN 쿼리를 통해 개선할 수 있습니다.
 
 default_batch_fetch_size를 10으로 설정하여 아래 테스트 코드를 실행해보면 
@@ -336,7 +336,7 @@ default_batch_fetch_size를 10으로 설정하여 아래 테스트 코드를 실
 
 # 결론 
 
-결과적으로 MultipleBagFetchException을 해결하기 위해서, 더 나아가 여러 개의 ToMany 연관 관계를 포함하는 Entity에서 발생하는 N+1을 해결법은 다음과 같이 정리할 수 있을 것 같습니다.  
+결과적으로 MultipleBagFetchException을 해결하기 위해서, 더 나아가 여러 개의 ToMany 연관 관계를 포함하는 엔티티에서 발생하는 N+1을 해결법은 다음과 같이 정리할 수 있을 것 같습니다.  
 + ToOne 연관 관계는 Fetch Join을 한다.
 + List의 크기가 가장 클 가능성이 높은 ToMany 연관 관계를 Fetch Join 한다.
 + 그 외 ToMany 연관 관계를 지닌 List는 batchSize를 통해 성능을 개선한다.
@@ -344,9 +344,9 @@ default_batch_fetch_size를 10으로 설정하여 아래 테스트 코드를 실
 참고로, 글을 쓰는 시점인 반갑개에서는 default_batch_size만을 통해 위 문제를 해결했습니다. 현재는 모임 리스트 API에 관련된 모든 기능에 페이징 처리를 하기 때문입니다.  
 (페이징은 Fetch Join과 혼합하여 사용할 경우 OOM 가능성을 내포하고 있습니다.)
 
-JPA를 활용하여 개발하다 보면 Club처럼 ToMany 연관 관계를 다수 지닌 Entity를 다루게 될 수 있습니다. 
+JPA를 활용하여 개발하다 보면 Club처럼 ToMany 연관 관계를 다수 지닌 엔티티를 다루게 될 수 있습니다. 
 N+1 문제를 해결하기 위해 무작정 Fetch Join을 사용하는 것 보다, Hibernate의 동작 과정을 이해한 후 N+1을 개선할 필요성이 있습니다.  
-Club Entity를 개발할 당시에는 JPA를 처음 접한 후 얼마 되지 않는 시점이라 "N+1은 Fetch JOIN으로 해결"이라는 공식이 머릿속에 박혀 있었던 것 같습니다.  
+Club 엔티티를 개발할 당시에는 JPA를 처음 접한 후 얼마 되지 않는 시점이라 "N+1은 Fetch JOIN으로 해결"이라는 공식이 머릿속에 박혀 있었던 것 같습니다.  
 
 # 참고자료
 
