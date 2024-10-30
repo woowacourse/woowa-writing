@@ -39,7 +39,7 @@ CD는 아래의 두 가지 자동화 과정을 포함합니다. 요약하자면,
 GitHub Actions는 GitHub에서 제공하는 무료 CI/CD 플랫폼입니다. 코드 저장소와 통합된 환경에서 빌드, 테스트, 배포 파이프라인을 만들 수 있도록 도와주지요. 다른 여러 도구들에 비해 GitHub Actions가 가지는 이점은 다음과 같습니다.
 
 1. 원활한 GitHub 통합: 외부 서비스 연동 없이 GitHub 환경 내에서 완결된 파이프라인 구성
-2. 유연한 워크플로우: YAML 파일만으로 프로젝트에 최적화된 트리거 조건과 작업 설정 가능
+2. 유연한 작업 흐름 설정: YAML 파일만으로 프로젝트에 최적화된 트리거 조건과 작업 설정 가능
 3. 무료 사용: 개인 및 소규모 팀 프로젝트에 적합한 비용 효율성
 
 ### 주요 용어 및 개념
@@ -76,34 +76,34 @@ GitHub Actions를 효과적으로 활용하기 위한 핵심 개념들을 먼저
 
 #### Runner
 
-**Workflow를 실행하는 실행 환경**입니다. GitHub에서는 아래의 두 가지 유형을 지원합니다:
+**Workflow를 실행하는 실행 환경**입니다. GitHub에서는 아래의 두 가지 유형을 지원합니다.
 
 - **GitHub-hosted Runner**: GitHub가 제공하는 기본 실행 환경(Ubuntu Linux, Windows, macOS)
 - **Self-hosted Runner**: 사용자가 직접 관리하는 실행 환경으로, 더 높은 커스터마이징이 가능
 
 ## React 애플리케이션을 위한 CI/CD Workflow 작성
 
-이제 GitHub Actions를 이용해 React 애플리케이션의 CI/CD 파이프라인을 구축하는 과정을 살펴봅시다. Workflow의 내용은 프로젝트의 구조와 필요한 환경 설정, 그리고 구현하고자 하는 자동화 단계의 성격에 따라 크게 달라질 수 있습니다. 여기서는 저희 크루루 프로젝트의 프론트엔드 애플리케이션 배포 과정을 예시로 하되, 최종 배포 타겟을 AWS 대신 GitHub Pages로 변경하여 설명하겠습니다.
+이제 GitHub Actions를 활용해 React 애플리케이션의 CI/CD 파이프라인을 구축해보겠습니다. 여기서는 크루루 프로젝트의 프론트엔드 애플리케이션 배포 과정을 예시로 하되, 최종 배포 타겟을 AWS 대신 GitHub Pages로 변경하여 Workflow를 구성하겠습니다.
 
 ### Workflow의 구성안 만들기
 
-무언가를 자동화하려면, 우선 자동화할 작업들의 목록과 순서를 정해야겠지요. 크루루의 프론트엔드 파트는 React 애플리케이션 코드의 Beta 버전을 담고 있는 `fe/develop` 브랜치를 기준으로 CI/CD 구현을 위해 다음과 같이 작업 흐름을 정의했습니다.
+무언가를 자동화하려면, 우선 자동화할 작업의 흐름을 먼저 정의해야 합니다. 아래는 `fe/develop` 브랜치를 기준으로 한 CI/CD 파이프라인의 구조입니다.
 
 ![크루루 FE CI 구현 다이어그램](assets/images/TechWriting/cruru-fe-ci-diagram.png)
 
-1. 신규 기능 브랜치에서 `fe/develop` 브랜치로 PR이 Merge됩니다.
-2. Github Actions에 정의한 워크플로우가 실행됩니다. 이 워크플로우는 아래 순서로 동작합니다.
-   1. Runner 인스턴스에 전체 코드의 의존성 항목들을 설치합니다.
-   2. 코드의 문법 규칙을 점검하는 ESLint 테스트를 실행합니다.
-   3. React 기반 훅(hook) 코드의 기능 테스트를 실행합니다.
-   4. Storybook을 빌드하여 컴포넌트들의 시각적 요소가 잘 구현되었는지 검증합니다.
-   5. 전체 코드를 빌드하여 애플리케이션 실행 흐름에 이상이 없는지 검증합니다.
-3. 모든 테스트가 성공했을 경우, 새로운 코드 기반으로 프론트엔드 애플리케이션 빌드가 이루어집니다.
-4. 빌드된 새 애플리케이션이 배포됩니다.
+1. `fe/develop` 브랜치로 PR 병합
+2. Workflow 실행
+   1. 의존성 설치
+   2. ESLint를 통한 코드 검사
+   3. React 훅(hook) 테스트
+   4. Storybook 빌드 및 컴포넌트 검증
+   5. 애플리케이션 빌드 테스트
+3. 테스트 통과 시 최종 빌드 진행
+4. 애플리케이션 배포
 
 ### CI 단계의 Workflow 작성
 
-이렇게 정의된 작업 흐름을 GitHub Actions에서 실행하기 위한 Workflow로 하나씩 변환합니다. 우선 CI에 해당하는 테스트-빌드 단계부터 차근차근 Workflow로 작성해 보겠습니다.
+이제 정의된 작업 흐름을 GitHub Actions Workflow로 구현해보겠습니다. 먼저 테스트와 빌드를 포함하는 CI 단계부터 시작하겠습니다.
 
 #### 실행 조건 명시
 
@@ -114,7 +114,7 @@ on:
       - fe/develop
 ```
 
-우선 Workflow가 실행될 트리거 조건(`on`)을 표기합니다. `push`는 코드에 대한 Merge 등 Push 이벤트가 발생했을 때를 의미합니다. 그 아래에 표기된 `branches`는 위에서 정의한 이벤트를 감지할 저장소 브랜치를 명시합니다.
+트리거 조건을 `on` 키워드로 정의합니다. 여기서는 `fe/develop` 브랜치에 대한 push 이벤트를 감지하도록 설정했습니다.
 
 #### Job에 부여할 Runner 인스턴스 설정
 
@@ -131,17 +131,16 @@ jobs:
       API_VERSION: ${{ secrets.API_VERSION }}
 ```
 
-각각의 Job에는 `jobs.<Job 이름>`의 형태로 별칭을 붙일 수 있습니다. 이 별칭은 Workflow 내부에서 서로 다른 Job 사이의 의존성을 표기하거나, GitHub Actions의 실행 현황을 살펴볼 때 참고할 수 있습니다.
+Job 설정의 주요 구성 요소는 다음과 같습니다.
 
-Job에 대한 설정 내용을 항목 별로 살펴보겠습니다.
+- **Job 식별자**: `jobs.<Job 이름>` 형태로 지정하며, 이 이름으로 워크플로우 내 의존성 표현과 실행 현황을 추적할 수 있습니다.
+- **실행 조건**: `if` 구문으로 Job 실행 조건을 정의합니다. 여기서는 `fe-` 접두어를 가진 브랜치의 PR을 지정했습니다.
+- **Runner 설정**: `runs-on`으로 실행할 Runner를 지정합니다. 여기서는 `ubuntu-22.04` 환경의 GitHub-hosted Runner를 사용합니다.
+- **기본 설정**: `defaults`로 모든 Step에 적용될 기본 실행 경로입니다. 여기서는 저장소의 `./frontend` 디렉토리를 선택했습니다.
+- **환경 변수**: `env`로 애플리케이션 실행에 필요한 환경 변수를 삽입합니다. 여기서 사용한 Secrets의 개념과 사용법에 대해서는 아래의 공식 문서를 참고하세요.
+  - [Using secrets in GitHub Actions - GitHub Docs](https://docs.github.com/en/actions/security-for-github-actions/security-guides/using-secrets-in-github-actions)
 
-- `if: startsWith(github.head_ref, 'fe-')` : Job의 실행 조건을 명시하는 부분입니다. 여기서는 `fe-`로 시작하는 브랜치로부터 PR이 들어왔을 때 실행되도록 정의했습니다.
-- `runs-on` : Runner 인스턴스의 OS 환경을 정의합니다. 현재는 [GitHub Actions에서 기본 제공되는 `Workflow label`값]을 넣어서 GitHub-hosted Runner를 사용할 것임을 명시했습니다.
-- `defaults` : Job에 속한 모든 Step들에 기본적으로 적용될 실행 환경을 정의합니다. 여기서는 모든 각 Step이 실행될 경로로 `./frontend`를 지정하고 있습니다. 크루루의 프로젝트 저장소는 백엔드(`./backend`)와 프론트엔드(`./frontend`) 코드를 모두 한곳에 모아 관리하는 모노레포 스타일로 운영되고 있기에, 이와 같은 설정을 추가했습니다.
-- `env` : 애플리케이션 코드의 실행 환경에 적용될 환경변수를 삽입하는 부분입니다. 여기서 사용한 Secrets의 개념과 이를 GitHub Actions에 적용하는 방법에 대해서는 아래의 공식 문서를 참고해 주세요.
-  - [Using secrets in GitHub Actions - GitHub Docs]
-
-#### 단계별 작업 설정
+#### CI 실행 환경 설정
 
 ```YAML
 steps:
@@ -152,7 +151,21 @@ steps:
     uses: actions/setup-node@v4
     with:
       node-version: 20.x
+```
 
+`steps` 아래에 실행할 작업들을 순차적으로 정의합니다. 각 Step에는 `name` 키워드로 작업의 내용을 표기할 수 있습니다. `name` 키워드를 활용하면, GitHub 저장소의 Actions 탭에서 Workflow 실행 결과를 살펴볼 때 어떤 작업에서 문제가 있었는지 쉽게 알 수 있습니다.
+
+![GitHub 저장소의 Actions 탭 > 개별 Workflow 실행 결과 화면](assets/images/TechWriting/cruru-fe-ci-steps.png)
+
+각 Step에는 Action 또는 명령어를 실행하도록 정의할 수 있습니다. 둘의 차이는 다음과 같습니다.
+
+- **Action 사용**: `uses` 키워드로 GitHub 또는 커뮤니티에서 미리 정의된 Action을 불러와 실행합니다. 저장소 체크아웃, Node.js 환경 설정, 의존성 캐싱 등의 작업을 간편하게 사용할 수 있습니다.
+
+- **명령어 실행**: `run` 키워드로 직접 명령어를 실행합니다. 이 명령어는 앞서 `defaults`로 설정된 Runner 인스턴스의 기본 경로에서 실행됩니다.
+
+#### 의존성 캐싱 설정
+
+```YAML
   - uses: actions/cache@v4
     id: npm-cache
     with:
@@ -166,30 +179,15 @@ steps:
     run: npm ci
 ```
 
-해당 Job에 속한 Step들은 `jobs.<Job 이름>.steps` 아래에 위와 같이 리스트 형태로 정의합니다. 각 Step에는 `name` 키워드로 작업의 내용을 간단히 표기할 수 있는데요. 이렇게 표기된 이름은 추후에 GitHub 저장소의 Actions 탭에서 개별 Workflow 실행 결과를 리뷰할 때, 아래 스크린샷과 같이 어떤 작업에서 문제가 있었는지를 파악할 때 도움이 됩니다.
+**프론트엔드 애플리케이션 구동에 필요한 의존성을 캐싱**하는 부분입니다.
 
-![GitHub 저장소의 Actions 탭 > 개별 Workflow 실행 결과 화면](assets/images/TechWriting/cruru-fe-ci-steps.png)
+Workflow가 실행될 때마다 의존성 설치가 반복된다면 불필요한 시간 낭비가 발생할 것입니다. 만약 의존성에 영향이 없는 코드 변경 사항이라면 `actions/cache@v4` 액션으로 캐싱을 설정하여 의존성 설치 단계를 생략할 수 있습니다.
 
-여기서 `uses`와 `run`의 차이가 궁금하실텐데요. 이 차이를 간단히 정리하면 다음과 같습니다.
+위의 YAML 코드는 `npm`을 통해 설치된 패키지들을 `key`로 지정된 식별자와 함께 GitHub 환경의 캐시에 저장시키는 내용입니다. 만약 캐시가 히트(hit)되었다면 GitHub 캐시로부터 해당 패키지들을 내려받습니다. 오직 캐시가 미스(miss)된 상태에서만 `npm ci`를 통해 의존성 설치가 이루어지게 됩니다.
 
-- `uses` 키워드는 GitHub 공식 또는 커뮤니티에서 배포한 Action을 불러와 실행할 때 씁니다. 맨 윗줄의 `uses: actions/checkout@v4`는 저장소의 내용을 체크아웃하여 Runner 인스턴스로 다운로드하는 Action을 불러와 실행하라는 뜻입니다.
-- `run` 키워드는 앞서 `working-directory`로 설정한 Runner 인스턴스의 기본 경로에서 바로 명령어를 실행할 때 씁니다. 애플리케이션 의존성 항목을 처음 설치할 때 사용하는 `npm ci` 같은 명령어를 여기에 포함시킬 수 있습니다.
+#### 단계별 테스트 추가
 
-끝으로 `actions/cache@v4`를 통해 실행하는 내용이 궁금하신 분도 계실텐데요. 바로 **프론트엔드 애플리케이션 구동에 필요한 의존성 항목에 대하여 GitHub Actions의 실행 환경에 캐쉬를 설정**하는 부분입니다. 매번 같은 Workflow가 실행될 때마다 의존성을 처음부터 끝까지 찬찬히 설치시켜야 한다면 많은 시간이 소요되겠지요.
-
-만약 코드에만 변경이 있을 뿐 의존성 항목에는 아무 변화가 없다면, 이처럼 캐쉬를 설정하고 체크하여 의존성 설치 단계를 뛰어넘도록 만들 수 있습니다. 그리고 아래와 같이 의존성 설치 Step에 `if`문으로 조건을 추가할 수 있겠지요. `actions/cache@v4`를 통해 저장되었던 캐쉬가 hit 되지 않았을 경우에만 전체 의존성 항목을 설치하도록 제한하는 것입니다.
-
-```YAML
-- name: 애플리케이션 의존성 항목들 설치
-  if: steps.npm-cache.outputs.cache-hit != 'true'
-  run: npm ci
-```
-
-이에 대한 상세한 내용은 아래의 공식 문서에서 확인하실 수 있습니다.
-
-- [워크플로 속도를 높이기 위한 종속성 캐싱 - GitHub Docs]
-
-이제 애플리케이션 구동과 테스트에 필요한 모든 조건이 Runner 인스턴스에 갖추어졌으니, 본격적인 테스트 실행 단계들을 Workflow에 추가합니다. 빌드 완료된 파일은 다음 단계의 Job에서 가져다 쓸 수 있도록 `fe-dev-dist`라는 이름의 Artifact로 업로드하도록 합니다.
+이제 본격적인 테스트 실행 단계들을 Workflow에 추가합니다. 또한 마지막으로 빌드된 결과물을 `fe-dev-dist`라는 이름의 Artifact로 업로드하여 후속 Job에서 사용할 수 있도록 합니다.
 
 ```YAML
 - name: 코드 문법 테스트
@@ -342,3 +340,5 @@ jobs:
 - [CI/CD란? - RedHat 공식 문서](https://www.redhat.com/ko/topics/devops/what-is-ci-cd)
 - [GitHub Actions Tutorial: Getting Started & Examples - spacelift.io](https://spacelift.io/blog/github-actions-tutorial)
 - [Workflow file YAML Syntax - korgithub.com](https://www.korgithub.com/Ch4.GitHub%20Actions/02.workflow/02.workflow_yaml_syntax.html)
+- [Using secrets in GitHub Actions - GitHub Docs](https://docs.github.com/en/actions/security-for-github-actions/security-guides/using-secrets-in-github-actions)
+- [워크플로 속도를 높이기 위한 종속성 캐싱 - GitHub Docs](https://docs.github.com/ko/actions/writing-workflows/choosing-what-your-workflow-does/caching-dependencies-to-speed-up-workflows)
