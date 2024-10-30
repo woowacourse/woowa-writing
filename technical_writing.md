@@ -1,87 +1,84 @@
 # 어노테이션 하나로 테스트에서 *LocalDateTime.now()* 제어하기
 
-'테스트가 실패해요.'
+'테스트 실패해요.'
 
-테스트를 작성한 당시에는 성공했는데 시간이 조금 지나고 나니 멀쩡한 테스트가 실패했습니다.
-관련 테스트는 비즈니스 로직에서 `LocalDateTIme.now()`로 현재 시간을 가져오고 있었고, 테스트를 실행할 때마다 현재 시간이 달라져 어느 시점부터 완전히 실패하는 테스트가 되었습니다.
+땅콩 프로젝트에서는 `LocalDateTime.now()`로 현재 시간을 가져오는 비즈니스 로직이 있습니다. 단위 테스트를 작성하고 자신있게 Pull Request를 올렸지만 CI에서 테스트가 실패하고 말았습니다. 테스트를 실행할 때마다 현재 시간이 달라져 어느 시점부터 완전히 실패하는 테스트가 되었기 때문이었습니다.
 
-좋은 단위 테스트는 [F.I.R.S.T 원칙](https://howtodoinjava.com/best-practices/first-principles-for-good-tests/)을 따릅니다. 하지만 제가 구현한 테스트는 반복 가능하지 않은 테스트, 즉 **Repeatable** 원칙을 만족하지 못하고 있었습니다. 현재 시간과 같은 랜덤 요소를 제어하는 것은 테스트에서 매우 중요한데요. 저는 단순히 '시간 제어하기'를 넘어 2가지도 함께 고민했습니다.
+좋은 단위 테스트는 [F.I.R.S.T 원칙](https://howtodoinjava.com/best-practices/first-principles-for-good-tests/)을 따릅니다. 하지만 제가 구현한 테스트는 반복 가능한 테스트, 즉 **Repeatable** 원칙을 만족하지 못하고 있었습니다.
+
+현재 시간과 같은 랜덤 요소를 제어하는 것은 테스트에서 매우 중요합니다. 저는 단순히 '랜덤한 시간 제어하기'를 넘어 두 가지도 함께 고민했습니다.
 
 1. 테스트 가독성 높이기
 2. 다른 팀원들도 테스트에서 쉽게 시간 제어하기
 
-위 고민을 해결하기 위해 ~~했는지 소개드리고자 합니다.
+위 고민을 해결하기 위해 어떤 시도를 했는지, 마지막으로 어노테이션 하나로 시간을 어떻게 제어했는지 소개드리고자 합니다.
 
-## 테스트에서 시간을 어떻게 제어할 것인가?
+## 테스트에서 시간을 어떻게 제어하면 좋을까?
 
-Mock이란 [테스트 더블](https://www.javacodegeeks.com/2019/04/introduction-to-test-doubles.html) 방법 중 하나로, 테스트에서 실제 객체와 동일한 모의 객체를 만들어 ~~
-이러한 행위를 모킹(Mocking)이라고 합니다.
+Mock이란 [테스트 더블](https://www.javacodegeeks.com/2019/04/introduction-to-test-doubles.html) 방법 중 하나로, 테스트에서 실제 객체와 동일한 mock 객체를 만들어 특정 동작을 검증하거나 제어할 수 있게 하는 방법입니다. 이와 같은 과정을 모킹(Mocking)이라고 합니다.
+스프링 부트에서는 `spring-boot-starter-test` 의존성에 포함된 [Mockito](https://site.mockito.org/) 프레임워크를 사용해서 객체를 쉽게 모킹할 수 있습니다.
 
-스프링 부트에서는 `spring-boot-starter-test`의존성에 포함된 [Mockito](https://site.mockito.org/) 프레임워크를 사용하여 모킹을 사용합니다.
+그렇다면 `LocalDateTime.now()`를 모킹해서 원하는 시간을 반환하면 쉽게 해결되지 않을까요? 아쉽게도 `LocalDateTime.now()`는 static 메서드이기 때문에 `Mockito.mock()`과 같은 일반적인 모킹 방식으로는 제어하기 어렵습니다.
 
-먼저 테스트 더블 중 모킹이 떠올랐습니다. `LocalDateTIme.now()`를 모킹해서 원하는 시간만 리턴하도록 변경하는 것이죠.
-
-`LocalDateTIme.now()`는 static 메서드입니다. 따라서 Mockito의 일반적인 모킹 방식으로는 제어할 수 없습니다.
-
-### 1. static 메서드 모킹
+### 1. MockedStatic 사용하기
 
 <img src='./images/mockStatic.png' width=600>
 
-[Mockito 3.4.0](https://javadoc.io/doc/org.mockito/mockito-core/latest/org/mockito/Mockito.html#48) 버전 이상부터 static 메서드 모킹을 지원합니다.
+[Mockito 3.4.0](https://javadoc.io/doc/org.mockito/mockito-core/latest/org/mockito/Mockito.html#48) 버전 이상부터 MockedStatic으로 static 메서드를 모킹할 수 있습니다.
 
-*TimeController*
+<br/>
 
 ```java
 @RestController
 public class TimeController {
 
     @GetMapping("/time")
-    public void printCurrentTime() {
+    public String time() {
         LocalDateTime now = LocalDateTime.now();
-        System.out.println("현재 시간: " + now);
+        System.out.println("현재 시간: %s".formatted(now));
+        return now.toString();
     }
 }
-```
 
-*Test*
+```
 
 ```java
 @WebMvcTest(TimeController.class)
-public class TimeControllerTest {
+class TimeControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
     @Test
-    void 현재_시간_mocking() throws Exception {
-        LocalDateTime now = LocalDateTime.parse("2024-08-01T00:00:00");
-        System.out.println("mocking한 현재 시간: " + now);
+    void 현재_시간_모킹_테스트() throws Exception {
+        // given
+        LocalDateTime now = LocalDateTime.parse("2024-10-31T12:30:15");
         MockedStatic<LocalDateTime> localDateTimeMockedStatic = Mockito.mockStatic(LocalDateTime.class);
         localDateTimeMockedStatic.when(LocalDateTime::now).thenReturn(now);
 
-        mockMvc.perform(get("/time"));
+        // when & then
+        mockMvc.perform(get("/time"))
+                .andExpect(jsonPath("$").value("2024-10-31T12:30:15"));
 
         localDateTimeMockedStatic.close();
     }
 }
 ```
+간단한 컨트롤러와 테스트를 작성해보겠습니다. LocalDateTime을 MockedStatic으로 모킹한 후 `now()`를 호출했을 때 고정된 시간을 반환하도록 합니다.
 
-*결과*
+<br/>
 
-<img src='./images/mockStatic_WebMvc.png' width=300>
+<img src="./images/mockStatic_WebMvc.png" width=600>
 
-그러나 Mockito에서 static 모킹을 지원하는 것은 레거시 코드
+테스트를 실행하면 고정된 시간을 잘 반환하고 있습니다. 이대로 문제를 해결했나 싶었지만 MockedStatic은 스레드 로컬로 동작하기 때문에 문제점이 있습니다.
 
-try-with-resource 또는 close() 명시 호출로 항상 리소스를 해제해야 합니다. 
+리소스를 해제하지 않으면 같은 스레드를 재사용하는 테스트에 영향을 줄 수 있습니다. 그래서 try-with-resources 구문을 사용하거나 close()를 명시적으로 호출해서 **항상 리소스를 해제**해야 합니다.
 
-가장 큰 문제점은 `mockStatic()`이 스레드 로컬 방식으로 처리된다는 것입니다. 그래서 `@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)` 등을 사용하는 인수테스트는 다른 스레드에서 실행되기 때문에 반영되지 않습니다
-
-
-*Test*
+[@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)](https://docs.spring.io/spring-boot/reference/testing/spring-boot-applications.html)을 사용하는 테스트는 테스트와 별도의 스레드에서 실행되기 때문에 스레드 로컬로 처리되는 MockedStatic이 반영되지 않습니다. 땅콩은 컨트롤러 테스트로 RestAssured와 WebEnvironment.RANDOM_PORT를 사용하기 때문에 이 방식으로는 문제를 해결할 수 없었습니다.
 
 ```java
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-public class TimeControllerTest {
+class TimeControllerTest {
 
     private static final Logger log = LoggerFactory.getLogger(TimeControllerTest.class);
 
@@ -94,26 +91,26 @@ public class TimeControllerTest {
     }
 
     @Test
-    void 현재_시간_mocking() {
-        LocalDateTime now = LocalDateTime.parse("2024-08-01T00:00:00");
-        log.info("mocking한 현재 시간: {} ", now);
-
+    void 현재_시간_모킹_테스트() {
+        // given
+        LocalDateTime now = LocalDateTime.parse("2024-10-31T12:30:15");
+        log.info("모킹한 시간: {}", now);
         MockedStatic<LocalDateTime> localDateTimeMockedStatic = Mockito.mockStatic(LocalDateTime.class);
         localDateTimeMockedStatic.when(LocalDateTime::now).thenReturn(now);
 
+        // when & then
         RestAssured.when()
                 .get("/time");
 
         localDateTimeMockedStatic.close();
     }
 }
+
 ```
 
-*결과*
+<img src="./images/mockStatic_RestAssured.png" width=900>
 
-<img src='./images/mockStatic_RestAssured.png' width=1000>
-
-서로 다른 스레드에서 실행되고, 모킹이 적용되지 않았음을 확인할 수 있습니다.
+실제로 테스트를 해보면 서로 다른 스레드에서 실행되어서 모킹이 적용되지 않음을 확인할 수 있습니다.
 
 ### 2. LocalDateTime을 래핑하는 클래스
 
@@ -127,18 +124,16 @@ public class LocalDateTimeWrapper {
 }
 ```
 
-테스트에서 래핑 클래스를 테스트 더블로 대체하는 방법입니다.
+LocalDateTime을 한 번 감싸고, 이 래핑 클래스를 테스트 더블로 대체하는 방법입니다.
 
-*TimeController*
 ```java
-@RestController
+@Service
 @RequiredArgsConstructor
 @Slf4j
-public class TimeController {
+public class TimeService {
 
     private final LocalDateTimeWrapper localDateTimeWrapper;
 
-    @GetMapping("/time")
     public void printCurrentTime() {
         LocalDateTime now = localDateTimeWrapper.now();
         log.info("현재 시간: {}", now);
@@ -146,48 +141,54 @@ public class TimeController {
 }
 ```
 
-*Test*
 ```java
-@WebMvcTest(TimeController.class)
-public class TimeControllerTest {
+@SpringBootTest
+public class TimeServiceTest {
 
-    private static final Logger log = LoggerFactory.getLogger(TimeControllerTest.class);
+    private static final Logger log = LoggerFactory.getLogger(TimeServiceTest.class);
 
     @Autowired
-    private MockMvc mockMvc;
+    private TimeService timeService;
 
     @MockBean
     private LocalDateTimeWrapper localDateTimeWrapper;
 
     @Test
-    void 현재_시간_mocking() throws Exception {
+    void 현재_시간_mocking() {
+        // given
         LocalDateTime now = LocalDateTime.parse("2024-12-12T00:00:00");
+        log.info("모킹한 시간: {}", now);
         when(localDateTimeWrapper.now()).thenReturn(now);
-        log.info("mocking한 현재 시간: {}", now);
 
-        mockMvc.perform(get("/time"));
+        // when
+        timeService.printCurrentTime();
     }
 }
 ```
 
-*결과*
+<img src="./images/localdatetime_wrapper.png" width=900>
 
-<img src='./images/localdatetime_wrapper.png' width=1000>
+가장 간단한 방법이지만 일반적이지 않은 코드라서 팀원들의 인지 비용이 생
 
-
-하지만 LocalDateTime 때문에 불필요하게 클래스가 생성되는 것이 내키지 않았습니다.
-
-### 3. Clock 객체를 bean으로 등록한 후 mocking
+### 3. Clock 객체를 bean으로 등록 후 모킹
 
 <img src='./images/localdatetime.png' width=600>
 
-`now()`의 내부를 살펴보면 `SystemClock`을 인자로 받는 내부 메서드를 호출하고 있습니다
+`LocalDateTime.now()`의 내부를 살펴보면 SystemClock을 인자로 받는 메서드를 호출하고 있습니다
 
 <img src='./images/localdatetime_clock.png' width=600>
 
-JavaDoc에서는 테스트를 위해 대체 clock을 사용할 수 있다고 안내하고 있습니다.
+내부적으로만 사용하는 줄 알았는데 접근제어자가 public이네요! JavaDoc을 보니까 테스트를 위해 대체 Clock을 사용할 수 있다고 안내하고 있습니다. 이 메서드를 사용하면 시간을 쉽게 제어할 수 있어 보입니다.
 
-*Clock bean 등록*
+Instant
+타임라인에서 한 지점을 나타내는 순간을 나타내며, UTC 기준으로 1970년 1월 1일 0시 0분 0초를 숫자 0으로 정하고 그로부터 경과된 시간을 양수 또는 음수로 표현합니다.
+
+ZoneId
+UTC, Asia/Seoul 등 특정 지역의 시간대 정보를 나타내는 타임존입니다.
+
+Clock
+Instant와 ZoneId를 사용해 현재 날짜, 시간을 제공하는 추상클래스입니다.
+
 ```java
 @Configuration
 public class ClockConfig {
@@ -198,8 +199,8 @@ public class ClockConfig {
     }
 }
 ```
+먼저 Clock을 bean으로 등록합니다.
 
-*TimeService*
 ```java
 @Service
 @RequiredArgsConstructor
@@ -214,12 +215,13 @@ public class TimeService {
     }
 }
 ```
-Clock 객체를 의존성 주입 후 `LocalDateTime.now(clock)`로 변경합니다.
+Clock bean을 의존성 주입 후 `LocalDateTime.now(clock)`로 변경합니다.
 
-*Test*
 ```java
 @SpringBootTest
 public class TimeServiceTest {
+
+    private static final Logger log = LoggerFactory.getLogger(TimeServiceTest.class);
 
     @Autowired
     private TimeService timeService;
@@ -228,8 +230,10 @@ public class TimeServiceTest {
     private Clock clock;
 
     @Test
-    void 현재_시간_mocking() {
-        when(clock.instant()).thenReturn(Instant.parse("2024-12-31T00:00:00Z"));
+    void 현재_시간_모킹_테스트() {
+        Instant now = Instant.parse("2024-12-31T00:00:00Z");
+        log.info("모킹한 시간: {}", now);
+        when(clock.instant()).thenReturn(now);
         when(clock.getZone()).thenReturn(ZoneOffset.UTC);
 
         timeService.printCurrentTime();
@@ -237,11 +241,13 @@ public class TimeServiceTest {
 }
 ```
 
-Clock을 제어해야 하는 테스트마다 모킹과 관련한 보일러플레이트 코드가 발생합니다.
+테스트에서는 Clock을 MockBean으로 주입하고 현재 시간을 만들어낼 때 사용하는 Instant와 Zone을 원하는 값으로 리턴합니다.
 
-이 때는 `TestConfiguration`에서 고정된 Clock 객체를 primary bean으로 등록해서 테스트 전역으로 제어할 수 있습니다.
+<img src="./images/clock_mocking.png" width=900>
 
-*TestConfiguration*
+주의할 점은 Zone을 UTC로 리턴하지 않으면 Instant에 작성한 시간을 Zone에 따라 변환하기 때문에 `LocalDateTime.now(clock)`에서 예상하지 않은 값이 리턴됩니다.
+
+번거로운 점은 Clock을 사용하는 테스트마다 모킹과 관련한 보일러플레이트 코드를 작성해야 합니다. `@TestConfiguration`을 사용해서 **고정된 Clock 객체**를 primary bean으로 등록하면 테스트 전역으로 Clock을 제어할 수 있습니다.
 
 ```java
 @TestConfiguration
@@ -254,8 +260,6 @@ public class TestConfig {
     }
 }
 ```
-
-*Test*
 ```java
 @SpringBootTest
 @Import(TestConfig.class)
@@ -265,39 +269,25 @@ public class TimeServiceTest {
     private TimeService timeService;
 
     @Test
-    void 현재_시간_mocking() {
+    void 현재_시간_모킹_테스트() {
         timeService.printCurrentTime();
     }
 }
 ```
-`@Import`로 TestConfiguration 설정을 적용해서 테스트에 고정된 Clock 객체를 사용합니다.
+`@Import`로 TestConfiguration 설정을 적용하면 고정된 Clock 객체를 사용합니다. 모킹과 관련한 코드가 모두 사라졌습니다!
 
-땅콩은 TestConfiguration으로 시간을 제어하도록
+## 커스텀 어노테이션으로 Clock 객체를 모킹할 수 없을까?
 
-## 커스텀 어노테이션으로 Clock 객체를 제어할 수 없을까?
-
-Clock 객체를 전역적으로 제어했지만 테스트를 작성할 때 여전히 불편함이 있었습니다.
+TestConfiguration으로 Clock bean을 전역으로 모킹했지만 테스트를 작성할 때 여전히 불편함이 있었습니다.
 1. 매 번 TestConfiguration에 고정된 시간을 확인하면서 테스트를 작성해야 함 ('시간 언제로 고정되어 있었지?')
 2. 테스트를 유연하게 작성하기 어려움 ('이 테스트에서는 다른 시간으로 고정해야 하는데...')
 3. 테스트에서 데잍를 왜 x시간으로 저장했는지 한 번에 읽히지 않음 ('이 테스트는 왜 x시간으로 저장하지?')
 
-기존 TestConfiguration의 단점을 극복하기 위해 
+TestConfiguration의 단점을 극복하기 위해 JUnit의 extension 기능을 활용했습니다.
 
-JUnit의 extension 기능을 활용했습니다
+JUnit 5에서 도입된 extension은 테스트 라이프사이클의 다양한 단계에 특정 동작을 확장할 수 있는 기능입니다.
 
-
-
-```java
-@Target({ElementType.TYPE, ElementType.METHOD})
-@Retention(RetentionPolicy.RUNTIME)
-@ExtendWith(FixedClockExtension.class)
-public @interface FixedClock {
-
-    String date();
-
-    String time();
-}
-```
+JUnit에서 제공하는 인터페이스 중 BeforeEachCallback 인터페이스를 구현해서 테스트 시작 전에 Clock bean을 모킹했습니다.
 
 ```java
 public class FixedClockExtension implements BeforeEachCallback {
@@ -342,38 +332,65 @@ public class FixedClockExtension implements BeforeEachCallback {
 }
 ```
 
-`BeforeEachCallback`은 JUnit에서 제공하는 extension
+```java
+@Target({ElementType.TYPE, ElementType.METHOD})
+@Retention(RetentionPolicy.RUNTIME)
+@ExtendWith(FixedClockExtension.class)
+public @interface FixedClock {
 
-Zone UTC
+    String date();
 
-입력하는 date, time은 KST가 이미 적용된 시간
+    String time();
+}
+```
+각 테스트 케이스가 시작되기 전에 리플렉션으로 테스트 메서드나 테스트 클래스를 읽어서 FixedClock 어노테이션을 찾습니다. 어노테이션에 작성된 날짜와 시간으로 Clock을 모킹합니다.
 
-`LocalDateTime.now()` 동작 방식을 보면
+FixedClock 어노테이션은 클래스, 메서드 모두 허용하도록 설정했습니다. 클래스, 메서드 모두 존재하면 메서드가 우선합니다.
 
-메서드가 우선 순위
+extension은 `@ExtendWith` 어노테이션을 작성하면 적용됩니다. FixedClock 어노테이션에 작성해두었기 때문에 FixedClock 어노테이션을 사용하면 extension이 자동으로 동작하게 됩니다.
 
 ```java
+@SpyBean(Clock.class)
+@FixedClock(date = "2025-01-01", time = "00:00:00")
+@SpringBootTest
+public class TimeServiceTest {
 
+    @Autowired
+    private TimeService timeService;
+
+    @Test
+    void 현재_시간_모킹_테스트1() {
+        timeService.printCurrentTime();
+    }
+
+    @Test
+    @FixedClock(date = "2024-12-25", time = "00:00:00")
+    void 현재_시간_모킹_테스트2() {
+        timeService.printCurrentTime();
+    }
+}
 ```
+Clock 객체는 전체 테스트 클래스에서 실제 객체 또는 mock 객체로 사용되기 때문에 SpyBean으로 등록합니다. `@SpyBean` 은 클래스, 필드만 선언가능합니다 만약 @FixedClock을 클래스만 사용할 수 있도록 제한하면 `@SpyBean(Clock.class)`도 포함할 수 있습니다 현재 구현은 @FixedClock을 메서드도 허용하고, 메서드에서만 사용할 경우 @SpyBean이 동작하지 않기 때문에 예외가 발생합니다.
 
-Clock 객체를 SpyBean으로 등록합니다. `@SpyBean` 은 클래스, 필드만 선언가능
+<img src="./images/fixed_clock_class.png" width=900>
 
-Clock을 사용하는 테스트 클래스에 적용
+클래스에 있는 @FixedClock으로 모킹되었습니다.
 
-`@FixedClock` 은 메서드, 클래스 모두 사용 가능 → `@SpyBean` 포함 불가
+<img src="./images/fixed_clock_method.png" width=900>
 
-테스트 flow 이미지
+메서드에 있는 @FixedClock으로 모킹되었습니다.
 
-### Test 적용
+어노테이션만 명시하면 어노테이션에 작성한 날짜, 시간으로 현재 시간을 리턴하게 되었습니다
 
-### 이점
--> 각 테스트마다 개발자 고유의 고정된 시간을 사용할 수 있음
--> 각 테스트마다 독립적으로 고정된 시간을 사용하여 테스트를 작성할 수 있음
--> 고정된 시간이 무엇인지 명시하여 가독성 증가
+어노테이션 기반 현재 시간 제어의 3가지 장점
+1. 각 테스트마다 개발자 고유의 고정된 시간을 사용할 수 있음
+2. 각 테스트마다 독립적으로 고정된 시간을 사용하여 유연하게 테스트를 작성할 수 있음
+3. 고정된 시간이 무엇인지 명시함으로써 가독성 증가
 
 
-## reference
+## 레퍼런스
 
 - https://www.baeldung.com/mockito-mock-static-methods
-- https://docs.oracle.com/javase/8/docs/api/java/time/LocalDate.html#now-java.time.Clock-
 - https://github.com/mockito/mockito/issues/1013
+- https://docs.oracle.com/javase/8/docs/api/java/time/LocalDate.html#now-java.time.Clock-
+- https://www.baeldung.com/junit-5-extensions
