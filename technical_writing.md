@@ -1,14 +1,27 @@
-# 커스텀 어노테이션 하나로 테스트에서 *LocalDateTime.now()* 제어하기
+# 어노테이션 하나로 테스트에서 *LocalDateTime.now()* 제어하기
 
-안녕하세요! 우아한테크코스 백엔드 6기 프린입니다. 현재 팀 프로젝트에서 ‘땅콩’이라는 서비스를 구현하고 있습니다. 저희 팀은 테스트~~ 테스트 코드를 열심히 작성하고 있습니다
+'테스트가 실패해요.'
 
-비즈니스 로직을 구현하다 보면 `LocalDateTIme.now()` 과 같이 현재 시간이 필요할 때가 있습니다. 그러나 현재에 맞춰서 테스트를 작성하면 당장은 성공하지만 시간이 조금만 지나도 실패하게 됩니다. 단위테스트 FIRST 원칙 중 Repeatable을 만족하지 못하는 것이죠. 시간과 같이 랜덤성 요소를 핸들링하는 것은 테스트에서 매우 중요합니다.
+테스트를 작성한 당시에는 성공했는데 시간이 조금 지나고 나니 멀쩡한 테스트가 실패했습니다.
+관련 테스트는 비즈니스 로직에서 `LocalDateTIme.now()`로 현재 시간을 가져오고 있었고, 테스트를 실행할 때마다 현재 시간이 달라져 어느 시점부터 완전히 실패하는 테스트가 되었습니다.
 
-땅콩은 테스트에서 이와 같은 시간을 어떻게 제어하고 있는지 소개하겠습니다
+좋은 단위 테스트는 [F.I.R.S.T 원칙](https://howtodoinjava.com/best-practices/first-principles-for-good-tests/)을 따릅니다. 하지만 제가 구현한 테스트는 반복 가능하지 않은 테스트, 즉 **Repeatable** 원칙을 만족하지 못하고 있었습니다. 현재 시간과 같은 랜덤 요소를 제어하는 것은 테스트에서 매우 중요한데요. 저는 단순히 '시간 제어하기'를 넘어 2가지도 함께 고민했습니다.
+
+1. 테스트 가독성 높이기
+2. 다른 팀원들도 테스트에서 쉽게 시간 제어하기
+
+위 고민을 해결하기 위해 ~~했는지 소개드리고자 합니다.
 
 ## 테스트에서 시간을 어떻게 제어할 것인가?
 
-`LocalDateTIme.now()` 는 static 메서드입니다. 따라서 Mockito의 일반적인 mocking 방식으로는 제어할 수 없습니다.
+Mock이란 [테스트 더블](https://www.javacodegeeks.com/2019/04/introduction-to-test-doubles.html) 방법 중 하나로, 테스트에서 실제 객체와 동일한 모의 객체를 만들어 ~~
+이러한 행위를 모킹(Mocking)이라고 합니다.
+
+스프링 부트에서는 `spring-boot-starter-test`의존성에 포함된 [Mockito](https://site.mockito.org/) 프레임워크를 사용하여 모킹을 사용합니다.
+
+먼저 테스트 더블 중 모킹이 떠올랐습니다. `LocalDateTIme.now()`를 모킹해서 원하는 시간만 리턴하도록 변경하는 것이죠.
+
+`LocalDateTIme.now()`는 static 메서드입니다. 따라서 Mockito의 일반적인 모킹 방식으로는 제어할 수 없습니다.
 
 ### 1. static 메서드 모킹
 
@@ -242,21 +255,33 @@ public class TestConfig {
 }
 ```
 
->  주의 🚨 <br/>
-BeanOverriding
+*Test*
+```java
+@SpringBootTest
+@Import(TestConfig.class)
+public class TimeServiceTest {
+
+    @Autowired
+    private TimeService timeService;
+
+    @Test
+    void 현재_시간_mocking() {
+        timeService.printCurrentTime();
+    }
+}
+```
+`@Import`로 TestConfiguration 설정을 적용해서 테스트에 고정된 Clock 객체를 사용합니다.
+
+땅콩은 TestConfiguration으로 시간을 제어하도록
 
 ## 커스텀 어노테이션으로 Clock 객체를 제어할 수 없을까?
 
-전역으로 제어하면서 여러 불편사항이 발생했습니다.
+Clock 객체를 전역적으로 제어했지만 테스트를 작성할 때 여전히 불편함이 있었습니다.
+1. 매 번 TestConfiguration에 고정된 시간을 확인하면서 테스트를 작성해야 함 ('시간 언제로 고정되어 있었지?')
+2. 테스트를 유연하게 작성하기 어려움 ('이 테스트에서는 다른 시간으로 고정해야 하는데...')
+3. 테스트에서 데잍를 왜 x시간으로 저장했는지 한 번에 읽히지 않음 ('이 테스트는 왜 x시간으로 저장하지?')
 
-기존 TestConfig에서 전역적으로 시간을 고정하는 방식의 단점을 극복하기 위함입니다.
-
-매 번 TestConfig에 고정된 시간을 확인하면서 테스트를 작성해야 함 ('시간 언제로 고정되어 있었지?')
--> 각 테스트마다 개발자 고유의 고정된 시간을 사용할 수 있음
-테스트를 유연하게 작성하기 어려움 ('이 테스트에서는 다른 시간으로 고정해야 하는데...')
--> 각 테스트마다 독립적으로 고정된 시간을 사용하여 테스트를 작성할 수 있음
-테스트를 읽을 때 왜 xx 시간으로 데이터를 저장했는지 한 번에 읽히지 않음 ('이 테스트는 왜 xx 시간으로 저장하지?')
--> 고정된 시간이 무엇인지 명시하여 가독성 증가
+기존 TestConfiguration의 단점을 극복하기 위해 
 
 JUnit의 extension 기능을 활용했습니다
 
@@ -327,8 +352,6 @@ Zone UTC
 
 메서드가 우선 순위
 
-### SpyBean 등록
-
 ```java
 
 ```
@@ -344,8 +367,13 @@ Clock을 사용하는 테스트 클래스에 적용
 ### Test 적용
 
 ### 이점
+-> 각 테스트마다 개발자 고유의 고정된 시간을 사용할 수 있음
+-> 각 테스트마다 독립적으로 고정된 시간을 사용하여 테스트를 작성할 수 있음
+-> 고정된 시간이 무엇인지 명시하여 가독성 증가
+
 
 ## reference
 
 - https://www.baeldung.com/mockito-mock-static-methods
 - https://docs.oracle.com/javase/8/docs/api/java/time/LocalDate.html#now-java.time.Clock-
+- https://github.com/mockito/mockito/issues/1013
