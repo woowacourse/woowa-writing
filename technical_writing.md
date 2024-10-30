@@ -198,7 +198,7 @@ public class S3StorageManage {
 
 코드에서 보이 듯이 @Value 어노테이션을 활용해서 yml에 있는 accessKey와 secretKey값을 참조하고 있다.
 
-그리고 해당 key를 통해 Aws인증을 거치고 있다.
+그리고 해당 key로 Aws인증을 거치고 있다.
 
 이러한 코드의 문제는 서두에서 이야기 했으니 넘어가겠다.
 
@@ -220,7 +220,7 @@ public class S3StorageManage {
 }
 ```
 
-필드에 아무런 정보도 없게 됐다. `InstanceProfileCredentialsProvider.create()` 를 통해 인증을 거치고 있는 것으로 보인다. 이렇게 개발자는 코드에 민감정보인 Key를 올리지 않아 보안적으로 노출될 위험은 없어졌다.
+필드에 아무런 정보도 없게 됐다. `InstanceProfileCredentialsProvider.create()` 메서드로 인증을 거치고 있는 것으로 보인다. 이렇게 개발자는 코드에 민감정보인 Key를 올리지 않아 보안적으로 노출될 위험은 없어졌다.
 
 그러면 어떻게 인증을 하고 있는가?
 
@@ -244,9 +244,7 @@ private String[] getSecurityCredentials(String imdsHostname, String metadataToke
 
 `169.254.169.254`는 EC2 인스턴스가 자신과 관련된 메타데이터 및 IAM 역할의 자격 증명을 조회하는 데 사용하는 특별한 내부 IP 주소이다.
 
- `/latest/meta-data/iam/security-credentials` 를 통해 해당 ec2에 부여된 iam을 역할을 찾게 된다.
-
-더 자세하게 말하면 [`http://169.254.169.254/latest/meta-data/iam/security-credentials/{역할이름}`](http://169.254.169.254/latest/meta-data/iam/security-credentials/{역할이름}) 을 통해 가져온다. 
+ `/latest/meta-data/iam/security-credentials` uri로 해당 ec2에 부여된 iam을 역할을 찾게 된다.
 
 더 자세한 내용은 [**인스턴스 메타데이터를 사용하여 EC2 인스턴스를 관리](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-metadata.html)** 를 참고하길 바란다.
 
