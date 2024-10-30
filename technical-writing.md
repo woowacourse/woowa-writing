@@ -168,6 +168,12 @@ jobs:
 
 약 28초 동안 요청을 제대로 처리하지 못할 수 있습니다.
 
+즉, 아래처럼 서버를 종료해도 약 30초간 정상으로 판단하고 로드밸런서가 트래픽을 계속 보내는 것입니다.
+
+![stop-server](image/stop-server.png)
+
+![stop-traffic](image/stop-traffic.png)
+
 ## 개선 방법
 
 1. 서버를 내리기 전에 로드밸런서에게 배포할 서버가 unhealthy 하다고 알림
