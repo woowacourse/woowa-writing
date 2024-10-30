@@ -20,11 +20,6 @@ Suspense는 두 가지 주요 props를 받습니다. 첫 번째는 Promise를 ca
 <Suspense fallback={<Loading />}>{children}</Suspense>
 ```
 
-#### Props
-
-- children : 렌더링하려는 실제 UI. 비동기 작업이 완료되면 화면에 표시.
-- fallback : 로딩이 완료되지 않은 경우 실제 UI 대신 렌더링할 대체 UI.
-
 예를 들어 리뷰 목록을 불러오는 리뷰 목록 페이지에서 비동기 작업이 있는 컴포넌트(ReviewList)를 Suspense로 감싸주고, 비동기 작업 중에는 fallback UI를 전달합니다. 즉, 데이터가 로딩되는 동안에는 Loading 컴포넌트가 화면에 표시되고, 로딩이 완료되면 ReviewList 컴포넌트가 화면에 렌더링됩니다.
 
 ```tsx
@@ -41,17 +36,43 @@ const ReviewListPage = () => {
 };
 ```
 
-Suspense는 비동기 작업이 이루어지는 동안 컴포넌트 렌더링을 “일시 중단"하는 방식으로 동작합니다. 여기서 비동기 작업이란? 특정 작업이 끝날때 까지 기다리지 않고 다음 작업을 실행하는 방식을 의미합니다. 그러면 이 비동기 작업이 완료된다는 것을 어떻게 알 수 있을까요?
+Suspense는 비동기 작업이 이루어지는 동안 컴포넌트 렌더링을 “일시 중단"하는 방식으로 동작합니다.
+
+> 비동기 작업이란? 특정 작업이 끝날때 까지 기다리지 않고 다음 작업을 실행하는 방식을 의미합니다.
+
+그러면 이 비동기 작업이 완료된다는 것을 어떻게 알 수 있을까요? 🤔
 
 ### Suspense는 비동기 작업의 상태를 어떻게 감지할까?
 
 그 핵심은 Suspense로 감싸진 하위 컴포넌트가 Promise를 throw하는 방식에 있습니다.
 
-| 상태          | 이미지                                 | 설명                                                                                                                                                                                                                                                                                                                                |
-| ------------- | -------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Pending**   | <img src="./image/tech/pending.png">   | 비동기 작업을 수행 중인 컴포넌트는 데이터를 가져오는 과정에서 Promise를 throw합니다. throw된 Promise는 Suspense에 의해 catch되며, 이후 Suspense는 이 Promise가 이행될 때까지 렌더링을 일시 중단합니다. 쉽게 말하면, "아직 준비 안 됐으니 좀 기다려봐라"라고 신호를 보내면 Suspense가 "오케이, 기다릴게"하며 로딩 화면을 보여줍니다. |
-| **Fulfilled** | <img src="./image/tech/fulfilled.png"> | 비동기 작업이 완료되면 Promise는 fulfilled 상태가 되고, Suspense는 로딩 UI를 제거한 후 하위 컴포넌트를 렌더링합니다. 데이터를 다 가져왔으니 화면을 보여줘도 되겠구나라고 판단한 Suspense가 로딩 화면을 지우고, 실제 화면을 보여줍니다.                                                                                              |
-| **Rejected**  | <img src="./image/tech/rejected.png">  | 비동기 작업이 실패하면 Promise는 rejected 상태가 되며, Suspense 자체가 실패 상태를 처리하지 않지만, 컴포넌트 내부에서 에러 경계를 사용하여 에러를 처리할 수 있습니다.                                                                                                                                                               |
+| 상태          | 이미지                                 | 설명                                                                                                                                                                                                                                                       |
+| ------------- | -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Pending**   | <img src="./image/tech/pending.png">   | 비동기 작업을 수행 중인 컴포넌트는 데이터를 가져오는 과정에서 Promise를 throw합니다. throw된 Promise는 Suspense에 의해 catch되며, 이후 Suspense는 이 Promise가 이행될 때까지 렌더링을 일시 중단합니다.                                                     |
+| **Fulfilled** | <img src="./image/tech/fulfilled.png"> | 비동기 작업이 완료되면 Promise는 fulfilled 상태가 되고, Suspense는 로딩 UI를 제거한 후 하위 컴포넌트를 렌더링합니다. 쉽게 말하면, 데이터를 다 가져왔으니 화면을 보여줘도 되겠구나라고 판단한 Suspense가 로딩 화면을 지우고, 실제 화면을 보여주는 것입니다. |
+| **Rejected**  | <img src="./image/tech/rejected.png">  | 비동기 작업이 실패하면 Promise는 rejected 상태가 되며, Suspense 자체가 실패 상태를 처리하지 않지만, 컴포넌트 내부에서 에러 경계를 사용하여 에러를 처리할 수 있습니다.                                                                                      |
+
+Suspense를 사용하면, 컴포넌트 단위로 hydration이 가능합니다. Suspense가 여러 개 있고, hydration을 각기 다른 시점에 수행해야 한다면? 어떻게 수행할까요?
+
+```tsx
+<Header />
+<Suspense fallback={<Loading />}>
+  <ReviewInfoSection />
+</Suspense>
+<Dropdown />
+<Suspense fallback={<Loading />}>
+  <ReviewCollectionSection />
+</Suspense>
+<Footer />
+```
+
+Suspense로 감싸진 컴포넌트(ReviewInfoSection, ReviewCollectionSection)를 제외한 나머지 컴포넌트는 HTML 렌더링과 hydration이 일어납니다.
+
+<img src="./image/tech/suspense4.png" style="height: 250px">
+
+React는 Suspense로 감싸진 두 컴포넌트 중 트리 구조에서 더 빨리 발견되는 Suspense 바운더리를 우선적으로 Hydration하려고 시도합니다. 예를 들어, ReviewInfoSection이 먼저 발견되면 이를 먼저 Hydrating합니다. 하지만 만약 사용자가 ReviewCollectionSection 컴포넌트에서 클릭 등의 상호작용을 시도한다면, React는 이 컴포넌트를 즉시 동기적으로 Hydrating하여 사용자 상호작용에 빠르게 응답할 수 있도록 처리합니다.
+
+<img src="./image/tech/suspense5.png" style="height: 250px">
 
 ### Suspense 사용 이유
 
@@ -150,11 +171,11 @@ useSuspenseQuery는 TanStack Query 라이브러리의 훅으로, React의 Suspen
 
  <img src="./image/tech/suspense2.png" style="width: 400px" />
 
-| 설명                                                                                   | 이미지                                                        |
-| -------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
-| 1. Biography가 로드 되지 않은 경우, BigSpinner가 그 내부 컴포넌트를 대체합니다.        | <img src="./image/tech/suspense1.png" style="width: 300px" /> |
-| 2. Biography의 데이터 패칭이 완료되면 BigSpinner 대신 Biography 컴포넌트가 표시됩니다. | <img src="./image/tech/suspense2.png" style="width: 300px" /> |
-| 3. Albums의 데이터 패칭이 완료되면 AlbumsGlimmer 대신 Albums 컴포넌트가 표시됩니다.    | <img src="./image/tech/suspense3.png" style="width: 300px" /> |
+| 이미지                                                        | 설명                                                                                   |
+| ------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| <img src="./image/tech/suspense1.png" style="width: 300px" /> | 1. Biography가 로드 되지 않은 경우, BigSpinner가 그 내부 컴포넌트를 대체합니다.        |
+| <img src="./image/tech/suspense2.png" style="width: 300px" /> | 2. Biography의 데이터 패칭이 완료되면 BigSpinner 대신 Biography 컴포넌트가 표시됩니다. |
+| <img src="./image/tech/suspense3.png" style="width: 300px" /> | 3. Albums의 데이터 패칭이 완료되면 AlbumsGlimmer 대신 Albums 컴포넌트가 표시됩니다.    |
 
 #### 코드 스플리팅
 
