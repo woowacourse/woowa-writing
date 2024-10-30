@@ -1,7 +1,7 @@
 # 개요
 
-반려견 친구찾기 및 사회화 장려 앱 "반갑개"의 모임(Club) 도메인의 기능을 개발하는 단계에서 마주쳤던 문제에 대해 공유하는 글 입니다.  
-Spring boot 3.3.x / Hibernate 6.x / Mysql 8.x 이상 버전 기준으로 작성 되었습니다.
+반려견 친구 찾기 및 사회화 장려 앱 "반갑개"의 모임(Club) 도메인의 기능을 개발하는 단계에서 마주쳤던 문제에 대해 공유하는 글입니다.
+Spring boot 3.3.x / Hibernate 6.x / MYSQL 8.x 이상 버전 기준으로 작성되었습니다.
 ### 문서 주제
 다중 ToMany 연관관계를 포함한 JPA Entity N+1 해결하기
 
@@ -13,7 +13,7 @@ MultipleBagFetchException을 해결하고자 하는 개발자.
 + 간단한 SQL Query 및 DML을 이해할 수 있는 개발자.
 + JPA Entity, 연관 관계, JPQL 등 기본적인 지식을 알고 있는 개발자.
 + N+1문제를 알고 있는 개발자.
-+ Fetch Join, EntityGraph 등을 사용해본 개발자
++ Fetch Join, EntityGraph 등을 사용해 본 개발자
 
   
 # 문제 상황
@@ -346,3 +346,9 @@ default_batch_fetch_size를 10으로 설정하여 아래 테스트 코드를 실
 JPA를 활용하여 개발하다 보면 Club처럼 ToMany 연관 관계를 다수 지닌 Entity가 발생할 수 있습니다.  
 N+1 문제를 해결하기 위해 무작정 Fetch Join을 사용하는 것 보다, Hibernate의 동작 과정을 이해한 후 N+1을 개선할 필요성이 있습니다.  
 저 역시 JPA를 처음 접한 후 Club 개발한 지 얼마되지 않는 시점이라 "N+1은 Fetch JOIN 으로 해결" 이라는 공식이 머릿 속에 박혀 있었던 것 같습니다.  
+
+# 참고자료
+
+[Hibernate](https://github.com/hibernate/hibernate-orm).  
+[기억보다 기록을 - 향로님 블로그](https://jojoldu.tistory.com/457).  
+[Baeldung](https://www.baeldung.com/java-hibernate-multiplebagfetchexception).  
