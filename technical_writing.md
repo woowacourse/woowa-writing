@@ -68,7 +68,7 @@ class TimeControllerTest {
 
 <br/>
 
-<img src="./images/mockStatic_WebMvc.png" width=600>
+<img src="./images/mockStatic_WebMvc.png" width=700>
 
 테스트를 실행하면 고정된 시간을 잘 반환하고 있습니다. 문제를 해결했나 싶었지만 MockedStatic은 스레드 로컬로 동작하기 때문에 문제점이 있습니다.
 
@@ -108,7 +108,7 @@ class TimeControllerTest {
 
 ```
 
-<img src="./images/mockStatic_RestAssured.png" width=900>
+<img src="./images/mockStatic_RestAssured.png" width=1000>
 
 실제로 테스트를 해보면 서로 다른 스레드에서 실행되어 모킹이 적용되지 않음을 확인할 수 있습니다.
 
@@ -166,7 +166,7 @@ public class TimeServiceTest {
 }
 ```
 
-<img src="./images/localdatetime_wrapper.png" width=900>
+<img src="./images/localdatetime_wrapper.png" width=1000>
 
 가장 간단한 방법이지만 일반적이지 않은 코드라서 팀원들의 인지 비용이 발생할 것이라 생각했습니다.
 
@@ -245,7 +245,7 @@ public class TimeServiceTest {
 
 **주의할 점**은 Instant에 작성한 시간을 Zone에 따라 변환하기 때문에 Zone을 UTC로 반환하지 않으면 `LocalDateTime.now(clock)`에서 예상하지 않은 값이 리턴됩니다.
 
-<img src="./images/clock_mocking.png" width=900>
+<img src="./images/clock_mocking.png" width=1000>
 
 테스트를 실행하면 고정된 시간을 반환하고 있습니다. 하지만 Clock을 사용하는 테스트마다 모킹하는 보일러플레이트 코드를 작성해야 하는 점이 매우 번거롭습니다.
 
@@ -388,11 +388,11 @@ public class TimeServiceTest {
 ```
 Clock 객체는 테스트 클래스에서 실제 객체 또는 mock 객체로 모두 사용되기 때문에 SpyBean으로 등록합니다.
 
-<img src="./images/fixed_clock_class.png" width=900>
+<img src="./images/fixed_clock_class.png" width=1000>
 
 첫 번째 테스트는 클래스 레벨에 있는 `@FixedClock`의 현재 시간을 반환합니다.
 
-<img src="./images/fixed_clock_method.png" width=900>
+<img src="./images/fixed_clock_method.png" width=1000>
 
 두 번째 테스트는 메서드 레벨에 있는 `@FixedClock`의 현재 시간을 반환합니다.
 
