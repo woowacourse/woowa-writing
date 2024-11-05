@@ -19,7 +19,7 @@
 
 MySQL은 세계에서 가장 널리 사용되는 오픈 소스 관계형 데이터베이스 관리 시스템(RDBMS)입니다. [DB-Engines](https://db-engines.com/en/ranking)에 따르면 MySQL은 Oracle Database의 뒤를 이어 두 번째로 널리 사용되는 데이터베이스입니다. Facebook, Twitter, Netflix 등 세계적인 애플리케이션들이 MySQL을 사용하고 있습니다.
 
-![](https://i.imgur.com/kR4wQHJ.png)
+![image](https://github.com/user-attachments/assets/c9d0b345-f808-4ce2-b438-b257ac1508eb)
 
 *그림 1 DB-Engines Ranking*
 
@@ -64,13 +64,13 @@ PostgreSQL은 복잡한 데이터 워크로드를 안전하게 저장할 수 있
 
 [Stack Overflow](https://survey.stackoverflow.co/2022/?utm_source=results#most-popular-technologies-database)와 [JetBrains](https://www.jetbrains.com/lp/devecosystem-2022/databases/)의 설문조사에 따르면 두 데이터베이스 모두 개발자들이 선호하는 데이터베이스임을 알 수 있습니다. Stack Overflow에서 진행한 설문조사를 보면 MySQL 46.85%, PostgreSQL 43.59%로 막상막하의 점유율을 보여주고 있습니다.
 
-![](https://i.imgur.com/H5KSqN8.png)
+![image](https://github.com/user-attachments/assets/82c696b1-dc73-44f5-bfe3-a631dad68a6d)
 
 *그림 2 JetBrains에서 진행한 설문 조사 (모든 응답자)*
 
 심지어 전문 개발자만 투표한 결과는 PostgreSQL 46.48%, MySQL 45.68%로 PostgreSQL가 1위 자리를 차지했습니다. 
 
-![](https://i.imgur.com/60FYrZJ.png)
+![image](https://github.com/user-attachments/assets/b6c77194-7008-4d6e-9334-d8f2e405cc77)
 
 *그림 3 JetBrains에서 진행한 설문 조사 (전문 개발자)*
 
@@ -175,7 +175,7 @@ MySQL에서는 `INSERT`, `UPDATE`, `DELETE` 문에 대해 `_AFTER_` 및 `_BEFORE
 
 [JetBrains](https://www.jetbrains.com/lp/devecosystem-2022/databases/)의 설문조사에 따르면 MySQL과 PostgreSQL은 개발자들이 가장 많이 사용하는 두 주요 데이터베이스로, 서로 직접적인 경쟁 관계에 있습니다. 흥미롭게도 MySQL은 PostgreSQL 사용자들 사이에서 덜 선호되며, 그 반대의 경우도 마찬가지입니다. 그런데도 응답자의 19%는 두 데이터베이스를 모두 사용한다고 응답하였습니다. 이는 각 데이터베이스의 강점과 특성에 따라 프로젝트에 적합한 DBMS를 선택하는 경향을 보여줍니다. 이러한 선택의 다양성은 개발자들이 특정 요구 사항에 맞춰 최적의 솔루션을 찾고 있음을 시사합니다.
 
-![](https://i.imgur.com/vHDzgmB.png)
+![image](https://github.com/user-attachments/assets/7c02ef71-5859-4367-8f0d-e0d3d31bc5a6)
 
 *그림 4 ‘지난 12개월 동안 어떤 데이터베이스를 사용하셨나요?’ 설문 결과*
 
