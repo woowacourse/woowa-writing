@@ -72,7 +72,7 @@ MockedStatic으로 LocalDateTime을 모킹한 후 `now()`를 호출했을 때 �
 
 <img src="./images/mockStatic_WebMvc.png" width=700>
 
-테스트를 실행하면 고정된 시간을 잘 반환하고 있습니다. 문제를 해결했나 싶었지만 MockedStatic은 스레드 로컬로 동작하기 때문에 **두 가지의 문제점**이 있었습니다.
+테스트를 실행하면 모킹한 시간이 잘 반환되고 있습니다. 문제를 해결했나 싶었지만 MockedStatic은 스레드 로컬로 동작하기 때문에 **두 가지의 문제점**이 있었습니다.
 
 1. 리소스를 해제하지 않으면 MockedStatic이 스레드에 활성 상태로 남아있게 되고, 같은 스레드를 재사용하는 다른 테스트에 영향을 줄 수 있습니다. 그래서 try-with-resources 구문을 사용하거나 `close()`를 명시적으로 호출해서 **항상 리소스를 해제**해야 합니다.
 
@@ -126,7 +126,7 @@ public class LocalDateTimeWrapper {
 }
 ```
 
-LocalDateTime을 한 번 감싸는 래핑 클래스를 생성해서 테스트 더블을 사용하는 방법입니다.
+LocalDateTime을 한 번 감싸는 래핑 클래스를 bean으로 사용하고 테스트 더블로 대체하는 방법입니다. 이 클래스를 주입해서 사용하는 서비스와 테스트를 작성해보겠습니다.
 
 ```java
 @Service
@@ -170,17 +170,23 @@ public class TimeServiceTest {
 
 <img src="./images/localdatetime_wrapper.png" width=1000>
 
-가장 간단한 방법이지만 일반적이지 않은 코드라서 팀원들의 인지 비용이 발생할 것이라 생각했습니다.
+모킹한 시간이 반환되었습니다. 간단하게 해결할 수 있는 방법이지만 **두 가지의 문제점**이 있습니다.
+1. 일반적이지 않은 코드이기 때문에 인지 비용이 발생합니다.
+2. 단순히 `LocalDateTime.now()`를 한 번 감싸기 위해 관리해야 할 클래스가 하나 더 늘어납니다.
+
+<br>
+
+마지막으로 `LocalDateTime.now()`가 어떻게 구현되어 있는지 살펴보면서 다른 해결 방법을 찾아보겠습니다.
 
 ### 3. Clock 객체를 bean으로 등록 후 모킹
 
 <img src='./images/localdatetime.png' width=600>
 
-`LocalDateTime.now()`의 내부를 살펴보면 Clock을 인자로 받는 메서드를 호출하고 있습니다.
+`LocalDateTime.now()`는 Clock을 파라미터로 받는 오버로딩 메서드를 호출하고 있습니다.
 
 <img src='./images/localdatetime_clock.png' width=600>
 
-내부적으로만 사용하는 줄 알았는데 접근제어자가 public이네요! JavaDoc을 보니까 테스트를 위해 대체 Clock을 사용할 수 있다고 안내하고 있습니다. 이 메서드를 사용하면 시간을 쉽게 제어할 수 있어 보입니다.
+내부적으로만 사용하는 줄 알았는데 접근제어자가 public이네요! Javadoc을 보면 테스트를 위해 대체 Clock을 사용할 수 있다고 안내하고 있습니다. 이 메서드를 사용하면 시간을 쉽게 제어할 수 있어 보입니다.
 
 > - Instant <br/>
 타임라인에서 한 지점을 나타내는 순간을 나타내며, UTC 기준 `1970-01-01T00:00:00`를 0(epoch)으로 정하고 이로부터 경과된 시간을 양수 또는 음수로 표현합니다.
@@ -245,11 +251,22 @@ public class TimeServiceTest {
 
 테스트에서는 Clock을 MockBean으로 주입하고 현재 시간을 만들어낼 때 사용하는 Instant를 원하는 값으로 반환합니다.
 
-**주의할 점**은 Zone에 따라 Instant에 작성한 시간을 변환하기 때문에 Zone이 UTC가 아니면 `LocalDateTime.now(clock)`에서 예상하지 않은 시간이 반환됩니다.
+> 🚨 **주의할 점**은 Zone에 따라 Instant에 작성한 시간을 변환하기 때문에 Zone이 UTC가 아니면 `LocalDateTime.now(clock)`에서 예상하지 않은 시간이 반환됩니다.
+>```java
+>@Test
+>void 현재_시간_모킹_테스트() {
+>    Instant now = Instant.parse("2024-12-31T00:00:00Z");
+>    log.info("모킹한 시간: {}", now);
+>    when(clock.instant()).thenReturn(now);
+>    when(clock.getZone()).thenReturn(ZoneId.of("Asia/Seoul"));
+>
+>    timeService.printCurrentTime(); // -> +9시간된 2024-12-31T09:00:00Z 리턴
+>}
+>```
 
 <img src="./images/clock_mocking.png" width=1000>
 
-테스트를 실행하면 고정된 시간을 반환하고 있습니다. 하지만 Clock을 사용하는 테스트마다 모킹하는 보일러플레이트 코드를 작성해야 하는 점이 매우 번거롭습니다.
+테스트를 실행하면 모킹한 시간이 반환되고 있습니다. 하지만 Clock을 사용하는 테스트마다 모킹하는 보일러플레이트 코드를 작성해야 하는 점이 매우 번거롭습니다.
 
 `@TestConfiguration`을 사용하면 **고정된 Clock 객체**를 primary bean으로 등록해서 테스트 전역으로 Clock을 제어할 수 있습니다. 가짜 객체가 진짜 객체처럼 행동하는 테스트 더블의 Fake 방법입니다.
 
@@ -278,7 +295,7 @@ public class TimeServiceTest {
     }
 }
 ```
-`@Import`로 설정을 적용하면 고정된 Clock 객체를 사용합니다. 반복되는 보일러플레이트 코드가 모두 사라졌습니다!
+테스트에서 `@Import`로 설정을 적용하면 고정된 Clock 객체를 사용합니다. 반복되는 보일러플레이트 코드가 모두 사라졌습니다!
 
 <br/>
 
@@ -365,8 +382,8 @@ public @interface FixedClock {
     String time();
 }
 ```
-테스트에서 사용할 커스텀 어노테이션입니다.
-extension은 `@ExtendWith` 어노테이션을 작성하면 적용됩니다. 여기서는 `@FixedClock` 어노테이션에 포함했기 때문에 `@FixedClock`을 사용하면 extension이 자동으로 동작하게 됩니다.
+테스트에서 사용할 커스텀 어노테이션입니다. 테스트를 유연하게 작성하기 위해 메서드와 클래스 모두 허용하도록 구현했습니다.
+extension은 테스트에서 `@ExtendWith` 어노테이션을 작성하면 적용됩니다. 여기서는 `@FixedClock` 어노테이션에 포함했기 때문에 테스트에서 `@FixedClock`을 사용하면 FixedClockExtension이 자동으로 동작합니다.
 
 ### 테스트 적용
 ```java
@@ -394,13 +411,15 @@ Clock 객체는 테스트 클래스에서 실제 객체 또는 mock 객체로 �
 
 <img src="./images/fixed_clock_class.png" width=1000>
 
-첫 번째 테스트는 클래스 레벨에 있는 `@FixedClock`의 현재 시간을 반환합니다.
+첫 번째 테스트는 메서드에 `@FixedClock`을 사용하지 않았기 때문에 클래스의 `@FixedClock`이 적용되어 `2025-01-01T00:00:00Z`으로 현재 시간을 반환합니다.
+
+<br>
 
 <img src="./images/fixed_clock_method.png" width=1000>
 
-두 번째 테스트는 메서드 레벨에 있는 `@FixedClock`의 현재 시간을 반환합니다.
+두 번째 테스트는 메서드에 `@FixedClock`을 사용했기 때문에 `2024-12-25T00:00:00Z`으로 현재 시간을 반환합니다.
 
->`@SpyBean` 어노테이션은 클래스 또는 필드에서만 사용할 수 있습니다. 만약 `@FixedClock`을 클래스에서만 사용할 수 있도록 제한하면 `@SpyBean(Clock.class)`도 `@FixedClock`에 포함할 수 있습니다. <br/>
+> 🚨 `@SpyBean` 어노테이션은 클래스 또는 필드에서만 사용할 수 있습니다. 만약 `@FixedClock`을 클래스에서만 사용할 수 있도록 제한하면 `@SpyBean(Clock.class)`도 `@FixedClock`에 포함할 수 있습니다. <br/>
 > 현재 구현은 `@FixedClock`을 메서드에서도 사용할 수 있기 때문에 어노테이션이 메서드 레벨에만 사용됐을 경우 `@SpyBean`이 동작하지 않아 예외가 발생합니다.
 
 이제 `@FixedClock` 어노테이션만 명시하면 어노테이션에 작성한 날짜, 시간으로 현재 시간을 반환할 수 있게 되었습니다!
@@ -420,5 +439,5 @@ Clock 객체는 테스트 클래스에서 실제 객체 또는 mock 객체로 �
 ## 레퍼런스
 - https://www.baeldung.com/mockito-mock-static-methods
 - https://github.com/mockito/mockito/issues/1013
-- https://docs.oracle.com/javase/8/docs/api/java/time/LocalDateTime.html#now-java.time.Clock-
+- https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/LocalDateTime.html#now(java.time.Clock)
 - https://www.baeldung.com/junit-5-extensions
