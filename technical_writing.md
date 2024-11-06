@@ -127,7 +127,7 @@ LiveData나 Observable과 같은 관찰 가능한 데이터 패턴을 지원합�
 
 `Observable`은 UI에 연결된 데이터의 변경 사항을 알릴 수 있는 방법을 제공합니다. 아래 이미지와 같이 `Observable`은 `interface`입니다. 
 
-  ![img_1.png](img_1.png)
+  ![img_1.png](img_1.png)  
 `Observable`을 구현한 클래스들은 `LiveData`처럼 변경 사항을 알릴 수 있는 관찰 가능한 클래스가 됩니다.
 `Observable` 객체는 클래스 내에서 관찰된 프로퍼티가 변경될 때마다 `Observable.OnPropertyChangedCallback`에 변경 사항을 전달해야 합니다.
 
@@ -138,7 +138,8 @@ LiveData나 Observable과 같은 관찰 가능한 데이터 패턴을 지원합�
 `ObservableField`란 객체를 관찰할 수 있도록 만들어주는 래퍼로, 객체 뿐만 아니라 필드의 변경 사항도 관찰할 수 있습니다.
 변경 사항이 관찰될 때 UI가 자동으로 업데이트되어, UI와 데이터 모델 간의 상호작용을 쉽게 만듭니다.
 
-`ObservableField.class`
+`ObservableField.class`  
+
 ![img_2.png](img_2.png)
 
 위 이미지에서 `ObservableField`가 `androidx.databinding` 패키지에 포함되어 있는 것을 확인할 수 있습니다.
@@ -173,8 +174,9 @@ class ObservableFieldViewModel : ViewModel() {
 }
 ```
 
-**2. 값 업데이트**
-![img_5.png](img_5.png)
+**2. 값 업데이트**  
+
+![img_5.png](img_5.png)  
 `get()`과 `set()`을 이용해 값을 읽고 업데이트할 수 있습니다.
 
 `ViewModel.kt`
