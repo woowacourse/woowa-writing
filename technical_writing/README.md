@@ -19,7 +19,7 @@
 
 ## 전반적인 인프라 소개
 
-![[Pasted image 20241001140153.png]]
+<img align="center" src="./image/ddangkong-infra-structure.png">
 
  위 구성은 크게 프론트 부분과 백엔드 부분으로 나눌 수 있다. 프론트엔드는 모든 유저에게 똑같이 제공되는 정적 파일을 담당한다. S3에서 정적 파일을 보관하며, CloudFront에서 정적 파일을 쉽게 이용할 수 있도록 도와준다. 그리고 유저, 상황마다 바뀌는 정보는 백엔드에게 요청한다.
 
@@ -44,7 +44,7 @@
 	6. ddangkong.kr의 DNS 정보 > 설정 버튼을 클릭하여 ddangkong.kr의 DNS 관리 페이지로 이동
 
 - 현재 설정 (24.10.01 기준)
-	![[Pasted image 20241001133544.png]]
+	<img align="center" src="./image/dns-setting.png">
 
 - prod 관련 도메인 설정
 	- @ : ddangkong.kr로 연결된 값되는 주소를 의미한다. prod 환경으로 구현된 프론트 CloudFront에 접근하는 주소이다.
