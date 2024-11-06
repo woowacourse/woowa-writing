@@ -251,6 +251,10 @@ public class TimeServiceTest {
 
 테스트에서는 Clock을 MockBean으로 주입하고 현재 시간을 만들어낼 때 사용하는 Instant를 원하는 값으로 반환합니다.
 
+<img src="./images/clock_mocking.png" width=1000>
+
+테스트를 실행하면 모킹한 시간이 반환되고 있습니다.
+
 > 🚨 **주의할 점**은 Zone에 따라 Instant에 작성한 시간을 변환하기 때문에 Zone이 UTC가 아니면 `LocalDateTime.now(clock)`에서 예상하지 않은 시간이 반환됩니다.
 >```java
 >@Test
@@ -260,15 +264,13 @@ public class TimeServiceTest {
 >    when(clock.instant()).thenReturn(now);
 >    when(clock.getZone()).thenReturn(ZoneId.of("Asia/Seoul"));
 >
->    timeService.printCurrentTime(); // -> +9시간된 2024-12-31T09:00:00Z 리턴
+>    timeService.printCurrentTime(); // -> +9시간된 2024-12-31T09:00:00Z 반환
 >}
 >```
 
-<img src="./images/clock_mocking.png" width=1000>
+<br>
 
-테스트를 실행하면 모킹한 시간이 반환되고 있습니다. 하지만 Clock을 사용하는 테스트마다 모킹하는 보일러플레이트 코드를 작성해야 하는 점이 매우 번거롭습니다.
-
-`@TestConfiguration`을 사용하면 **고정된 Clock 객체**를 primary bean으로 등록해서 테스트 전역으로 Clock을 제어할 수 있습니다. 가짜 객체가 진짜 객체처럼 행동하는 테스트 더블의 Fake 방법입니다.
+하지만 Clock을 사용하는 테스트마다 모킹하는 보일러플레이트 코드를 작성해야 하는 점이 매우 번거롭습니다. `@TestConfiguration`을 사용하면 **고정된 Clock 객체**를 primary bean으로 등록해서 테스트 전역으로 Clock을 제어할 수 있습니다. 가짜 객체가 진짜 객체처럼 행동하는 테스트 더블의 Fake 방법입니다.
 
 ```java
 @TestConfiguration
