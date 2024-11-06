@@ -1,6 +1,6 @@
 # 어노테이션 하나로 테스트에서 *LocalDateTime.now()* 제어하기
 
-'테스트 실패해요.'
+"테스트 실패해요."
 
 땅콩 프로젝트는 `LocalDateTime.now()`로 현재 시간을 가져와서 비교하는 비즈니스 로직이 있습니다. 단위 테스트를 작성하고 자신있게 Pull Request를 올렸지만 CI에서 테스트가 실패했습니다. 테스트를 실행할 때마다 현재 시간이 달라져 어느 시점부터 완전히 실패하는 테스트가 되었기 때문이었습니다.
 
@@ -26,7 +26,7 @@ Mock이란 [테스트 더블](https://www.javacodegeeks.com/2019/04/introduction
 
 <img src='./images/mockStatic.png' width=600>
 
-[Mockito 3.4.0](https://javadoc.io/doc/org.mockito/mockito-core/latest/org/mockito/Mockito.html#48) 버전 이상부터 MockedStatic으로 static 메서드를 모킹할 수 있습니다.
+[Mockito 3.4.0](https://javadoc.io/doc/org.mockito/mockito-core/latest/org/mockito/Mockito.html#48) 버전 이상부터 MockedStatic을 사용해서 static 메서드를 모킹할 수 있습니다. 간단한 컨트롤러와 테스트를 작성해보겠습니다.
 
 <br/>
 
@@ -66,17 +66,17 @@ class TimeControllerTest {
     }
 }
 ```
-간단한 컨트롤러와 테스트를 작성해보겠습니다. MockedStatic으로 LocalDateTime을 모킹한 후 `now()`를 호출했을 때 고정된 시간을 반환하도록 합니다.
+MockedStatic으로 LocalDateTime을 모킹한 후 `now()`를 호출했을 때 고정된 시간을 반환하도록 합니다.
 
 <br/>
 
 <img src="./images/mockStatic_WebMvc.png" width=700>
 
-테스트를 실행하면 고정된 시간을 잘 반환하고 있습니다. 문제를 해결했나 싶었지만 MockedStatic은 스레드 로컬로 동작하기 때문에 문제점이 있습니다.
+테스트를 실행하면 고정된 시간을 잘 반환하고 있습니다. 문제를 해결했나 싶었지만 MockedStatic은 스레드 로컬로 동작하기 때문에 **두 가지의 문제점**이 있었습니다.
 
-리소스를 해제하지 않으면 MockedStatic이 스레드에 활성 상태로 남아있게 되고, 같은 스레드를 재사용하는 다른 테스트에 영향을 줄 수 있습니다. 그래서 try-with-resources 구문을 사용하거나 `close()`를 명시적으로 호출해서 **항상 리소스를 해제**해야 합니다.
+1. 리소스를 해제하지 않으면 MockedStatic이 스레드에 활성 상태로 남아있게 되고, 같은 스레드를 재사용하는 다른 테스트에 영향을 줄 수 있습니다. 그래서 try-with-resources 구문을 사용하거나 `close()`를 명시적으로 호출해서 **항상 리소스를 해제**해야 합니다.
 
-[@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)](https://docs.spring.io/spring-boot/reference/testing/spring-boot-applications.html)을 사용하면 HTTP 클라이언트가 테스트와 별도의 스레드에서 실행되기 때문에 스레드 로컬로 처리되는 MockedStatic이 반영되지 않습니다. 땅콩은 컨트롤러 테스트로 RestAssured와 WebEnvironment.RANDOM_PORT를 사용하기 때문에 이 방식으로는 문제를 해결할 수 없습니다.
+2. [@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)](https://docs.spring.io/spring-boot/reference/testing/spring-boot-applications.html)을 사용하면 HTTP 클라이언트가 테스트와 별도의 스레드에서 실행되기 때문에 스레드 로컬로 처리되는 MockedStatic이 반영되지 않습니다. 땅콩은 컨트롤러 테스트로 RestAssured와 WebEnvironment.RANDOM_PORT를 사용하기 때문에 이 방식으로는 문제를 해결할 수 없습니다.
 
 ```java
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
