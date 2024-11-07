@@ -349,8 +349,6 @@ class IncreaseTest {
 - runCurrent()
     - runCurrent() 메서드는 현재 큐에 있는 모든 코루틴을 즉시 실행합니다.
  
-runCurrent() 메서드는 현재 큐에 있는 모든 코루틴을 즉시 실행합니다.
-
 <img src="https://github.com/user-attachments/assets/f52c2a5e-eaec-42dd-89fc-3d20f6582291" img width="500">
 
 <br>
