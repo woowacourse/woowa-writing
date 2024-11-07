@@ -45,7 +45,7 @@
 
 ### 3.1. 가정을 버려라
 
-![image](https://github.com/user-attachments/assets/c530837f-d926-4a0c-a30c-6f2614e38fa9)
+<img src="https://github.com/user-attachments/assets/c530837f-d926-4a0c-a30c-6f2614e38fa9" img width="500">
 
 <p>$\huge{\rm{\color{#DD6565}가정한 속도 비교: Cache > DB > API}}$</p>
 
@@ -62,7 +62,7 @@
 
 **그러나** 다음과 같이 인프라가 바뀌어 DB가 API보다 느려지게 된다면 작동을 멈추거나 예상치 못한 일이 발생할 수 있습니다.
 
-![image](https://github.com/user-attachments/assets/ca3e012b-55cd-4cbe-836b-66cab784a31e)
+<img src="https://github.com/user-attachments/assets/ca3e012b-55cd-4cbe-836b-66cab784a31e" img width="500">
 
 <p>$\huge{\rm{\color{#DD6565}예상하지 못한 속도: Cache > API > DB}}$</p>
 
@@ -70,7 +70,7 @@
 
 ### 3.2. 나무가 아닌 숲에 집중하라
 
-![image](https://github.com/user-attachments/assets/02f0c7de-8cde-46cb-8f24-dc38e2ae6cb2)
+<img src="https://github.com/user-attachments/assets/02f0c7de-8cde-46cb-8f24-dc38e2ae6cb2" img width="500">
 
 코루틴 테스트 할 때 "캐시로부터 정보 조회 성공" 같은 나무에 집중하는 것도 중요합니다. 하지만 숲에도 집중해야 합니다.
 - DB가 API 보다 오래 걸려 누락된 정보가 있을 때 무슨 일이 발생하는지
@@ -215,7 +215,7 @@ class CrewManager(private val dataSource: DataSource) {
 
 <br>
 
-![image](https://github.com/user-attachments/assets/98e88ff5-2be6-475a-8d39-d4617a0778d5)
+<img src="https://github.com/user-attachments/assets/98e88ff5-2be6-475a-8d39-d4617a0778d5" img width="500">
 
 그런데 아직 남아있는 문제점이 있습니다. 테스트를 돌리면 delay만큼 오래 걸린다는 점입니다.
 
@@ -226,7 +226,8 @@ class CrewManager(private val dataSource: DataSource) {
 <br>
 
 코틀린 코루틴 테스트 라이브러리 적용 시
-![image](https://github.com/user-attachments/assets/69b5ef55-c2c8-4d30-a031-16dbf35343f5)
+
+<img src="https://github.com/user-attachments/assets/69b5ef55-c2c8-4d30-a031-16dbf35343f5" img width="500">
 
 <br>
 
@@ -263,7 +264,7 @@ fun `해피케이스`() = runTest {
 
 ### 4.3. runTest
 
-![image](https://github.com/user-attachments/assets/4d8f0342-32cd-4dd6-a233-142a7c01e152)
+<img src="https://github.com/user-attachments/assets/4d8f0342-32cd-4dd6-a233-142a7c01e152" img width="500">
 
 runTest 구조입니다. runTest는 코루틴 테스트 목적으로 만들어진 특별한 코루틴 빌더입니다.
 테스트 코드를 실행하고 자동으로 딜레이 스킵합니다. 또한 처리되지 않은 예외 핸들링을 할 수 있고 TimeOut도 설정할 수 있습니다.
@@ -273,7 +274,7 @@ runTest는 TestScope을 가지고 있고 TestScope은 TestDispatcher를 가지�
 
 ### 4.4 TestDispatcher + TestCoroutineScheduler
 
-![image](https://github.com/user-attachments/assets/71063a9c-c03f-407e-9d61-10ec47e26e37)
+<img src="https://github.com/user-attachments/assets/71063a9c-c03f-407e-9d61-10ec47e26e37" img width="500">
 
 TestDispatcher의 구현체로는 StadradTestDispather, UnconfinedTestDispather가 있습니다.
 
@@ -315,7 +316,7 @@ class IncreaseTest {
 
 당연하게도 위 테스트 코드는 실패하게 됩니다. 
 
-![image](https://github.com/user-attachments/assets/f7495f94-ca5c-44dd-b60d-441c51bd18d2)
+<img src="https://github.com/user-attachments/assets/f7495f94-ca5c-44dd-b60d-441c51bd18d2" img width="500">
 
 자식 코루틴들이 실행되기 전에 assertEquals 코드가 실행되기 때문입니다.
 
@@ -348,7 +349,7 @@ class IncreaseTest {
  
 runCurrent() 메서드는 현재 큐에 있는 모든 코루틴을 즉시 실행합니다.
 
-![image](https://github.com/user-attachments/assets/f52c2a5e-eaec-42dd-89fc-3d20f6582291)
+<img src="https://github.com/user-attachments/assets/f52c2a5e-eaec-42dd-89fc-3d20f6582291" img width="500">
 
 <br>
 
@@ -377,7 +378,7 @@ class IncreaseTest {
 - advanceTimeBy(delayTimeMillis: Long)
     - advanceTimeBy는 지정된 시간만큼 가상 시간을 진행합니다. 이 시간 동안 지연된 코루틴이 실행됩니다.
 
-![image](https://github.com/user-attachments/assets/749a8676-cd9a-458c-9ab2-c6cbc495e7d5)
+<img src="https://github.com/user-attachments/assets/749a8676-cd9a-458c-9ab2-c6cbc495e7d5" img width="500">
 
 <br>
 
