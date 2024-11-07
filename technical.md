@@ -201,7 +201,7 @@ https://my-bucket.s3.us-east-1.amazonaws.com/images/sample.jpg
 <a href="https://my-bucket.s3.us-east-1.amazonaws.com/images/sample.jpg" download>이미지 다운로드</a>
 ```
 
-이처럼 S3 객체 URL을 활용하면 파일을 쉽게 공유하고 접근할 수 있다. 하지만 보안이 중요한 파일을 안전하게 관리해야 할 경우에는 Presigned URL을 사용하는 것이 필요하다.
+이처럼 S3 객체 URL을 활용하면 파일을 쉽게 공유하고 접근할 수 있다.
 
 #### (3) Spring에서 S3 객체 URL 생성 방법
 
