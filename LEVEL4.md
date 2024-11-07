@@ -60,7 +60,7 @@
 
 <br>
 
-**그러나 다음과 같이 인프라가 바뀌어 DB가 API보다 느려지게 된다면 작동을 멈추거나 예상치 못한 일이 발생할 수 있습니다.**
+**그러나 과 같이 인프라가 바뀌어 DB가 API보다 느려지게 된다면 작동을 멈추거나 예상치 못한 일이 발생할 수 있습니다.**
 
 <img src="https://github.com/user-attachments/assets/ca3e012b-55cd-4cbe-836b-66cab784a31e" img width="500">
 
@@ -225,7 +225,9 @@ class CrewManager(private val dataSource: DataSource) {
 
 <br>
 
-코틀린 코루틴 테스트 라이브러리 적용 시
+다음으로는 이러한 테스트 delay를 감소시킬 수 있는 코틀린 코루틴 테스트 라이브러리에 대해서 알아보겠습니다.
+
+코를린 코루틴 라이브러리 사용 시 아래와 같이 시간이 줄어든 것을 볼 수 있습니다.
 
 <img src="https://github.com/user-attachments/assets/69b5ef55-c2c8-4d30-a031-16dbf35343f5" img width="500">
 
