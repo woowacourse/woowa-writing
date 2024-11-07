@@ -80,7 +80,7 @@ Amazon S3는 다양한 장점 덕분에 클라우드 스토리지 솔루션으�
 
 S3Client는 AWS SDK로 제공되며, Spring Boot에서 파일 업로드와 다운로드를 쉽게 지원한다. S3Client를 설정하고 사용하는 방법은 다음과 같다.
 
-1. 의존성 추가: 먼저, pom.xml 파일에 AWS SDK를 추가한다.
+1. 의존성 추가: 먼저, `build.gradle` 파일에 AWS SDK를 추가한다.
 
 ```xml
 <dependency>
