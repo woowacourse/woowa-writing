@@ -186,7 +186,7 @@ TestDispatcher의 구현체로는 StadradTestDispather, UnconfinedTestDispather�
 왜냐하면 테스트 환경에서 시간의 흐름을 일관되게 제어하기 위해서입니다.
 
 TestDispatcher의 딜레이는 TestCoroutineScheulder에 의해 컨트롤 됩니다.
-실제 시간만큼 기다리는 DefaultDelay 대신 디스패처가 가진 scheduleResumeAfterDelay 함수를 호출합니다.
+실제 시간만큼 기다리는 DefaultDelay 대신, 디스패처가 가진 scheduleResumeAfterDelay 함수를 호출합니다.
 
 <br>
 
