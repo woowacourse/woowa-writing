@@ -448,9 +448,9 @@ runTest를 사용하면 편리하게 코틀린 코루틴 테스트를 사용할 
 <br>
 
 ### 참고
-- 코틀린 코루틴의 정석 책
-- 코틀린 코루틴 책
-- 코루틴 동시성 프로그래밍 책
+- 코틀린 코루틴의 정석 책 (저자: 조세영) 
+- 코틀린 코루틴 책 (저자: 마르친 모스카와)
+- 코루틴 동시성 프로그래밍 책 (저자: 미구엘 엔젤 카스티블랑코 토레스)
 - https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-test/
 - <a href="https://www.flaticon.com/kr/free-icons/" title="나무 아이콘">나무 아이콘 제작자: Freepik - Flaticon</a>
 - <a href="https://www.flaticon.com/kr/free-icons/" title="삼림지 아이콘">삼림지 아이콘 제작자: surang - Flaticon</a>
