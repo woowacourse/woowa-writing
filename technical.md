@@ -125,7 +125,8 @@ public class S3Service {
                     .bucket(bucketName)
                     .key(file.getOriginalFilename())
                     .build();
-
+            
+            // S3 버킷으로 이미지 업로드
             s3Client.putObject(request, RequestBody.fromBytes(file.getBytes()));
         } catch (IOException e) {
             throw new RuntimeException("파일 업로드 중 오류가 발생했습니다.");
