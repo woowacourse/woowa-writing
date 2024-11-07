@@ -269,7 +269,7 @@ fun `해피케이스`() = runTest {
 <img src="https://github.com/user-attachments/assets/4d8f0342-32cd-4dd6-a233-142a7c01e152" img width="500">
 
 runTest 구조입니다. runTest는 코루틴 테스트 목적으로 만들어진 특별한 코루틴 빌더입니다.
-테스트 코드를 실행하고 자동으로 딜레이 스킵합니다. 또한 처리되지 않은 예외 핸들링을 할 수 있고 TimeOut도 설정할 수 있습니다.
+테스트 코드를 실행하고 자동으로 딜레이 스킵합니다. 또한 처리되지 않은 예외 핸들링을 할 수 있고 Timeout도 설정할 수 있습니다.
 
 runTest는 TestScope을 가지고 있고 TestScope은 TestDispatcher를 가지고 있습니다.
 그리고 TestDispatcher는 TestCoroutineScheduler에 의존하고 있습니다.
