@@ -60,7 +60,7 @@
 
 <br>
 
-**그러나** 다음과 같이 인프라가 바뀌어 DB가 API보다 느려지게 된다면 작동을 멈추거나 예상치 못한 일이 발생할 수 있습니다.
+**그러나 다음과 같이 인프라가 바뀌어 DB가 API보다 느려지게 된다면 작동을 멈추거나 예상치 못한 일이 발생할 수 있습니다.**
 
 <img src="https://github.com/user-attachments/assets/ca3e012b-55cd-4cbe-836b-66cab784a31e" img width="500">
 
