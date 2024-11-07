@@ -377,6 +377,13 @@ class IncreaseTest {
 - advanceTimeBy(delayTimeMillis: Long)
     - advanceTimeBy는 지정된 시간만큼 가상 시간을 진행합니다. 이 시간 동안 지연된 코루틴이 실행됩니다.
 
+![image](https://github.com/user-attachments/assets/749a8676-cd9a-458c-9ab2-c6cbc495e7d5)
+
+<br>
+
+- advanceUntilIdle() 
+    - 대기열에 있는 작업이 더 이상 없을 때까지 모든 대기열 작업을 실행합니다.
+
 ```kotlin
 class IncreaseTest {
     @Test
@@ -398,11 +405,6 @@ class IncreaseTest {
     }
 }
 ```
-
-- advanceUntilIdle() 
-    - 대기열에 있는 작업이 더 이상 없을 때까지 모든 대기열 작업을 실행합니다.
-
-![image](https://github.com/user-attachments/assets/57d0d56b-e01b-48fe-b3d9-bf672c7618aa)
 
 <br>
 
