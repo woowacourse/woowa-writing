@@ -438,7 +438,7 @@ UnconfinedTestDispatcher는 코루틴을 즉시 실행하기 때문에, 테스�
 
 하지만 실제 동시성을 따르지 않기 때문에, 복잡한 테스트에서는 예상치 못한 결과가 발생할 수 있습니다.
 
-따라서 꼭 필요한 경우가 아닌 이상 UnconfinedTestDispatcher보다는 StandardTetsDispatcher 사용하는 것이 좋습니다.
+따라서꼭 필요한 경우가 아닌 이상 UnconfinedTestDispatcher보다는 StandardTetsDispatcher 사용하는 것이 좋습니다.
 
 <br>
 
