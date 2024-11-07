@@ -47,8 +47,9 @@
 
 ![image](https://github.com/user-attachments/assets/c530837f-d926-4a0c-a30c-6f2614e38fa9)
 
-가정한 속도 비교
-Cache > DB > API
+<p>$\huge{\rm{\color{#DD6565}가정한 속도 비교: Cache > DB > API}}$</p>
+
+<br>
 
 크루의 id를 사용해 해당 크루에 정보 세트를 검색 및 구성하고 반환해야 하는 간단한 상황을 가정해 보겠습니다.
 - 나이는 cache로부터
@@ -63,8 +64,7 @@ Cache > DB > API
 
 ![image](https://github.com/user-attachments/assets/ca3e012b-55cd-4cbe-836b-66cab784a31e)
 
-예상하지 못한 속도
-Cache > API > DB
+<p>$\huge{\rm{\color{#DD6565}예상하지 못한 속도: Cache > API > DB}}$</p>
 
 <br>
 
