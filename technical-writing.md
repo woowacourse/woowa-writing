@@ -1,3 +1,5 @@
+# CORS의 개념과 크로스 오리진 간의 쿠키 전송
+
 ## 문제 상황
 ---
 
@@ -22,19 +24,19 @@ CORS는 Cross-Origin Resource Sharing의 줄임말로, 서로 다른 출처(Orig
 
 다음 예시를 보자.
 ```
-https://api.example.org:8080/search?query=value&page=3#Title
+https://www.example.org:8080/user?name=pedro&team=momo#Detail
 ```
 - `https://` (Protocol)
   - 리소스에 접근하는 데 사용되는 프로토콜을 명시하는 부분으로, Scheme이라고도 부른다.
-- `api.example.org`: (Host)
+- `www.example.org`: (Host)
   - Host 부분으로, 해당 사이트의 도메인 이름이나 IP 주소를 나타낸다.
 - `:8080` (Port)
   - 호스트 서버의 특정 서비스에 접근하기 위한 포트 번호를 나타낸다.
-- `/search` (Path)
+- `/user` (Path)
   - 서버 내 특정 리소스의 경로를 나타낸다.
-- `?query=value&page=3` (Query String)
+- `?name=pedro&team=momo` (Query String)
   - 웹 서버로 전달하는 매개변수로, 키-값 쌍으로 구성된다.
-- `#Title` (Fragment)
+- `#Detail` (Fragment)
   - 웹 페이지 내의 특정 섹션을 가리키는 부분이다.
 
 CORS 이해를 위해서는 `Protocol`, `Host`, `Port` 부분이 중요한데, 이는 Origin이 이 3가지의 조합으로 정의되어 있기 때문이다.
@@ -42,7 +44,7 @@ CORS 이해를 위해서는 `Protocol`, `Host`, `Port` 부분이 중요한데, �
 ### Same-Origin
 > cross
 > 4. 동사 (서로) 교차하다[엇갈리다]  
-     > *- 네이버 어학사전*
+> *- 네이버 어학사전*
 
 앞선 예시에서 Origin을 정의하는 URL 요소들에 대해 알아 보았다.  
 CORS의 `C` 가 cross인 만큼, 여러 URL 중 어떤 URL이 같은 Origin이고, 어떤 URL이 다른 Origin인지 판단할 수 있어야 한다.
@@ -106,7 +108,7 @@ CORS 허용 Origin의 리스트는 서버에서 관리하지만, 이는 서버�
 2. 정상 사용자가 공격자의 글을 조회하면, 악성 스크립트는 `api.example.com`으로 사용자 정보 조회를 요청한다.
 3. 해당 요청에서 `api.example.com`으로 전송된 쿠키는 정상적인 사용자를 식별할 수 있는 값이 포함되어 있으므로 사용자의 정보를 정상적으로 응답한다.
 4. 악성 스크립트는 해당 응답을 받아 공격자 서버인 `attack.com`으로 전송한다.
-  - 이때, `example.com`과 `attack.com`은 다른 Origin이지만, 공격자가 `attack.com`의 서버 CORS 설정에 `example.com`을 직접 추가할 수 있으므로 요청이 허용된다.
+   - 4-1) 이때, `example.com`과 `attack.com`은 다른 Origin이지만, 공격자가 `attack.com`의 서버 CORS 설정에 `example.com`을 직접 추가할 수 있으므로 요청이 허용된다.
 5. 공격자가 사용자 정보 탈취에 성공한다.
 
 ## CORS의 3가지 시나리오
@@ -114,7 +116,7 @@ CORS 허용 Origin의 리스트는 서버에서 관리하지만, 이는 서버�
 
 ### 단순 요청 (Simple Request)
 ![image](https://www.baeldung.com/wp-content/uploads/sites/4/2021/01/Simple-Request.png)
-- 이미지 출처: Baeldung CS
+- 이미지 출처: [Baeldung CS](https://www.baeldung.com/cs/cors-preflight-requests)
 
 브라우저는 다른 Origin으로 요청을 전송할 때 `Origin` 헤더를 자동으로 추가하여 전송한다.
 ```
@@ -142,11 +144,12 @@ Access-Control-Allow-Origin: *  # 와일드카드로 모든 출처를 허용할 
 하지만 프론트엔드와 백엔드 서버가 분리되어 CORS 설정이 필요한 대부분의 경우 데이터 교환은 JSON으로 이루어진다. 이 경우 `Content-Type`은 `application/json` 이 주로 사용되며, 사용자 식별을 위해 쿠키를 전송해야 하는 경우 `Cookie` 헤더를 사용하기 때문에 단순 요청을 만족하는 요청은 그렇게 많지 않다.
 
 ### 사전 요청 (Preflight Request)
-서버는 CORS 위반 여부와 관계없이 요청이 수신되면 처리 후 응답을 전송한다. 단순 요청에서는 응답을 받은 브라우저가 `Access-Control-*` 응답 헤더와 비교 후 파기 여부를 결정한다.  
+이후 다시 언급하겠지만, CORS 위반 여부를 검사하고 응답 처리 여부의 판단은 브라우저가 담당한다. 그렇기에 서버에서는 요청의 CORS 위반 여부와 무관하게 요청이 수신되면 처리 후 응답을 전송한다.  
+단순 요청에서는 응답을 받은 브라우저가 `Access-Control-*` 응답 헤더와 비교 후 파기 여부를 결정한다.  
 이때, `GET`이나 `HEAD`와 같은 조회성 메서드들은 큰 문제가 되지 않지만, `POST`나 `DELETE`같이 상태를 변경시키는 메서드들은 서버에 부수 효과(Side Effect)를 야기할 수 있다. 예를 들어, 사용자의 특정 정보를 삭제하는 `DELETE` 요청을 다른 Origin에서 전송하면 브라우저는 CORS 정책에 따라 서버의 응답을 파기하지만, 서버에서는 정보가 이미 삭제된 상태로 남아 있을 것이다.
 
 ![image](https://www.baeldung.com/wp-content/uploads/sites/4/2021/01/Screenshot-2021-01-13-at-23.13.47.png)
-- 이미지 출처: Baeldung CS
+- 이미지 출처: [Baeldung CS](https://www.baeldung.com/cs/cors-preflight-requests)
 
 이러한 부수 효과를 방지하기 위해 사전 요청(Preflight Request)가 등장하였다.  
 사전 요청은 말 그대로 실제 요청을 보내기 전에 서버 측이 해당 요청의 메서드와 헤더에 대해 인식하고 있는지를 확인하기 위해 보내는 요청이다.  
@@ -286,7 +289,7 @@ open -n -a /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --args
 > [!WARNING]  
 > 실행 시 표시되는 경고 문구에서도 알 수 있듯, 보안 옵션을 강제로 비활성화하는 설정이므로 임시 테스트 용도로만 사용해야 한다.
 
-## 새로운 문제 상황
+## 새로운 문제 상황 - 쿠키 전송 실패
 ---
 위의 CORS 관련 설정을 모두 해 주었음에도 웹 클라이언트(로컬)와 서버 간에 쿠키가 전송되는 경우 개발자의 의도와 다르게 동작하는 경우가 있다.  
 이는 쿠키의 속성 중 `SameSite` 설정과 관련이 있는데, 조건을 만족하지 않는 경우 별다른 메시지 없이 클라이언트의 쿠키가 전송되지 않지 때문에 문제 원인 파악에 어려움을 겪게 된다.
