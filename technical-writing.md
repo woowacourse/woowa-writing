@@ -1,3 +1,5 @@
+제목: JPA를 사용해야 하는 이유
+
 # 태초에 JDBC가 있었으니
 
 ---
@@ -8,7 +10,7 @@ JDBC의 탄생 배경을 논하기에 앞서, 먼저 자바라는 언어에 대�
 
 개발자가 작성한 코드는 컴퓨터 위에서 실행됩니다, 그리고 그 컴퓨터가 돌아가기 위해서는 운영체제라는 소프트웨어가 필수적이죠. 컴퓨터는 저마다 다른 운영체제를 가질 수 있고, 그 점이 개발자들에게 아주아주 큰 불편함을 안겨 주었습니다. 각 운영체제는 서로 다른 API를 제공하며, 파일 시스템 접근, 네트워크 통신, 메모리 관리 등의 방식이 다릅니다. 각 플랫폼에 맞게 코드를 작성하고 테스트를 해야 하니, 개발 시간과 비용의 증가는 당연한 결과였습니다.
 
-자바는 개발자들에게 JVM 추상화를 제공하여 이 문제를 해결했습니다. JVM은 바이트코드를 해석하고 실행하며, 플랫폼에 따라 적절한 작업을 수행합니다. 이를 통해 자바 애플리케이션은 다양한 운영체제와 하드웨어에서 일관되게 실행될 수 있으며, 개발자는 운영체제와 하드웨어의 세부 사항에 신경 쓰지 않고 개발에 집중할 수 있게 되었습니다. JVM의 등장이 개발자의 작업을 단순화하고, 실행 환경 간의 호환성을 보장하여 개발과 유지보수의 부담을 크게 줄여 준 것이죠.
+자바는 개발자들에게 JVM 추상화를 제공하여 이 문제를 해결했습니다. JVM은 자바 프로그램을 실행하기 위한 가상 머신으로, 자바 컴파일러가 생성한 바이트 코드를 운영체제와 하드웨어에 맞게 해석하고 실행하는 역할을 하며, 이를 통해 자바 프로그램이 다양한 플랫폼에서 동일하게 실행될 수 있도록 해줍니다. 이를 통해 개발자는 운영체제와 하드웨어의 세부 사항에 신경 쓰지 않고 개발에 집중할 수 있게 되었습니다. JVM의 등장이 개발자의 작업을 단순화하고, 실행 환경 간의 호환성을 보장하여 개발과 유지보수의 부담을 크게 줄여 준 것이죠.
 
 JVM이 다양한 환경에서 일관성을 제공하듯이, 데이터베이스와의 통신에도 해결책이 필요했습니다. 운영체제가 서로 다른 API를 제공했던 것처럼, 데이터베이스 간에도 불일치가 존재했으며, 이로 인해 애플리케이션이 특정 데이터베이스에 종속되는 문제가 발생했습니다. 그렇게 작성된 코드는 유지보수를 어렵게 하고, 자바의 “Write Once, Run Anywhere” 철학에도 어긋났죠. 이러한 문제를 해결하기 위해 JDBC라는 데이터베이스 접근 표준 API가 도입되었습니다. JDBC는 데이터베이스 간의 차이로 인한 개발의 어려움을 줄이며, 자바의 플랫폼 독립성을 보존하는 역할을 수행했습니다.
 
@@ -28,9 +30,34 @@ Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/myDb",
 
 직접 SQL을 실행하는 대신, JDBC에서 제공하는 `Statement` 인터페이스를 통해  `PreparedStatement` , 그리고`CallableStatement` 객체를 사용해 더 안전하고 효율적인 쿼리 실행이 가능해졌습니다.
 
+**Statement**
+
+`Statement` 객체는 동적 SQL 실행을 위해 사용되며, 다음과 같은 세 가지 방식으로 SQL 명령을 실행할 수 있습니다:
+
+- `executeQuery()`  SELECT 쿼리를 실행하여 결과를 조회할 때 사용됩니다.
+
+    ```java
+    String selectSql = "SELECT emp_id, name FROM employees";
+    ResultSet rs = stmt.executeQuery(selectSql);
+    ```
+
+- `executeUpdate()` INSERT, UPDATE, DELETE 쿼리를 실행하여 데이터베이스의 데이터를 수정하거나 추가할 때 사용됩니다.
+
+    ```java
+    String updateSql = "UPDATE employees SET name='John Doe' WHERE emp_id=1";
+    int rowsAffected = stmt.executeUpdate(updateSql);
+    ```
+
+- `execute()` SQL 명령이 ResultSest을 반환할 수도 있고, 업데이트를 수행할 수도 있는 경우에 사용됩니다.
+
+    ```java
+    String createTableSql = "CREATE TABLE test_table (id INT PRIMARY KEY, name VARCHAR(100))";
+    boolean isResultSet = stmt.execute(createTableSql);
+    ```
+
 **PreparedStatement**
 
-`PreparedStatement`는 미리 컴파일된 SQL문을 사용해 파라미터화된 쿼리를 안전하게 실행할 수 있습니다. 이러한 방식은 SQL 인젝션 공격을 예방할 수 있어, 보안성이 높습니다.
+처음 등장한 `Statement`는 동적 쿼리를 실행할 수 있었지만, SQL 인젝션 공격에 취약했습니다. `PreparedStatement`는 미리 컴파일된 SQL문을 사용해 파라미터화된 쿼리를 안전하게 실행할 수 있습니다. 이러한 방식은 SQL 인젝션 공격을 예방할 수 있어, 보안성이 높습니다.
 
 ```java
 String updateSql = "UPDATE employees SET position=? WHERE emp_id=?";
@@ -58,32 +85,6 @@ try (CallableStatement cstmt = con.prepareCall(callSql)) {
     e.printStackTrace();
 }
 ```
-
-**Statement**
-
-`Statement` 객체는 동적 SQL 실행을 위해 사용되며, 다음과 같은 세 가지 방식으로 SQL 명령을 실행할 수 있습니다:
-
-- `executeQuery()`  SELECT 쿼리를 실행하여 결과를 조회할 때 사용됩니다.
-
-    ```java
-    String selectSql = "SELECT emp_id, name FROM employees";
-    ResultSet rs = stmt.executeQuery(selectSql);
-    ```
-
-- `executeUpdate()` INSERT, UPDATE, DELETE 쿼리를 실행하여 데이터베이스의 데이터를 수정하거나 추가할 때 사용됩니다.
-
-    ```java
-    String updateSql = "UPDATE employees SET name='John Doe' WHERE emp_id=1";
-    int rowsAffected = stmt.executeUpdate(updateSql);
-    ```
-
-- `execute()` SQL 명령이 ResultSest을 반환할 수도 있고, 업데이트를 수행할 수도 있는 경우에 사용됩니다.
-
-    ```java
-    String createTableSql = "CREATE TABLE test_table (id INT PRIMARY KEY, name VARCHAR(100))";
-    boolean isResultSet = stmt.execute(createTableSql);
-    ```
-
 
 앞서 설명한 세 가지의 `Statement` 인터페이스는 공통적으로 다음과 같은 장점을 제공합니다:
 
@@ -126,7 +127,7 @@ SQL을 실행하는 과정이 유사할지라도, 매번 SQL 구문을 작성하
 
 JDBC 코드를 작성하는 과정에서 가장 빈번하게 발생할 수 있는 예외는 `SQLException`입니다. 그러나 이외에도 다양한 예외가 발생할 수 있습니다. 예를 들어, `ResultSet`에서 특정 컬럼이 `null`일 경우, 해당 값을 제대로 처리하지 않으면 `NullPointerException`이 발생할 수 있습니다.
 
-또한, JDBC에서 `Connection`, `Statement`, `ResultSet`과 같은 자원은 명시적으로 해제해야 합니다. 자원 해제를 실수로 누락하면 자원 누수로 인해 데이터베이스 연결이 제대로 해제되지 않고 남아있을 수 있으며, 이는 커넥션 풀 고갈이나 애플리케이션의 성능 저하로 이어질 수 있습니다. try-with-resources 구문을 활용하여 자원 누수를 방지할 수 있지만, 이를 사용하지 ㅇ낳는 경우 자원 해제 누락으로 인한 커넥션 누수 문제가 발생할 수 있습니다. 여전히 SQL 실행 중 발생하는 다양한 예외는 개발자가 직접 처리해야 합니다.
+또한, JDBC에서 `Connection`, `Statement`, `ResultSet`과 같은 자원은 명시적으로 해제해야 합니다. 자원 해제를 실수로 누락하면 자원 누수로 인해 데이터베이스 연결이 제대로 해제되지 않고 남아있을 수 있으며, 이는 커넥션 풀 고갈이나 애플리케이션의 성능 저하로 이어질 수 있습니다. try-with-resources 구문을 활용하여 자원 누수를 방지할 수 있지만, 이를 사용하지 않는 경우 자원 해제 누락으로 인한 커넥션 누수 문제가 발생할 수 있습니다. 여전히 SQL 실행 중 발생하는 다양한 예외는 개발자가 직접 처리해야 합니다.
 
 JDBC 코드는 기본적으로 절차 지향적인 방식으로 작성됩니다. 즉, 데이터베이스 연결, SQL 실행, 결과 처리, 자원 해제와 같은 작업을 순차적으로 수동으로 처리해야 합니다. 이 작업들을 올바르게 처리하지 않으면 자원 누수나 실행 오류가 발생할 가능성이 높으며, 이런 반복적이고 복잡한 과정은 JDBC의 주요 단점 중 하나로 꼽힙니다.
 
@@ -443,3 +444,11 @@ JPA를 사용하면 SQL 코드를 작성하지 않고도 데이터베이스를 �
 ## 성능 개선
 
 JPA는 영속성 컨텍스트를 통해 성능을 크게 향상시킵니다. 1차 캐시는 동일 트랜잭션 내에서 이미 조회된 엔티티를 재사용하여 불필요한 데이터베이스 조회를 최소화합니다. 쓰기 지연 기능은 여러 데이터 변경을 하나의 트랜잭션에서 일괄 처리하여 데이터베이스 쓰기 작업을 보다 최적화합니다. 변경 감지는 엔티티의 상태 변화를 자동으로 감지하여 실제로 변경된 데이터만 업데이트함으로써 불필요한 데이터베이스 작업을 줄입니다. 이 기능들이 모두 함께 작동하여 데이터베이스와의 상호작용을 더욱 효율적으로 만듭니다.
+
+---
+
+### 출처
+- https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-1.html
+- https://www.baeldung.com/java-jdbc
+- https://docs.spring.io/spring-framework/docs/3.0.x/spring-framework-reference/html/jdbc.html
+- https://product.kyobobook.co.kr/detail/S000000935744
