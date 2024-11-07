@@ -292,7 +292,7 @@ TestDispatcher의 딜레이는 TestCoroutineScheulder에 의해 컨트롤 됩니
 
 TestDispatcher의 구현체인 StadradTestDispather에 대해서 살펴보겠습니다.
 
-runTest는 디폴트로 StandardTestDispatcher 사용합니다.
+runTest는 디폴트로 StandardTestDispatcher를 사용합니다.
 TestCoroutineScheduler에 연결되어 있다는 것을 제외하면 특별한 동작이 없는 단순한 디스패처입니다.
 
 ```kotlin
