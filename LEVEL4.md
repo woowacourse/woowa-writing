@@ -87,22 +87,79 @@
 
 ### 3.3. 두 가지 원칙을 지킨 코루틴 테스트
 
-![image](https://github.com/user-attachments/assets/45de2d89-54e7-4677-a2d8-71f176992e98)
+```kotlin
+class FastDbDataSource(
+    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
+): DataSource {
+    override suspend fun getNameFromCache(id: Int): Deferred<String> =
+        ...
+
+    override suspend fun getAgeFromDB(id: Int): Deferred<Int> =
+        CoroutineScope(dispatcher).async {
+            delay(0.5.seconds)
+            Calendar.getInstance().get(Calendar.YEAR) - 1998
+        }
+
+    override suspend fun getPositionFromApi(id: Int): Deferred<String> =
+        CoroutineScope(dispatcher).async {
+            delay(2.seconds)
+            "Android"
+        }
+}
+```
+
 가정한 속도: DB > API
 
 보시는 바와 같이 FastDbDataSource는 대부분의 개발자가 예상하듯이 DB가 API보다 빠르게 delay가 설정 되어 있습니다.
 
 <br>
 
+```kotlin
+class SlowDbDataSource(
+    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
+): DataSource {
+    override suspend fun getNameFromCache(id: Int): Deferred<String> =
+        ...
+
+    override suspend fun getAgeFromDB(id: Int): Deferred<Int> =
+        CoroutineScope(dispatcher).async {
+            delay(2.seconds)
+            Calendar.getInstance().get(Calendar.YEAR) - 1998
+        }
+
+    override suspend fun getPositionFromApi(id: Int): Deferred<String> =
+        CoroutineScope(dispatcher).async {
+            delay(0.5.seconds)
+            "Android"
+        }
+}
+```
+
 예상하지 못한 속도: API > DB
-![image](https://github.com/user-attachments/assets/32f80bb2-501d-457a-9fdf-a3efc4cccdf1)
 
 SlowDbDataSource는 대부분의 개발자가 예상에 빗나가게 db가 API보다 오래 걸리게 설정되어 있습니다.
 
 <br>
 
-![image](https://github.com/user-attachments/assets/c5fc5a50-cb39-4c5f-82f5-f478139d99a3)
-![image](https://github.com/user-attachments/assets/482b420a-d03d-4415-b949-04435d277603)
+```kotlin
+@Test
+fun `해피케이스`() = runBlocking {
+    val crewManager = CrewManager(FastDbDataSource())
+    val crew = crewManager.getCrew(1)
+    assertTrue { crew.name == "Haeum" }
+    assertTrue { crew.age == Calendar.getInstance().get(Calendar.YEAR) - 1998 } 
+    assertTrue { crew.position == "Android" } 
+}
+
+@Test
+fun `언해피케이스`() = runBlocking {
+    val crewManager = CrewManager(SlowDbDataSource())
+    val crew = crewManager.getCrew(1)
+    assertTrue { crew.name == "Haeum" }
+    assertTrue { crew.age == Calendar.getInstance().get(Calendar.YEAR) - 1998 } 
+    assertTrue { crew.position == "Android" } 
+}
+```
 
 두가지 원칙을 지켜서 작성한 테스트 코드를 살펴봅니다.
 
@@ -115,7 +172,21 @@ DB가 외부 시스템보다 더 오래 걸리는 것은 불가능하다는 말�
 
 <br>
 
-![image](https://github.com/user-attachments/assets/bc5a768b-3caa-4603-94cf-f9b40c22cbd7)
+```kotlin
+class CrewManager(private val dataSource: DataSource) {
+    suspend fun getCrew(id: Int): Crew {
+        val name = dataSource.getNameAsync(id)
+        val age = dataSource.getAgeAsync(id)
+        val position = dataSource.getPositionAsync(id)
+        position.await()
+        return Crew(
+            name.getComleted(),
+            age.getComleted(),
+            position.getComleted(),
+        )
+    }
+}
+```
 
 문제가 됐던 코드를 보면 postion이 가장 오래걸리는 api를 통해서 올것이라고 가정했기 때문에 postion에만 await가 걸려있습니다.
 
@@ -123,7 +194,20 @@ DB가 외부 시스템보다 더 오래 걸리는 것은 불가능하다는 말�
 
 <br>
 
-![image](https://github.com/user-attachments/assets/08911228-5e97-4b3f-b3a4-457724cd87c3)
+```kotlin
+class CrewManager(private val dataSource: DataSource) {
+    suspend fun getCrew(id: Int): Crew {
+        val name = dataSource.getNameAsync(id)
+        val age = dataSource.getAgeAsync(id)
+        val position = dataSource.getPositionAsync(id)
+        return Crew(
+            name.await(),
+            age.await(),
+            position.await(),
+        )
+    }
+}
+```
 
 실패한 테스트를 보고 수정한 코드입니다.
 가정을 없애고 name, age, poistion 각각에 await가 있는 것을 볼 수 있습니다.
@@ -150,15 +234,26 @@ DB가 외부 시스템보다 더 오래 걸리는 것은 불가능하다는 말�
 
 ### 4.1. 코틀린 코루틴 테스트 버전
 
-![image](https://github.com/user-attachments/assets/4ec82a74-6178-459a-8bda-1a17dd753bcb)
+```kotlin
+testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.9.0")
+```
 
-코틀린 코루틴 테스트 라이브러리의 가장 최신 버전인 1.9.0 기준으로 설명하겠습니다.
+(2024년 11월 7일 기준) 코틀린 코루틴 테스트 라이브러리의 1.9.0 버전으로 설명하겠습니다.
 
 <br>
 
 ### 4.2. 코틀린 코루틴 훑어보기
 
-![image](https://github.com/user-attachments/assets/c930c1f4-780d-48fe-8eb2-2f0e8c23c11b)
+```kotlin
+@Test
+fun `해피케이스`() = runTest {
+    val crewManager = CrewManager(FastDbDataSource(StandardTestDispatcher(testScheduler)))
+    val crew = crewManager.getCrew(1)
+    assertTrue { crew.name == "Haeum" }
+    assertTrue { crew.age == Calendar.getInstance().get(Calendar.YEAR) - 1998 } 
+    assertTrue { crew.position == "Android" } 
+}
+```
 
 테스트 코드를 보시면 runTest 블록 안에 코드들이 있는 것을 볼 수 있습니다. 
 
@@ -197,7 +292,26 @@ TestDispatcher의 구현체인 StadradTestDispather에 대해서 살펴보겠습
 runTest는 디폴트로 StandardTestDispatcher 사용합니다.
 TestCoroutineScheduler에 연결되어 있다는 것을 제외하면 특별한 동작이 없는 단순한 디스패처입니다.
 
-![image](https://github.com/user-attachments/assets/d2fb6e83-47c7-43e2-a84e-e49eb6cc4b16)
+```kotlin
+class IncreaseTest {
+    @Test
+    fun `증감연산자 테스트`() = runTest {
+        var a = 0
+        var b = 0
+
+        launch {
+            delay(1000)
+            a++
+        }
+        launch {
+            delay(500)
+            b++
+        }
+        assertEquals(1, a)
+        assertEquals(1, b)
+    }
+}
+```
 
 당연하게도 위 테스트 코드는 실패하게 됩니다. 
 
@@ -209,7 +323,25 @@ TestCoroutineScheduler에 연결되어 있다는 것을 제외하면 특별한 �
 
 세 가지 메서드를 사용하여 가상 시간을 조작할 수 있습니다.
 
-![image](https://github.com/user-attachments/assets/3c896038-085a-4ab9-a4cf-f145b49839b0)
+```kotlin
+class IncreaseTest {
+    @Test
+    fun `증감연산자 테스트`() = runTest {
+        var a = 0
+        var b = 0
+
+        launch {
+            a++
+        }
+        launch {
+            b++
+        }
+        runCurrent()
+        assertEquals(1, a)
+        assertEquals(1, b)
+    }
+}
+```
 
 - runCurrent()
     - runCurrent() 메서드는 현재 큐에 있는 모든 코루틴을 즉시 실행합니다.
@@ -220,12 +352,52 @@ runCurrent() 메서드는 현재 큐에 있는 모든 코루틴을 즉시 실행
 
 <br>
 
-![image](https://github.com/user-attachments/assets/02537a45-9c6b-417e-bb9e-c809bfe7ea11)
+```kotlin
+class IncreaseTest {
+    @Test
+    fun `증감연산자 테스트`() = runTest {
+        var a = 0
+        var b = 0
+
+        launch {
+            delay(1000)
+            a++
+        }
+        launch {
+            delay(500)
+            b++
+        }
+        advanceTimeBy(1001)
+        assertEquals(1, a)
+        assertEquals(1, b)
+    }
+}
+```
 
 - advanceTimeBy(delayTimeMillis: Long)
     - advanceTimeBy는 지정된 시간만큼 가상 시간을 진행합니다. 이 시간 동안 지연된 코루틴이 실행됩니다.
 
-![image](https://github.com/user-attachments/assets/749a8676-cd9a-458c-9ab2-c6cbc495e7d5)
+```kotlin
+class IncreaseTest {
+    @Test
+    fun `증감연산자 테스트`() = runTest {
+        var a = 0
+        var b = 0
+
+        launch {
+            delay(1000)
+            a++
+        }
+        launch {
+            delay(500)
+            b++
+        }
+        advanceUntilIdle()
+        assertEquals(1, a)
+        assertEquals(1, b)
+    }
+}
+```
 
 - advanceUntilIdle() 
     - 대기열에 있는 작업이 더 이상 없을 때까지 모든 대기열 작업을 실행합니다.
@@ -236,7 +408,24 @@ runCurrent() 메서드는 현재 큐에 있는 모든 코루틴을 즉시 실행
 
 #### 4.4.2 UnconfinedTestDispatcher
 
-![image](https://github.com/user-attachments/assets/b4690c23-f06d-4bb7-a64f-b41ce88e77f3)
+```kotlin
+class IncreaseTest {
+    @Test
+    fun `증감연산자 테스트`() = runTest(UnconfinedTestDispatcher()) {
+        var a = 0
+        var b = 0
+
+        launch {
+            a++
+        }
+        launch {
+            b++
+        }
+        assertEquals(1, a)
+        assertEquals(1, b)
+    }
+}
+```
 
 UnconfinedTestDispatcher에 대해 살펴보겠습니다.
 
