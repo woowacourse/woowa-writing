@@ -379,7 +379,7 @@ CloudFront는 S3와 결합해 정적 파일을 엣지 로케이션에 캐싱해 
 
 CloudFront는 S3와 함께 사용될 때 성능과 보안 측면에서 더욱 강력해진다. 다음은 CloudFront와 S3를 통합하여 설정하는 과정이다.
 
-1. S3 버킷 생성 및 이미지 업로드: 먼저, AWS Management Console에서 S3 버킷을 생성하고 이미지 파일을 업로드한다. 이때 퍼블릭 접근을 차단하여 S3 파일을 보호할 수 있다. 그러나 CloudFront를 통해 사용자에게 접근 권한을 부여하게 된다.
+1. S3 버킷 생성 및 이미지 업로드: AWS Management Console에서 S3 버킷을 생성하고 이미지 파일을 업로드한다. 이때 퍼블릭 접근을 차단하여 S3 파일을 보호할 수 있다. 그러나 CloudFront를 통해 사용자에게 접근 권한을 부여하게 된다.
 2. CloudFront 배포 생성: AWS 콘솔에서 CloudFront 서비스를 선택한 후, Create Distribution을 클릭하여 새 배포를 생성한다. 이때 Origin Domain Name으로 S3 버킷을 선택하여 CloudFront가 해당 버킷의 콘텐츠를 캐싱할 수 있도록 설정한다. Origin Access Control(OAC)을 설정하면 CloudFront만이 S3 버킷에 접근할 수 있게 할 수 있다. 따라서 S3 버킷을 비공개로 유지하면서도 CloudFront를 통해 콘텐츠를 제공할 수 있다.
 3. Cache Behavior 설정: Cache Behavior에서 Default TTL(Time to Live)을 설정하여 콘텐츠가 엣지 로케이션에서 얼마나 오래 캐싱될지를 결정할 수 있다. 자주 변경되지 않는 이미지 파일은 TTL을 길게 설정하여 CloudFront 캐시에서 빠르게 제공할 수 있도록 설정하는 것이 좋다.
 4. HTTPS 및 접근 제어 설정: Viewer Protocol Policy를 Redirect HTTP to HTTPS로 설정하여 사용자들이 항상 HTTPS로 콘텐츠에 접근하도록 한다. Allowed HTTP Methods는 이미지 파일의 경우 GET, HEAD 메서드만 허용하는 것이 권장된다. 이는 불필요한 접근을 방지하고 보안을 강화하는 데 유리하다.
