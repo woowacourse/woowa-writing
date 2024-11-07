@@ -5,8 +5,6 @@
     - Immediate
     - Long-Running
     - Deferrable
-    - Exact
-    - Foreground Service
   - 안드로이드 백그라운드 API
     - Service
     - JobScheduler
@@ -31,7 +29,7 @@
 <br>
 
 ## 안드로이드 백그라운드 작업이란
-안드로이드에서 백그라운드 작업(Background Task)이란, 앱이 화면에서 보이지 않는 상태에서도 동작하는 작업을 말한다. 대표적인 예로 음악 재생, 파일 다운로드, 위치 정보 수집 등이 있다.  
+안드로이드에서 백그라운드 작업이란, 앱이 화면에서 보이지 않는 상태에서도 동작하는 작업을 말한다. 대표적인 예로 음악 재생, 파일 다운로드, 위치 정보 수집 등이 있다.  
 잘못된 API를 선택하면 앱의 성능이 저하되어 배터리가 소모되고, 사용자 기기 전체의 성능이 저하될 수 있다. 경우에 따라 Play Store에 앱이 등록되지 않을 수도 있다.  
 일단 백그라운드 작업의 종류에는 어떤 것이 있는지, 백그라운드 작업을 구현할 수 있는 API 중에는 어떤 것이 있는지 살펴보자.  
 
@@ -41,25 +39,19 @@
 <img width="808" alt="image" src="https://github.com/user-attachments/assets/f4e0e105-0902-4024-a256-46a4f35adb4a">
 
 #### Immediate
-Immediate 백그라운드 작업은 백그라운드에서 실행되는 작업 중에서도 우선순위가 매우 높은 작업을 말한다. 예를 들어 아래와 같은 작업들이 있다.
+백그라운드에서 실행되는 작업 중에서도 우선순위가 매우 높은 작업을 말한다. 예를 들어 아래와 같은 작업들이 있다.
 - 푸시 알림
 - 파일 다운로드
 - 데이터 동기화  
 이 작업이 백그라운드에서 계속해서 실행될 경우, 배터리 수명과 성능에 영향을 미칠 수 있다.안드로이드에서 제한하고 있는 정책을 적용시키고, 필요한 경우에만 실행되도록 주의해야 한다.  
 
 #### Long-Running
-Long-Running 백그라운드 작업은 작업을 완료하는데 10분 이상이 걸릴 것으로 예상되는 작업들이다. 예를 들어 용량이 매우 큰 파일을 한 번에 다운로드 해야 하는 작업이다.  
+작업을 완료하는데 10분 이상이 걸릴 것으로 예상되는 작업들이다. 예를 들어 용량이 매우 큰 파일을 한 번에 다운로드 해야 하는 작업이다.  
 
 #### Deferrable
-Deferrable 백그라운드 작업은 Immediate 작업과는 달리 백그라운드에서 실행될 때 사용자에게 직접적으로 영향을 주지 않는 작업들이다.  
+Immediate 작업과는 달리 백그라운드에서 실행될 때 사용자에게 직접적으로 영향을 주지 않는 작업들이다.  
 사용자에게 영향을 주지 않으므로 우선순위가 낮은 작업들이다. 사용자가 앱을 벗어났을 때만 실행될 수 있는 작업이다.  
 예를 들어 데이터베이스에서 데이터를 업데이트하거나, 로그 수집, 데이터 백업 등의 작업들이다.
-
-#### Exact
-Exact 백그라운드 작업은 정확한 시간에 실행되어야 하는 작업이다. 예를 들어 매일 정해진 시간에 알림을 보내는 작업, 매주 특정 요일에 데이터를 동기화하는 작업들이다.  
-
-#### Foreground Service
-지속적으로 유저에게 작업 상황을 보여줘야하는 작업이다. 백그라운드에서 실행되면서도 알림을 통해 사용자에게 작업 진행 상황을 알려야 한다.  
 
 <br>
 
@@ -77,7 +69,7 @@ Service는 안드로이드 4대 컴포넌트 중 하나다. Service의 종류에
   - 사용자에게 보이지 않는 작업을 수행한다.
 - Bound Service
   - 클라이언트-서버 인터페이스를 제공한다.
-  - 하나의 서비스에 여러 컴포넌트(액티비티 등)이 연결될 수 있다.
+  - 하나의 서비스에 여러 컴포넌트(Activity, Fragment 등)이 연결될 수 있다.
   - 앱이 살아있을 때만 실행된다.
 
 Service를 사용하면서 주의할 점은, 기본적으로 안드로이드의 Main Thread (= UI Thread)에서 수행된다는 점이다. ANR 오류를 방지하기 위해서는 Service 내에서 별도의 스레드를 생성해야 한다.  
@@ -87,6 +79,7 @@ Service를 사용하면서 주의할 점은, 기본적으로 안드로이드의 
 
 #### AlarmManager
 특정 시간/기간마다 `Intent`를 실행한다. `Intent`에 예약한 시간에 수행할 작업을 정의할 수 있다. Doze 모드에 제약을 받고, 기기 재부팅 시 예약해둔 작업이 취소된다는 특징이 있다.  
+이 때 Doze 모드란, 기기를 오랫동안 사용하지 않는 경우 앱의 백그라운드 CPU 및 네트워크 활동을 지연시켜 배터리 소모를 줄이는 것이다.  
 
 #### WorkManager
 지속적인 작업에 권장되는 API다. 앱이 다시 시작되거나 기기가 재부팅될 때 예약된 작업이 사라지지 않고 남아있다.  
@@ -130,7 +123,7 @@ Foreground Service는 많은 기기 리소스를 사용할 수 있기 때문에,
 
 ## 우리 팀의 이야기
 ### 어떤 기능을 백그라운드 작업으로 실행하려고 하는가
-<img width="300" alt="image" src="https://github.com/user-attachments/assets/45292b82-89f4-4139-ad3e-447f09fd601c">  
+<img width="600" alt="image" src="https://github.com/user-attachments/assets/2a73becf-04b8-45c7-a0e0-29353f0b785a">  
 
 백그라운드 작업 도입 과정을 설명하기 전에, 우리 앱은 어떤 앱인지와 어떤 기능을 백그라운드 작업으로 실행하려고 하는지를 말해야 할 것 같다.  
 먼저 우리 앱 오디를 한마디로 정의하자면 “원만한 친구 사이를 위한 약속 지킴이 서비스"다.  
@@ -217,8 +210,14 @@ class EtaWorker(context: Context, workerParameters: WorkerParameters) :
     }
 ```
 - `WorkRequest`의 id, 상태 등을 담고 있는 클래스다.
-- `ENQUEUED`, `RUNNING`, `SUCCEEDED`, `FAILED`, `BLOCKED`, `CANCELLED`의 6개 State를 가진다.
-
+- `BLOCKED`, `CANCELLED`, `ENQUEUED`, `FAILED`, `RUNNING`, `SUCCEEDED`의 6개 State를 가진다.
+  - `BLOCKED`: 선행 조건이 완료되지 않아 `WorkRequest`가 차단
+  - `CANCELLED`: `WorkRequest`가 취소
+  - `ENQUEUED`: `WorkRequest`가 큐에 대기 중
+  - `FAILED`: `WorkRequest`가 실패 상태에서 완료
+  - `RUNNING`: 현재 `WorkRequest`가 실행 중임
+  - `SUCCEEDED`: `WorkRequest`가 성공적으로 완료
+ 
 <br>
 
 ### WorkManager의 동작 방식
@@ -246,9 +245,7 @@ WorkManager로 기능을 개발하고 앱을 테스트하며, 예상치 못한 �
 큐에 여러 작업이 쌓이면, 불규칙적으로 작업이 수행되지 않았다.
 
 <br>
-
-<img width="903" alt="스크린샷 2024-10-29 오후 4 40 52" src="https://github.com/user-attachments/assets/550273a6-006c-47bb-81da-fdb63c996f9e">
-
+<img width="800" src="https://github.com/user-attachments/assets/5cfea512-492d-4af5-834f-45c9bab29827">
 
 WorkManager에서 스케줄링할 수 있는 작업의 개수를 지정할 수 있는 `setMaxSchedulerLimit()` 함수가 있다.  
 [안드로이드 공식 문서](https://developer.android.com/reference/androidx/work/Configuration.Builder#setMaxSchedulerLimit(kotlin.Int))에 따르면, 최대 작업의 개수는 50개다.
@@ -348,7 +345,7 @@ interface MateEtaInfoDao {
 
 # 마무리 하며
 안드로이드 백그라운드는 배터리 수명을 최적화하기 위해서 제약 사항이 많다.  
-글 초반에 말했듯이 우선순위가 높은 백그라운드 작업과 우선순위가 낮은 백그라운드 작업이 있다/
+글 초반에 말했듯이 우선순위가 높은 백그라운드 작업과 우선순위가 낮은 백그라운드 작업이 있다.
 
 내가 개발해야 하는 기능은 항상 실행되어야 할, 우선순위가 높은 백그라운드 작업이었다.
 하지만 WorkManager는 상황에 따라 지연될 수 있는 백그라운드 작업에 적합한 API다.  
@@ -361,3 +358,4 @@ interface MateEtaInfoDao {
 https://developer.android.com/develop/background-work/services?hl=ko  
 https://small-stepping.tistory.com/1050  
 https://developer.android.com/develop/background-work/background-tasks?hl=ko  
+https://developer.android.com/training/monitoring-device-state/doze-standby?hl=ko   
