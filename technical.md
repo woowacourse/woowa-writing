@@ -82,11 +82,8 @@ S3Client는 AWS SDK로 제공되며, Spring Boot에서 파일 업로드와 다�
 
 1. 의존성 추가: 먼저, `build.gradle` 파일에 AWS SDK를 추가한다.
 
-```xml
-<dependency>
-    <groupId>software.amazon.awssdk</groupId>
-    <artifactId>s3</artifactId>
-</dependency>
+```gradle
+implementation 'software.amazon.awssdk:s3'
 ```
 
 2. S3Client 설정: Spring에서 S3Client를 빈(bean)으로 설정한다.
