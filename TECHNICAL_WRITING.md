@@ -5,7 +5,7 @@
 커뮤니티 어플리케이션을 개발하다 보면 실시간 채팅 기능의 필요성을 자연스럽게 느끼게 됩니다. 저 역시 이번 총대마켓 프로젝트에서 빠르게 어플리케이션 내 채팅 기능을 구현해야 했습니다. 이 글에서는 Kotlin을
 사용해 안드로이드 어플리케이션에서 채팅 기능을 간단하게 구현하는 방법을 설명드리고자 합니다. View부터 Polling 방식을 통한 채팅 구현까지 단계별로 세세하게 다룰 예정입니다.
 
-특히, Kotlin의 coroutines를 활용해 적절한 job 할당 및 해제를 통해 Polling을 효율적으로 구현하는 방법을 중점적으로 소개하겠습니다. 프로젝트의 요구사항과 상황에 따라 실시간성을 확보하는 데
+특히, Kotlin의 coroutines를 활용한 적절한 job 할당 및 해제를 통해 Polling을 효율적으로 구현하는 방법을 중점적으로 소개하겠습니다. 프로젝트의 요구사항과 상황에 따라 실시간성을 확보하는 데
 가장 적합한 방법을 선택하는 것이 중요합니다. 이번 글을 통해 여러분이 안드로이드 어플리케이션에 실시간 기능을 빠르고 쉽게 도입할 수 있기를 바랍니다. Polling 방식은 복잡하지 않으면서도 일정 수준의 실시간성을
 충족시켜주는 강력한 도구입니다. 실시간으로 업데이트가 필요한 기능이라면, 굳이 채팅이 아니더라도 Polling 방식을 활용하여 프로젝트에서 유용하게 적용할 수 있을 것입니다.
 
@@ -71,13 +71,12 @@ Polling은 클라이언트가 일정한 주기(간격)으로 서버에 요청을
 가능하지만, 서버 설정이 복잡해지고 유지보수가 어려워질 수 있습니다. 반면, Polling은 상대적으로 구현이 간단하고, 서버 부담을 예측하기 쉽습니다. 프로젝트의 요구사항이 서버의 간단한 통신 구조와 빠른 구현을
 필요로 했기 때문에, 안정적이고 직관적인 Polling 방식을 채택하게 되었습니다.
 
-하지만 폴링에는 명확한 단점이 존재합니다.
+하지만 Polling에는 명확한 단점이 존재합니다.
 
 1. 요청 주기가 짧으면 오버헤드/트래픽으로 인해 서버에 부담이 갑니다.
 2. 요청 주기가 길면 실시간성이 떨어집니다.
 
-이번 프로젝트에서 Polling 방식을 이용해 채팅 기능을 구현하면서, 실시간성을 유지하면서도 서버 성능을 최적화하는 균형의 중요성을 배울 수 있었습니다. Polling 방식이 단순해 보이지만, 서버 과부하를 줄이기
-위한 캐싱 전략과 job 해제에 대한 깊이 있는 고민을 할 수 있는 기회가 되었습니다.
+이 단점을 해결하기 위한 캐싱 전략과 job 해제애 대해서도 고민도 소개하겠습니다.
 
 ---
 
@@ -368,7 +367,7 @@ viewModel.comments.observe(this) { comments ->
 
 Guideline을 사용하여 본인의 메시지를 오른쪽에 배치하기 위해 설정되었습니다. app:layout_constraintGuide_begin 속성으로 왼쪽에서 150dp 떨어진 위치에 Guideline을
 배치했습니다.
-app:layout_constrainedWidth="true"로 설정을 꼭 해주어야 제대로 조정이 가능합니다.
+app:layout_constrainedWidth="true"로 설정을 꼭 해주어야 의도한 뷰로 동작합니다.
 그리고 다양한 옵션을 통해 구현을 하였습니다.
 
 아래는 이런식으로 구현한 채팅 뷰 item 입니다.
@@ -384,9 +383,9 @@ ViewType이 추가되면 when 표현식에서 누락된 타입에 대해 컴파�
 저는 추가 기능 요구 사항으로 채팅의 날짜에 대한 ViewType을 추가해야했기 때문에, 현재는 UiModel을 만들어서 관리해주고 있습니다!
 
 ``` kotlin
-sealed class ChatViewType {
-    data class MyMessage(val comment: Comment) : ChatViewType()
-    data class OtherMessage(val comment: Comment) : ChatViewType()
+sealed class CommentViewType {
+    data class MyMessage(val comment: Comment) : CommentViewType()
+    data class OtherMessage(val comment: Comment) : CommentViewType()
 }
 ```
 
@@ -431,7 +430,10 @@ class CommentAdapter : ListAdapter<CommentViewType, RecyclerView.ViewHolder>(DIF
 
 polling을 적용하여 실제로 구현한 화면입니다.
 
-<img width="300" alt="gif" src ="https://velog.velcdn.com/images/wjdcogus6/post/2be24d2b-d7f9-4fa9-a7fb-a11d177c0142/image.gif">
+<img width="300" alt="gif" src ="https://github.com/user-attachments/assets/c4530d77-00d2-4da0-bca3-b38a5cc14954">
+
+이번 프로젝트에서 Polling 방식을 이용해 채팅 기능을 구현하면서, 실시간성을 유지하면서도 서버 성능을 최적화하는 균형의 중요성을 배울 수 있었습니다. Polling 방식이 단순해 보이지만, 서버 과부하를 줄이기
+위한 캐싱 전략과 job 해제에 대한 깊이 있는 고민을 할 수 있는 기회가 되었습니다.
 
 ## 참고
 
