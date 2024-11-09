@@ -430,7 +430,7 @@ class CommentAdapter : ListAdapter<CommentViewType, RecyclerView.ViewHolder>(DIF
 
 polling을 적용하여 실제로 구현한 화면입니다.
 
-<img width="300" alt="gif" src ="https://github.com/user-attachments/assets/c4530d77-00d2-4da0-bca3-b38a5cc14954">
+![image](https://github.com/user-attachments/assets/85dd5795-8545-496e-9729-745ddce5bb83)
 
 이번 프로젝트에서 Polling 방식을 이용해 채팅 기능을 구현하면서, 실시간성을 유지하면서도 서버 성능을 최적화하는 균형의 중요성을 배울 수 있었습니다. Polling 방식이 단순해 보이지만, 서버 과부하를 줄이기
 위한 캐싱 전략과 job 해제에 대한 깊이 있는 고민을 할 수 있는 기회가 되었습니다.
