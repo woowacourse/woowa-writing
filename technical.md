@@ -1,8 +1,8 @@
-# DB Replication으로 알아보는 OSIV
+# OSIV, DB 복제 환경에서 왜 문제였나? 제대로 이해해보기 
 
 ## 1. 개요
 
-이 글에서는 일상 기록 서비스 `Staccato`의 데이터베이스를 단일 인스턴스에서 `Replication` 환경으로 마이그레이션하는 과정에서 `OSIV(Open Session In View)` 설정과 관련된 문제를 다룹니다.<br>
+이 글에서는 일상 기록 서비스 `Staccato`의 단일 데이터베이스 환경에서 복제 환경으로 마이그레이션하는 과정에서 `OSIV(Open Session In View)` 설정과 관련된 문제를 다룹니다.<br>
 OSIV가 무엇인지 학습하고, 실제 문제 상황을 재현하고 분석하는 과정을 통해 문제의 본질을 이해하고 해결책을 제시합니다.
 
 이 글은 특히 OSIV의 개념을 잘 모르는 독자를 대상으로 OSIV의 동작 방식과 설정에 따른 장단점을 체계적으로 설명하고, 비슷한 상황에서 문제 파악과 해결을 논리적으로 할 수 있도록 돕는 것을 목표로 합니다.
@@ -10,13 +10,13 @@ OSIV가 무엇인지 학습하고, 실제 문제 상황을 재현하고 분석�
 ## 2. 문제 상황
 ### 2.1 Writer-Reader Replication 환경으로의 마이그레이션
 
-데이터베이스의 성능과 확장성을 높이기 위해 싱글 DB 인스턴스 구조에서 Writer-Reader Replication 환경으로 마이그레이션 작업을 진행했습니다.
-기존에는 싱글 EC2 인스턴스에 MySQL을 설치하여 사용했고, 마이그레이션 과정에서 Writer와 Reader RDS 2대를 사용하는 구조로 변경했습니다.
+데이터베이스의 성능과 확장성을 높이기 위해 싱글 DB 인스턴스 구조에서 Writer-Reader 복제 환경으로 마이그레이션 작업을 진행했습니다.
+기존에는 단일 EC2 인스턴스에 MySQL을 설치하여 사용했고, 마이그레이션 과정에서 Writer와 Reader로 구성된 2대의 RDS를 사용하는 구조로 변경했습니다.
 
 ### 2.2 Spring Boot에서 다중 데이터 소스 구성 과정
 
 Spring Boot는 하나의 데이터소스를 사용하는 경우 AutoConfiguration으로 `DataSource`, `EntityManager`, `TransactionManager` 등을 설정합니다.
-하지만, 2개 이상의 데이터소스를 정의하면 Spring Boot의 기본 AutoConfiguration은 비활성화되고, 개발자가 직접 코드로 두 개의 데이터소스를 명시해야 합니다.
+하지만, 2개 이상의 데이터소스를 정의하면 Spring Boot의 기본 AutoConfiguration은 비활성화되고, 개발자가 직접 코드로 두 개의 `DataSource`를 명시해야 합니다.
 
 따라서 애플리케이션 코드에서 `AbstractRoutingDataSource`를 사용하여, 쓰기 트랜잭션은 Writer로, 읽기 트랜잭션은 Reader로 보내도록 설정했습니다.
 
@@ -128,7 +128,8 @@ OSIV를 서블릿 필터 적용할지 스프링 인터셉터에서 적용할지�
 > - OpenSessionInViewInterceptor
 
 Spring JPA의 OSIV 옵션이 true일 때 동작 과정을 `OpenSessionInViewInterceptor`의 코드와 함께 살펴봅시다.
-1. 요청이 들어오면 `Spring Interceptor`에서 세션(영속성 컨텍스트)을 생성합니다.
+
+1. **요청이 들어오면 `Spring Interceptor`에서 세션(영속성 컨텍스트)을 생성합니다.**
    ``` java
    @Override
    public void preHandle(WebRequest request) throws DataAccessException {
@@ -158,14 +159,14 @@ Spring JPA의 OSIV 옵션이 true일 때 동작 과정을 `OpenSessionInViewInte
    `OpenSessionInViewInterceptor`는 영속성 컨텍스트를 요청 범위 전체에 걸쳐 유지하는 역할을 합니다. 
    이는 트랜잭션 범위에서만 영속성 컨텍스트를 열고 닫는 기본 방식과 차이가 있습니다. 
    이 인터셉터는 클라이언트 요청이 들어오면 `preHandle` 메서드를 통해 영속성 컨텍스트를 생성하고 요청의 끝까지 유지함으로써, View 계층에서도 지연 로딩을 사용할 수 있게 합니다.
-2. Transaction AOP 혹은 `begin`을 이용하여 트랜잭션을 시작할 때 앞서 생성한 영속성 컨텍스트를 사용하여 트랜잭션을 시작합니다.
+2. **Transaction AOP 혹은 `begin`을 이용하여 트랜잭션을 시작할 때 앞서 생성한 영속성 컨텍스트를 사용하여 트랜잭션을 시작합니다.**
    ``` java
    TransactionSynchronizationManager.bindResource(obtainSessionFactory(), sessionHolder);
    ```
    앞서 생성한 영속성 컨텍스트를 `TransactionSynchronizationManager`에 바인딩하는 작업을 `prehandle`메서드에서 진행함을 확인할 수 있습니다.
-3. `Service` 클래스에서 `Transaction AOP`를 이용한다면, `Service` 로직이 완료되었을 때 트랜잭션을 커밋하고 종료합니다.
-4. 영속성 컨텍스트는 아직 유지하고 있습니다. 즉, 데이터베이스와의 커넥션이 종료되지 않았습니다. `Controller`와 `View`까지 영속성 컨텍스트가 유지됩니다.
-5. `Spring Interceptor`로 로직이 다시 돌아오면 세션(영속성 컨텍스트)을 종료합니다.
+3. **`Service` 클래스에서 `Transaction AOP`를 이용한다면, `Service` 로직이 완료되었을 때 트랜잭션을 커밋하고 종료합니다.**
+4. **영속성 컨텍스트는 아직 유지하고 있습니다. 즉, 데이터베이스와의 커넥션이 종료되지 않았습니다. `Controller`와 `View`까지 영속성 컨텍스트가 유지됩니다.**
+5. **`Spring Interceptor`로 로직이 다시 돌아오면 세션(영속성 컨텍스트)을 종료합니다.**
    ``` java
    @Override
    public void afterCompletion(WebRequest request, @Nullable Exception ex) throws DataAccessException {
@@ -358,3 +359,6 @@ OSIV를 사용한다면 다음과 같은 단점이 있습니다.
 마지막으로, OSIV가 활성화 여부에 따른 장단점을 함께 비교 분석하며 OSIV의 비활성화가 문제 해결에 적합한지 판단해보았습니다.
 
 이 글이 OSIV의 개념을 이해하고, 유사한 문제 상황에서 해결 방안을 찾는 데 도움이 되기를 바랍니다.
+
+## 참고자료
+- 자바 ORM 표준 JPA 프로그래밍 (김영한 저)
