@@ -1,7 +1,8 @@
-# 절대 안 까먹는 Pass by Value과 Pass by Reference
+# Java는 Pass by Value 일까? Pass by Reference 일까?
 
-Java는 메서드의 결과가 어떤 영향을 미치는지 헷갈릴 수 있다. 
-아래 Java 언어의 `main()` 메서드를 실행했을 때 결과를 예측해보자.
+Java로 함수를 수행하다보면 예기치 못한 결과에 당황할때가 있다.
+
+아래 Java 예제를 보며 `main()` 메서드를 실행했을 때 결과를 예측해보자.
 ```java
 class Person {
     
@@ -45,38 +46,54 @@ public class Main {
     }
 }
 ```
-실행 결과는 아래 **서론의 예제 분석**에서 다룰 것이다.
+실행 결과는 흥미를 위해 아래 예제 분석에 배치하겠다.
 
 Java를 예시로 들었지만 흥미로운 사실은 개발 언어마다 실행 결과가 다르다는 것이다.
 이는 개발 언어마다 메서드의 매개변수 전달 방식이 다르기 때문이다.
 
-가장 일반적으로 알려진 값에 의한 전달(Pass by Value)과 참조에 의한 전달(Pass by Reference)을 토대로 매개변수 전달 방식을 알아보자.
+그 중 가장 일반적으로 알려진 값에 의한 전달(Pass by Value)과 참조에 의한 전달(Pass by Reference)을 토대로 매개변수 전달 방식을 알아보자.
+
+> [!note] 
+> 매개변수 전달 방식은 값에 의한 방식과 참조에 의한 전달만 존재하는 것이 아니다. </br>
+> 본 글에서는 가장 많이 알려진 값에 의한 전달(Pass by Value)과 참조에 의한 전달(Pass by Reference)에 대해서만 논한다. </br>
+> 이름에 대한 전달(Call by Name), 공유에 의한 값 전달(Pass by Value Sharing), 이동 의미론(Move Semantics) 등 다양한 전달 방식이 있으니 궁금하다면 찾아보길 권장한다. </br>
 
 ## 용어 정리
 
 ### 값에 의한 전달(Pass by Value, Call by Value)
-값에 의한 전달은 매개변수로 데이터의 복사본을 전달한다. 
-즉, 메서드 안의 모든 수정 사항은 메서드 밖에 영향을 미치지 않는다.
+값에 의한 전달은 매개변수로 데이터의 복사본을 전달하는 방식이다.
+그래서 메서드 안의 모든 수정 사항은 메서드밖에 영향을 미치지 않는다.
 
-C++ 언어로 알아보자. 
+아래 예시 코드로 값에 의한 전달을 알아보자.
+예시 코드로 C++ 언어를 사용하였는데, 값에 의한 전달과 참조에 의한 전달 모두 표현할 수 있는 언어이기 때문이다.
+대부분은 주석을 통해 남겨두었으니 코드를 이해하는데는 큰 어려움은 없을 것이다.
 ```cpp
+// 입출력 스트림을 포함하는 표준 라이브러리 헤더로, 콘솔에 출력하기 위해 사용한다
 #include <iostream>
 
+// std 이름 공간을 사용하여 std::cout, std::endl 등을 간략하게 사용하도록 설정했다
 using namespace std;
 
 void process(int value) {
     // 문자열과 변수의 값을 줄바꿈과 함께 콘솔에 출력한다
     cout << "Value passed into function: " << value << endl;
+    
     value = 100;
+    
+    // 문자열과 변수의 값을 줄바꿈과 함께 콘솔에 출력한다
     cout << "Value before leaving function: " << value << endl;
 }
 
 int main() {
     int parameter = 10;
+    // 문자열과 변수의 값을 줄바꿈과 함께 콘솔에 출력한다
     cout << "Value before function call: " << parameter << endl;
+    
+    // process 함수를 수행한다.
     process(parameter);
+    
+    // 문자열과 변수의 값을 줄바꿈과 함께 콘솔에 출력한다
     cout << "Value after function call: " << parameter << endl;
-
     return 0;
 }
 ```
@@ -97,7 +114,7 @@ Value after function call: 10
 
 ### 값에 의한 전달과 콜 스택
 
-![img.png](img/pass-by-value-call-stack.png)
+![pass-by-value-call-stack.png](img/pass-by-value-call-stack.png)
 
 먼저 `main()` 메서드에서 호출한 변수 `parameter`가 콜 스택에 쌓인다. 
 이후 `process()` 메서드가 호출되고 반환 주소(Return Address)가 저장된다. 
@@ -108,11 +125,11 @@ Value after function call: 10
 콜 스택에 저장된 두 변수의 값은 10으로 같지만 서로 다른 메모리 주소에 저장된다.
 위의 그림처럼 `main()` 메서드의 `parameter` 변수는 0x7170 주소 값을 `process()` 메서드의 `value` 변수는 0x71270 주소 값을 가진다.
 
-![img.png](img/pass-by-value-call-stack-change-value.png)
+![pass-by-value-call-stack-change-value.png](img/pass-by-value-call-stack-change-value.png)
 
 `process() `메서드 내 value 변수의 값을 변경하면 메모리에 할당된 값만 바뀌게 된다.
 
-![img.png](img/pass-by-value-call-stack-reclaimed.png)
+![pass-by-value-call-stack-reclaimed.png](img/pass-by-value-call-stack-reclaimed.png)
 
 이후 메서드가 반환되면 `process()` 메서드가 할당된 메모리가 해제된다. 
 그렇기에 `process()` 메서드의 결과가 `parameter`에 반영되지 않았다.
@@ -120,35 +137,39 @@ Value after function call: 10
 이러한 매개변수 전달 방식을 값에 의한 전달이라 한다.
 
 
-## 참조에 의한 전달(Pass by Reference)
+## 참조에 의한 전달(Pass by Reference, Call by Reference)
 
-참조에 의한 전달(Pass by Reference)은 주소 값을 전달하여 동일한 데이터에 대해 여러 변수 이름을 사용한다. 
+참조에 의한 전달은 주소 값을 전달하여 동일한 데이터에 대해 여러 변수 이름을 사용한다. 
 때문에 값을 수정하면 원본 데이터도 함께 수정된다.
 
 코드로 예시를 들어보자.
 ```cpp
+// 입출력 스트림을 포함하는 표준 라이브러리 헤더로, 콘솔에 출력하기 위해 사용한다
 #include <iostream>
 
+// std 이름 공간을 사용하여 std::cout, std::endl 등을 간략하게 사용하도록 설정했다
 using namespace std;
 
 // c++은 참조값을 전달하기 위해 &를 사용한다.
 void process(int& value) {
-    // 문자열과 변수의 값을 줄바꿈과 함께 콘솔에 출력한다
     cout << "Value passed into function: " << value << endl;
+    
     value = 100;
+    
     cout << "Value before leaving function: " << value << endl;
 }
 
 int main() {
     int parameter = 10;
     cout << "Value before function call: " << parameter << endl;
+    
     process(parameter);
+    
     cout << "Value after function call: " << parameter << endl;
-
     return 0;
 }
 ```
-`main()` 메서드를 실행해보면 값에 의한 전달(Pass by Value)과 다른 결과가 도출된다.
+`main()` 메서드를 실행해보면 함수 호출 후 변경된 값에서 값에 의한 전달과 다른 결과가 도출된다.
 
 ```bash
 Value before function call: 10                                                                                                                                              
@@ -157,32 +178,34 @@ Value before leaving function: 100
 Value after function call: 100
 ```
 
-값을 복사한 것이 아닌 참조(Alias)를 넘겼기에 `process()` 메서드에서 변경된 값이 원본에도 영향을 끼쳤다.
-콜 스택을 통해 더 깊게 알아보자.
+`process()` 함수의 매개변수로 복사한 값이이 아닌 참조(Alias)를 넘겼기에 `process()` 메서드 내의 값의 변경이 원본에도 영향을 끼쳤다.
+이 과정을 콜 스택을 통해 다시 보자.
 
-### 참조에 의한 전달(Pass by Reference)과 콜 스택
+### 참조에 의한 전달과 콜 스택
 
-![img.png](img/pass-by-reference-call-stack.png)
+![pass-by-reference-call-stack.png](img/pass-by-reference-call-stack.png)
 
 먼저 `main()` 메서드에서 선언된 `parameter` 변수가 스택에 쌓인다.
 이후 `process()` 메서드 호출되고 반환 주소(Return Address)가 적재고 그 후 매개변수 정보를 스택에 저장한다.
 이때 저장 되는 것은 10 이 아닌 변수 `parameter` 의 값이 저장된 메모리의 주소를 저장된다.
 
-![img.png](img/pass-by-reference-change-value.png)
+![pass-by-reference-change-value.png](img/pass-by-reference-change-value.png)
 
 `process()` 메서드에서 매개변수로 전달 받은 변수 `value`는 변수 `parameter`가 저장된 값의 참조이다. 
 그래서 변수 `value`를 변경하면 주소 값이 가리키는 변수 `parameter` 메모리의 값을 변경한다.
 
 ## Java의 매개변수 전달 방식
 
-Java는 어떤 방식으로 매개변수를 전달할까?
+그렇다면 Java는 어떤 방식으로 매개변수를 전달할까?
 
 > When the method or constructor is invoked (§15.12), the values of the actual argument expressions **_initialize newly created parameter variables_**, each of the declared type, before execution of the body of the method or constructor.
 > </br> \- JLS(Java Language Specification) ch 8.4.1
 
-JLS(Java Language Specification)에 따르면 Java는 값에 의한 전달(Pass by Value)임을 명시하고 있다.
+JLS(Java Language Specification)에 의하면 Java는 인수가 복사되어 함수의 매개변수를 초기화하고, 그 후 함수의 본문이 실행된다고 나와있다.
+여기서 인수(Argument)는 호출하는 쪽, 매개변수(Parameter)는 호출 되는 쪽을 의미한다.
+즉, 공식 문서를 통해 Java가 값에 의한 호출을 하고 있음을 알 수 있다.
 
-하지만 Java에는 기본적으로 원시 타입과 참조 타입이 존재한다. 
+Java에는 기본적으로 원시 타입과 참조 타입이 존재한다. 
 두 타입이 어떻게 값에 의한 전달(Pass by Value)를 사용하는지 이해하려면 Java의 메모리 할당 방식을 먼저 알아야 한다.
 
 ## Java 메모리 할당
@@ -243,7 +266,7 @@ Java의 참조 타입인 객체는 좀 더 확장된 규칙이 적용된다.
 
 ## 서론의 예제 분석
 
-서론의 예제를 분석해보자.
+처음에 다뤘던 Java 코드를 다시 보자.
 
 ```java
 class Person {
@@ -289,7 +312,7 @@ public class Main {
 }
 ```
 
-실행 결과는 아래와 같다.
+`main()` 메서드의 실행 결과는 아래와 같다.
 
 ```bash
 x: 3
@@ -300,7 +323,7 @@ person2.name: 바뀐 우리
 
 ### 1. 원시 타입 x
 
-![img.png](img/java-memory-ex-2-primitive.png)
+![java-memory-ex-2-primitive.png](img/java-memory-ex-2-primitive.png)
 변수 x의 동작은 앞서 설명한 값에 의한 전달(Pass by Value) 메모리 할당과 동일하게 동작한다.
 `foo()` 메서드에서의 변경 사항은 유지되지 않는다.
 
@@ -319,7 +342,7 @@ person2.name: 바뀐 우리
 
 ### 4. 참조 타입 Person2
 
-![img.png](img/java-memory-ex-2-person-2.png)
+![java-memory-ex-2-person-2.png](img/java-memory-ex-2-person-2.png)
 변수 `Person2`는 `foo()` 메서드 내부에서 객체의 필드에 접근하여 값을 변경하였다.
 참조 타입은 객체 내 필드를 변경하면 그 메모리가 가리키는 값을 따라가 직접 수정하게 되므로 변경이 유지된다.
 
