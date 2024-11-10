@@ -186,6 +186,9 @@ JLS(Java Language Specification)에 따르면 Java는 값에 의한 전달(Pass 
 두 타입이 어떻게 값에 의한 전달(Pass by Value)를 사용하는지 이해하려면 Java의 메모리 할당 방식을 먼저 알아야 한다.
 
 ## Java 메모리 할당
+
+![jvm-memory-structure.png](img/jvm-memory-structure.png)
+
 Java의 메모리 할당은 Java의 가상머신인 JVM의 메모리 구조를 기반으로 이루어진다.
 JVM의 메모리 구조는 크게 Stack 영역, Heap 영역, Method 영역으로 나눌 수 있다. 
 
