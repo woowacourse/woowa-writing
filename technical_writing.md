@@ -1,4 +1,4 @@
-# Java는 Pass by Value 일까? Pass by Reference 일까?
+# Java의 매개변수 호출 방식(Pass by Value vs. Pass by Reference)
 
 Java로 함수를 수행하다보면 예기치 못한 결과에 당황할 때가 있다.
 
