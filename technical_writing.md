@@ -1,8 +1,8 @@
 # Java는 Pass by Value 일까? Pass by Reference 일까?
 
-Java로 함수를 수행하다보면 예기치 못한 결과에 당황할때가 있다.
+Java로 함수를 수행하다보면 예기치 못한 결과에 당황할 때가 있다.
 
-아래 Java 예제를 보며 `main()` 메서드를 실행했을 때 결과를 예측해보자.
+아래 Java 예제를 보며 `main()` 함수를 실행했을 때 결과를 예측해보자.
 ```java
 class Person {
     
@@ -46,10 +46,10 @@ public class Main {
     }
 }
 ```
-실행 결과는 흥미를 위해 아래 예제 분석에 배치하겠다.
+실행 결과는 흥미를 위해 아래 예제 분석에서 다루겠다.
 
 Java를 예시로 들었지만 흥미로운 사실은 개발 언어마다 실행 결과가 다르다는 것이다.
-이는 개발 언어마다 메서드의 매개변수 전달 방식이 다르기 때문이다.
+이는 개발 언어마다 함수의 매개변수 전달 방식이 다르기 때문이다.
 
 그 중 가장 일반적으로 알려진 값에 의한 전달(Pass by Value)과 참조에 의한 전달(Pass by Reference)을 토대로 매개변수 전달 방식을 알아보자.
 
@@ -62,7 +62,7 @@ Java를 예시로 들었지만 흥미로운 사실은 개발 언어마다 실행
 
 ### 값에 의한 전달(Pass by Value, Call by Value)
 값에 의한 전달은 매개변수로 데이터의 복사본을 전달하는 방식이다.
-그래서 메서드 안의 모든 수정 사항은 메서드밖에 영향을 미치지 않는다.
+그래서 함수 안의 모든 수정 사항은 함수밖에 영향을 미치지 않는다.
 
 아래 예시 코드로 값에 의한 전달을 알아보자.
 예시 코드로 C++ 언어를 사용하였는데, 값에 의한 전달과 참조에 의한 전달 모두 표현할 수 있는 언어이기 때문이다.
@@ -97,7 +97,7 @@ int main() {
     return 0;
 }
 ```
-`main()` 메서드를 실행하면 어떤 결과가 나올까?
+`main()` 함수를 실행하면 어떤 결과가 나올까?
 
 ```bash
 Value before function call: 10                                                                                                                                              
@@ -105,10 +105,10 @@ Value passed into function: 10
 Value before leaving function: 100                                                                                                                                                
 Value after function call: 10
 ```
-`paramter` 변수의 값이 `process()` 메서드를 수행한 후 100이 될 것을 예상했지만 변하지 않았다.
+`paramter` 변수의 값이 `process()` 함수를 수행한 후 100이 될 것을 예상했지만 변하지 않았다.
 
 왜 이런 결과가 도출되었는지 콜 스택(Call Stack)을 통해 알아보자.
-콜 스택은 프로그램 실행 중에 메서드 호출을 관리하는 데이터 구조이다.
+콜 스택은 프로그램 실행 중에 함수 호출을 관리하는 데이터 구조이다.
 
 아래 예시들은 아래에서 위로 데이터가 쌓인다고 가정한다.
 
@@ -116,31 +116,29 @@ Value after function call: 10
 
 ![pass-by-value-call-stack.png](img/pass-by-value-call-stack.png)
 
-먼저 `main()` 메서드에서 호출한 변수 `parameter`가 콜 스택에 쌓인다. 
-이후 `process()` 메서드가 호출되고 반환 주소(Return Address)가 저장된다. 
-반환 주소(Return Address)란 메서드가 실행을 마치고 다시 돌아가야 할 위치를 저장하는 메모리 주소이다. 
+먼저 `main()` 함수에서 호출한 변수 `parameter`가 콜 스택에 쌓인다. 
+이후 `process()` 함수가 호출되고 반환 주소(Return Address)가 저장된다. 
+반환 주소란 함수가 실행을 마치고 다시 돌아가야 할 위치를 저장하는 메모리 주소이다. 
 
 다음으로 매개변수인 변수 `value`가 콜 스택에 쌓인다.
 
-콜 스택에 저장된 두 변수의 값은 10으로 같지만 서로 다른 메모리 주소에 저장된다.
-위의 그림처럼 `main()` 메서드의 `parameter` 변수는 0x7170 주소 값을 `process()` 메서드의 `value` 변수는 0x71270 주소 값을 가진다.
+콜 스택에 저장된 두 변수의 값은 10으로 같지만 스택의 서로 다른 메모리 주소로 각각 관리된다.
+위의 그림에서 보듯이 `main()` 함수의 `parameter` 변수는 `0x1234` 주소 값을 갖는 것에 비해 `process()` 함수의 `value` 변수는 `0x1270` 주소 값을 가진다.
 
 ![pass-by-value-call-stack-change-value.png](img/pass-by-value-call-stack-change-value.png)
 
-`process() `메서드 내 value 변수의 값을 변경하면 메모리에 할당된 값만 바뀌게 된다.
+`process() `함수 내 value 변수의 값을 변경하면 `0x1270` 메모리에 할당된 값만 바뀌게 된다.
 
 ![pass-by-value-call-stack-reclaimed.png](img/pass-by-value-call-stack-reclaimed.png)
 
-이후 메서드가 반환되면 `process()` 메서드가 할당된 메모리가 해제된다. 
-그렇기에 `process()` 메서드의 결과가 `parameter`에 반영되지 않았다.
+이후 `process()` 함수가 반환되면 할당된 메모리가 해제된다. 
+그렇기에 `process()` 함수의 결과가 `parameter`에 반영되지 않았다.
 
 이러한 매개변수 전달 방식을 값에 의한 전달이라 한다.
 
-
 ## 참조에 의한 전달(Pass by Reference, Call by Reference)
 
-참조에 의한 전달은 주소 값을 전달하여 동일한 데이터에 대해 여러 변수 이름을 사용한다. 
-때문에 값을 수정하면 원본 데이터도 함께 수정된다.
+참조에 의한 전달은 주소 값을 전달하여 실제 값에 대한 참조(Alias)를 구성함으로써, 값을 수정하면 원본의 데이터가 수정되도록 하는 방식이다.
 
 코드로 예시를 들어보자.
 ```cpp
@@ -169,7 +167,7 @@ int main() {
     return 0;
 }
 ```
-`main()` 메서드를 실행해보면 함수 호출 후 변경된 값에서 값에 의한 전달과 다른 결과가 도출된다.
+`main()` 함수를 실행해보면 함수 호출 후 변경된 값에서 값에 의한 전달과 다른 결과가 도출된다.
 
 ```bash
 Value before function call: 10                                                                                                                                              
@@ -178,20 +176,20 @@ Value before leaving function: 100
 Value after function call: 100
 ```
 
-`process()` 함수의 매개변수로 복사한 값이이 아닌 참조(Alias)를 넘겼기에 `process()` 메서드 내의 값의 변경이 원본에도 영향을 끼쳤다.
+`process()` 함수의 매개변수로 복사한 값이 아닌 참조(Alias)를 넘겼기에 `process()` 함수 내의 값의 변경이 원본에도 영향을 끼쳤다.
 이 과정을 콜 스택을 통해 다시 보자.
 
 ### 참조에 의한 전달과 콜 스택
 
 ![pass-by-reference-call-stack.png](img/pass-by-reference-call-stack.png)
 
-먼저 `main()` 메서드에서 선언된 `parameter` 변수가 스택에 쌓인다.
-이후 `process()` 메서드 호출되고 반환 주소(Return Address)가 적재고 그 후 매개변수 정보를 스택에 저장한다.
+먼저 `main()` 함수에서 선언된 `parameter` 변수가 스택에 쌓인다.
+이후 `process()` 함수 호출되고 반환 주소(Return Address)가 적재고 그 후 매개변수 정보를 스택에 저장한다.
 이때 저장 되는 것은 10 이 아닌 변수 `parameter` 의 값이 저장된 메모리의 주소를 저장된다.
 
 ![pass-by-reference-change-value.png](img/pass-by-reference-change-value.png)
 
-`process()` 메서드에서 매개변수로 전달 받은 변수 `value`는 변수 `parameter`가 저장된 값의 참조이다. 
+`process()` 함수에서 매개변수로 전달 받은 변수 `value`는 변수 `parameter`가 저장된 값의 참조이다. 
 그래서 변수 `value`를 변경하면 주소 값이 가리키는 변수 `parameter` 메모리의 값을 변경한다.
 
 ## Java의 매개변수 전달 방식
@@ -216,51 +214,58 @@ Java의 메모리 할당은 Java의 가상머신인 JVM의 메모리 구조를 �
 JVM의 메모리 구조는 크게 Stack 영역, Heap 영역, Method 영역으로 나눌 수 있다. 
 
 이 중 변수를 선언할 때 할당되는 메모리는 Stack과 Heap이 있다. 
-두 메모리 영역의 차이는 데이터 적재 순서이다. 
-Stack 영역은 순서대로 메모리에 쌓이지만 Heap 영역은 메모리의 랜덤 위치에 할당된다. 
 
 아래 코드로 예시를 들어보자.
 ```java
 public class MemoryEx {
     
-    public void ex() {
+    public void ex(int x, boolean isDaon, String name, String[] array) {
+        x = 3;
+        isDaon = true;
+        name = "daon";
+        array[0] = "daon";
+    }
+    
+    public static void main(String[] args) {
         int x = 3;
         boolean isDaon = true;
-        String name = "daon";
-        String[] array = new String[2];
-        array[0] = new String("daon");
-        array[1] = "jamsil";
+        String name = "Me";
+        String[] array = {"I", "YOU"};
+        ex(x, isDaon, name, array);
     }
 }
 ```
-이들이 적재된 메모리를 나타내면 아래와 같다.
+각각의 변수에 대해 아래와 같이 메모리에 적재된다.
 
-![img.png](img/java-ex-stack-heap-memory.png)
+![java-ex-stack-heap-memory.png](img/java-ex-stack-heap-memory.png)
 
-> `String`은 Heap에 저장되지만 저장 방식이 다른 객체와 다르다. 자세한 내용은 `리터럴 풀`을 찾아보자.
+Java 는 2개의 타입이 존재한다.
+하나는 int, long, short 등 원시 타입(Primitive Type)이고, 다른 하나는 이외 나머지를 뜻하는 참조 타입(Reference Type)이다. 
+배열과 같은 객체들이 참조 타입에 속한다.
 
-Java의 두 타입을 바탕으로 어떻게 동작하는지 알아보자.
+> [!tip]
+> `String`은 객체로서 Heap에 저장되지만 Java에서 불변(immutable) 객체로 설계되어 있어서 특별한 동작 방식을 갖는다. 
+> 이로 인해 `String name = "Me";` 같은 코드가 실행될 때, name 변수는 "Me"라는 문자열 객체를 가리키는 참조 값을 갖게 된다.
+> `ex()` 함수에서 `name = "daon";`으로 재할당하면, 새로운 문자열 객체 "daon"을 가리키도록 참조가 변경된다. 
+> 이때 원래의 name이 가리키던 "Me" 객체는 수정되지 않고 그대로 남아 있게 된다.
 
-### Java의 원시 타입
+원시 타입은 위에서 설명한 것과 동일하게 값 복사 방식으로 동작한다.
+문제는 참조 타입이다. 이에 대해 자세히 알아보자.
 
-값에 의한 전달(Pass by Value)에서 설명한 방식과 동일하게 동작한다.
+### 참조 타입 - 배열 array
 
-### 참조 타입 배열 array
+배열 array를 살펴보면 Stack 영역에 Heap 영역의 메모리 주소를 저장하는 것을 볼 수 있다. 이를 보고 array가 `Pass by Reference`라고 헷갈릴 수 있다.
+앞서 `Pass by Reference`는 실제 값에 대한 참조를 구성하여 값을 수정하면 원본의 데이터가 수정되는 방식이라고 정의하였다.
+Java의 객체를 전달하는 방식은 주소값을 전달하지만, 이는 그저 `array`에 대한 복사본일 뿐이다.
+다시 말해, 객체의 주소값으로 객체의 필드 값에 접근하여 값을 변경하는 것일 뿐, 실제 객체 자체에 변화를 주는 것이 아니다.
 
-Java의 참조 타입인 객체는 좀 더 확장된 규칙이 적용된다. 
-
-객체는 값이 아닌 실제 메모리를 가리키는 포인터를 저장하여 내부 필드의 값을 변경하면 반영 된다.
-
-이것이 어떻게 값에 의한 전달(Pass by Value)인지 의문이 들 수 있다.
-참조 타입인 객체는 매개변수로 전달될 때 내부 연산은 가능하지만 그 객체 자체가 새로운 객체로 재할당하는 것은 반영이 되지 않는다.
-
-그 외 참조 타입으로 가능한 연산은 아래와 같다.
+추가로 필드 변경 이외의 참조 타입으로 가능한 연산은 아래와 같다.
 
 > JLS(Java Language Specification)의 4.3.1 절 Object
 > - Field 접근
 > - Method Invocation
 > - Cast Operator
-> - String의 `+` 연산자와 호출되면 `toString()` 메서드를 호출하여 문자열로 변환하여 연결한다.
+> - String의 `+` 연산자와 호출되면 `toString()` 함수를 호출하여 문자열로 변환하여 연결한다.
 > - instanceof 연산자
 > - == 또는 != 또는 ? :
 
@@ -312,7 +317,7 @@ public class Main {
 }
 ```
 
-`main()` 메서드의 실행 결과는 아래와 같다.
+`main()` 함수의 실행 결과는 아래와 같다.
 
 ```bash
 x: 3
@@ -321,36 +326,62 @@ person1.name: 나
 person2.name: 바뀐 우리
 ```
 
-### 1. 원시 타입 x
+이를 바탕으로 어떤 일이 일어났는지 메모리 공간을 통해 알아보자.
+Stack 영역의 메모리 주소에서 검정 글씨는 `main()` 함수에서 일어난 변경을, 빨간 글씨는 `foo()` 함수에서 일어난 변경을 나타낸다..
 
+### 1. 원시 타입 x
+```java
+private static void foo(int x, int[] array, Person person1, Person person2) {
+    x++;
+}
+```
 ![java-memory-ex-2-primitive.png](img/java-memory-ex-2-primitive.png)
-변수 x의 동작은 앞서 설명한 값에 의한 전달(Pass by Value) 메모리 할당과 동일하게 동작한다.
-`foo()` 메서드에서의 변경 사항은 유지되지 않는다.
+변수 x는 값이 복사되어 매개변수로 오기 때문에 값이 변경된 이후 함수가 반환되면 `main()` 까지 x의 변경이 유지되지 않는다.
 
 ### 2. 참조 타입 배열 array
 
+```java
+private static void foo(int x, int[] array, Person person1, Person person2) {
+    array[0]++;
+}
+```
 ![img.png](img/java-memory-ex-2-array.png)
-참조 타입은 생성된 객체 내에 접근하여 값을 변경하는 것이 가능하다.
-따라서 배열의 값을 변경하면 실제 배열에도 반영된다.
+앞서 참조 타입은 생성된 객체 내에 접근하여 값을 변경하는 것이 가능하다고 설명하였다.
+참조 타입은 스택 안에 Heap 영역에서 할당된 메모리 주소를 저장하고 있기 때문에 실제 저장된 값의 변경이 일어난다.
+위 그림에서 보면, `0x1000`이란 동일한 메모리 주소가 가리키는 공간에 변경을 가하여 Heap 영역 내 할당된 메모리 공간 내부 값에 직접적인 변경이 일어났다. 
+따라서 매개변수로 받은 배열 내부 값이 변경되면 함수가 반환된 이후에도 변경이 유지되게 된다.
 
 ### 3. 참조 타입 Person1
 
-![img.png](img/java-memory-ex-2-person-1.png)
-`foo()` 메서드 내부에서 변수 `Person1`에 새로운 객체를 할당했다.
-그림과 같이 아예 다른 메모리 주소를 참조하도록 바뀌게 되었다.
-따라서 `foo()` 메서드가 반환되더라도 변경이 유지되지 않는다.
+```java
+private static void foo(int x, int[] array, Person person1, Person person2) {
+    person1 = new Person("바뀐 나");
+}
+```
+![java-memory-ex-2-person-1.png](img/java-memory-ex-2-person-1.png)
+person1 변수의 경우 앞서 설명한 array 와는 다르게 동작한다.
+person1은 새로운 Person 객체를 생성하여 재할당하고 있다.
+이때 위 그림의 스택 영역을 보면, 새롭게 할당된 `new Person("바뀐 나")`의 메모리 주소가 Stack 영역에 저장되었다.
+`foo()`내의 person1 변수가 가리키는 메모리 주소와 `main()`내의 person1 변수가 가리키는 메모리 주소가 서로 다르다.
+그래서 이후 아무리 person1 변수 내부를 수정해도 그 변경이 함수 외부까지 유지되지 않는 것이다.
+
+따라서 재할당되는 경우 함수가 반환되면 그 변경이 유지되지 않는다.
 
 ### 4. 참조 타입 Person2
 
+```java
+private static void foo(int x, int[] array, Person person1, Person person2) {
+    person2.setName("바뀐 우리");
+}
+```
 ![java-memory-ex-2-person-2.png](img/java-memory-ex-2-person-2.png)
-변수 `Person2`는 `foo()` 메서드 내부에서 객체의 필드에 접근하여 값을 변경하였다.
-참조 타입은 객체 내 필드를 변경하면 그 메모리가 가리키는 값을 따라가 직접 수정하게 되므로 변경이 유지된다.
+변수 `person2`는 `setter`를 활용하여 객체의 필드 값을 변경하였다.
+이 역시 Heap 영역에 할당된 메모리 주소로 직접적인 변경을 가하므로 `foo()` 함수가 반환된 이후에도 변경이 유지된다.
 
 ## 결론
 
-값에 의한 전달(Pass by Value)와 참조에 의한 전달(Pass by Reference)를 알아보았다.
-값에 의한 전달은 매개변수의 복사본을, 참조에 의한 전달은 원본의 메모리 참조를 전달하게 된다.
-사용하는 언어의 매개변수 전달 방식도 알게된다면 예기치 못한 에러 상황을 피할 수 있을 것이다. 
+값에 의한 전달와 참조에 의한 전달과 Java는 어떤 매개변수 전달 방식을 사용하는지 알아보았다.
+함수의 변경이 의도한 대로 동작하지 않는다면 그 언어의 매개변수 전달 방식도 한번 살펴보길 말하며 글을 마무리하겠다.
 
 ---
 ### 참고 자료
