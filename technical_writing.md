@@ -323,6 +323,22 @@ person2.name: 바뀐 우리
 이를 바탕으로 어떤 일이 일어났는지 메모리 공간을 통해 알아보자.
 Stack 영역의 메모리 주소에서 검정 글씨는 `main()` 함수에서 일어난 변경을, 빨간 글씨는 `foo()` 함수에서 일어난 변경을 나타낸다.
 
+### 0. 변수 생성
+```java
+public static void main(String[] args) {
+    int x = 3;
+    int[] array = {1, 2, 3};
+    Person person1 = new Person("나");
+    Person person2 = new Person("우리");
+}
+```
+![img_1.png](img/java-memory-ex2-object.png)
+
+우선 `main()` 함수에서 생성된 데이터들을 메모리에 나타내었다.
+각각의 화살표는 참조하고 있는 메모리 주소를 나타낸다.
+
+이제 `foo()` 함수 내부에서의 동작을 알아보자.
+
 ### 1. 원시 타입 x
 ```java
 private void foo(int x) {
@@ -339,7 +355,7 @@ private void foo(int[] array) {
     array[0]++;
 }
 ```
-![img.png](img/java-memory-ex-2-array.png)
+![java-memory-ex-2-array.png](img/java-memory-ex-2-array.png)
 앞서 참조 타입은 생성된 객체 내에 접근하여 값을 변경하는 것이 가능하다고 설명하였다.
 참조 타입은 스택 안에 Heap 영역에서 할당된 메모리 주소를 저장하고 있기 때문에 실제 저장된 값의 변경이 일어난다.
 <br/>
