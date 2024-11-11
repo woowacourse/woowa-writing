@@ -390,7 +390,7 @@ private void foo(Person person2) {
 }
 ```
 ![java-memory-ex-2-person-2.png](img/java-memory-ex-2-person-2.png)
-변수 `person2`는 `setter`를 활용하여 객체의 필드 값을 변경한다.
+이번 예시는 3번의 예시와 달리 `setter`를 활용하여 객체의 필드 값의 변경을 시도한다.
 앞서 설명한 array의 동작 방식과 동일하게 Heap 영역에 할당된 메모리 주소로 직접적인 변경을 가한다.
 그래서 `foo()` 함수가 반환된 이후에도 변경이 유지된다.
 
