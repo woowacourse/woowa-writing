@@ -171,7 +171,7 @@ private Activity performLaunchActivity(ActivityClientRecord r, Intent customInte
 
 
 ### 정리
-Context가 생성되는 과정을 정리하면 다음과 같습니다.
+Context가 초기화되는 과정을 정리하면 다음과 같습니다.
 
 1. 액티비티 luanch 시, `ActivityThread#performLaunchActivity` 실행
     - ActivityContext 생성합니다.
@@ -186,7 +186,9 @@ Context가 생성되는 과정을 정리하면 다음과 같습니다.
 
 ## ApplicationContext 생성 원리
 
-그리고 지금부터, `ApplicatonContext`가 어떻게 생성되는지 자세히 뜯어보겠습니다.
+지금까지 Context가 초기화되는 과정을 살펴보았습니다.
+그렇다면, 이렇게 생성된 Context를 이용해 어떻게 `ApplicatonContext`가 만들어질까요
+지금부터 `ApplicatonContext`가 생성되는 과정을 자세히 뜯어보겠습니다.
 
 우선은 함수가 호출되는 순서를 먼저 설명하겠습니다.
 
@@ -265,7 +267,7 @@ public static Application currentApplication() {
 
 ### 정리
 
-위의 로직 순서를 정리하면 다음과 같습니다.
+ApplicationContext가 생성되는 과정을 정리하면 다음과 같습니다.
 
 1. `ActivityThread#main` 메서드 내부에서 thread.attach(false, startSeq) 실행
 2. `ActivityThread#attach` 메서드 실행
@@ -431,3 +433,6 @@ static ContextImpl createActivityContext(ActivityThread mainThread,
 
 - 만약 `ActivityContext`를 이용해 사용한다면, 그 receiver는 해당 activity 내에 종속됩니다. 이것은, activity가 destroy 되기 전까지는 receiver 등록이 해지되지 않는다는 것을 의미합니다. 만약 그렇게 하지 않으면, 프레임워크는 activity를 제거하고 오류를 기록하면서 누수된 registration을 정리합니다. 
 - 만약 `ApplicationContext`를 사용한다면, 어플리케이션의 전역적인 상태에 종속되게 됩니다. registration이 자동으로 취소되지 않으므로, 특정 컴포넌트가 아닌 정적 데이터와 연결된 경우에 필요합니다.
+
+# 참고자료
+https://developer.android.com/reference/android/content/Context
