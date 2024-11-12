@@ -38,7 +38,7 @@ Context란, **문맥**, **맥락** 이라는 뜻을 가진 단어입니다.
 
 
 애플리케이션은 **소설, 영화와 같은 한 편의 이야기**로 볼 수 있습니다.
-![어플리케이션의 흐름_1](./technical_writing_images/어플리케이션의_흐름_1.png)
+![애플리케이션의 흐름_1](./technical_writing_images/애플리케이션의_흐름_1.png)
 애플리케이션은 안드로이드 시스템 위에서 실행됩니다.  
 이야기의 밑바탕이 되는 시대, 공간적 배경과 등장인물, 무대 장치 등의 정보들로부터 이야기가 진행되는 것처럼,
 애플리케이션도 **앱이 실행되는 환경과 시스템에서 제공해주는 다양한 서비스, 리소스 자원 등의 정보**를 기반으로 실행됩니다.
@@ -55,12 +55,12 @@ Context란, **문맥**, **맥락** 이라는 뜻을 가진 단어입니다.
 이렇듯, 사건도 맥락이 존재합니다.
 
 애플리케이션의 화면을 구성하는 Activity도 마찬가지입니다.  
-Activity는 어플리케이션이라는 **이야기 속에서 진행되는 크고 작은 사건 또는 챕터**에 비유할 수 있습니다.  
+Activity는 애플리케이션이라는 **이야기 속에서 진행되는 크고 작은 사건 또는 챕터**에 비유할 수 있습니다.  
 Activity가 실행되어 기능을 제공하거나 사용자와 상호작용을 하기 위해서, **시스템의 서비스, 장치나 리소스 자원과 같은 정보가 필요**할 수 있습니다.  
 이 정보들 역시 Context에 접근하여 제공받을 수 있습니다.
 
-![어플리케이션의 흐름_2](./technical_writing_images/어플리케이션의_흐름_2.png)
-정리하자면, 안드로이드에서의 **Context**는 어플리케이션의 **흐름 및 구성요소**, 현재 화면에서 보여주고 있는 것들에 대한 **흐름 및 구성요소**를 나타냅니다.  
+![애플리케이션의 흐름_2](./technical_writing_images/애플리케이션의_흐름_2.png)
+정리하자면, 안드로이드에서의 **Context**는 애플리케이션의 **흐름 및 구성요소**, 현재 화면에서 보여주고 있는 것들에 대한 **흐름 및 구성요소**를 나타냅니다.  
 
 
 ### 안드로이드에서의 Context의 정의
@@ -74,20 +74,20 @@ Activity가 실행되어 기능을 제공하거나 사용자와 상호작용을 
 
 [안드로이드 공식 문서](https://developer.android.com/reference/kotlin/android/content/Context)에 나타나있는 설명입니다. 이를 해석하여 정리하면 아래와 같습니다.
 
-> 어플리케이션 환경에 관한 글로벌 인터페이스입니다. 추상클래스이며, 안드로이드 시스템에서 구현해줍니다.   
-> Context 는 어플리케이션의 특정 리소스와 클래스에 대한 접근 뿐 아니라, 
-> Activity 실행, Intent Broadcasting 과 Receiving 과 같은 상위 어플리케이션 레벨의 API 호출도 가능하게 해줍니다.
+> 애플리케이션 환경에 관한 글로벌 인터페이스입니다. 추상클래스이며, 안드로이드 시스템에서 구현해줍니다.   
+> Context 는 애플리케이션의 특정 리소스와 클래스에 대한 접근 뿐 아니라, 
+> Activity 실행, Intent Broadcasting 과 Receiving 과 같은 상위 애플리케이션 레벨의 API 호출도 가능하게 해줍니다.
 
-- 어플리케이션 환경에 관한 글로벌 인터페이스
+- 애플리케이션 환경에 관한 글로벌 인터페이스
 - 추상 클래스로 구현되어 있으며, 안드로이드 시스템에서 구현체 제공
-- 어플리케이션의 특정 리소스와 클래스에 대한 접근 가능
-- 상위 어플리케이션 레벨의 API 호출 가능(Activity 실행, Intent 송수신 등)
+- 애플리케이션의 특정 리소스와 클래스에 대한 접근 가능
+- 상위 애플리케이션 레벨의 API 호출 가능(Activity 실행, Intent 송수신 등)
 
-Context로 어플리케이션 환경에 접근하여 여러 리소스와 클래스, 기능에 접근할 수 있습니다.  
+Context로 애플리케이션 환경에 접근하여 여러 리소스와 클래스, 기능에 접근할 수 있습니다.  
 또한 화면 실행 및 전환 등 Activity 레벨에서는 할 수 없는 작업들이 존재하는데요.  
 Context를 이용해서 상위 Application 레벨의 API를 호출하여, 상위 레벨의 작업들을 수행할 수 있습니다.
 
-요약하자면, Context는 어플리케이션 실행에 관한 정보들과 관련된 자원 및 기능들을 제공하고 관리하는 역할을 합니다.
+요약하자면, Context는 애플리케이션 실행에 관한 정보들과 관련된 자원 및 기능들을 제공하고 관리하는 역할을 합니다.
 
 
 ### Context 의 두 종류
@@ -101,7 +101,7 @@ Context를 이용해서 상위 Application 레벨의 API를 호출하여, 상위
 
 **Application Context**
 
-Application Context는 어플리케이션 전역에서 사용되는 Context입니다.
+Application Context는 애플리케이션 전역에서 사용되는 Context입니다.
 [공식 문서](https://developer.android.com/reference/kotlin/android/content/Context#getapplicationcontext)에 나타나는 설명을 참고하여
 Application Context의 특징에 대해 살펴보겠습니다.  
 
@@ -151,7 +151,7 @@ Activity 안에서만 사용이 가능하며, 특정 Activitiy의 생명 주기�
 
 Context에는 Application Context와 Activity Context 두 종류가 있다는 것을 알았습니다.  
 그렇다면, 둘 중에 어떤 것을 사용해야 할까요? 아무 것이나 사용해도 되는 것일까요?  
-아닙니다. Context를 잘못 사용했다가는 어플리케이션의 비정상적인 종료를 유발할 수 있으므로, 각별한 주의가 필요합니다.  
+아닙니다. Context를 잘못 사용했다가는 애플리케이션의 비정상적인 종료를 유발할 수 있으므로, 각별한 주의가 필요합니다.  
 
 그렇다면 어떤 상황에서 어느 것을 사용해야 할까요? 이를 이해하기 위해서는 두 Context의 중요한 차이점에 대해 짚고 넘어가야 합니다.  
 두 Context의 가장 큰 차이점은 바로 Lifecycle, 즉 **생명 주기**입니다.  
@@ -186,7 +186,7 @@ Activity Context는 한 장면에서 배역에 따라 연기를 하는 배우들
 
 ![메모리_누수_문제_1](./technical_writing_images/메모리_누수_문제_1.png)
 예산 부족에 포인트를 두어 더 자세히 설명드리겠습니다.  
-Application Context를 사용하는 경우는 어플리케이션 전역에서 사용되는 객체, 또는 라이브러리가 Context가 필요한 경우입니다.  
+Application Context를 사용하는 경우는 애플리케이션 전역에서 사용되는 객체, 또는 라이브러리가 Context가 필요한 경우입니다.  
 DataBase 인스턴스 등을 사용할 때, Application Context가 필요합니다.  
 
 ![메모리_누수_문제_2](./technical_writing_images/메모리_누수_문제_2.png)
@@ -219,14 +219,14 @@ Activity Context를 사용해야하는 상황은 Activity와 같은 생명 주�
 Context를 통해 여러 가지 리소스를 얻어올 수 있는데, 그 중 하나는 Theme입니다.
 Context는 xml에서 설정한 Theme, 즉 테마에 대한 정보도 가지고 있습니다.
 그런데 Activity Context 대신 Application Context를 사용하게 된다면, Activity에서 사용되는 테마가 아닌 Application의 테마가 적용될 수 있습니다.   
-Application의 테마는 어플리케이션이 처음 실행되어 설정된 기본 테마를 의미합니다.
+Application의 테마는 애플리케이션이 처음 실행되어 설정된 기본 테마를 의미합니다.
 한 화면에 맞추어 디자인된 테마가 아니라 기본 테마가 설정된다면 UI 출력에 문제가 발생할 수 있습니다.
 
 ![dialog_applicaion_context](./technical_writing_images/dialog_applicaion_context.png)
 ![error_메시지](./technical_writing_images/error_메시지.png)
 또한 View를 그릴 때에 필요한 요소들 중 일부를 지원하지 않습니다. 대표적으로 Activity의 윈도우에 대한 접근이 불가능한데요.   
 만약 다이얼로그를 띄울 때 Activity Context가 아닌 Application Context를 넘겨주게 된다면,  
-다이얼로그 출력 시 Window 접근에 관련된 에러가 발생하며 어플리케이션이 강제 종료됩니다.   
+다이얼로그 출력 시 Window 접근에 관련된 에러가 발생하며 애플리케이션이 강제 종료됩니다.   
 
 
 # Context의 사용법
@@ -281,7 +281,7 @@ UI 작업은 여러 View나 Fragment 등 Activity 내부에서 이루어집니�
       // 문자열 리소스에 작성된 포맷 문자열을 가지고 와 동적으로 값을 넣을 수 있습니다.
       val formattedDate = context.getString(R.string.format_date, 2024, 10, 1)
       ```
-   - 색상 및 drawable 접근: 어플리케이션에 정의된 색상이나, 이미지, icon 등의 drawable을 가져올 때 사용됩니다.
+   - 색상 및 drawable 접근: 애플리케이션에 정의된 색상이나, 이미지, icon 등의 drawable을 가져올 때 사용됩니다.
       ```kotlin
       // 색상을 가져옵니다.
       val color = ContextCompat.getColor(context, R.color.primary_color)
@@ -331,7 +331,7 @@ UI 작업은 여러 View나 Fragment 등 Activity 내부에서 이루어집니�
      
 
 5. **파일 접근 및 저장**
-   - 어플리케이션 내부 또는 외부 파일 디렉터리에 파일을 저장하거나 불러올 때 사용합니다.
+   - 애플리케이션 내부 또는 외부 파일 디렉터리에 파일을 저장하거나 불러올 때 사용합니다.
       ```kotlin
       // getFilesDir, getExternalFilesDir 같은 메서드로 파일 경로를 얻습니다.
       val file = File(context.filesDir, "file.txt")
