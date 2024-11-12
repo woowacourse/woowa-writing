@@ -101,11 +101,7 @@ Activity가 실행되어 기능을 제공하거나 사용자와 상호작용을 
 > as well as up-calls for application-level operations
 > such as launching activities, broadcasting and receiving intents, etc.
 
-[안드로이드 공식 문서](https://developer.android.com/reference/kotlin/android/content/Context)에 나타나있는 설명입니다. 이를 해석하여 정리하면 아래와 같습니다.
-
-> 애플리케이션 환경에 관한 글로벌 인터페이스입니다. 추상클래스이며, 안드로이드 시스템에서 구현해줍니다.   
-> Context 는 애플리케이션의 특정 리소스와 클래스에 대한 접근 뿐 아니라, 
-> Activity 실행, Intent Broadcasting 과 Receiving 과 같은 상위 애플리케이션 레벨의 API 호출도 가능하게 해줍니다.
+[안드로이드 공식 문서](https://developer.android.com/reference/kotlin/android/content/Context)에 나타나있는 설명입니다. 정리하면 아래와 같습니다.
 
 - 애플리케이션 환경에 관한 글로벌 인터페이스
 - 추상 클래스로 구현되어 있으며, 안드로이드 시스템에서 구현체 제공
@@ -141,11 +137,7 @@ Application Context의 특징에 대해 살펴보겠습니다.
 > This generally should only be used if you need a Context whose lifecycle is separate from the current context, 
 > that is tied to the lifetime of the process rather than the current component.
 
-> 현재 프로세스의 단일 전역 Application 객체의 Context를 반환합니다.  
-> 현재의 구성요소가 아닌 전체 프로세스의 수명에 연결되어 있으며,  
-> 일반적으로 현재 화면 흐름과 별도의 생명주기를 가진 Context가 필요한 경우에만 사용하여야 합니다.
-
-하나 하나씩 살펴보겠습니다.
+위에서 설명한 Application Context의 특징을 하나씩 살펴보겠습니다.
 
 - 단일 전역 Application 객체의 Context를 반환
 
