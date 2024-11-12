@@ -2,7 +2,32 @@
 
 ---
 
-## 들어가며
+## 목차
+
+### Chapter 0: 들어가며
+
+### Chapter 1: Context란?
+- **Context는 맥락이다**
+- **안드로이드의 Context도 비슷해요!**
+- **안드로이드 Context의 정의**
+
+### Chapter 2: Context 더 이해하기
+- **Context의 두 종류**
+  - Application Context
+  - Activity Context
+- **두 Context의 차이점: 비유를 들어 이해하기**
+  - Application Context 대신 Activity Context를 사용한다면?
+  - Activity Context 대신 Application Context를 사용한다면?
+
+### Chapter 3: Context 올바르게 사용하기
+- **Context 사용의 기준: Lifecycle**
+- **Context 사용 예시: 코드로 이해하기**
+  - Activity Context가 필요한 상황
+  - Application Context가 필요한 상황
+
+<br>
+
+# Chapter 0: 들어가며
 안드로이드를 개발해 본 경험이 있으신가요? 그렇다면, Context에 대해서 잘 알고 계시나요?   
 아마 잘 알지는 못하더라도 최소한 한 번쯤 들어보았거나 직접 사용해 봤을 것입니다.
 
@@ -14,7 +39,11 @@ Context는 안드로이드 앱에서 매우 중요한 역할을 합니다.
 왜 비정상 종료라는 현상이 발생했고, 또 Context가 어떤 일을 하는 것인지 궁금해졌습니다.  
 그래서 제가 Context를 공부하며 이해한 내용을 바탕으로, 여러분께 Context가 무엇인지 비유를 들어 쉽게 설명해 드리려 합니다.
 
-# Context 란?
+<br>
+
+# Chapter 1: Context란?
+
+## Context는 맥락이다
 
 Context란 무엇일까요?
 
@@ -27,7 +56,7 @@ Context란, **문맥**, **맥락** 이라는 뜻을 가진 단어입니다.
 나이가 어떻게 되냐고 물었는데 개발을 정말 좋아한다고 대답한다면, 좀 뜬금없고 대화의 흐름이 어색하겠죠?
 이처럼 맥락은 이야기가 자연스럽게 이어질 수 있는 중요한 요소입니다.
 
-## 안드로이드의 Context
+## 안드로이드의 Context도 비슷해요!
 
 안드로이드에서의 **Context**도 크게 다르지 않습니다. 소설 또는 영화의 이야기 흐름에 빗대어서 설명하겠습니다.  
 
@@ -63,7 +92,7 @@ Activity가 실행되어 기능을 제공하거나 사용자와 상호작용을 
 정리하자면, 안드로이드에서의 **Context**는 애플리케이션의 **흐름 및 구성요소**, 현재 화면에서 보여주고 있는 것들에 대한 **흐름 및 구성요소**를 나타냅니다.  
 
 
-### 안드로이드에서의 Context의 정의
+## 안드로이드 Context의 정의
 **맥락**이라는 의미에 집중하면서, 공식 문서의 내용을 참고해 조금 더 자세하게 알아보겠습니다.
 
 > Interface to global information about an application environment.
@@ -89,8 +118,9 @@ Context를 이용해서 상위 Application 레벨의 API를 호출하여, 상위
 
 요약하자면, Context는 애플리케이션 실행에 관한 정보들과 관련된 자원 및 기능들을 제공하고 관리하는 역할을 합니다.
 
+<br>
 
-### Context 의 두 종류
+# Chapter 2: Context 더 이해하기
 
 앞서 애플리케이션을 소설과 영화에 빗대어 표현했습니다.  
 소설, 영화에서 전체 이야기를 관통하는 맥락과, 각 챕터 또는 하나의 사건에 대한 맥락으로 구분했습니다.  
@@ -99,7 +129,9 @@ Context를 이용해서 상위 Application 레벨의 API를 호출하여, 상위
 
 이렇게 두 가지의 Context로 분류되며, 각각 Application Context와 Activity Context라고 합니다.
 
-**Application Context**
+## Context의 두 종류
+
+### Application Context
 
 Application Context는 애플리케이션 전역에서 사용되는 Context입니다.
 [공식 문서](https://developer.android.com/reference/kotlin/android/content/Context#getapplicationcontext)에 나타나는 설명을 참고하여
@@ -129,7 +161,7 @@ Application 의 생명 주기와 연결되어있다는 것을 의미하며, 앱�
 
 <br/>
 
-**Activity Context**
+### Activity Context
 
 다음으로는 Activity Context의 특징을 살펴보겠습니다.
 
@@ -145,9 +177,7 @@ Activity 안에서만 사용이 가능하며, 특정 Activitiy의 생명 주기�
 
 이 역시 Activity Context를 사용할 때의 주의점입니다. 곧 이에 대해서도 설명을 이어나가겠습니다.
 
-## Context 올바르게 사용하기
-
-### 두 Context의 차이점
+## 두 Context의 차이점: 비유를 들어 이해하기
 
 Context에는 Application Context와 Activity Context 두 종류가 있다는 것을 알았습니다.  
 그렇다면, 둘 중에 어떤 것을 사용해야 할까요? 아무 것이나 사용해도 되는 것일까요?  
@@ -162,12 +192,12 @@ Context에는 Application Context와 Activity Context 두 종류가 있다는 �
 
 즉, Activity 의 생명 주기에 종속되어 있느냐(Activitiy Context), 그렇지 않느냐(Application Context)에 따라 사용하는 Context가 달라집니다.
 
-### 아무거나 쓰면 안되는 이유 : 비유를 통해 이해하기
+<br>
 
 사실 위의 두 주의점을 보아서는, 잘못 사용하게 되었을 때 어떠한 문제점이 나타날 수 있는지를 알기 어렵습니다.  
 그래서, 이번에도 간단한 비유를 들어서 쉽게 접근해보겠습니다.
 
-**Application Context 대신 Activity Context를 사용한다면?**
+### Application Context 대신 Activity Context를 사용한다면?
 
 ![activity_context의_잘못된_사용_비유](./technical_writing_images/activity_context의_잘못된_사용_비유.png)
 영화 촬영에 빗대어 보겠습니다.  
@@ -201,7 +231,7 @@ Activity에 의해 메모리 누수가 발생한 상황에서, 다른 Activity�
 
 > Activity Context 라는 배우가 계속 남아서 일을 하게 되면서 인건비가 증가하고, 결국에는 메모리라는 예산이 부족해질 수 있습니다.
 
-**Activity Context 대신 Application Context를 사용한다면?**
+### Activity Context 대신 Application Context를 사용한다면?
 
 메모리 누수 현상을 피하기 위해서 Application Context만 사용해도 되지 않을까요? 
 그렇지 않습니다. 이 역시도 영화 촬영에 비유해서 설명해보겠습니다.
@@ -228,18 +258,17 @@ Application의 테마는 애플리케이션이 처음 실행되어 설정된 기
 만약 다이얼로그를 띄울 때 Activity Context가 아닌 Application Context를 넘겨주게 된다면,  
 다이얼로그 출력 시 Window 접근에 관련된 에러가 발생하며 애플리케이션이 강제 종료됩니다.   
 
+<br>
 
-# Context의 사용법
+# Chapter 3: Context 올바르게 사용하기
 
-## Context 사용의 기준
+## Context 사용의 기준: Lifecycle
 
 이렇듯 다양한 리소스와 기능들을 제공해주고 여러 방면에서 활용되는 Context이지만, 잘못 사용하게 될 경우에는 치명적일 수 있습니다.  
 그렇다면 이 Context를 어떻게 적절하게 사용해야 할까요?   
-명확한 기준이 있다면 좋겠지만, 상황과 개발 환경에 따라서 달라질 수 있기 때문에 확실한 기준을 세우기 어렵습니다.
+명확한 기준이 있다면 좋겠지만, 상황과 개발 환경에 따라서 달라질 수 있기 때문에 확실한 기준을 세우기 어렵습니다.  
 
-### Lifecycle을 기준으로!
-
-그래도 저희는 확실하지 않지만, 어림 짐작으로 힌트를 얻을 수 있습니다. 바로 생명 주기입니다. 
+그래도 저희는 확실하지 않지만, 어림 짐작으로 힌트를 얻을 수 있습니다. 바로 생명 주기입니다.  
 
 ![생명주기_1](./technical_writing_images/생명주기_1.png)
 Context를 넘겨받는다는 것은 결국 Context를 넘겨주는 객체, 즉 Activity 또는 Application의 생명 주기에 종속된다는 것을 의미합니다. 
@@ -257,12 +286,12 @@ UI 작업은 여러 View나 Fragment 등 Activity 내부에서 이루어집니�
 결국 View 에 관련된 작업은 Activity의 생명주기에 종속된다는 의미이므로, Activity Context를 넘겨주는 것입니다.   
 
 
-## Context 사용 예시
+## Context 사용 예시: 코드로 이해하기
 
 지금까지 Context의 개념과 특성에 대해 비유를 통해 알아보았고, 사용 시에 어떤 주의점이 있는지도 알아보았습니다.  
 그렇다면 이 Context를 구체적으로 어떤 상황에서 사용할 수 있는지를 살펴보겠습니다.
 
-### Context가 필요한 다양한 상황
+### Activity Context가 필요한 상황
 
 안드로이드에서 Context를 사용하여 앱의 다양한 요소들에 접근할 수 있는데요.   
 주로 아래와 같은 상황에서 사용할 수 있습니다. 사용 예시 코드와 함께 첨부했습니다.
@@ -354,6 +383,9 @@ UI 작업은 여러 View나 Fragment 등 Activity 내부에서 이루어집니�
       // Activity, 또는 Fragment에서 토스트를 띄울 때, Context를 사용합니다.
       Toast.makeText(context, "Hello!", Toast.LENGTH_SHORT).show()
       ```
+
+### Application Context가 필요한 상황
+추후 작성 예정
 
 ## 결론
 이렇듯 Context는 안드로이드 앱에서 중요한 요소들을 관리하고 접근할 수 있는, 매우 필수적인 객체입니다.   
