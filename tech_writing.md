@@ -21,7 +21,7 @@
 - 원래의 `Context`를 변경하지 않고 원하는 동작만 수정하기 위해 사용
 
 
-```
+``` java
 public class ContextWrapper extends Context {
     @UnsupportedAppUsage
     Context mBase;
@@ -42,7 +42,7 @@ public class ContextWrapper extends Context {
 `ContextThemeWrapper`는 `ContextWrapper`의 wrapper입니다.
 `Context`의 테마를 수정하거나 교체할 때 사용합니다.
 
-```
+```java
 public class ContextThemeWrapper extends ContextWrapper {
 
     public ContextThemeWrapper() {
@@ -69,7 +69,7 @@ public class ContextThemeWrapper extends ContextWrapper {
 Activity의 `attachBaseContext()` 메서드를 이용해 `mBase`를 초기화합니다.
 
 
-```
+```java
 @UiContext
 public class Activity extends ContextThemeWrapper {
 
@@ -117,7 +117,7 @@ public class ContextWrapper extends Context {
 
 그리고 `attachBaseContext()` 메서드는 Activity 내 `attach` 메서드 내부에서 호출됩니다. 
 
-```
+```java
 @UnsupportedAppUsage(maxTargetSdk = Build.VERSION_CODES.R, trackingBug = 170729553)
 final void attach(Context context, ActivityThread aThread,
         Instrumentation instr, IBinder token, int ident,
@@ -135,7 +135,7 @@ final void attach(Context context, ActivityThread aThread,
 - `ActivityThread`는 애플리케이션 프로세스에서 메인 스레드의 실행을 관리하고, 활동, 브로드캐스트 및 기타 작업을 예약 및 실행하며, 활동 관리자가 요청하는 대로 activity manager가 요청하는 작업을 관리합니다.
 
 
-```
+```java
 /**  Core implementation of activity launch. */
 private Activity performLaunchActivity(ActivityClientRecord r, Intent customIntent) {
 
@@ -186,7 +186,7 @@ Context가 생성되는 과정을 정리하면 다음과 같습니다.
 
 우선은 함수가 호출되는 순서를 먼저 설명하겠습니다.
 
-```
+```java
 public static void main(String[] args) {
         Trace.traceBegin(Trace.TRACE_TAG_ACTIVITY_MANAGER, "ActivityThreadMain");
 
@@ -209,7 +209,7 @@ public static void main(String[] args) {
 
 `ActivityThread` 내부에서 `thread.attach(false, startSeq)`를 통해 `ApplicationContext`가 초기화되고 생성됩니다.
 
-```
+```java
 @UnsupportedAppUsage
 private void attach(boolean system, long startSeq) {
     sCurrentActivityThread = this;
@@ -237,7 +237,7 @@ private void attach(boolean system, long startSeq) {
 
 그 후 `ApplicationThread`를 통해 Handler로 메시지를 받아, 메시지의 데이터를 이용해 `handleBindApplication`메서드를 통해 `Application`을 생성합니다.
 
-```
+```java
 @UnsupportedAppUsage
 private void handleBindApplication(AppBindData data) {
     app = data.info.makeApplicationInner(data.restrictedBackupMode, null);
@@ -250,7 +250,7 @@ private void handleBindApplication(AppBindData data) {
 
 이렇게 하여, `mInitialApplication`가 초기화 되고, `currentApplication` 메서드를  통해 Applicaton 객체를 싱글톤으로 가져오게 됩니다.
 
-```
+```java
 @UnsupportedAppUsage
 public static Application currentApplication() {
     ActivityThread am = currentActivityThread();
@@ -279,7 +279,7 @@ public static Application currentApplication() {
 
 그렇다면, `ApplicationContext`를 생성하기 위해 어떤 정보가 필요할까요?
 
-```
+```java
 private void handleBindApplication(AppBindData data) {
 
     // ...
@@ -297,7 +297,7 @@ private void handleBindApplication(AppBindData data) {
 
 `makeApplication` 코드 내부는 다음과 같습니다.
 
-```
+```java
 private Application makeApplicationInner(boolean forceDefaultAppClass,
        Instrumentation instrumentation, boolean allowDuplicateInstances) {
 
@@ -318,7 +318,7 @@ makeApplication 메서드에서는 `ContextImpl#createAppContext`를 이용해 C
 
 ContextImpl 내부를 보면
 
-```
+```java
 class ContextImpl extends Context {
     // ...
 
@@ -358,7 +358,7 @@ class ContextImpl extends Context {
 
 - `Intrumentation`은 어플리케이션 계측 코드 구현을 위한 베이스 클래스 입니다.
 
-```
+```java
 public Application newApplication(ClassLoader cl, String className, Context context)
         throws InstantiationException, IllegalAccessException, 
         ClassNotFoundException {
@@ -378,7 +378,7 @@ public Application newApplication(ClassLoader cl, String className, Context cont
 
 다시 돌아와 `ActivityThread#performLaunchActiviy`를 보겠습니다.
 
-```
+```java
 static ContextImpl createActivityContext(ActivityThread mainThread,
         LoadedApk packageInfo, ActivityInfo activityInfo, IBinder activityToken, int displayId,
         Configuration overrideConfiguration) {
