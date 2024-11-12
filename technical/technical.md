@@ -187,7 +187,7 @@ class OfferingPagingSource(
 <br>
 
 - `closestPageToPosition(anchorPosition)`
-    - 현재 스크롤 위치와 가장 가까운 페이지 정보를 반환한ㄴ다.
+    - 현재 스크롤 위치와 가장 가까운 페이지 정보를 반환한다.
 
 <br>
 
@@ -270,7 +270,7 @@ class OfferingAdapter : PagingDataAdapter<Offering, OfferingViewHolder>(productC
 
 Paging 라이브러리에서 제공하는 `PagingDataAdapter`를 확장하여 Adapter를 만들어 줍니다.
 
-또한 Adpater는 `DiffUtil.ItemCallback`을 지정해주어야 합니다.
+또한 Adpater는 `DiffUtil.ItemCallback`을 지정해주어야 한다.
 
 
 ## 검색과 필터기능 추가하기
