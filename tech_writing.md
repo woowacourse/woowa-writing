@@ -42,6 +42,8 @@ public class ContextWrapper extends Context {
 `ContextThemeWrapper`는 `ContextWrapper`의 wrapper입니다.
 `Context`의 테마를 수정하거나 교체할 때 사용합니다.
 
+Activity는 `ContextThemeWrapper`를 상속받고 있기 때문에, 해당 클래스의 메서드를 거쳐서 context를 생성합니다.
+
 ```java
 public class ContextThemeWrapper extends ContextWrapper {
 
@@ -64,9 +66,11 @@ public class ContextThemeWrapper extends ContextWrapper {
 
 ### `Activity`
 
-그렇다면 context는 어떻게 초기화될까요?
+지금까지 context 구현체에 대해 설명했습니다.
 
-Activity의 `attachBaseContext()` 메서드를 이용해 `mBase`를 초기화합니다.
+그렇다면 context는 어떠한 과정을 거쳐 초기화될까요?
+
+우선 Activity는 `attachBaseContext()` 메서드를 이용해 `mBase`를 초기화합니다.
 
 
 ```java
