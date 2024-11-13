@@ -25,6 +25,8 @@
   - Activity Context가 필요한 상황
   - Application Context가 필요한 상황
 
+---
+
 <br>
 
 # Chapter 0: 들어가며
@@ -383,3 +385,9 @@ UI 작업은 여러 View나 Fragment 등 Activity 내부에서 이루어집니�
 이렇듯 Context는 안드로이드 앱에서 중요한 요소들을 관리하고 접근할 수 있는, 매우 필수적인 객체입니다.   
 Context의 개념을 잘 이해하고, 사용 시 주의점을 잘 지켜내어 올바르게 접근하는 것이 중요합니다.   
 
+### 출처
+
+- [안드로이드 공식 문서 - Context](https://developer.android.com/reference/kotlin/android/content/Context)
+- [안드로이드 공식 문서 - ApplicationContext](https://developer.android.com/reference/kotlin/android/content/Context#getapplicationcontext)
+- [[Android] Context, 너 대체 뭐야?](https://velog.io/@haero_kim/Android-Context-%EB%84%88-%EB%8C%80%EC%B2%B4-%EB%AD%90%EC%95%BC)
+- [[Java]가비지 컬렉터(Garbage Collector)란?](https://velog.io/@yarogono/Java%EA%B0%80%EB%B9%84%EC%A7%80-%EC%BB%AC%EB%A0%89%ED%84%B0Garbage-Collector%EB%9E%80)
