@@ -15,6 +15,12 @@ Foreground Service에 대해 딱 알기 위해서 아주 간단한 예시를 들
 
 ## 서비스 만들기
 
+공식 문서에서는 Service 클래스를 상속받으라 설명되어 있다.
+그러나 Service는 onCreate, onStartCommand, onBind, onDestroy 등으로 생명주기를 직접 관리해야 한다.
+반면에 LifecycleService는 LifecycleOwner 인터페이스를 구현하여 이런 관리를 조금 쉽게 다룰 수 있댜.
+(coroutine이 언제 살고 언제 죽어야 하는지 등.. aac viewmodel과 viewmodelscope를 생각해보면 감아 올 것)
+자세히 알아보지는 않고, 한번 import하고 적어나 보자.
+
 먼저 gradle에 필요한 의존성을 넣는다.
 
 ```xml
