@@ -117,6 +117,16 @@ notification을 보여주려면 권한도 필요한데, 마찬가지로 자세�
 
 이후에 서비스의 onStartCommand에서 startForeground를 호출해 주면 된다.
 
+### onStartCommand의 리턴값은 대체 뭐지?
+
+onStartCommand의 리턴값은, 만약 시스템에 의해 우리 서비스가 종료될 경우 (배터리가 부족하거나, 메모리가 모자라거나 할 때) 어떻게 대처할지를 정한다고 보면 된다. 이 리턴값은 몇 가지가 있는데,
+
+- START_STICKY: 강제 종료된 후 재시작하나, onStartCommand의 Intent에 null을 전달.
+- START_NOT_STICKY: 강제 종료된 후 재시작하지 않기.
+- START_REDELIVER_INTENT는 강제 종료되면 null이 아닌 기존의 Intent를 다시 전달한다.
+
+다만 START_STICKY의 경우 “서비스 다시 켜줘”라고 시스템에 보내는 요청일 뿐 반드시 받아들여지는가는 보장을 못 하는 것 같다. (예: 서비스가 비정상적으로 반복해서 종료되는 경우)
+
 ```kotlin
 //MyForegroundService
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -167,17 +177,9 @@ onStartCommand는 외부(액티비티 등)에서 startService로 서비스를 �
 
 새로 만들어지는 건 아니고, 이미 만들어진 서비스에 Intent만 다시 전달한다고 보면 될 것 같다. (startService로 Intent를 보내고 onStartCommand에서 Intent를 받고..)
 
-### 2. onStartCommand의 리턴값은 대체 뭐지?
 
-onStartCommand의 리턴값은, 만약 시스템에 의해 우리 서비스가 종료될 경우 (배터리가 부족하거나, 메모리가 모자라거나 할 때) 어떻게 대처할지를 정한다고 보면 된다. 이 리턴값은 몇 가지가 있는데,
 
-- START_STICKY: 강제 종료된 후 재시작하나, onStartCommand의 Intent에 null을 전달.
-- START_NOT_STICKY: 강제 종료된 후 재시작하지 않기.
-- START_REDELIVER_INTENT는 강제 종료되면 null이 아닌 기존의 Intent를 다시 전달한다.
-
-다만 START_STICKY의 경우 “서비스 다시 켜줘”라고 시스템에 보내는 요청일 뿐 반드시 받아들여지는가는 보장을 못 하는 것 같다. (예: 서비스가 비정상적으로 반복해서 종료되는 경우)
-
-### 3. 왜 onStartCommand에서 startForeground를 호출하는 거야?
+### 2. 왜 onStartCommand에서 startForeground를 호출하는 거야?
 
 startForegroundService가 호출된 뒤 5초 안에 startForeground가 호출되어야 한다고 했었다. startService시에 바로 실행되는 onStartCommand에서 startForeground를 하는 게 아무래도 상식에 맞겠지? 거기에 더해 이 작업을 서비스를 호출하는 곳마다 작성한다면, 같은 로직인데 여러 군데 분산되니 관리하기 힘들다는 이유도 있다.
 
