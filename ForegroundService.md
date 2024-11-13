@@ -54,56 +54,9 @@ class MyForegroundService: LifecycleService() {}
 
 manifest에 추가로 서비스에 대한 권한을 등록하자.
 
-마찬가지로, 작업에 대한 권한도 같이 요청해야 한다.
+마찬가지로, 작업에 대한 권한도 같이 요청해야 한다. 위치 작업에 관련된 권한과 서비스 권한들이다.
 
-예시로 위치 작업에 관련된 서비스 권한을 요청했다.
-
-```xml
-<manifest...>
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION"/>
-```
-
-추가적으로, 위치작업과 관련된 권한도 작성했다.
-
-```xml
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
-```
-
-예시로 들기 위한 위치 권한은 런타임에서 유저에게 권한을 또 얻어야 하니, 관련 코드를 작성해 주었다.
-
-```kotlin
-class MainActivity: AppCompatActivity() {    
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        requestLocationPermission()
-    }
-
-    private fun requestLocationPermission() {
-        val locationPermissionRequest = registerForActivityResult(
-            ActivityResultContracts.RequestMultiplePermissions()
-        ) { permissions ->
-            when {
-                permissions.getOrDefault(android.Manifest.permission.ACCESS_FINE_LOCATION, false) -> {
-                    // Precise location access granted.
-                }
-                permissions.getOrDefault(android.Manifest.permission.ACCESS_COARSE_LOCATION, false) -> {
-                    // Only approximate location access granted.
-                } else -> {
-                // No location access granted.
-            }
-            }
-        }
-        locationPermissionRequest.launch(arrayOf(
-            android.Manifest.permission.ACCESS_FINE_LOCATION,
-            android.Manifest.permission.ACCESS_COARSE_LOCATION)
-        )
-    }
-}
-```
+이것들은 공식 홈페이지에 친절하게 설명되어 있으므로 자세한 설명은 생략한다.
 
 여기에 서비스를 시작해 주는 코드를 더하면…
 
@@ -156,49 +109,7 @@ class MyForegroundService: Service {
 }
 ```
 
-notification을 보여주려면 권한도 필요하다.
-
-manifest에 알림 권한을 작성해 주고
-
-```kotlin
-<uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
-```
-
-마찬가지로 권한 요청 코드 작성을 해주면
-
-```kotlin
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        requestLocationPermission()
-        requestNotificationPermission()
-        findViewById<TextView>(R.id.tv_hello).setOnClickListener {
-            startService()
-        }
-    }
-    
-    private fun requestNotificationPermission() {
-        if (ContextCompat.checkSelfPermission(
-                this, android.Manifest.permission.POST_NOTIFICATIONS
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                if (shouldShowRequestPermissionRationale(android.Manifest.permission.POST_NOTIFICATIONS)) {
-                    // 권한 요청 거부한 경우
-                } else {
-                    requestPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
-                }
-            } else {
-                // 안드로이드 12 이하는 Notification에 관한 권한 필요 없음
-            }
-        }
-    }
-
-    private val requestPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { isGranted: Boolean ->
-    }
-```
+notification을 보여주려면 권한도 필요한데, 마찬가지로 자세한 설명은 생략한다.
 
 알람에 관한 작업 끝.
 
