@@ -66,10 +66,10 @@ manifest에 추가로 서비스에 대한 권한을 등록하자.
     requestPermission()
     startService()
 ...
-    private fun startService() {
-        val intent = Intent(applicationContext, MyForegroundService::class.java)
-        startForegroundService(intent)
-    }
+private fun startService() {
+    val intent = Intent(applicationContext, MyForegroundService::class.java)
+    startForegroundService(intent)
+}
 ```
 
 끝인 줄 알았지? 아직 남았다.
@@ -129,28 +129,28 @@ onStartCommand의 리턴값은, 만약 시스템에 의해 우리 서비스가 �
 
 ```kotlin
 //MyForegroundService
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        super.onStartCommand(intent, flags, startId)
+override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+    super.onStartCommand(intent, flags, startId)
 
-        val notification = getNotification()
-        startForeground(1, notification)
+    val notification = getNotification()
+    startForeground(1, notification)
 
-        return START_STICKY
-    }
+    return START_STICKY
+}
 ```
 
 마지막으로 텍스트를 누르면 서비스가 시작되도록 만들자.
 
 ```kotlin
 //MainActivity
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        requestPermission()
-        findViewById<TextView>(R.id.tv_hello).setOnClickListener {
-            startService()
-        }
+override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    setContentView(R.layout.activity_main)
+    requestPermission()
+    findViewById<TextView>(R.id.tv_hello).setOnClickListener {
+        startService()
     }
+}
 ```
 
 버튼을 눌러보면..
@@ -201,21 +201,21 @@ onDestroy는 시스템에 의해 서비스가 종료되거나, 서비스 외부�
 
 ```kotlin
 //MyForegroundService
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        super.onStartCommand(intent, flags, startId)
+override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+    super.onStartCommand(intent, flags, startId)
 
-        val notification = getNotification()
-        startForeground(1, notification)
-        Log.d("MyForegroundService", "onStartCommand")
-        stopSelf()
-        return START_STICKY
-    }
+    val notification = getNotification()
+    startForeground(1, notification)
+    Log.d("MyForegroundService", "onStartCommand")
+    stopSelf()
+    return START_STICKY
+}
     
-    override fun onDestroy() {
-        super.onDestroy()
-        Log.d("MyForegroundService", "onDestroy")
-        job.cancel()
-    }
+override fun onDestroy() {
+    super.onDestroy()
+    Log.d("MyForegroundService", "onDestroy")
+    job.cancel()
+}
 ```
 
 다음과 같이 onDestroy가 호출되는 것을 볼 수 있다.
