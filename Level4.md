@@ -296,7 +296,7 @@ public class InMemoryCredentialRepository implements CredentialRepository {
 패스키를 검증하기 위해선 아래의 순서대로 요청해야 한다.
 
 ```
-1. 인증 요청할 계정 정보를 서버에 전달(/assert/requset)
+1. 인증 요청할 계정 정보를 서버에 전달(/assert/request)
   - 서버는 인증할 계정 정보를 바탕으로 challenge를 생성
   - challenge 정보는 검증을 위해 세션에 저장 후 클라이언트에게 전달
 2. 클라이언트는 전달받은 challenge 정보를 바탕으로 패스키를 인증
