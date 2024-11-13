@@ -155,7 +155,7 @@ override fun onCreate(savedInstanceState: Bundle?) {
 
 버튼을 눌러보면..
 
-<img width="207" alt="스크린샷 2024-10-01 17 40 44" src="https://github.com/user-attachments/assets/727c6f6a-ea0c-4317-82e3-071fc4ad7fd9">
+<img width="414" alt="스크린샷 2024-10-01 17 40 44" src="https://github.com/user-attachments/assets/727c6f6a-ea0c-4317-82e3-071fc4ad7fd9">
 <br>
 잘 된다.
 
