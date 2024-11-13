@@ -94,7 +94,7 @@ where
 	m1_0.name=?
 ```
 
-와 같이 `UPDATE` 문이 없고, `SELECT` 문만 존재합니다.
+와 같이 `UPDATE` 문이 없고 `SELECT` 문만 존재합니다.
 분명히, JPA 는 엔티티의 변경을 감지하고 DB에 flush 를 한다고 설명을 들은거 같은데요.(Dirty Check)
 
 ```java
@@ -121,7 +121,7 @@ MANUAL 은 간단하게 설명하면
 - 스냅샷(기존 엔티티를 저장해 상태를 비교하는 용)을 사용하지 않습니다.
 - 명시적으로 호출하지(`session.flush`) 않으면 DB 에 어떤 변경 사항도 반영하지 않습니다.
 
-그렇기에, JPA 는 viewCount 가 1 증가한 것을 알지 못하며, 반영하지 않습니다.
+그렇기에, JPA 는 viewCount 가 1 증가한 것을 알지 못하며 반영하지 않습니다.
 
 ```java
 @Transactional  
@@ -181,7 +181,7 @@ public MemberResponse getMember(final String name) {
 }
 ```
 
-로그인을 하고, 회원 정보를 가져오는 로직을 예시로 들어보겠습니다.
+로그인을 하고 회원 정보를 가져오는 로직을 예시로 들어보겠습니다.
 실행을 하면?
 
 `java.sql.SQLException: The MySQL server is running with the --read-only option so it cannot execute this statement`
@@ -194,7 +194,7 @@ public MemberResponse getMember(final String name) {
 
 > Open Session In View
 
-직역하면, `View 영역까지 세션이 열려있다.` 이며,
+직역하면 `View 영역까지 세션이 열려있다.` 이며,
 좀 더 풀어보자면 하나의 HTTP 요청 동안 **동일한 JPA 영속성 컨텍스트**를 유지하는 것을 의미합니다.
 
 이 말은 두 가지의 특징을 포함합니다.
@@ -210,7 +210,7 @@ public MemberResponse getMember(final String name) {
 ### 실제 확인
 
 위의 말이 사실인지 확인하기 위해 현재 연결된 Connection 의 정보를 가져와보겠습니다.
-( 로그를 확인한 방법은 ... 를 참고해주세요. )
+( 로그를 확인한 방법은 [util 패키지](https://github.com/youngsu5582/open-in-view-study/tree/main/src/main/java/joyson/openinviewtest/util) 를 참고해주세요. )
 
 > 이때 `dataSource.getConnection` 을 통해서는 유의미한 확인을 할 수 없습니다.
 > 말 그대로, `Transactional` 에 맞게 새로운 연결을 받아오는 것이므로 기존 연결이 아닙니다.
@@ -273,7 +273,7 @@ No entity keys found
 }
 ```
 로직도 성공적으로 작동하는데 끝일까요...? 단순, 설정을 끄는게 뭔가 꺼림칙 하지 않나요?
-그러므로, 좀 더 알아보겠습니다.
+좀 더 알아보겠습니다.
 
 <img width="500" alt="image" src="https://i.imgur.com/g52XJuf.jpeg">
 
@@ -293,11 +293,11 @@ open-in-view 가 활성화 되어 있어서 뷰 렌더링( JSP,Thymeleaf ) 중�
 
 와 같이 경고가 뜨는걸 볼 수 있습니다. 무조건 사용하지 않아야 하는 `Deprecated` 적인 요소일까요?
 
-그렇지 않습니다. 이에 대해서는 아직도 뜨거울 수도 있는 논쟁입니다. ( 그렇기에, 제목으로 어그로를 끌었고요 🙂🙂 )
+이에 대해서는 아직도 뜨거울 수도 있는 논쟁입니다. ( 그렇기에 제목으로 어그로도 끌었고요 🙂🙂 )
 ( [What is this spring.jpa.open-in-view=true property in Spring Boot?](https://stackoverflow.com/questions/30549489/what-is-this-spring-jpa-open-in-view-true-property-in-spring-boot) - 9년전에 물어봤지만, 1달 전에도 수정이 되고 있습니다. )
 ( [A Guide to Spring’s Open Session in View](https://www.baeldung.com/spring-open-session-in-view) OSIV 에 대한 설명이 자세히 담겨 있습니다. )
 
-그러면 반대편의 입장으로, OSIV 를 쓰지 않았을 때 발생한 (`+`가능성이 있는) 문제점들에 대해 살펴보겠습니다.
+그러면 반대편의 입장으로 OSIV 를 쓰지 않았을 때 발생한 (`+`가능성이 있는) 문제점들에 대해 살펴보겠습니다.
 
 ### 매번 새로운 연결, 새로운 영속성 컨텍스트
 
@@ -467,7 +467,7 @@ A의 계좌에서 추가적으로 20만원을 인출한다.
 - 커넥션으로 인한 성능 저하 
 와 같은 문제점들이 발생할 수 있습니다.
 
-그러면, `처음부터 키면 되는거 아닌가?`
+그러면 `처음부터 키면 되는거 아닌가?`
 라고 생각할 수는 있지만 도움을 주는 `슈가 코드` 가 아닌 `관리 포인트 & 제어할 수 없는 포인트` 만 늘어난다고 생각합니다.
 
 이런 관점도 있으니 참고만 해주세요!
