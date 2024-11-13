@@ -293,15 +293,15 @@ open-in-view 가 활성화 되어 있어서 뷰 렌더링( JSP,Thymeleaf ) 중�
 
 와 같이 경고가 뜨는걸 볼 수 있습니다. 무조건 사용하지 않아야 하는 `Deprecated` 적인 요소일까요?
 
-이에 대해서는 아직도 뜨거울 수도 있는 논쟁입니다. ( 그렇기에 제목으로 어그로도 끌었고요 🙂🙂 )
-( [What is this spring.jpa.open-in-view=true property in Spring Boot?](https://stackoverflow.com/questions/30549489/what-is-this-spring-jpa-open-in-view-true-property-in-spring-boot) - 9년전에 물어봤지만, 1달 전에도 수정이 되고 있습니다. )
+이에 대해서는 아직도 뜨거울 수도 있는 논쟁입니다. ( 그렇기에 제목으로 어그로도 끌었고요 🙂🙂 ) <br>
+( [What is this spring.jpa.open-in-view=true property in Spring Boot?](https://stackoverflow.com/questions/30549489/what-is-this-spring-jpa-open-in-view-true-property-in-spring-boot) - 9년전에 물어봤지만, 1달 전에도 수정이 되고 있습니다. ) <br>
 ( [A Guide to Spring’s Open Session in View](https://www.baeldung.com/spring-open-session-in-view) OSIV 에 대한 설명이 자세히 담겨 있습니다. )
 
 그러면 반대편의 입장으로 OSIV 를 쓰지 않았을 때 발생한 (`+`가능성이 있는) 문제점들에 대해 살펴보겠습니다.
 
 ### 매번 새로운 연결, 새로운 영속성 컨텍스트
 
-극단적으로, 컨트롤러 내 각각의 트랜잭션 내에서 작업을 해야 하는 경우가 있다고 가정해보겠습니다.
+극단적으로, 컨트롤러 내 각각 트랜잭션 내에서 작업을 해야 하는 경우가 있다고 가정해보겠습니다.
 
 ```java
 @GetMapping("/login")  
@@ -358,7 +358,7 @@ where
 	id=?
 ```
 
-### 영속 관리의 어려움
+### 영속 관리의 어려움
 
 다른 트랜잭션의 도메인을 실수로 사용할 수 있습니다.
 아니 누가 그런 실수를? 라고 할 수 있지만
