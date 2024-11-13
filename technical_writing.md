@@ -243,7 +243,7 @@ Activity Context를 사용해야하는 상황은 Activity와 같은 생명 주�
 Context에 접근하여 여러 가지 리소스를 얻어올 수 있는데, 그 중 하나는 Theme입니다.
 Context는 xml에서 설정한 Theme, 즉 테마에 대한 정보도 가지고 있습니다.
 그런데 Activity Context 대신 Application Context를 사용하면, Activity에서 사용하는 테마가 아닌 Application의 테마가 적용될 수 있습니다.   
-Application의 테마는 애플리케이션이 처음 실행되어 설정된 기본 테마를 의미합니다.
+Application의 테마란 애플리케이션 전역에 설정된 기본 테마를 의미합니다.
 한 화면에 맞추어 디자인된 테마가 아니라 기본 테마가 설정되면 UI 출력에 문제가 발생할 수 있습니다.
 
 ![dialog_applicaion_context](./technical_writing_images/dialog_applicaion_context.png)
