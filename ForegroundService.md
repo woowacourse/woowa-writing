@@ -117,7 +117,7 @@ notification을 보여주려면 권한도 필요한데, 마찬가지로 자세�
 
 이후에 서비스의 onStartCommand에서 startForeground를 호출해 주면 된다.
 
-### onStartCommand의 리턴값은 대체 뭐지?
+### onStartCommand의 리턴값
 
 onStartCommand의 리턴값은, 만약 시스템에 의해 우리 서비스가 종료될 경우 (배터리가 부족하거나, 메모리가 모자라거나 할 때) 어떻게 대처할지를 정한다고 보면 된다. 이 리턴값은 몇 가지가 있는데,
 
