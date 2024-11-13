@@ -225,7 +225,7 @@ public class InMemoryCredentialRepository implements CredentialRepository {
 패스키를 등록하기 위해선 아래의 순서대로 요청해야 한다.
 
 ```
-1. 등록할 계정 정보를 서버에 전달(/register/requset)
+1. 등록할 계정 정보를 서버에 전달(/register/request)
   - 서버는 계정 정보를 바탕으로 RelyingParty를 이용해 challenge 요청 값 생성
   - 요청 값은 재사용을 위해 세션에 저장
 2. 클라이언트는 서버가 전달한 값을 이용해 패스키 정보 생성
