@@ -67,49 +67,6 @@ manifest에 추가로 서비스에 대한 권한을 등록하자.
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
 ```
 
-지금까지 작성한 manifest는 아래와 같다.
-
-```xml
-<?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
-
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
-
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION"/>
-
-    <application
-        android:allowBackup="true"
-        android:dataExtractionRules="@xml/data_extraction_rules"
-        android:fullBackupContent="@xml/backup_rules"
-        android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
-        android:supportsRtl="true"
-        android:theme="@style/Theme.ImmortalServiceExample"
-        tools:targetApi="31">
-        <service
-            android:name=".MyForegroundService"
-            android:foregroundServiceType="location"
-            android:exported="false">
-        </service>
-        <activity
-            android:name=".MainActivity"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-    </application>
-
-</manifest>
-
-```
-
 예시로 들기 위한 위치 권한은 런타임에서 유저에게 권한을 또 얻어야 하니, 관련 코드를 작성해 주었다.
 
 ```kotlin
