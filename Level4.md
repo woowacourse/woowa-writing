@@ -1,5 +1,7 @@
 
-# 패스키(Passkey)란 무엇인가
+# 패스키(Passkey) 구현하기
+
+## 패스키란 무엇인가
 
 패스키(Passkey)는 사이트에 로그인 할 때 패스워드 없이 가지고 있는 기기(핸드폰, 노트북 등)를 이용하여 인증하는 방식이다.
 
@@ -63,14 +65,13 @@ FIDO alliance 따르면 패스워드로 인한 피해는 아래와 같이 나타
 
 ## 패스키 구현
 
-패스키는 Web Authentication API(WebAuthn)을 사용하여 구현이 가능하다. webAuthn은 FIDO2 기반 인증을 구현하기 위한 웹 표준 기술이다. 즉 패스키는 FIDO2 기반 인증 기술을 구현한 구현체라고 생각하면 된다.
+패스키는 Web Authentication API(WebAuthn)을 사용하여 구현이 가능하다. WebAuthn은 FIDO2 기반 인증을 구현하기 위한 웹 표준 기술이다. 즉 패스키는 FIDO2 기반 인증 기술을 구현한 구현체라고 생각하면 된다.
 
 언어별로 WebAuthn 라이브러리를 지원하는 목록은 [passkeys.dev에서 확인 가능하다.](https://passkeys.dev/docs/tools-libraries/libraries/) 
 
-
 ### Java 기반 WebAuthn
 
-java 어플리케이션에서 지원하는 라이브러리는 [yubico의 java-webauthn-server](https://developers.yubico.com/java-webauthn-server/)이다. yubico는 W3C에서 [webauthn 웹 표준을 개발하기 위해](https://www.w3.org/TR/webauthn-2/)) 참여한 단체이다.
+java 어플리케이션에서 지원하는 라이브러리는 [yubico의 java-webauthn-server](https://developers.yubico.com/java-webauthn-server/)이다. yubico는 W3C에서 [WebAuthn 웹 표준을 개발하기 위해](https://www.w3.org/TR/webauthn-2/)) 참여한 단체이다.
 
 패스키를 구현하기 위해선 아래의 의존성을 추가해야 한다.
 
@@ -80,17 +81,69 @@ implementation("com.yubico:webauthn-server-core:2.5.3")
 
 #### CredentialRepository 구현
 
-추가한 후 패스키 등록 정보를 저장하기 위한 저장소인 `CredentialRepository`를 구현해야 한다. 구현하기 쉽게 하기 위해 InMemory기반 저장소로 아래와 같이 구현하였다. 
+추가한 후 패스키 등록 정보를 저장하기 위한 저장소인 `CredentialRepository`를 구현해야 한다.  이 레포지토리는 `RelyingParty`객체가 패스키를 검증하기 위해 사용한다. CredentialRepository에 대한 자세한 설명은 [yubico WebAuthn Github 소스코드에 있다](https://github.com/Yubico/java-webauthn-server/blob/main/webauthn-server-core/src/main/java/com/yubico/webauthn/CredentialRepository.java). 이 글에선 구현의 용이함을 위해 In-Memory방식으로 구현하는 방법을 설명한다.
+
 
 ``` java
+public interface CredentialRepository {
 
-@Component
+  Set<PublicKeyCredentialDescriptor> getCredentialIdsForUsername(String username);
+  Optional<ByteArray> getUserHandleForUsername(String username);
+  Optional<String> getUsernameForUserHandle(ByteArray userHandle);
+  Optional<RegisteredCredential> lookup(ByteArray credentialId, ByteArray userHandle);
+  Set<RegisteredCredential> lookupAll(ByteArray credentialId);
+}
+```
+
+##### 1. getUserHandleForUsername
+
+패스키를 등록한 `username`에 대응하는 `userHandle`값을 반환해야 해야 한다. 필자는 `Map`을 이용하여 `username`과 대응되는 `userHandle`을 저장하도록 구현했다.
+
+``` java
+public class InMemoryCredentialRepository implements CredentialRepository {
+
+    private final Map<String, ByteArray> userIdMapping = new ConcurrentHashMap<>();
+
+    public Optional<ByteArray> getUserHandleForUsername(String username) {
+        return Optional.ofNullable(userIdMapping.get(username));
+    }
+}
+```
+
+#####  2. getUsernameForUserHandle
+
+`username`를 등록하지 않은 계정을 위해 `userHandle`에 대응되는 `username`을 반환한다.
+
+이를 통해 패스키 등록하거나 인증하기 위해선 `username`혹은 `userHandle`값을 서버에 전달해야 함을 알 수 있다. 
+
+일관된 저장공간을 갖기 위해 `userIdMapping`을 재활용했다.
+
+``` java
+public class InMemoryCredentialRepository implements CredentialRepository {
+
+    private final Map<String, ByteArray> userIdMapping = new ConcurrentHashMap<>();
+
+    public Optional<String> getUsernameForUserHandle(ByteArray userHandle) {
+        return userIdMapping.entrySet().stream()
+                .filter(entry -> entry.getValue().equals(userHandle))
+                .map(Map.Entry::getKey)
+                .findFirst();
+    }
+}
+```
+
+##### 3.  getCredentialIdsForUsername
+
+`username`로 등록한 패스키들을 반환한다. `PublicKeyCredentialDescriptor`는 패스키 등록 시 생성한 `RegistrationResult` 객체에서 `getKeyId`메서드의 반환 값을 바탕으로 만들 수 있다.  
+
+필자는 아래와 같이 라이브러리에서 제공하는 빌더를 이용해 인증에 필요한 값을 생성한다. credentials의 키 값으로 userHandle을 사용한 이유는 뒤의 나오는 `lookup`메서드 타입 맞추기 위해 사용하게 되었다.
+
+``` java
 public class InMemoryCredentialRepository implements CredentialRepository {
 
     private final Map<ByteArray, List<RegisteredCredential>> credentials = new ConcurrentHashMap<>();
     private final Map<String, ByteArray> userIdMapping = new ConcurrentHashMap<>();
 
-    @Override
     public Set<PublicKeyCredentialDescriptor> getCredentialIdsForUsername(String username) {
         ByteArray userId = userIdMapping.get(username);
         if (userId == null) {
@@ -103,21 +156,31 @@ public class InMemoryCredentialRepository implements CredentialRepository {
                                 .build())
                 .collect(Collectors.toSet());
     }
+}
+```
 
-    @Override
-    public Optional<ByteArray> getUserHandleForUsername(String username) {
-        return Optional.ofNullable(userIdMapping.get(username));
-    }
+##### 4. lookup
 
-    @Override
-    public Optional<String> getUsernameForUserHandle(ByteArray userHandle) {
-        return userIdMapping.entrySet().stream()
-                .filter(entry -> entry.getValue().equals(userHandle))
-                .map(Map.Entry::getKey)
+패스키로 인증할 때 값을 검증하는 용도로 사용한다. 등록된 패스키 값 뿐만 아니라, 패스키로 인증한 횟수를검사하여 기기 복제와 재전송 공격을 방지하는 역할을 한다. 
+
+```java
+public class InMemoryCredentialRepository implements CredentialRepository {
+
+    public Optional<RegisteredCredential> lookup(ByteArray credentialId, ByteArray userHandle) {
+        return credentials.getOrDefault(userHandle, Collections.emptyList()).stream()
+                .filter(cred -> cred.getCredentialId().equals(credentialId))
                 .findFirst();
     }
+}   
+```
 
-    @Override
+##### 5. lookupAll
+
+패스키 등록 시 중복을 방지하기 위해 사용되는 메서드이다. 
+
+``` java
+public class InMemoryCredentialRepository implements CredentialRepository {
+
     public Set<RegisteredCredential> lookupAll(ByteArray credentialId) {
         return credentials.values().stream()
                 .flatMap(Collection::stream)
@@ -125,47 +188,6 @@ public class InMemoryCredentialRepository implements CredentialRepository {
                 .collect(Collectors.toSet());
     }
 
-    @Override
-    public Optional<RegisteredCredential> lookup(ByteArray credentialId, ByteArray userHandle) {
-        return credentials.getOrDefault(userHandle, Collections.emptyList()).stream()
-                .filter(cred -> cred.getCredentialId().equals(credentialId))
-                .findFirst();
-    }
-
-    // 패스키를 등록하기 위해 추가 구현
-    public void addCredential(String username, RegisteredCredential credential) {
-        ByteArray userId = userIdMapping.computeIfAbsent(username, (k) -> credential.getUserHandle());
-        credentials.computeIfAbsent(userId, k -> new ArrayList<>()).add(credential);
-    }
-
-    // 인증 후 credential의 인증 횟수를 업데이트 하기 위해 사용
-    public void updateSignatureCount(String username, ByteArray credentialId, long newSignatureCount) {
-        ByteArray userId = userIdMapping.get(username);
-        if (userId == null) {
-            return;
-        }
-
-        List<RegisteredCredential> userCredentials = credentials.get(userId);
-        if (userCredentials != null) {
-            List<RegisteredCredential> updatedCredentials = userCredentials.stream()
-                    .map(credential -> updateCredential(credentialId, credential, newSignatureCount))
-                    .toList();
-            credentials.put(userId, updatedCredentials);
-        }
-    }
-
-    private RegisteredCredential updateCredential(ByteArray credentialId, RegisteredCredential credential,
-                                                  long newSignatureCount) {
-        if (credential.getCredentialId().equals(credentialId)) {
-            return RegisteredCredential.builder()
-                    .credentialId(credential.getCredentialId())
-                    .userHandle(credential.getUserHandle())
-                    .publicKeyCose(credential.getPublicKeyCose())
-                    .signatureCount(newSignatureCount)
-                    .build();
-        }
-        return credential;
-    }
 }
 ```
 
