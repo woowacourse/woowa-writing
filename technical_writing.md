@@ -238,7 +238,7 @@ Activity에 의해 메모리 누수가 발생한 상황에서, 다른 Activity�
 Activity Context를 사용해야하는 상황은 Activity와 같은 생명 주기를 가진 객체가 Context를 필요로 하는 경우,   
 그리고 View와 관련된 UI 작업에 Context가 필요한 경우입니다.  
 
-Context를 통해 여러 가지 리소스를 얻어올 수 있는데, 그 중 하나는 Theme입니다.
+Context에 접근하여 여러 가지 리소스를 얻어올 수 있는데, 그 중 하나는 Theme입니다.
 Context는 xml에서 설정한 Theme, 즉 테마에 대한 정보도 가지고 있습니다.
 그런데 Activity Context 대신 Application Context를 사용하게 된다면, Activity에서 사용되는 테마가 아닌 Application의 테마가 적용될 수 있습니다.   
 Application의 테마는 애플리케이션이 처음 실행되어 설정된 기본 테마를 의미합니다.
@@ -280,7 +280,7 @@ UI 작업은 여러 View나 Fragment 등 Activity 내부에서 이루어집니�
 
 ## Context 사용 예시: 코드로 이해하기
 
-지금까지 Context의 개념과 특성에 대해 비유를 통해 알아보았고, 사용 시에 어떤 주의점이 있는지도 알아보았습니다.  
+지금까지 Context의 개념과 특성에 대해 비유를 들어 알아보았고, 사용 시에 어떤 주의점이 있는지도 알아보았습니다.  
 그렇다면 이 Context를 구체적으로 어떤 상황에서 사용할 수 있는지를 살펴보겠습니다.
 
 ### Activity Context가 필요한 상황
@@ -362,7 +362,7 @@ UI 작업은 여러 View나 Fragment 등 Activity 내부에서 이루어집니�
 6. **SharedPreferences 접근**
    - 간단한 설정 값을 저장하거나 불러올 수 있는 SharedPreference에 접근할 때에도 Context가 필요합니다.
       ```kotlin
-      // Context를 통해 SharedPreference에 접근하여 사용할 수 있습니다.
+      // Context의 getSharedPreferences 메서드를 사용해 SharedPreference에 접근할 수 있습니다.
       val sharedPreferences = context.getSharedPreferences("my_prefs", Context.MODE_PRIVATE)
       val editor = sharedPreferences.edit()
       editor.putString("key", "value").apply()
