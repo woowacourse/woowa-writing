@@ -231,7 +231,8 @@ https://developer.android.com/develop/background-work/services/fg-service-timeou
 
 dataSync 타입과 mediaProjection 타입의 Foreground service는 시간제한이 있는 게 확실해 보인다. 하지만 다른 타입의 경우 공식 문서에서 시간제한이 있는지 명확히 확인하지 못했다.
 
-While an app is in the foreground, it can create and run both foreground and background services freely. When an app goes into the background, it has a window of several minutes in which it is still allowed to create and use services. At the end of that window, the app is considered to be *idle*. At this time, the system stops the app's background services, just as if the app had called the services' [`Service.stopSelf()`](https://developer.android.com/reference/android/app/Service#stopSelf()) methods. 
+> While an app is in the foreground, it can create and run both foreground and background services freely. When an app goes into the background, it has a window of several minutes in which it is still allowed to create and use services. At the end of that window, the app is considered to be *idle*. At this time, the system stops the app's background services, just as if the app had called the services' [`Service.stopSelf()`](https://developer.android.com/reference/android/app/Service#stopSelf()) methods.
+
 
 - https://developer.android.com/about/versions/oreo/background
 - 번역하기 뭔가 애매해서 원문으로 가져왔다. 앱이 백그라운드에 있으면 서비스를 만들고 사용할 수 있는 몇 분 동안의 window를 가지며 window가 끝날 때가 되면 앱은 idle로 취급되고, 시스템이 앱의 백그라운드 서비스를 멈춰버린다고 한다.
