@@ -15,8 +15,6 @@ Foreground Service에 대해 딱 알기 위해서 아주 간단한 예시를 들
 
 ## 서비스 만들기
 
-공식 문서에서는 Service 클래스를 상속받으라 설명되어 있기는 하나, onCreate, onStartCommand, onBind, onDestroy 등으로 생명주기를 직접 관리해야 한다. 그래서, LifecycleOwner 인터페이스를 구현하여 Lifecycle-aware component(LiveData 등)을 사용할 수 있는 LifecycleService를 사용해 보자.
-
 먼저 gradle에 필요한 의존성을 넣는다.
 
 ```xml
