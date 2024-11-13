@@ -200,7 +200,7 @@ Activity Context는 한 장면에서 배역에 따라 연기를 하는 배우들
 
 촬영에 사용될 새로운 조명이 들어왔습니다. 이 조명을 관리할 인원이 필요한 상황입니다.   
 일반적으로는 감독 또는 본부 팀(Application Context)에게 관리를 맡길 텐데,  
-만약 배우들(Activity Context)에게 관리를 맡기게 된다면 어떻게 될까요?
+만약 배우들(Activity Context)에게 관리를 맡긴다면 어떻게 될까요?
 
 배우들은 자신들의 장면 촬영이 모두 끝났는데도, 다음 장면에서도 사용될 조명을 관리해야 하기 때문에 퇴근을 할 수 없습니다.  
 계속해서 퇴근하지 못하고 일을 하고 있는 배우들로 인해 인력이 낭비되고, 인건비가 증가하게 될 것입니다.  
@@ -214,7 +214,7 @@ Application Context를 사용하는 경우는 애플리케이션 전역에서 �
 DataBase 인스턴스 등을 사용할 때, Application Context가 필요합니다.  
 
 ![메모리_누수_문제_2](./technical_writing_images/메모리_누수_문제_2.png)
-만약 DB와 같은 객체가 Application Context가 아닌 Activity Context를 사용하게 된다면, 그림과 같이 Activity Context를 참조하게 됩니다.  
+만약 DB와 같은 객체가 Application Context가 아닌 Activity Context를 사용한다면, 그림과 같이 Activity Context를 참조하게 됩니다.  
 그런데 이 Activity가 종료되고 더 이상 사용하지 않게 되어도, DB는 메모리 상에 여전히 남아있고 계속해서 Activity의 Context를 참조합니다.  
 이 경우 메모리 공간을 관리해주는 Garbage Collector가 참조가 남아있으며 여전히 사용 중이라고 판단하게 되고, 사용하지 않는 Activity를 메모리에서 지울 수 없게 됩니다. 
 
@@ -235,21 +235,21 @@ Activity에 의해 메모리 누수가 발생한 상황에서, 다른 Activity�
 연기를 하는 배우들을(Activity Context) 촬영해야 하는데, 만약 감독과 본부 팀(Application Context)을 촬영한다면 어떻게 될까요?  
 이 사람들은 배우들보다 연기를 못하기 때문에, 촬영에 어려움을 겪게 될 수 있습니다.  
 
-이렇듯 Application Context만 사용하게 된다면 촬영, 즉 보여주는 것에 문제가 발생할 수 있습니다.
+이렇듯 Application Context만 사용하면 촬영, 즉 보여주는 것에 문제가 발생할 수 있습니다.
 
 Activity Context를 사용해야하는 상황은 Activity와 같은 생명 주기를 가진 객체가 Context를 필요로 하는 경우,   
 그리고 View와 관련된 UI 작업에 Context가 필요한 경우입니다.  
 
 Context에 접근하여 여러 가지 리소스를 얻어올 수 있는데, 그 중 하나는 Theme입니다.
 Context는 xml에서 설정한 Theme, 즉 테마에 대한 정보도 가지고 있습니다.
-그런데 Activity Context 대신 Application Context를 사용하게 된다면, Activity에서 사용되는 테마가 아닌 Application의 테마가 적용될 수 있습니다.   
+그런데 Activity Context 대신 Application Context를 사용하면, Activity에서 사용하는 테마가 아닌 Application의 테마가 적용될 수 있습니다.   
 Application의 테마는 애플리케이션이 처음 실행되어 설정된 기본 테마를 의미합니다.
-한 화면에 맞추어 디자인된 테마가 아니라 기본 테마가 설정된다면 UI 출력에 문제가 발생할 수 있습니다.
+한 화면에 맞추어 디자인된 테마가 아니라 기본 테마가 설정되면 UI 출력에 문제가 발생할 수 있습니다.
 
 ![dialog_applicaion_context](./technical_writing_images/dialog_applicaion_context.png)
 ![error_메시지](./technical_writing_images/error_메시지.png)
 또한 View를 그릴 때에 필요한 요소들 중 일부를 지원하지 않습니다. 대표적으로 Activity의 윈도우에 대한 접근이 불가능한데요.   
-만약 다이얼로그를 띄울 때 Activity Context가 아닌 Application Context를 넘겨주게 된다면,  
+만약 다이얼로그를 띄울 때 Activity Context가 아닌 Application Context를 넘겨준다면,  
 다이얼로그 출력 시 Window 접근에 관련된 에러가 발생하며 애플리케이션이 강제 종료됩니다.   
 
 <br>
