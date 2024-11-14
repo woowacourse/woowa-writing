@@ -90,7 +90,8 @@
 
 ## ▌ 실제 구현
 방금 말씀드렸던 구조는 실제 코드에서 아래와 같은 계층 구조로 사용할 수 있습니다. 
-![](https://velog.velcdn.com/images/pakxe/post/f4716937-d0d5-456e-b2c0-1ac0f0771b04/image.png)
+<img width="1103" alt="image" src="https://github.com/user-attachments/assets/240284d1-e19c-48be-ad1d-ef6966959d2e">
+
 
 `전역 에러 바운더리` 하위에 `업데이터` 역할인 queryClient를 둡니다. 그리고 더 하위에 `구독자` 역할인 ErrorCatcher를 둡니다.
 그리고 에러가 발생할 수도 있는 페이지 또는 컴포넌트를 안에 위치시킵니다.
