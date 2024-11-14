@@ -10,15 +10,18 @@
 
 ### 성능 저하 문제 인식
 
-저희 팀은 데이터 저장소로 MySQL을 사용하면서, JPA의 `saveAll()` 메서드를 사용해 시간 데이터를 일괄 처리하는 기능을 구현했었습니다. 하지만 대량의 데이터를 처리할 때, 의도하지 않은 개별 쿼리가 실행되면서 네트워크 통신 비용이 증가하였고, 쿼리 속도가 크게 저하 되었습니다. 이로 인해 서비스 속도가 현저히 느려지는 문제를 경험하게 되었습니다.
+저희 팀은 데이터 저장소로 MySQL을 사용하면서, JPA의 `saveAll()` 메서드를 사용해 시간 데이터를 일괄 처리하는 기능을 구현했었습니다. 하지만 대량의 데이터를 처리할 때, 의도하지 않은 개별 쿼리가 실행되면서 네트워크 통신 비용이 증가하였고, 쿼리 속도가 크게 저하 되었습니다. 이로 인해 서비스 속도가 현저히 느려지는 문제를 경험하게 되었습니다. 
 
-쿼리가 개별적으로 실행되면 왜 성능이 저하될까요? 가장 큰 이유는 네트워크와 데이터베이스간의 빈번한 I/O 작업 때문입니다. 각 쿼리마다 별도의 네트워크 요청이 발생하면서, 네트워크 왕복 시간이 누적되고 데이터베이스의 트랜잭션 관리 비용이 증가하게 됩니다. 또한 이러한 반복적인 요청은 데이터베이스의 리소스 사용을 급격히 증가시켜 병목 현상을 일으키며, 전체적인 처리 속도를 저하시킵니다.
+![image](https://github.com/user-attachments/assets/7725d525-53ea-4852-b42e-ea32f1b45a92)
+> 1,440건 데이터 저장 시 9.1초 소요
+
+쿼리가 개별적으로 실행되면 왜 성능이 저하될까요? 가장 큰 이유는 네트워크와 데이터베이스 간의 빈번한 I/O 작업 때문입니다. 각 쿼리마다 별도의 네트워크 요청이 발생하면서, 네트워크 왕복 시간이 누적되고 데이터베이스의 트랜잭션 관리 비용이 증가하게 됩니다. 또한 이러한 반복적인 요청은 데이터베이스의 리소스 사용을 급격히 증가시켜 병목 현상을 일으키며, 전체적인 처리 속도를 저하시킵니다.
 
 서비스 성능을 최적화하기 위한 가장 일반적인 방법은 불필요한 I/O를 줄이는 것입니다. 불필요한 I/O를 줄인다는 것은 네트워크와 데이터베이스 간의 통신을 최소화하는 것을 말합니다. 개별적으로 실행되는 다수의 쿼리를 한 번에 처리할 수 있다면 누적되는 네트워크 병목 현상을 줄일 수 있고 요청 처리 속도는 물론 시스템의 전반적인 효율성을 향상시킬 수 있습니다.
 
 ## JPA를 활용한 Batch 처리
 
-배치 작업은 대량의 데이터를 한 번에 처리하는 작업을 의미합니다. 여러 개의 요청을 각각 처리하는 대신 하나의 트랜잭션로 묶어 한 번에 처리하면 어플리케이션과 데이터베이스간의 통신을 최소화할 수 있습니다. 자바와 스프링을 사용하는 경우 배치 프로세스를 구축하기 위해 보통 JDBC나 Spring Batch 프레임워크를 많이 사용하는데요. JPA, Hibernate를 사용하는 경우에도 배치 기능을 사용할 수 있습니다. 
+배치 작업은 대량의 데이터를 한 번에 처리하는 작업을 의미합니다. 여러 개의 요청을 각각 처리하는 대신 하나의 트랜잭션으로 묶어 한 번에 처리하면 어플리케이션과 데이터베이스간의 통신을 최소화할 수 있습니다. 자바와 스프링을 사용하는 경우 배치 프로세스를 구축하기 위해 보통 JDBC나 Spring Batch 프레임워크를 많이 사용하는데요. JPA, Hibernate를 사용하는 경우에도 배치 기능을 사용할 수 있습니다. 
 
 적용하는 방법은 생각보다 매우 간단합니다. application.yml 파일에 `hibernate.jdbc.batch_size`를 설정하여 배치 크기를 지정하면 Hibernate는 지정된 배치 크기만큼 INSERT, UPDATE, DELETE 쿼리에 대해 배치 작업을 수행합니다. 
 
@@ -31,7 +34,7 @@ spring:
           batch_size: 50
 ```
 
-Hibernate는 설정한 배치 크기에 도달할 때 까지 [PreparedStatement.addBatch()](https://docs.oracle.com/en/java/javase/11/docs/api/java.sql/java/sql/Statement.html#addBatch(java.lang.String))를 호출하여 각각의 쿼리를 실행하지 않고, 여러 개의 SQL 쿼리들을 배치로 모아두는 작업을 수행합니다. 이후 설정한 배치 개수에 도달하거나 모든 엔티티에 대해 모아두는 작업을 마치게 되면 [PreparedStatement.executeBatch()](https://docs.oracle.com/javase/8/docs/api/java/sql/Statement.html#executeBatch--)를 호출합니다. `executeBatch()` 메서드는 `addBatch()`로 모아둔 SQL 쿼리들을 한꺼번에 묶어 데이터베이스로 한번에 전송하는 역할을 합니다.
+Hibernate는 설정한 배치 크기에 도달할 때 까지 [PreparedStatement.addBatch()](https://docs.oracle.com/en/java/javase/11/docs/api/java.sql/java/sql/Statement.html#addBatch(java.lang.String))를 호출하여 각각의 쿼리를 실행하지 않고, 여러 개의 SQL 쿼리들을 배치로 모아두는 작업을 수행합니다. 이후 설정한 배치 개수에 도달하거나 모든 엔티티에 대해 모아두는 작업을 마치게 되면 [PreparedStatement.executeBatch()](https://docs.oracle.com/en/java/javase/11/docs/api/java.sql/java/sql/Statement.html#executeBatch())를 호출합니다. `executeBatch()` 메서드는 `addBatch()`로 모아둔 SQL 쿼리들을 한꺼번에 묶어 데이터베이스로 한번에 전송하는 역할을 합니다.
 
 JPA는 데이터를 저장하기 위해 `save()`, `saveAll()` 메서드를 제공합니다. 서로 다른 메서드이지만 내부 구현을 살펴보면 이 두 메서드가 내부적으로 동작하는 원리는 거의 같습니다. 
 
@@ -67,26 +70,26 @@ public <S extends T> List<S> saveAll(Iterable<S> entities) {
 
 ## rewriteBatchedStatements
 
-지금까지 `hibernate.jdbc.batch_size` 옵션을 통해 Hibernate가 제공하는 배치 기능과 데이터를 저장하는 방식에 대해 알아봤습니다. 배치란 결국 개별 쿼리들을 원하는 개수만큼 하나의 트랜잭션에서 처리하는 작업을 말합니다. 그런데 여기서 헷갈리지 말아야 하는 부분은 배치란 네트워크 왕복을 줄여 성능을 개선하는 것이지 한 번의 쿼리를 실행한다는 의미가 아니라는 점입니다. 
+지금까지 `hibernate.jdbc.batch_size` 옵션을 통해 Hibernate가 제공하는 배치 기능과 데이터를 저장하는 방식에 대해 알아봤습니다. 배치란 결국 개별 쿼리들을 원하는 개수만큼 하나의 트랜잭션에서 처리하는 작업을 말합니다. 여기서 헷갈리지 말아야 하는 부분은 배치란 네트워크 왕복을 줄여 성능을 개선하는 것이지 한 번의 쿼리를 실행한다는 의미가 아니라는 점입니다. 
 
-Hibernate 배치 기능을 활성화하고 직접 SQL을 실행해보면, 실제로 INSERT 쿼리가 단건식 출력되는 모습을 확인할 수 있습니다.
+Hibernate 배치 기능을 활성화하고 직접 SQL을 실행해보면, 실제로 INSERT 쿼리가 한 건씩 출력되는 모습을 확인할 수 있습니다.
 
 ```sql
-org.hibernate.SQL                        : 
+org.hibernate.SQL                        
     insert 
     into
         member
         (name, age, id) 
     values
         (?, ?, ?)
-org.hibernate.SQL                        : 
+org.hibernate.SQL                        
     insert 
     into
         member
         (name, age, id) 
     values
         (?, ?, ?)
-org.hibernate.SQL                        : 
+org.hibernate.SQL                        
     insert 
     into
         member
@@ -95,7 +98,7 @@ org.hibernate.SQL                        :
         (?, ?, ?)
 ```
 
-네트워크 왕복 횟수를 줄여 오버헤드를 감소시키기는 했지만, 데이터베이스에서는 여전히 각 SQL 쿼리를 개별적으로 실행해야 하는 상황입니다. MySQL 기준으로 데이터베이스에 데이터를 삽입하려면 클라이언트 스레드 할당 –> 쿼리 파서 및 전처리 -> 옵티마이저의 실행 계획 수립 -> 락 획득 -> 데이터 저장 -> 락, 스레드 반납과 같은 과정을 거쳐야 합니다. 아무리 단시간에 처리되는 간단한 쿼리라도 쿼리마다 매번 이러한 과정이 발생하면 성능 상 손해를 볼 수 밖에 없습니다. 예를 들어, 한 쿼리에 0.01초가 걸린다고 해도 이를 100번 반복하면 총 1초가 소요됩니다. 단순한 계산으로도 배치를 통해 얻는 성능상의 이점을 넘어서는 수치입니다.
+네트워크 왕복 횟수를 줄여 오버헤드를 감소시키기는 했지만, 데이터베이스에서는 여전히 각 SQL 쿼리를 개별적으로 실행해야 하는 상황입니다. MySQL 기준으로 데이터베이스에 데이터를 삽입하려면 `클라이언트 스레드 할당 –> 쿼리 파서 및 전처리 -> 옵티마이저의 실행 계획 수립 -> 락 획득 -> 데이터 저장 -> 락, 스레드 반납`과 같은 과정을 거쳐야 합니다. 아무리 단시간에 처리되는 간단한 쿼리라도 쿼리마다 매번 이러한 과정이 발생하면 성능 상 손해를 볼 수 밖에 없습니다. 예를 들어, 한 쿼리에 0.01초가 걸린다고 해도 이를 100번 반복하면 총 1초가 소요됩니다. 단순한 계산으로도 배치를 통해 얻는 성능상의 이점을 넘어서는 수치입니다.
 
 따라서 여러 건의 INSERT 쿼리를 하나의 BULK INSERT 쿼리로 개선할 수 있도록 MySQL `rewriteBatchedStatements` 옵션을 제공합니다.
 
@@ -125,7 +128,7 @@ VALUES ('jazz', 26), ('pedro', 26), ('baeky', 26), ('mark', 27), ('daon', 28);
 > [12.2. Session batching](https://docs.jboss.org/hibernate/orm/5.4/userguide/html_single/Hibernate_User_Guide.html#batch-session-batch)  
 > Hibernate disables insert batching at the JDBC level transparently if you use an identity identifier generator.
 
-데이터베이스에 ID 생성 책임을 위임하는 `IDENTITY` 전략과 서로 이해관계가 맞지 않기 떄문입니다.기본적으로 엔티티를 영속성 컨텍스트에 영속화 하기 위해서는 값을 식별하기 위한 ID가 반드시 필요합니다. `IDENTITY` 전략에서 ID를 획득할 수 있는 유일한 방법은 SQL을 실행시키는 것입니다. 따라서 persist 메서드가 호출될 때 INSERT가 실행되며 flush 시점까지 지연시킬 방법이 없습니다. 개별 엔티티들을 영속화 하는 시점에 `em.flush`가 호출되게 되어 배치 작업이 이루어지지 않고 개별 쿼리가 발생하게 되는 것입니다.
+데이터베이스에 ID 생성 책임을 위임하는 `IDENTITY` 전략과 서로 이해관계가 맞지 않기 떄문입니다. 기본적으로 엔티티를 영속성 컨텍스트에 영속화하기 위해서는 값을 식별하기 위한 ID가 반드시 필요합니다. `IDENTITY` 전략에서 ID를 획득할 수 있는 유일한 방법은 SQL을 실행시키는 것입니다. 따라서 persist 메서드가 호출될 때 INSERT가 실행되며 flush 시점까지 지연시킬 방법이 없습니다. 개별 엔티티들을 영속화하는 시점에 `em.flush`가 호출되게 되어 배치 작업이 이루어지지 않고 개별 쿼리가 발생하게 되는 것입니다.
 
 만약 `SEQUENCE` 전략일 경우 어떻게 될까요? `SEQUENCE` 전략이란 데이터베이스의 시퀀스 객체를 사용하여 기본 키를 생성하는 방식을 말합니다. MySQL에서는 `SEQUENCE` 전략을 사용할 수 없지만, `allocationSize` 속성을 통해 한 번의 시퀀스 호출로 여러 개수의 식별자를 메모리로 가져올 수 있어 MySQL을 제외한 다른 데이터베이스에서는 `IDENTITY` 만큼 자주 사용됩니다. 엔티티를 영속성 컨텍스트에 추가하려고 시도하면 즉시 시퀀스를 호출하여 새로운 ID를 할당 받는데 `IDENTITY`와는 달리 flush를 통한 데이터 삽입이 일어나지 않기 때문에 Hibernate의 지연 로딩을 활용할 수 있고 배치 철학과 통합할 수 있습니다.
 
@@ -169,7 +172,9 @@ try {
 }
 ```
 
-내부 구현을 살펴보면 `batchSize`를 기준으로 `EntityManager`가 주기적으로 `flush()`와 `clear()`를 호출하며 영속성 컨텍스트를 초기화하는 것을 확인할 수 있습니다. `batchSize`가 제한되어 있지 않다면 영속성 컨텍스트에 모든 엔티티가 올라가게 되고 최악의 경우 `OutOfMemoryException`이 발생할 수 있기 때문입니다. Hibernate는 영속성 컨텍스트에 한 번에 많은 양의 엔티티를 올리는 안티패턴을 공식적으로 경고하고 있습니다.
+> Hibernate caches all the newly inserted Customer instances in the session-level cache, so, when the transaction ends, 100 000 entities are managed by the persistence context. If the maximum memory allocated to the JVM is rather low, this example could fail with an OutOfMemoryException. The Java 1.8 JVM allocated either 1/4 of available RAM or 1Gb, which can easily accommodate 100 000 objects on the heap.  
+
+내부 구현을 살펴보면 `batchSize`를 기준으로 `EntityManager`가 주기적으로 `flush()`와 `clear()`를 호출하며 영속성 컨텍스트를 초기화하는 것을 확인할 수 있습니다. `batchSize`가 제한되어 있지 않다면 영속성 컨텍스트에 모든 엔티티가 올라가게 되고 최악의 경우 `OutOfMemoryException`이 발생할 수 있기 때문입니다. Hibernate는 영속성 컨텍스트에 한 번에 많은 양의 엔티티를 적재하는 안티패턴을 공식적으로 경고하고 있습니다.
 
 > Example 431. Naive way to insert 100 000 entities with Hibernate
 
@@ -199,8 +204,6 @@ try {
 ```
 
 > [12.2. Session batching](https://docs.jboss.org/hibernate/orm/5.4/userguide/html_single/Hibernate_User_Guide.html#batch-session-batch)  
-> Hibernate caches all the newly inserted Customer instances in the session-level cache, so, when the transaction ends, 100 000 entities are managed by the persistence context. If the maximum memory allocated to the JVM is rather low, this example could fail with an OutOfMemoryException. The Java 1.8 JVM allocated either 1/4 of available RAM or 1Gb, which can easily accommodate 100 000 objects on the heap.  
-> long-running transactions can deplete a connection pool so other transactions don’t get a chance to proceed.  
 > JDBC batching is not enabled by default, so every insert statement requires a database roundtrip. To enable JDBC batching, set the hibernate.jdbc.batch_size property to an integer between 10 and 50.
 
 Hibernate는 공식적으로 10에서 50사이의 `batchSize`를 권장하고 있습니다. 위 내용들을 살펴봤을 때 Hibernate는 배치 처리 기능을 지원하기는 하지만 대규모 데이터 삽입이나 업데이트에 대해 항상 최적화된 성능을 보장하기 어렵다는 것을 알 수 있습니다.
@@ -209,7 +212,7 @@ Hibernate는 공식적으로 10에서 50사이의 `batchSize`를 권장하고 �
 
 MySQL에서 자동 증가 키를 사용하면 거의 모든 상황에 `IDENTITY` 전략을 사용하게 됩니다. Hibernate를 사용하는 환경에서 특정 API가 대량의 데이터를 다뤄야 하는 상황이 생기면 어떻게 해야 할까요? 새로운 기술을 도입하거나, 키 생성 전략을 변경할 수도 있지만 순수 JDBC를 사용해서 문제를 해결할 수 있습니다.
 
-JPA는 JDBC 위에서 동작하는 추상화된 API입니다. 당연하게도 JPA가 제공하는 기능들은 모두 내부적으로 JDBC 기반으로 동작하고 있습니다. 따라서 JPA를 사용하고 있으면 다른 기술의 도입이나 변경 없이 JDBC를 사용할 수 있고, 당연히 JDBC를 활용한 Batch 처리를 활용할 수 있습니다.
+JPA는 JDBC 기반으로 동작하는 추상화된 API입니다. 당연하게도 JPA가 제공하는 기능들은 모두 내부적으로 JDBC 기반으로 동작하고 있습니다. 따라서 JPA를 사용하고 있으면 다른 기술의 도입이나 변경 없이 JDBC를 사용할 수 있고, 당연히 JDBC를 활용한 Batch 처리를 활용할 수 있습니다.
 
 ```java
     private static final int BATCH_SIZE = 500;
@@ -254,7 +257,7 @@ JPA는 JDBC 위에서 동작하는 추상화된 API입니다. 당연하게도 JP
 | 10,000     | 87.669s | 0.9s                | 0.75s                | 97.41x           | 116.89x           |
 
 
-위는 JPA, JDBC를 사용했을 때 데이터 개수에 따른 성능 변화를 나타낸 것입니다. 처리해야 할 데이터 수가 많아질수록 JPA와 비교해서 JDBC의 `batchUpdate()`를 사용했을 때 성능 차이가 100배에 달하는 것을 확인할 수 있습니다.
+위는 JPA, JDBC를 사용했을 때 데이터 개수에 따른 성능 변화를 나타낸 것입니다. 처리해야 할 데이터 수가 많아질수록 JPA와 비교해서 JDBC의 `batchUpdate()`를 사용했을 때 성능 차이가 약 100배에 달하는 것을 확인할 수 있습니다.
   
 BatchSize를 설정할 때에는 `JVM 메모리`와 `DB Packet Size Limit` 두 가지를 고려해야 합니다.
 너무 작게 설정하면 네트워크 통신 비용이 증가함에 따라 성능이 하락하고, 너무 크게 한다면 어플리케이션과 데이터베이스에 무리를 줄 수 있습니다.
