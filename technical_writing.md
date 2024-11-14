@@ -293,6 +293,7 @@ SELECT * FROM performance_schema.data_locks;
 <details>
 <summary><h4>참고 : 갭 락이 어떻게 팬텀 리드를 방지하지?</h4></summary>
 위의 예제에서 age가 23인 레코드를 X 락과 함께 조회한다고 해보겠습니다:
+	
 ```sql
 SELECT * FROM ... WHERE age = 23 FOR UPDATE
 ```
