@@ -38,7 +38,26 @@ Context는 안드로이드 앱에서 매우 중요한 역할을 합니다.
 때로는 개발자가 어떤 특성이 있는지 모르는 채 사용하기도 하여, 애플리케이션의 비정상적인 동작을 일으키기도 합니다.
 
 저도 Context에 대해 잘 모르고서 개발을 이어가다가 테스트 도중 애플리케이션이 비정상적으로 종료된 경험이 있습니다.  
-왜 비정상 종료라는 현상이 발생했고, 또 Context가 어떤 일을 하는 것인지 궁금해졌습니다.  
+
+![dialog_applicaion_context](./technical_writing_images/dialog_applicaion_context.png)  
+Fragment에서 다이얼로그를 띄우는 코드입니다.  
+Dialog 생성자에 Context를 넘겨줄 때 큰 고민 없이 `applicationContext` 를 사용했습니다.  
+
+![error_메시지](./technical_writing_images/error_메시지.png)  
+그러나 다이얼로그를 띄우는 시점에서, 위와 같은 에러가 발생하며 앱이 종료됐습니다. 🤔  
+
+원인은 올바르지 않은 Context를 넘겨준 데에 있었습니다. `applicationContext`가 아니라 Activity의 Context를 넘겨주어야 하기 때문에, 아래와 같이 코드를 수정해야 합니다.  
+
+```kotlin
+private fun showConfirmationDialog() {
+    val dialog =
+        Dialog(requireActivity()).apply {  // applicationContext가 아닌 Activity의 Context를 넘겨줍니다.
+            // ...
+        }
+}
+```
+
+에러를 수정하는 과정에서 왜 이런 비정상 종료라는 현상이 발생했고, 또 Context가 어떤 역할을 하는 것인지 궁금해졌습니다.  
 그래서 제가 Context를 공부하며 이해한 내용을 바탕으로, 여러분께 Context가 무엇인지 비유를 들어 쉽게 설명해 드리려 합니다.
 
 <br>
