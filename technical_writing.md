@@ -49,7 +49,7 @@ public interface PlaceRepository extends JpaRepository<Place, Long> {
 테스트 코드를 통해 문제를 재현해 보면 다음과 같습니다:
 
 ```java
-	@Test
+    @Test
     void createTraveloguePlacesWithConcurrency() throws InterruptedException {
         TraveloguePlaceRequest request = new TraveloguePlaceRequest(...);
 		
