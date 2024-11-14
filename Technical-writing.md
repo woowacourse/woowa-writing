@@ -8,7 +8,7 @@
 - 본론 1 : 익스텐션 구성요소 살펴보기 - popup, background
 - 본론 2 : 익스텐션 구성요소 살펴보기 - manifest.json, content 스크립트
 - 본론 3 : 복잡한 요구사항 구현해보기 - 데이터 저장과 context 간 데이터 전송
-- 결론
+- 마치며
 
 ## 서언
 
@@ -24,7 +24,7 @@ Chrome, Firefox, Safari 등 어떤 브라우저를 쓰시더라도 크롬 익스
 
 ## 들어가기에 앞서
 
-사실 Web Extension이라고 하는 것이 "크롬" 익스텐션보다 더 포괄적이고 정확한 명칭일 것입니다. 크롬의 익스텐션에만 있는 기능이 아니기 때문입니다. 다만 이번 글에서는 크롬 팀이 주도한 Extension manifest v3에 기반하여 작성하기에, "크롬" 익스텐션 명칭을 하였습니다. [MDN의 참고자료](https://developer.mozilla.org/ko/docs/Mozilla/Add-ons/WebExtensions)
+사실 웹 익스텐션(Web Extension)이라고 하는 것이 "크롬" 익스텐션보다 더 포괄적이고 정확한 명칭일 것입니다. 크롬의 익스텐션에만 있는 기능이 아니기 때문입니다. 다만 이번 글에서는 크롬 팀이 주도한 Extension manifest v3에 기반하여 작성하기에, "크롬" 익스텐션 명칭을 하였습니다. [MDN의 참고자료](https://developer.mozilla.org/ko/docs/Mozilla/Add-ons/WebExtensions)
 
 ## 익스텐션 구성요소 살펴보기 - popup, background
 
@@ -34,9 +34,9 @@ Chrome, Firefox, Safari 등 어떤 브라우저를 쓰시더라도 크롬 익스
 
 ### Popup 페이지
 
-그 중 먼저 Popup 페이지에 대해 알아보겠습니다. Popup 페이지는 HTML + CSS + JS로 구성되는 전형적인 웹 애플리케이션입니다. 브라우저 상단의 툴바에 있는 extension 아이콘을 눌렀을 때, 팝업되어 나오는 화면입니다. 한 가지 유의하여 기억해둘 점은, 현재 띄워져 있는 브라우저의 context와 Popup 페이지는 별개의 context를 가진다는 점 입니다. 여기서 context란 Javascript 코드가 실행되는 하나의 실행 환경이라고 간단히 이해하고 넘어가겠습니다. 예를 들어, 서로 다른 context라면 한 곳에서 선언한 변수를 다른 한 곳에서는 참조하지 못하는 환경입니다.
+그 중 먼저 Popup 페이지에 대해 알아보겠습니다. Popup 페이지는 HTML + CSS + JS로 구성되는 전형적인 웹 애플리케이션입니다. 브라우저 상단의 툴바에 있는 익스텐션 아이콘을 눌렀을 때, 팝업되어 나오는 화면입니다. 한 가지 유의하여 기억해둘 점은, 현재 띄워져 있는 브라우저의 context와 Popup 페이지는 별개의 context를 가진다는 점 입니다. 여기서 context란 Javascript 코드가 실행되는 하나의 실행 환경이라고 간단히 이해하고 넘어가겠습니다. 예를 들어, 서로 다른 context라면 한 곳에서 선언한 변수를 다른 한 곳에서는 참조하지 못하는 환경입니다.
 
-다음 그림과 같이 UI를 제공해 extension을 직접 제어하거나 사용자와 extension간 상호작용 할 수 있는 공간입니다. 앞서 Popup 페이지의 context에 대한 이야기를 하였습니다. Popup 페이지의 context는 유저의 클릭 등으로 인해 팝업되어 있는 동안에만 존재하며 페이지가 닫히면 해당 context도 사라진다는 것을 유의해야합니다.
+다음 그림과 같이 UI를 제공해 익스텐션을 직접 제어하거나 사용자와 익스텐션 간 상호작용 할 수 있는 공간입니다. 앞서 Popup 페이지의 context에 대한 이야기를 하였습니다. Popup 페이지의 context는 유저의 클릭 등으로 인해 팝업되어 있는 동안에만 존재하며 페이지가 닫히면 해당 context도 사라진다는 것을 유의해야합니다.
 
 <img src='./images/4.png' width=500>
 
@@ -74,7 +74,7 @@ manifest.json은 익스텐션의 메타데이터를 표시하고 익스텐션이
 
 - `manifest_version` : 익스텐션 manifest의 버전입니다. v2에서 v3로 바뀌며 보안 및 성능이 개선되었습니다.
 
-- `permissions` : 익스텐션에서 필요한 특정 Chrome API 권한을 명시합니다. 주의할 점은, 익스텐션에서 사용하는 권한만 정확히 명시해야합니다. 만약 쓰지 않는 권한을 이곳에 명시한다면 Chrome Web Store에 배포할 때, 심사에서 막힐 것입니다.
+- `permissions` : 익스텐션에서 필요한 특정 Chrome API 권한을 명시합니다. 주의할 점은, 익스텐션에서 사용하는 권한만 정확히 명시해야합니다. 만약 쓰지 않는 권한을 이곳에 명시한다면 Chrome Web Store에 배포할 때, 심사에서 반려당할 것입니다.
 
 - `host_permissions` : 특정 웹사이트에 대해 익스텐션이 동작할 권한을 요청합니다. URL 형식으로 웹사이트에 대한 권한을 요청하며 v3에서 추가된 항목입니다.
 
@@ -125,9 +125,9 @@ manifest.json은 익스텐션의 메타데이터를 표시하고 익스텐션이
 
 그렇다면 익스텐션의 모든 context에서 접근 가능한 저장소는 없을까요? Chrome API 에서는 이를 위해 `chrome.storage API`를 제공하고 있습니다. 관련 두가지 API를 살펴보겠습니다.
 
-먼저 `chrome.storage.sync API` 입니다. 이는 web storage와 유사하게 get, set 메서드가 존재합니다. 특징으로는 저장하는 공간이 클라이언트의 리소스가 아닌 chrome 브라우저에 로그인되어있는 유저의 클라우드에 저장을 합니다. 구글 chrome에서 제공하는 클라우드에 저장하는 만큼 한정적인 용량을 제공합니다.
+먼저 `chrome.storage.sync API` 입니다. 이는 web storage와 유사하게 `get`, `set` 메서드가 존재합니다. 특징으로는 저장하는 공간이 클라이언트의 리소스가 아닌 chrome 브라우저에 로그인되어있는 유저의 클라우드에 저장을 합니다. Google chrome에서 제공하는 클라우드에 저장하는 만큼 한정적인 용량을 제공합니다.
 
-`chrome.storage.sync` 대신 web storage와 비슷하게 클라이언트 단의 리소스를 사용하는 API로 `chrome.storage.local API`가 있습니다. 이 또한 get, set 메서드를 제공합니다. `sync`와 `local` API를 통해 익스텐션의 각 context간 동일한 저장소를 접근해 사용할 수 있습니다.
+`chrome.storage.sync` 대신 web storage와 비슷하게 클라이언트 단의 리소스를 사용하는 API로 `chrome.storage.local API`가 있습니다. 이 또한 `get`, `set` 메서드를 제공합니다. `sync`와 `local` API를 통해 익스텐션의 각 context간 동일한 저장소를 접근해 사용할 수 있습니다.
 
 ### 데이터 전달하기 - Message Passing
 
@@ -143,14 +143,14 @@ manifest.json은 익스텐션의 메타데이터를 표시하고 익스텐션이
 
 이렇게 메시지를 전달하는 방식으로 익스텐션 내의 각 context끼리 데이터를 공유할 수 있습니다.
 
-## 결론
+## 마치며
 
 지금까지 익스텐션의 주요 구성요소에 대해 살펴 보았습니다. 이에 더불어 익스텐션을 처음 접할 때, 헷갈릴 수 있는 context와 Origin에 대해 정확히 알고 간다면 앞으로 익스텐션을 개발할 때 각각의 역할을 충실히 수행할 수 있을 것입니다.
 
 예시로 쓰인 `contextsMenus API`와 `storage API`를 제외하고 수많은 `Chrome API`가 존재합니다.
 `chrome.webRequest`로 네트워크 요청을 가로채거나 `chrome.bookmarks`로 북마크에 접근하고 `devtools`에 접근해 커스텀할 수 있는 기능도 제공됩니다. `i18n`을 통해 다국어 지원, `commands`를 통해 단축키를 커스텀하고 `tts`도 지원 가능합니다.
 
-이번 글에서의 예시와 공식문서에는 Vanilla Javascript로 작성되어있지만 Webpack/Vite + TypeScript + React로 웹 프론트엔드에서 익숙한 기술 스택으로 빠르게 개발이 가능합니다.
+이번 글에서의 예시와 공식문서에는 `Vanilla Javascript`로 작성되어있지만 `Webpack/Vite + TypeScript + React`로 웹 프론트엔드에서 익숙한 기술 스택으로 빠르게 개발이 가능합니다.
 
 `chrome web store`에 개발자 아이디를 등록하는 비용은 일회성으로 $5 지불로 저렴한 편에 속하며, 소스코드만 올린다면 심사 후 구글에서 배포 관리를 해주니 이 또한 편리할 것입니다.
 
