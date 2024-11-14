@@ -282,136 +282,144 @@ Application의 테마란 애플리케이션 전역에 설정된 기본 테마를
 
 <br>
 
-# Chapter 3: Context 올바르게 사용하기
+_# Chapter 3: Context 올바르게 사용하기
 
 ## Context 사용의 기준: Lifecycle
 
-이렇듯 다양한 리소스와 기능들을 제공해주고 여러 방면에서 활용되는 Context이지만, 잘못 사용하게 될 경우에는 치명적일 수 있습니다.  
+Context는 다양한 리소스와 기능들을 제공해주지만, 잘못 사용할 경우에는 메모리 누수 등의 문제를 일으킬 수 있습니다.  
 그렇다면 이 Context를 어떻게 적절하게 사용해야 할까요?   
-명확한 기준이 있다면 좋겠지만, 상황과 개발 환경에 따라서 달라질 수 있기 때문에 확실한 기준을 세우기 어렵습니다.  
-
-그래도 저희는 확실하지 않지만, 어림 짐작으로 힌트를 얻을 수 있습니다. 바로 생명 주기입니다.  
+안드로이드 구성요소의 생명 주기를 파악하면, 어떤 Context를 사용해야할 지 힌트를 얻을 수 있습니다.  
 
 ![생명주기_1](./technical_writing_images/생명주기_1.png)
-Context를 넘겨받는다는 것은 결국 Context를 넘겨주는 객체, 즉 Activity 또는 Application의 생명 주기에 종속된다는 것을 의미합니다. 
+어떤 객체가 Context를 넘겨받는다는 것은 Context를 넘겨주는 주체, 즉 Activity 또는 Application의 생명 주기에 종속된다는 것을 의미합니다. 
 
 ![생명주기_2](./technical_writing_images/생명주기_2.png)
-그러므로 Context를 받는 객체들의 생명주기가 얼마나 긴 지를 파악한다면, 어떤 Context를 넘겨주어야 할 지 힌트를 잡을 수 있습니다.
+그러므로 Context를 받는 객체들의 생명주기가 얼마나 긴 지를 파악한다면, 어떤 Context를 넘겨주어야 할 지 힌트를 얻을 수 있습니다.
 
 
 또한, View에 관련된 UI 작업의 경우는 Activity Context를 사용하는 것이 바람직합니다.  
 
 ![activity와_views_1](./technical_writing_images/activity와_views_1.png)
-UI 작업은 여러 View나 Fragment 등 Activity 내부에서 이루어집니다.   
+여러 View나 Fragment 등의 UI 작업은 결국 Activity 내부에서 이루어집니다.   
 
 ![activity와_views_2](./technical_writing_images/activity와_views_2.png)
-결국 View 에 관련된 작업은 Activity의 생명주기에 종속된다는 의미이므로, Activity Context를 넘겨주는 것입니다.   
+UI 작업을 행하는 주체는 Activity와 그 생명주기에 종속된 View 또는 Fragment이고,  
+이들은 View에 관한 자원에 접근할 수 있어야 하므로 Activity Context를 넘겨주어야 합니다.   
 
 
 ## Context 사용 예시: 코드로 이해하기
 
-지금까지 Context의 개념과 특성에 대해 비유를 들어 알아보았고, 사용 시에 어떤 주의점이 있는지도 알아보았습니다.  
-그렇다면 이 Context를 구체적으로 어떤 상황에서 사용할 수 있는지를 살펴보겠습니다.
+이제 Context를 구체적으로 어떤 상황에서 어떻게 사용할 수 있는지 예시와 함께 살펴봅시다.
+
+### Application Context가 필요한 상황
+
+Activity, Fragment 등 안드로이드 구성 요소의 생명 주기를 벗어난 생명 주기를 갖는 객체가 Context가 필요한 경우, Application의 Context를 넘겨주는 것이 적합합니다.  
+또는 안드로이드 구성 요소의 생명 주기에 상관 없이, 애플리케이션 내 전역적으로 접근할 수 있는 경우에도 Application의 Context를 넘겨주는 것이 좋습니다.
+
+1. **시스템 서비스 접근**
+    - 앱에서 위치 서비스, 알림 서비스, 인터넷 연결 상태 등 시스템에 접근해야할 때 사용합니다.
+       ```kotlin
+       // 시스템으로부터 SW 키보드를 관리하는 Manager를 가져옵니다.
+       val inputMethodManager = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+       // 위치 서비스를 가져옵니다.
+       val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+       ```
+
+
+2. **파일 접근 및 저장**
+    - 애플리케이션 내부 또는 외부 파일 디렉터리에 파일을 저장하거나 불러올 때 사용합니다.
+       ```kotlin
+       // getFilesDir, getExternalFilesDir 같은 메서드로 파일 경로를 얻습니다.
+       val file = File(context.filesDir, "file.txt")
+       ```
+
+
+3. **SharedPreferences 접근**
+    - 간단한 설정 값을 저장하거나 불러올 수 있는 SharedPreference에 접근할 때에도 Context가 필요합니다.
+       ```kotlin
+       // Context의 getSharedPreferences 메서드를 사용해 SharedPreference에 접근할 수 있습니다.
+       val sharedPreferences = context.getSharedPreferences("my_prefs", Context.MODE_PRIVATE)
+       val editor = sharedPreferences.edit()
+       editor.putString("key", "value").apply()
+       ```
+
 
 ### Activity Context가 필요한 상황
 
-안드로이드에서 Context를 사용하여 앱의 다양한 요소들에 접근할 수 있는데요.   
-주로 아래와 같은 상황에서 사용할 수 있습니다. 사용 예시 코드와 함께 첨부했습니다.
+Context가 필요한 객체가 Activity의 생명주기에 속하거나, UI 작업과 연관된 리소스에 접근해야 할 때 Activity Context가 필요합니다.
 
-1. **리소스 접근**
-   - 문자열 리소스 접근: 앱에서 제공하는 문자열 리소스에 접근하여 화면에 텍스트를 출력할 때 사용할 수 있습니다.
-      ```xml
-      <resources>
-         <string name="app_name">MyApplication</string>
-         <string name="format_date">%1$d.%2$d.%3$d</string>
-      </resources>
-      ```
-      ```kotlin
-      // 문자열 리소스로부터 application 의 이름을 가져옵니다.
-      val appName = context.getString(R.string.app_name)
-      // 문자열 리소스에 작성된 포맷 문자열을 가지고 와 동적으로 값을 넣을 수 있습니다.
-      val formattedDate = context.getString(R.string.format_date, 2024, 10, 1)
-      ```
-   - 색상 및 drawable 접근: 애플리케이션에 정의된 색상이나, 이미지, icon 등의 drawable을 가져올 때 사용됩니다.
-      ```kotlin
-      // 색상을 가져옵니다.
-      val color = ContextCompat.getColor(context, R.color.primary_color)
-      // drawable 의 icon 또는 이미지를 가지고 올 수 있습니다.
-      val closeIcon = ContextCompat.getDrawable(context, R.drawable.icon_close)
-      val backgroundImage = ContextCompat.getDrawable(context, R.drawable.image_background)
-      ```
-     ContextCompat은 안드로이드 하위 버전과의 호환을 위해서 사용되는 Context입니다.   
-     일반적인 Context처럼 사용할 수 있으며, 첫번째 인자로 Context를 넘겨줍니다.
+1. **View 동적으로 생성**
+    - 코드에서 동적으로 View 객체를 생성해야 할 때 Activity의 Context를 사용합니다.
+       ```kotlin
+       // 동적으로 View를 생성할 때 사용할 수 있습니다.
+       val button = Button(context).apply {
+             text = "Click Me"
+             layoutParams = LinearLayout.LayoutParams(
+                 LinearLayout.LayoutParams.WRAP_CONTENT,
+                 LinearLayout.LayoutParams.WRAP_CONTENT
+             )
+         }
+       ```
 
 
-2. **View 가져오기 및 생성**
-   - 코드에서 xml 레이아웃에 정의된 View를 가져오거나, 동적으로 View 객체를 생성해야 할 때 사용합니다.
-      ```kotlin
-      // activity_main.xml에서 정의된 TextView를 가져옵니다.
-      val textView: TextView = findViewById(R.id.my_text_view)
-      textView.text = "Hello, World!"
-      
-      // 또는 동적으로 View를 생성할 때 사용할 수 있습니다.
-      val button = Button(context).apply {
-            text = "Click Me"
-            layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            )
-        }
-      ```
+2. **다이얼로그, 또는 토스트를 표시**
+    - 화면에 다이얼로그나 토스트를 띄워서, 사용자에게 원하는 메시지를 보여주고 싶을 때 사용합니다.
+       ```kotlin
+       // Activity, 또는 Fragment에서 토스트를 띄울 때, Context를 사용합니다.
+       Toast.makeText(context, "Hello!", Toast.LENGTH_SHORT).show()
+       ```
 
 
-3. **시스템 서비스 접근**
-   - 앱에서 위치 서비스, 알림 서비스, 인터넷 연결 상태 등 시스템에 접근해야할 때 사용합니다.
-      ```kotlin
-      // 시스템으로부터 SW 키보드를 관리하는 Manager를 가져옵니다.
-      val inputMethodManager = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-      // 위치 서비스를 가져옵니다.
-      val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-      ```
-
-
-4. **Application, Activity, Fragment간의 데이터 공유**
+3. **Application, Activity, Fragment간의 데이터 공유**
    - 특정 Activity, 또는 Fragment에서 다른 Component로 데이터를 전달할 때 사용됩니다. Intent를 함께 사용합니다.
       ```kotlin
       // Intent를 사용하여 다른 Activity를 실행할 때 사용됩니다.
       val intent = Intent(context, AnotherActivity::class.java)
       context.startActivity(intent)
       ```
-     
 
-5. **파일 접근 및 저장**
-   - 애플리케이션 내부 또는 외부 파일 디렉터리에 파일을 저장하거나 불러올 때 사용합니다.
-      ```kotlin
-      // getFilesDir, getExternalFilesDir 같은 메서드로 파일 경로를 얻습니다.
-      val file = File(context.filesDir, "file.txt")
-      ```
+### Activity Context와 Application Context에 구애받지 않는 경우
 
+`drawables`, `strings`, `colors` 등 애플리케이션에 정의된 리소스에 접근하는 경우에는 어떤 Context를 사용하는가가 큰 상관이 없습니다.
 
-6. **SharedPreferences 접근**
-   - 간단한 설정 값을 저장하거나 불러올 수 있는 SharedPreference에 접근할 때에도 Context가 필요합니다.
-      ```kotlin
-      // Context의 getSharedPreferences 메서드를 사용해 SharedPreference에 접근할 수 있습니다.
-      val sharedPreferences = context.getSharedPreferences("my_prefs", Context.MODE_PRIVATE)
-      val editor = sharedPreferences.edit()
-      editor.putString("key", "value").apply()
-      ```
+- **리소스 접근**
+    - 문자열 리소스 접근: 앱에서 제공하는 문자열 리소스에 접근하여 화면에 텍스트를 출력할 때 사용할 수 있습니다.
+       ```xml
+       <resources>
+          <string name="app_name">MyApplication</string>
+          <string name="format_date">%1$d.%2$d.%3$d</string>
+       </resources>
+       ```
+       ```kotlin
+       // 문자열 리소스로부터 application 의 이름을 가져옵니다.
+       val appName = context.getString(R.string.app_name)
+       // 문자열 리소스에 작성된 포맷 문자열을 가지고 와 동적으로 값을 넣을 수 있습니다.
+       val formattedDate = context.getString(R.string.format_date, 2024, 10, 1)
+       ```
+    - 색상 및 drawable 접근: 애플리케이션에 정의된 색상이나, 이미지, icon 등의 drawable을 가져올 때 사용됩니다.
+       ```kotlin
+       // 색상을 가져옵니다.
+       val color = ContextCompat.getColor(context, R.color.primary_color)
+       // drawable 의 icon 또는 이미지를 가지고 올 수 있습니다.
+       val closeIcon = ContextCompat.getDrawable(context, R.drawable.icon_close)
+       val backgroundImage = ContextCompat.getDrawable(context, R.drawable.image_background)
+       ```
+      추가로 ContextCompat은 안드로이드 하위 버전과의 호환을 위해서 사용되는 Context입니다.   
+      일반적인 Context처럼 사용할 수 있으며, 첫번째 인자로 Context를 넘겨줍니다.
 
-
-7. **다이얼로그, 또는 토스트를 표시**
-   - 화면에 다이얼로그나 토스트를 띄워서, 사용자에게 원하는 메시지를 보여주고 싶을 때 사용합니다.
-      ```kotlin
-      // Activity, 또는 Fragment에서 토스트를 띄울 때, Context를 사용합니다.
-      Toast.makeText(context, "Hello!", Toast.LENGTH_SHORT).show()
-      ```
-
-### Application Context가 필요한 상황
-추후 작성 예정
 
 ## 결론
-이렇듯 Context는 안드로이드 앱에서 중요한 요소들을 관리하고 접근할 수 있는, 매우 필수적인 객체입니다.   
-Context의 개념을 잘 이해하고, 사용 시 주의점을 잘 지켜내어 올바르게 접근하는 것이 중요합니다.   
+이렇듯 Context는 안드로이드 앱에서 중요한 요소들을 관리하고 접근할 수 있는, 매우 필수적인 객체입니다.  
+Context의 개념을 잘 이해하고 사용 시 주의점을 잘 지켜내어 올바르게 접근하는 것이 중요합니다.  
+아래에 정리된 주의사항만 잘 기억한다면, Context의 잘못된 사용으로 애플리케이션의 비정상적인 종료를 방지할 수 있습니다.
+
+### Application Context가 필요한 경우
+- Context를 사용하는 객체가 Activity, Fragment 등 안드로이드 구성 요소의 생명 주기를 벗어난 경우
+- Context를 사용하는 객체가 애플리케이션 전역에서 접근할 수 있는 경우
+
+### Activity Context가 필요한 경우
+- Context를 필요로 하는 객체가 Activity의 생명주기에 종속된 경우
+- Context를 필요호 하는 객체가 View, Fragment, Dialog 등 UI 작업과 관련된 객체인 경우
 
 ### 출처
 
