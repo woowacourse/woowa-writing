@@ -63,7 +63,7 @@ ESLint는 다음과 같은 과정을 통해 동작합니다.
 
 ESLint는 설정 파일에서 [Custom Parser를 별도로 지정](https://eslint.org/docs/latest/use/configure/parser)할 수 있지만, 기본적으로 [Espree](https://github.com/eslint/js/tree/main/packages/espree)를 사용합니다. 정적 분석을 위해서 가장 먼저 자바스크립트 코드를 문자열로 읽습니다. `parse()`메서드를 통해 코드를 문자열로 읽고 코드를 구조화합니다.
 
-```jsx
+```js
 /**
  * @param {string} code
  * @param {object} option
@@ -78,7 +78,7 @@ espree.parse(code, option);
 
 ### 2. 자바스크립트 코드로 분석할 수 있는 파서로 코드를 구조화한다.
 
-```jsx
+```js
 import * as espree from 'espree';
 
 const ast = espree.parse('var foo = "bar"');
@@ -88,7 +88,7 @@ console.log(ast);
 
 위의 코드처럼 파싱하면 아래와 같은 형태의 추상 구문 트리를 반환하게 됩니다. ESLint는 반환한 추상 구문 트리를 통해 코드를 분석할 수 있습니다.
 
-```jsx
+```js
 Node {
   type: 'Program',
   start: 0,
@@ -114,9 +114,9 @@ ESLint는 각 노드의 타입하거나 떠날 때 이벤트를 발생시킵니�
 
 대조하는 과정을 풀어서 설명하자면 다음과 같습니다.
 
-1. 생성된 추상 구문 트리를 깊이 우선 탐색 방식을 이용해 순회합니다.
-2. 순회하는 과정에서 각 노드에 진입하거나 떠날 때 해당 노드 타입과 동일한 이름의 이벤트를 발생시킵니다.
-3. 설정한 규칙에 관련된 특정 노드 타입의 이벤트에 핸들러를 설정하고, 이벤트가 발생할 때 핸들러가 실행되며 코드를 검사합니다.
+1. 생성된 추상 구문 트리를 깊이 우선 탐색 방식을 이용해 순회
+2. 순회하는 과정에서 각 노드에 진입하거나 떠날 때 해당 노드 타입과 동일한 이름의 이벤트 발생
+3. 설정한 규칙에 관련된 특정 노드 타입의 이벤트에 핸들러를 설정하고, 이벤트가 발생할 때 핸들러가 실행되며 코드 검사
 
 이와 같은 방식으로 추상 구문 트리를 기준으로 각종 규칙과 대조합니다.
 
@@ -134,7 +134,7 @@ ESLint는 위와 같은 4단계의 동작 원리를 통해 설정한 규칙을 �
 
 아래와 같이 depth를 2로 설정하면, 블록의 중첩이 3이 되는 순간 에러를 발생시킵니다.
 
-```jsx
+```js
 /*eslint max-depth: ["error", 2]*/
 
 function foo() {
@@ -149,7 +149,7 @@ function foo() {
 
 실제 [max-depth](https://github.com/eslint/eslint/blob/main/lib/rules/max-depth.js)가 정의되어 있는 코드는 아래와 같습니다. (앞서 말했던 설명을 더 잘 이해하기 위해 `meta` 프로퍼티는 생략하도록 하겠습니다.)
 
-```jsx
+```js
 "use strict";
 
 module.exports = {
@@ -250,7 +250,7 @@ ESLint는 커스터마이징할 수 있어 유연하고 확장성이 매우 뛰�
 
 plugins 정의한 규칙은 말 그대로 “_해당 플러그인에 정의된 규칙을 사용하겠다_”라는 의미이며 직접적으로 사용할 규칙을 `rules`에 정의하여 사용해야 합니다. 만약 별도의 규칙을 정의하지 않고 plugin만 연결한다면 관련 규칙을 모두 `off` 한 것과 같습니다.
 
-```jsx
+```js
 // eslint.config.js
 
 const react = require('eslint-plugin-react');
@@ -269,7 +269,7 @@ module.exports = {
 
 따라서 위와 같이 사용하려는 규칙 모음을 한 번에 적용할 수 있는 [shareable config](https://eslint.org/docs/latest/extend/shareable-configs)가 존재합니다. 플러그인에는 사전에 추천되는 규칙을 미리 정의해둔 preset을 제공하는 경우도 있습니다. `eslint-plugin-react`의 경우 `recommended`, `all`, `jsx-runtime` 세 종류의 preset이 있습니다. 이 외에도 여러 플러그인을 조합하여 하나의 config로 정의한 규칙을 사용하는 경우도 있습니다. [eslint-config-airbnb](https://www.npmjs.com/package/eslint-config-airbnb?activeTab=code)가 대표적인 예시라고 할 수 있습니다. 따라서 `eslint.config.js` 파일에 다음과 같이 정의할 수 있습니다.
 
-```jsx
+```js
 // eslint.config.js
 
 const react = require('eslint-plugin-react');
@@ -295,7 +295,7 @@ module.exports = {
 > `const`로 선언된 `nakta`라는 변수명에 항상 문자열 리터럴인 `"nakta"`를 할당해야 하는 규칙
 > 만약, 다른 값이 들어오게 된다면 `"nakta"`문자열로 수정한다.
 
-```jsx
+```js
 const nakta = 'nakta'; // OK
 
 const nakta = 13; // 에러 발생 및 "nakta"문자열 리터럴로 수정할 수 있도록 제안
@@ -305,18 +305,14 @@ const nakta = 13; // 에러 발생 및 "nakta"문자열 리터럴로 수정할 �
 
 가장 먼저 플러그인을 배포하기 위한 프로젝트를 생성합니다. 생성한 프로젝트명을 `eslint-plugin-` prefix를 사용하여 작성하고 `eslint`를 설치합니다.
 
-```jsx
+```json
 // package.json
 {
   "name": "eslint-plugin-nakta",
   "version": "1.0.0",
   "description": "ESLint plugin for enforce-nakta rule.",
   "main": "index.js",
-  "keywords": [
-    "eslint",
-    "eslintplugin",
-    "eslint-plugin"
-  ],
+  "keywords": ["eslint", "eslintplugin", "eslint-plugin"],
   "author": "",
   "license": "ISC",
   "devDependencies": {
@@ -334,7 +330,7 @@ const nakta = 13; // 에러 발생 및 "nakta"문자열 리터럴로 수정할 �
 
 설정할 meta 프로퍼티에 대한 자세한 내용은 공식 문서의 [Custom Rules](https://eslint.org/docs/latest/extend/custom-rules)에서 확인할 수 있습니다.
 
-```jsx
+```js
 // nakta-enforce.js
 
 module.exports = {
@@ -377,7 +373,7 @@ ESLint에서는 RuleTester를 제공합니다. RuleTester를 통해 커스터마
 
 RuleTester에 대해 자세하게 알고 싶다면 공식 문서의 [Rule Tester](https://eslint.org/docs/latest/integrate/nodejs-api#ruletester)를 참고할 수 있습니다.
 
-```jsx
+```json
 // package.json
 {
   ...
@@ -388,7 +384,7 @@ RuleTester에 대해 자세하게 알고 싶다면 공식 문서의 [Rule Tester
 }
 ```
 
-```jsx
+```js
 // enforce-nakta.test.js
 const { RuleTester } = require('eslint');
 const naktaRule = require('./enforce-nakta');
@@ -421,7 +417,7 @@ console.log('All tests passed');
 
 테스트도 정상적으로 통과가 되었다면 배포한 규칙을 ESLint 설정 파일에 정의한 후 규칙을 사용할 수 있습니다.
 
-```jsx
+```js
 'use strict';
 const nakta = require('./index');
 
