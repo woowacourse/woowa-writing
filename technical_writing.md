@@ -33,7 +33,6 @@
 
 ```java
 public interface PlaceRepository extends JpaRepository<Place, Long> {
-
     Optional<Place> findByNameAndLatitudeAndLongitude(String name, String lat, String lng);
 }
 ```
@@ -53,7 +52,7 @@ public interface PlaceRepository extends JpaRepository<Place, Long> {
     void createTraveloguePlacesWithConcurrency() throws InterruptedException {
         TraveloguePlaceRequest request = new TraveloguePlaceRequest(...);
 		
-		// 스레드 10개 생성
+	// 스레드 10개 생성
         ExecutorService executorService = Executors.newFixedThreadPool(10);
         
         // 10개의 스레드가 동시에 getPlace() 호출
@@ -61,14 +60,14 @@ public interface PlaceRepository extends JpaRepository<Place, Long> {
             executorService.execute(() -> traveloguePlaceService.getPlace(request));
         }
         
-	    // 모든 작업이 끝날 때까지 최대 30초 대기
+	// 모든 작업이 끝날 때까지 최대 30초 대기
         executorService.shutdown();
         executorService.awaitTermination(30, TimeUnit.SECONDS);
 		
         String placeName = request.placeName();
         TraveloguePositionRequest position = request.position();
 		
-		// DB에 해당 place 가 하나만 저장되었는지 확인
+	// DB에 해당 place 가 하나만 저장되었는지 확인
         assertThat(placeRepository.findByNameAndLatitudeAndLongitude(placeName, position.lat(), position.lng()))
                 .isPresent();
     }
@@ -146,7 +145,6 @@ SELECT * FROM place WHERE ... FOR UPDATE;
 
 ```java
 public interface PlaceRepository extends JpaRepository<Place, Long> {
-    
     @Lock(LockModeType.PESSIMISTIC_READ)
     Optional<Place> findByNameAndLatitudeAndLongitude(String name, String lat, String lng);
 }
@@ -181,7 +179,6 @@ Exception in thread "pool-3-thread-4" org.springframework.dao.CannotAcquireLockE
 
 ```java
 public interface PlaceRepository extends JpaRepository<Place, Long> {
-    
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     Optional<Place> findByNameAndLatitudeAndLongitude(String name, String lat, String lng);
 }
