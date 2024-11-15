@@ -145,7 +145,7 @@ lighthouse https://www.google.com/ --config-path=./lighthouse-config.js
 
 ![image.png](image%202.png)
 
-> 만약 크롬 lighthouse와 같은 성능으로 측정을 하고 싶으면 `throttling` 에 다음과 같은 값을 넣으십시오.
+> 만약 크롬 lighthouse와 같은 성능으로 측정을 하고 싶으면 `throttling` 에 다음과 같은 값을 넣으세요.
 
 ```jsx
 // 모바일 (느린 4G + cpu 4배 감소)
