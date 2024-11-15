@@ -89,61 +89,6 @@ public class TreeNode {
 		data = item;
 
 	}
-
-	
-
- //자신과 왼쪽 자식 노드(sub)와 연결해주는 method
-
-	public void makeLeftSubTree(TreeNode sub){
-
-   if(this.left != null) this.left = null;
-
-		this.left = sub;
-
-	}
-
-	
-
- //자신과 오른쪽 자식 노드(sub)와 연결해주는 method
-
-	public void makeRightSubTree(TreeNode sub){
-
-   if(this.right != null) this.right = null;
-
-		this.right = sub;
-
-	}
-
-	
-
- //자신의 data를 반환하는 함수
-
-	public Object getData(){
-
-  return this.data;
-
-	}
-
-	
-
- //자신의 왼쪽 자식노드를 반환하는 함수
-
-	public TreeNode getLeftSubTree(){
-
-  return this.left;
-
-	}
-
-	
-
- //자신의 오른쪽 자식노드를 반환하는 함수
-
-	public TreeNode getRightSubTree(){
-
-  return this.right;
-
-	}
-
 }
 
 ```
@@ -151,8 +96,6 @@ public class TreeNode {
 
 
 ```java
-import java.util.*;
-
 public class TreeOrder2Matrix {
 	static int n;
 	static int[][] tree;
@@ -242,13 +185,6 @@ public class TreeOrder2Matrix {
 
 1차원 배열을 써서 선형 탐색을 해야하면 O(N) 시간복잡도가 걸리는데 트리는 O(logN)만에 찾을 수 있습니다. 1차원 배열이라도 매번 이진탐색을 사용하여 logN의 탐색 시간복잡도를 가질 수 있지만, 트리 자료구조는 삽입, 삭제, 수정 또한 log(N)의 시간복잡도가 걸린다는 것이 장점입니다.
 
-블라블라
+트리는 비선형 자료구조 중에서도 효율적이고 강력한 도구입니다. 탐색, 삽입, 삭제에서 제공하는 효율성과 더불어 데이터 간의 계층적 관계를 표현할 수 있는 유연성 덕분에, 많은 분야에서 활용되고 있습니다.
 
-
-
-몇 가지 유용한 트리 자료구조를 소개하면서 글을 마치겠습니다.
-
-
-B Tree
-
-https://velog.io/@emplam27/%EC%9E%90%EB%A3%8C%EA%B5%AC%EC%A1%B0-%EA%B7%B8%EB%A6%BC%EC%9C%BC%EB%A1%9C-%EC%95%8C%EC%95%84%EB%B3%B4%EB%8A%94-B-Tree
+구현은 어려울 수 있지만, 이를 통해 얻는 이점은 그만큼 큽니다. 앞으로 트리를 학습하면서 다양한 응용 사례를 접하고, 이를 활용해보길 바랍니다.
