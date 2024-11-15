@@ -128,7 +128,7 @@ MySQL을 기준으로 사용법을 알아보자.
 
 `CREATE INDEX` 구문을 사용하거나, 테이블 생성 시 `CREATE TABLE` 구문에 인덱스를 포함시키는 방법이 있다.
 
-- **구문**
+**구문**
 
 ```sql
 CREATE INDEX 인덱스_이름 ON 테이블_이름(열_이름1, 열_이름2);
@@ -146,13 +146,15 @@ CREATE TABLE 테이블_이름 (
 
 ### 삭제
 
-- **구문**
+**구문**
 
 ```sql
 DROP INDEX 인덱스_이름 ON 테이블_이름;
 ```
 
-- **참고**
+<details>
+<summary>참고</summary>
+<div markdown="1">
 
 외래키가 포함된 인덱스를 삭제하려고 하면 에러가 발생한다.
 
@@ -160,7 +162,7 @@ DROP INDEX 인덱스_이름 ON 테이블_이름;
 
 이때는 외래키 제약조건을 먼저 삭제한 후 외래키 삭제를 진행하면 된다.
 
-  - **구문**
+**구문**
 
 ```sql
 ALTER TABLE 테이블_이름 DROP FOREIGN KEY 제약조건_이름;
@@ -170,11 +172,14 @@ ALTER TABLE 테이블_이름 DROP FOREIGN KEY 제약조건_이름;
 ALTER TABLE 테이블_이름 ADD CONSTRAINT 제약조건_이름 
     FOREIGN KEY (외래키_열_이름) REFERENCES 참조_테이블_이름 (참조_열_이름);
 ```
-  - **예시**
+**예시**
 
 <img width="1302" alt="image" src="https://github.com/user-attachments/assets/21a27440-da33-48e9-87d3-fd8ae6ad5fbb">
 <img width="1279" alt="image" src="https://github.com/user-attachments/assets/5747ef2b-871a-43c9-9be1-4157380b0b2c">
 <img width="1278" alt="image" src="https://github.com/user-attachments/assets/0490b1ae-4e11-4d3c-8745-9191883f60ad">
+
+</div>
+</details>
 
 <br>
 
@@ -186,15 +191,15 @@ ALTER TABLE 테이블_이름 ADD CONSTRAINT 제약조건_이름
 
 ### 조회
 
-- **구문**
+**구문**
 
 ```sql
 SHOW INDEX FROM 테이블_이름;
 ```
 
-- **예시**
+**예시**
 
-구문을 통해 member 테이블에 composite index가 있음을 확인할 수 있다.
+구문을 통해 member 테이블에 복합 인덱스가 있음을 확인할 수 있다.
 
 <img width="1004" alt="image" src="https://github.com/user-attachments/assets/f7528e5d-0c36-41d7-ae07-bb6b02829c3d">
 
@@ -202,13 +207,11 @@ SHOW INDEX FROM 테이블_이름;
 
 ### 성능 최적화
 
-쿼리 성능을 향상하고 싶다면 **실행 계획**을 통해 진단해 볼 수 있다.
+쿼리 성능을 향상하고 싶다면 **실행 계획**을 통해 진단해 볼 수 있다. 실행 계획이란 데이터베이스가 데이터를 찾아가는 일련의 과정을 사람이 알아보기 쉽게 DB 결과 셋으로 보여주는 것이다.
 
-**실행 계획**이란 데이터베이스가 데이터를 찾아가는 일련의 과정을 사람이 알아보기 쉽게 DB 결과 셋으로 보여주는 것이다.
+**구문**
 
-- **구문**
-
-사용 방법은 쿼리 앞에 `EXPLAIN` 키워드를 사용하면 된다.
+쿼리 앞에 `EXPLAIN` 키워드를 사용하면 된다.
 
 ```sql
 EXPLAIN 쿼리;
@@ -220,11 +223,13 @@ MySQL 8.0.18 부터는 `EXPLAIN ANALYZE`로도 쿼리를 분석할 수 있다. 
 EXPLAIN ANALYZE 쿼리;
 ```
 
-<br>
+<details>
+<summary>참고</summary>
+<div markdown="1">
 
 보통 옵티마이저가 적절하게 인덱스를 선택한다. 하지만 직접 인덱스를 고르고 싶다면 아래 구문을 활용할 수 있다.
 
-- **구문**
+**구문**
 
 `USE INDEX`는 쿼리에서 특정 인덱스만 사용하도록 힌트를 준다. 여러 인덱스가 있을 때, 특정 인덱스를 선택해서 성능을 개선할 수 있다.
 
@@ -243,6 +248,9 @@ SELECT .. FROM 테이블_이름 FORCE INDEX (인덱스_이름) WHERE ..;
 ```sql
 SELECT .. FROM 테이블_이름 IGNORE INDEX (인덱스_이름) WHERE ..;
 ```
+
+</div>
+</details>
 
 ## 인덱스를 어떻게 사용하는 게 좋을까?
 ### A. 데이터 양이 많을 때
