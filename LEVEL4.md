@@ -152,34 +152,27 @@ CREATE TABLE 테이블_이름 (
 DROP INDEX 인덱스_이름 ON 테이블_이름;
 ```
 
-<details>
-<summary>참고</summary>
-<div markdown="1">
-
-외래키가 포함된 인덱스를 삭제하려고 하면 에러가 발생한다.
-
-<img width="1373" alt="image" src="https://github.com/user-attachments/assets/8a9e9727-acb6-4630-8753-042653f4532f">
-
-이때는 외래키 제약조건을 먼저 삭제한 후 외래키 삭제를 진행하면 된다.
-
-**구문**
-
-```sql
-ALTER TABLE 테이블_이름 DROP FOREIGN KEY 제약조건_이름;
-```
-
-```sql
-ALTER TABLE 테이블_이름 ADD CONSTRAINT 제약조건_이름 
-    FOREIGN KEY (외래키_열_이름) REFERENCES 참조_테이블_이름 (참조_열_이름);
-```
-**예시**
-
-<img width="1302" alt="image" src="https://github.com/user-attachments/assets/21a27440-da33-48e9-87d3-fd8ae6ad5fbb">
-<img width="1279" alt="image" src="https://github.com/user-attachments/assets/5747ef2b-871a-43c9-9be1-4157380b0b2c">
-<img width="1278" alt="image" src="https://github.com/user-attachments/assets/0490b1ae-4e11-4d3c-8745-9191883f60ad">
-
-</div>
-</details>
+> 외래키가 포함된 인덱스를 삭제하려고 하면 에러가 발생한다.
+> 
+> <img width="1373" alt="image" src="https://github.com/user-attachments/assets/8a9e9727-acb6-4630-8753-042653f4532f">
+> 
+> 이때는 외래키 제약조건을 먼저 삭제한 후 외래키 삭제를 진행하면 된다.
+> 
+> **구문**
+> 
+> ```sql
+> ALTER TABLE 테이블_이름 DROP FOREIGN KEY 제약조건_이름;
+> ```
+> 
+> ```sql
+> ALTER TABLE 테이블_이름 ADD CONSTRAINT 제약조건_이름 
+>     FOREIGN KEY (외래키_열_이름) REFERENCES 참조_테이블_이름 (참조_열_이름);
+> ```
+> **예시**
+> 
+> <img width="1302" alt="image" src="https://github.com/user-attachments/assets/21a27440-da33-48e9-87d3-fd8ae6ad5fbb">
+> <img width="1279" alt="image" src="https://github.com/user-attachments/assets/5747ef2b-871a-43c9-9be1-4157380b0b2c">
+> <img width="1278" alt="image" src="https://github.com/user-attachments/assets/0490b1ae-4e11-4d3c-8745-9191883f60ad">
 
 <br>
 
@@ -223,31 +216,27 @@ MySQL 8.0.18 부터는 `EXPLAIN ANALYZE`로도 쿼리를 분석할 수 있다. 
 EXPLAIN ANALYZE 쿼리;
 ```
 
-<details>
-<summary>참고</summary>
-<div markdown="1">
-
-보통 옵티마이저가 적절하게 인덱스를 선택한다. 하지만 직접 인덱스를 고르고 싶다면 아래 구문을 활용할 수 있다.
-
-**구문**
-
-`USE INDEX`는 쿼리에서 특정 인덱스만 사용하도록 힌트를 준다. 여러 인덱스가 있을 때, 특정 인덱스를 선택해서 성능을 개선할 수 있다.
-
-```sql
-SELECT .. FROM 테이블_이름 USE INDEX (인덱스_이름) WHERE ..;
-```
-
-`FORCE INDEX`는 `USE INDEX`보다 더 강력한 명령어로, 지정된 인덱스를 반드시 사용하게 만든다.
-
-```sql
-SELECT .. FROM 테이블_이름 FORCE INDEX (인덱스_이름) WHERE ..;
-```
-
-`IGNORE INDEX`는 특정 인덱스를 사용하지 말라고 지시하는 명령어이다. 해당 인덱스를 무시하고 다른 방식으로 데이터를 검색하도록 강제할 수 있다.
-
-```sql
-SELECT .. FROM 테이블_이름 IGNORE INDEX (인덱스_이름) WHERE ..;
-```
+> 보통 옵티마이저가 적절하게 인덱스를 선택한다. 하지만 직접 인덱스를 고르고 싶다면 아래 구문을 활용할 수 있다.
+> 
+> **구문**
+> 
+> `USE INDEX`는 쿼리에서 특정 인덱스만 사용하도록 힌트를 준다. 여러 인덱스가 있을 때, 특정 인덱스를 선택해서 성능을 개선할 수 있다.
+> 
+> ```sql
+> SELECT .. FROM 테이블_이름 USE INDEX (인덱스_이름) WHERE ..;
+> ```
+> 
+> `FORCE INDEX`는 `USE INDEX`보다 더 강력한 명령어로, 지정된 인덱스를 반드시 사용하게 만든다.
+> 
+> ```sql
+> SELECT .. FROM 테이블_이름 FORCE INDEX (인덱스_이름) WHERE ..;
+> ```
+> 
+> `IGNORE INDEX`는 특정 인덱스를 사용하지 말라고 지시하는 명령어이다. 해당 인덱스를 무시하고 다른 방식으로 데이터를 검색하도록 강제할 수 있다.
+> 
+> ```sql
+> SELECT .. FROM 테이블_이름 IGNORE INDEX (인덱스_이름) WHERE ..;
+> ```
 
 </div>
 </details>
