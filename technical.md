@@ -620,7 +620,7 @@ VSCode 를 실행한 뒤 왼쪽 네모 조각 모양을 클릭한 후 아래 확
 ### SSH 설정
 
 아래와 같이 이동하여 SSH 를 설정 파일을 작성합니다.
-![](https://velog.velcdn.com/images/chch1213/post/c7c1ac69-ec5e-4765-8451-8ee914752873/image.png)
+![image](https://github.com/user-attachments/assets/010eea56-d373-44f4-8992-2706268e1ea5)
 
 제일 위의 홈 폴더 아래 `.ssh/config` 를 선택해주세요.
 ![](https://velog.velcdn.com/images/chch1213/post/b10ee3e4-28f2-427c-815e-e7d82b9eea95/image.png)
@@ -637,18 +637,18 @@ VSCode 를 실행한 뒤 왼쪽 네모 조각 모양을 클릭한 후 아래 확
 
 파일 구성이 완료되었으면 새로고침 한 후 버튼을 눌러 접속하면 됩니다.
 
-![](https://velog.velcdn.com/images/chch1213/post/826fe476-9049-4367-a05e-af2d1509d7da/image.png)
+![image](https://github.com/user-attachments/assets/48b63785-93e3-48c7-beee-c4c93819a4c9)
 
 최초 연결 시 **지문 등록 yes** 메세지나 **운영체제 선택 Linux** 메세지가 뜰 수 있습니다.
 
 또한 최초 연결 시 서버에 `vscode-server` 를 설치 및 동작하게 되는 시간이 걸리므로 조금 기다려주시면 연결이 됩니다.
 
 위쪽에 `Terminal` 을 클릭하면 SSH 를 연결했을 때와 똑같은 터미널을 사용할 수 있습니다.
-![](https://velog.velcdn.com/images/chch1213/post/66315d56-43b4-4464-a9c0-3f4f75c87784/image.png)
+![image](https://github.com/user-attachments/assets/1cf5378d-60fb-4d72-8ee8-68613a3ed6e9)
 
 좌측에 폴더를 클릭하여 열 경우 파일 탐색기 처럼 볼 수 있습니다.
 
-![](https://velog.velcdn.com/images/chch1213/post/0f0bb37b-a848-4782-893e-7a381a36d094/image.png)
+![image](https://github.com/user-attachments/assets/622cbccd-6f3c-48ef-a2c9-7746b854c1e1)
 
 ![](https://velog.velcdn.com/images/chch1213/post/61cf3c44-8a1f-4086-b6ad-f7ee17af7865/image.png)
 
