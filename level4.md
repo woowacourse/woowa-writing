@@ -319,7 +319,7 @@ Frontend 개발자가 할 일은 1, 2, 3, 7번 입니다.
 4, 5, 6번은 Backend 개발자가 Authorization Server와 Resource Server 사이에서 데이터를 주고 받는 코드를 작성하면 됩니다.
 
 ```tsx
-// 1. Callback 페이지 (Github 로그인을 하면 자동으로 넘어옵니다)
+// 1. Callback 페이지 (Github 로그인을 하면 자동으로 이동합니다)
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -358,6 +358,25 @@ const CallbackPage = () => {
 };
 
 export default CallbackPage;
+```
+
+<br>
+
+**<mark style='background-color: #fff5b1'>postLogin 함수</mark>**
+
+postLogin 함수는 Client가 Authorization Server에 로그인 요청을 보내는 함수입니다. code 파라미터를 사용하여 API 요청을 하고 Authorization Server가 자체 생성한 Access Token, Refresh Token 그리고 Resource Server로 부터 받은 User Info를 Client에 넘겨주면 이를 저장합니다.
+
+```ts
+const postLogin = async (code: string) => {
+  const response = await fetch("/api/auth/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ code }),
+  });
+
+  if (!response.ok) throw new Error("Login failed");
+  return response.json(); // { accessToken, refreshToken, userInfo }
+};
 ```
 
 <br>
@@ -431,6 +450,26 @@ const Header = () => {
 };
 
 export default Header;
+```
+
+<br>
+
+**<mark style='background-color: #fff5b1'>postLogout 함수</mark>**
+
+postLogout 함수는 세션을 종료하기 위해 Client가 Authorization Server에 로그아웃 요청을 보내는 함수입니다.
+
+```ts
+const postLogout = async () => {
+  const response = await fetch("/api/auth/logout", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (!response.ok) throw new Error("Logout failed");
+};
 ```
 
 <br>
