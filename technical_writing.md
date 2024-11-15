@@ -51,7 +51,7 @@ key 정보를 모두가 모르는 상태에서 spring에서 s3 인프라를 구�
 
 # AWS IAM이란?
 
-**IAM(Identity and Access Management)** 는 AWS에서 사용자가 **누가 무엇에 접근할 수 있는지**롤 관리하는 서비스이다.
+**IAM(Identity and Access Management)**은 AWS에서 사용자가 **누가 무엇에 접근할 수 있는지**롤 관리하는 서비스이다.
 
  쉽게 말해, **“누구에게 어떤 권한을 줄 것인가?＂** 를 결정하고 관리하는 시스템이다.
 
