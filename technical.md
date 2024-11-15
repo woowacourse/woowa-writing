@@ -674,4 +674,4 @@ VSCode 를 실행한 뒤 왼쪽 네모 조각 모양을 클릭한 후 아래 확
 
 따라서, 가끔 서버에 접속하여 `sudo apt update && sudo apt upgrade -y` 를 해주시길 바랍니다.
 
-재부팅시 필요하다고 `*** System restart required ***` 가 보이시면 `sudo reboot` 을 하여 재부팅을 해주시는 것도 필요합니다.
+재부팅이 필요하다고 `*** System restart required ***` 가 보이시면 `sudo reboot` 을 하여 재부팅을 해주시는 것도 필요합니다.
