@@ -1,7 +1,7 @@
 # ObservableField와 LiveData의 이해(+ Data Binding와 결합하기)
 
 > **글 소개**  
-> `ObservableField`와 `LiveData`의 개념과 차이점, 활용 방법을 알아보는 글입니다.
+> `ObservableField`와 `LiveData`의 개념과 차이점, `DataBinding`과 함께 활용하는 방법을 알아보는 글입니다.
 
 ## 목차
 ### 0️⃣ 도입부
@@ -36,9 +36,11 @@ ___
 <br>
 
 ## 0️⃣ 도입부
-안드로이드에서 데이터를 관찰하고 업데이트할 때, 흔히 사용되는 `ObservableField`와 `LiveData`는 각각의 특성과 용도에 따라 선택될 수 있습니다.  
 
-이 글에서는 `ObservableField`와 `LiveData`의 차이점에 대해 알아보고, 어떤 상황에서 각 객체가 적합한지 살펴보겠습니다.
+안드로이드에서 데이터를 관찰하고 UI에 업데이트할 때 흔히 `ObservableField`와 `LiveData`를 사용합니다. 두 객체의 각 특성과 용도에 따라 어느 것을 사용할 지 선택할 수 있습니다.  
+`ObservableField`나 `LiveData`를 데이터 바인딩과 함께 사용하면 XML 레이아웃과 데이터를 연결해 UI와 데이터 동기화를 자동화하고, 코드의 간결성과 유지보수성을 높일 수 있습니다.
+
+이 글에서는 `Data Binding`과 함께 자주 사용되는 데이터 홀더인 `ObservableField`와 `LiveData`의 특징 및 사용 예제를 살펴보고, 두 기술의 선택 기준에 대해 알아보려고 합니다.
 
 ## 1️⃣ 데이터 바인딩의 기본 개념
 ### 데이터 바인딩이란?
@@ -63,12 +65,8 @@ LiveData나 Observable과 같은 관찰 가능한 데이터 패턴을 지원합�
 따라서, 데이터 바인딩은 UI와 데이터를 간단하고 효율적으로 연결할 수 있는 도구입니다.
 
 ### 데이터 바인딩의 중요성
-데이터 바인딩은 레이아웃을 사용할 때 몇가지 장점을 제공합니다. 간단한 예로 아래와 같이 `findViewById(..)`를 호출하지 않고 뷰를 사용할 수 있게 해줍니다.
-```kotlin
-    findViewById<TextView>(R.id.name).apply {
-        text = viewModel.userName
-    }
-```
+데이터 바인딩은 레이아웃을 사용할 때 몇가지 장점을 제공합니다. 
+
 <br>
 
 > **데이터 바인딩의 장점**
@@ -98,7 +96,12 @@ LiveData나 Observable과 같은 관찰 가능한 데이터 패턴을 지원합�
   <br>
   데이터 바인딩을 활용하면 `findViewById()`를 이용해 뷰를 찾고 데이터를 설정하는 등의 반복적인 UI 업데이트 작업을 줄일 수 있습니다. 
   데이터 바인딩 클래스는 자동으로 생성되므로, 각 뷰를 `findViewById()`로 찾을 필요가 없으며, XML에서 정의한 데이터를 코드에 수동으로 연결하지 않아도 됩니다.
-  이를 통해 코드가 간결해지고 유지 보수가 용이해집니다.
+  이로써 코드가 간결해지고 유지 보수가 용이해집니다.
+    ```kotlin
+        findViewById<TextView>(R.id.name).apply {
+            text = viewModel.userName
+        }
+    ```
 
    <br>
 
@@ -149,7 +152,7 @@ LiveData나 Observable과 같은 관찰 가능한 데이터 패턴을 지원합�
 
 **ObservableField의 장점**
 - **직관적이고 쉬움**  
-  `ObservableField`는 사용법이 매우 직관적이어서, LiveData와 달리 별도의 추가 개념을 학습하지 않아도 쉽게 이해하고 사용할 수 있습니다. 특히 데이터 바인딩과 함께 사용할 때 유용하며, 추가적인 라이브러리나 설정 없이 바로 데이터를 바인딩할 수 있습니다.
+  `ObservableField`는 사용법이 매우 직관적이어서, LiveData와 달리 쉽게 이해하고 사용할 수 있습니다. 특히 데이터 바인딩과 함께 사용할 때 유용하며, 추가적인 라이브러리나 설정 없이 바로 데이터를 바인딩할 수 있습니다.
 
 **ObservableField의 단점**
 - **생명주기 인식 X**  
@@ -243,20 +246,20 @@ UI 컴포넌트와 ViewModel, 모델 간의 상호 작용을 쉽게 해주며 �
 
 
 - **Activity가 중단된 동안 크래시 발생 X**  
-  Activity가 백 스택에 있을 때를 비롯해 `Observer`의 수명 주기가 비활성 상태라면 `Observer`는 어떤 `LiveData` 이벤트도 받지 않기 때문에 Activity가 중단된 동안 크래시 발생할 위험이 없습니다.
+  Activity가 백 스택에 있을 때를 비롯해 `Observer`의 수명 주기가 비활성 상태라면, `Observer`는 어떤 `LiveData` 이벤트도 받지 않기 때문에 Activity가 중단된 동안 크래시 발생할 위험이 없습니다.
 
 
-- **생명 주기를 자동으로 관리**  
-UI 컴포넌트는 관련 데이터를 관찰하기만 할 뿐 관찰을 중지하거나 다시 시작하지 않습니다. `LiveData`는 관찰하는 동안 관련 수명 주기 상태의 변경을 인식하므로 수명주기를 자동으로 관리합니다.
+- **생명 주기를 자동으로 관리**
+`LiveData`는 Observer를 통해서 생명주기를 자동으로 관리해주기 때문에 UI 컴포넌트는 그저 관련 데이터를 관찰하기만 하면 됩니다.
 
 
 - **적절한 구성 변경**  
-기기 회전과 같은 구성 변경으로 인해 액티비티 또는 프래그먼트가 다시 생성되면 사용 가능한 최신 데이터를 즉시 받습니다.
-
+화면 회전 시 새로 생성된 Activity나 Fragment에서도 LiveData를 관찰하여 즉시 최신 데이터를 다시 받을 수 있습니다. 이는 LiveData가 수명 주기와 결합되어 있어, 관찰자(Observer)가 재등록될 때 최신 데이터를 자동으로 제공하기 때문입니다.
 
  **LiveData의 단점**
-- **비동기 데이터 스트림 처리 제한**  
-`LiveData`는 비동기 데이터 스트림을 처리하도록 설계되지 않았습니다. 따라서 입출력 처리를 포함한 데이터 레이어의 비동기 작업에서는 다소 제한적입니다.
+- **비동기 데이터 스트림 제한**  
+`비동기 데이터 스트림`이란, 시간의 흐름에 따라 비동기적으로 발생하는 데이터를 연속적으로 전달하는 흐름을 말합니다. `LiveData`는 Data Layer에서 비동기 데이터 스트림을 처리하도록 설계된 도구가 아닙니다.  
+`LiveData`를 변형하거나 `MediatorLiveData`를 활용해 Data Layer에서 `LiveData`를 사용할 수는 있으나 이는 메인 스레드에서 호출되는 비용이 많이 드는 호출이며, UI에서 심각한 끊김 현상을 유발할 수 있습니다.
 
 <br>
 
@@ -281,7 +284,7 @@ class LiveDataViewModel : ViewModel() {
 ![img_4.png](img_4.png)
 
 `MutableLiveData` 타입을 활용하면 값을 업데이트할 수 있습니다. `MutableLiveData`는 `setValue(T)`와 `postValue(T)` 두 가지 메서드를 제공합니다.  
-`setValue(T)`는 메인 스레드에서 호출해야 합니다. 백그라운드 스레드에서 값을 설정해야 하는 경우 postValue`를 사용해야 합니다. postValue(T)` 는 값을 바로 변경하지 않고 메인 스레드에게 작업을 할당합니다. 
+`setValue(T)`는 메인 스레드에서 호출해야 합니다. 백그라운드 스레드에서 값을 설정해야 하는 경우 `postValue(T)`를 사용해야 합니다. `postValue(T)` 는 값을 바로 변경하지 않고 메인 스레드에게 작업을 할당합니다. 
 
 `ViewModel.kt`
 ```kotlin
