@@ -128,7 +128,7 @@ Authorization Server는 백엔드에서 관리하는 서버로 사용자를 인�
 
 > 권한을 부여받은 열쇠
 
-Access Token은 Client나 Authorization Server가 리소스 서버에 접근할 수 있도록 부여받는 토큰입니다. 이 토큰은 보통 짧은 유효 기간을 가지고 있으며, Client가 서버에 API 요청을 보낼 때 `헤더(Header)`에 포함시켜 보냅니다. 예를 들어, Github API에 요청을 보낼 때 이 토큰을 사용해 사용자 정보를 불러옵니다.
+Access Token은 Client나 Authorization Server가 리소스 서버에 접근할 수 있도록 부여받는 토큰입니다. 이 토큰은 보통 짧은 유효 기간을 가지고 있으며, Client가 서버에 API 요청 시 `헤더(Header)`에 포함시켜 보냅니다. 예를 들어, Github API에 요청 시 이 토큰을 사용해 사용자 정보를 불러옵니다.
 
 <br>
 
@@ -234,10 +234,31 @@ Client secrets
 
 ### 2. 로그인 클릭
 
-- 로그인을 클릭합니다.
 - 현재 localStorage는 비어있습니다.
+- 로그인을 클릭하면 Github OAuth로 리다이렉트 되는 코드를 구현합니다.
+- 발급 받은 `client_id`와 백엔드와 정한 `scope`로 Github OAuth URL를 생성합니다.
 
 ![6](https://github.com/user-attachments/assets/34578ed3-569a-46aa-813b-e1c02d4007b8)
+
+<br>
+
+**<mark style='background-color: #fff5b1'>로그인 클릭 코드</mark>**
+
+[OAuth 앱의 Scope](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/scopes-for-oauth-apps)
+
+```tsx
+const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${발급받은 Client Id}&scope=${OAuth 앱의 Scope}`;
+
+const Header = () => {
+  const handleLoginClick = async () => {
+    window.open(githubAuthUrl, "_self")
+  };
+
+  return <button onClick={handleLoginClick}>로그인</button>;
+};
+
+export default Header;
+```
 
 <br>
 <br>
@@ -245,40 +266,22 @@ Client secrets
 ### 3. Github OAuth로 리다이렉트
 
 - Resource Owner(사용자)에게 인증을 요청합니다.
-- 발급 받은 `client_id`와 백엔드와 정한 `scope`로 Github OAuth URL를 생성합니다.
+- Github OAuth에서 로그인을 성공하면 Github Authorization callback URL에 지정한 callback 페이지로 이동합니다.
 
 ![7](https://github.com/user-attachments/assets/09940612-5417-43e0-a7cb-34aac53b14fc)
 
 <br>
-
-**<mark style='background-color: #fff5b1'>로그인 코드</mark>**
-
-[OAuth 앱의 Scope](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/scopes-for-oauth-apps)
-
-```tsx
-const App = () => {
-  const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${발급받은 Client Id}&scope=${OAuth 앱의 Scope}`;
-
-  const handleLogin = () => {
-    window.open(githubAuthUrl, "_self");
-  };
-
-  return <button onClick={handleLogin}>로그인</button>
-};
-
-export default App;
-```
 
 <br>
 <br>
 
 ### 4. Callback 페이지 화면
 
-1\. Github Authorization callback URL에 지정한 callback 페이지로 넘어갑니다.
+1\. Github OAuth에서 로그인을 성공해서 Github Authorization callback URL에 지정한 callback 페이지로 이동했습니다.
 
 <br>
 
-2\. callback url 뒤에 query 파라미터로 code가 넘어옵니다.
+2\. callback URL 뒤에 query 파라미터(`?code=`)로 code가 넘어옵니다.
 
 <br>
 
@@ -365,17 +368,17 @@ export default CallbackPage;
 
 ![1003](https://github.com/user-attachments/assets/d9cad189-c443-40de-b17a-cec5e5b12c82)
 
-1\. Resource Owner는 Client를 통해 로그인을 한 후 Resource Server로부터 code를 받습니다.
+1\. [FE] Resource Owner는 Client를 통해 로그인을 한 후 Resource Server로부터 code를 받습니다.
 
-2\. Client는 이 code로 Authorization Server에 `로그인 post` 요청을 합니다.
+2\. [FE] Client는 이 code로 Authorization Server에 `로그인 post` 요청을 합니다.
 
-3\. Authorization Server는 Client ID, Client secrets, code를 이용하여 Resource Server에 Access Token을 요청합니다.
+3\. [BE] Authorization Server는 Client ID, Client secrets, code를 이용하여 Resource Server에 Access Token을 요청합니다.
 
-4\. Authorization Server는 발급 받은 Access Token을 header에 담아서 Resource Server에 User Info를 요청합니다.
+4\. [BE] Authorization Server는 발급 받은 Access Token을 header에 담아서 Resource Server에 User Info를 요청합니다.
 
-5\. Authorization Server는 자체 생성한 access Token, refresh Token과 Resource Server로 부터 받은 User Info를 Client에 넘겨줍니다.
+5\. [BE] Authorization Server는 자체 생성한 access Token, refresh Token과 Resource Server로 부터 받은 User Info를 Client에 넘겨줍니다.
 
-6\. Client는 이를 기기에 저장한 후 Access Token을 header에 담아서 api를 요청하는 데에 사용합니다.
+6\. [FE] Client는 이를 기기에 저장한 후 Access Token을 header에 담아서 api를 요청하는 데에 사용합니다.
 
 <br>
 <br>
@@ -409,18 +412,17 @@ export default CallbackPage;
 
 2\. Authorization Server는 로그아웃 post를 요청 받으면 DB에 있는 refresh Token을 삭제합니다.
 
-![10](https://github.com/user-attachments/assets/d4a4ed60-714a-4dd2-b80f-f66dbeb74aa1)
-
 <br>
 
 **<mark style='background-color: #fff5b1'>로그아웃 코드</mark>**
 
 ```tsx
-const LogoutPage = () => {
+const Header = () => {
   const handleLogoutClick = async () => {
     try {
       await postLogout(); // 로그아웃 요청
       localStorage.clear(); // 로그아웃 후 로컬 스토리지 클리어
+      window.location.replace("/"); // 로그아웃 상태로 바꾸기 위해 새로고침
     } catch (error) {
       alert(error.message);
     }
@@ -429,7 +431,7 @@ const LogoutPage = () => {
   return <button onClick={handleLogoutClick}>로그아웃</button>;
 };
 
-export default LogoutPage;
+export default Header;
 ```
 
 <br>
