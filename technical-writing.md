@@ -1,233 +1,436 @@
-# 목차
-
-### 1. Kotlin Flow 개요
-
-- Kotlin Flow의 기본 개념
-- 비동기 데이터 스트림 처리 방식 소개
-
-### 2. Cold Stream vs Hot Stream
-
-- Cold Stream: 구독자가 생길 때마다 새로운 데이터 생성
-- Hot Stream: 여러 구독자가 동시에 데이터 수신
-- Cold Stream과 Hot Stream에서의 활용 차이
-
-### 3. Flow의 주요 연산자
-
-- map, filter, collect 등 기본 연산자
-- flatMapLatest, flowOn을 통한 비동기 처리 제어 및 최적화
-
-### 4. 안드로이드에서 Flow의 등장 배경
-
-- Kotlin의 등장과 함께 안드로이드 개발에서 반응형 프로그래밍의 필요성 증대
-- Flow가 왜 LiveData의 한계를 보완하고, 더 유연한 상태 관리 방식을 제공하게 되었는지 설명
-
-### 5. StateFlow와 SharedFlow
-
-- StateFlow: 상태 관리 최적화
-    - StateFlow의 개념과 역할
-    - 기존 LiveData와의 차이점 및 장점
-    - 상태 보존과 수명 주기 인식 처리
-- SharedFlow: 이벤트 스트림 처리
-    - SharedFlow의 특징과 유스케이스
-
-### 6. Flow의 비동기 처리와 에러 핸들링
-
-- tryCatch, onCompletion을 통한 에러 처리
-- Flow의 비동기 처리 패턴과 리소스 관리 전략
-
-### 7. SharedFlow와 Channel 비교
-
-- Channel과 SharedFlow의 차이점
-- Channel의 비동기 메시지 전달 메커니즘
-- SharedFlow의 다수 구독자 지원 및 버퍼링 전략
-
-### 9. EventFlow: 이벤트 처리에 적합한 Flow
-
-- EventFlow 개념 및 이벤트 처리 패턴
-- StateFlow와 EventFlow의 차이
-- EventFlow를 활용한 UI 이벤트 처리
-
-### 10. SharedFlow와 EventFlow 활용 사례
-
-- 실시간 스트림 이벤트 처리 방법
-- EventFlow를 사용한 사용자 액션 및 이벤트 관리 예시
-
-### 11. 결론 및 향후 전망
-
-- Flow의 발전 방향과 안드로이드 개발에서의 중요성
-- LiveData를 대체하는 Flow의 미래에 대한 통찰
-
----
-
-![image](https://github.com/user-attachments/assets/808bb435-e12a-4b15-99a9-d3442420c804)
-
-# 1. Kotlin Flow 개요
-
-Kotlin Flow는 Kotlin에서 제공하는 비동기 데이터 스트림 처리 도구로, RxJava와 같은 리액티브 프로그래밍의 개념을 간단하고 직관적으로 구현한 라이브러리입니다. 이를 통해 Kotlin 개발자는 비동기 데이터 흐름을 효율적으로 처리할 수 있으며, 데이터를 순차적으로 처리하거나 상태를 유지하면서도 복잡한 비동기 작업을 깔끔하게 표현할 수 있습니다.
-
-## **Kotlin Flow의 기본 개념**
-
-Kotlin Flow는 일련의 데이터를 시간에 따라 순차적으로 전달하는 "Flow"를 기본 개념으로 삼고 있습니다. 이는 **콜드 스트림**으로 동작하며, 데이터 흐름이 구독자에 의해 시작됩니다. 구독자가 없는 상태에서는 데이터 흐름이 시작되지 않기 때문에, 필요하지 않은 리소스 낭비를 방지할 수 있습니다. 또한 Flow는 coroutine과 결합하여 비동기 작업을 자연스럽게 처리할 수 있으며, 기본적으로 단일 스레드에서 동작하지만 필요에 따라 스레드를 전환할 수 있는 유연성도 제공합니다.
-
-## **비동기 데이터 스트림 처리 방식**
-
-비동기 프로그래밍에서 가장 큰 문제 중 하나는 데이터가 언제 발생할지 예측할 수 없다는 점입니다. 이 문제를 해결하기 위해 Kotlin Flow는 데이터 스트림을 비동기적으로 처리합니다. 일반적인 데이터 스트림은 **emit**을 통해 데이터를 발생시키고, 구독자가 **collect**를 통해 데이터를 수집합니다. 이 과정은 coroutine과 결합하여 자연스럽게 비동기 작업을 처리합니다.
-
-또한 Flow는 **backpressure** 문제를 기본적으로 처리합니다. 많은 데이터를 빠르게 전송할 때 시스템 자원이 과부하되는 문제를 해결하기 위해, Flow는 필요한 속도에 맞춰 데이터를 조절하며 처리합니다. 이로 인해, 시스템 자원을 효율적으로 활용하면서도 안정적인 비동기 처리를 가능하게 합니다.
-
-Kotlin Flow는 이러한 특징들을 통해 간결하고 효율적인 비동기 처리 메커니즘을 제공하며, 특히 안드로이드 개발에서 자주 사용되는 LiveData를 대체할 수 있는 도구로 자리잡고 있습니다. Flow는 더욱 유연하고 확장성 있는 방식으로 데이터 스트림을 관리할 수 있어, 비동기 처리가 중요한 앱 개발에 적합한 솔루션입니다.
-
----
-
-![image](https://github.com/user-attachments/assets/04b8d67e-645d-45e9-b735-45f92c65c7db)
 
 
-# 2. **Cold Stream vs Hot Stream**
-
-Kotlin Flow에서는 데이터 스트림을 **Cold Stream**과 **Hot Stream**으로 구분합니다. 이 두 가지 스트림 유형은 데이터의 생성 방식과 구독자에 대한 반응에서 차이를 보이며, 각각의 활용 방안이 다릅니다.
-
-## **Cold Stream**
-
-Cold Stream은 구독자가 생길 때마다 새로운 데이터를 생성하는 스트림입니다. 즉, 데이터 흐름은 구독자가 존재하지 않는 경우에는 발생하지 않으며, 구독자가 추가되면 그 시점부터 데이터를 제공하게 됩니다. 이 방식은 효율적인 리소스 사용을 가능하게 합니다. 예를 들어, API 요청이나 데이터베이스 쿼리와 같이 특정한 이벤트가 발생할 때만 데이터를 가져오는 경우에 적합합니다. Cold Stream은 각 구독자에게 독립적인 데이터 세트를 제공하므로, 서로 다른 구독자들이 각기 다른 시점에서 데이터를 받는 것이 가능합니다.
-
-Cold Stream을 사용하는 간단한 예로는, 사용자가 특정 버튼을 클릭했을 때 서버에서 데이터를 요청하는 경우가 있습니다. 이 버튼 클릭 이벤트가 발생할 때마다 새로운 API 요청이 이루어지며, 각 요청은 독립적으로 처리됩니다.
-
-## **Hot Stream**
-
-반면, Hot Stream은 여러 구독자가 동시에 데이터를 수신할 수 있는 스트림입니다. 데이터는 스트림이 생성된 후에도 계속 발생하며, 구독자는 이 데이터를 동시에 받을 수 있습니다. Hot Stream은 일반적으로 사용자 인터페이스와 같이 지속적으로 변화하는 데이터를 처리할 때 사용됩니다. 모든 구독자는 동일한 데이터 소스에 접근하기 때문에, 데이터가 변경되면 모든 구독자에게 즉시 반영됩니다.
-
-Hot Stream의 예로는 실시간 주식 가격이나 소셜 미디어 피드가 있습니다. 주식 가격이 변화할 때마다 모든 구독자에게 즉시 업데이트가 전송되며, 사용자는 최신 정보를 실시간으로 받을 수 있습니다.
-
-## **Cold Stream과 Hot Stream에서의 활용 차이**
-
-Cold Stream과 Hot Stream의 차이는 활용 사례에 따라 구체적으로 나타납니다. Cold Stream은 데이터 요청이 필요할 때마다 독립적으로 데이터를 생성하고 처리하기에 적합하며, 주로 비동기 API 호출이나 특정 이벤트에 따라 발생하는 데이터에 사용됩니다. 반면 Hot Stream은 지속적인 데이터 흐름이 필요한 경우에 적합하며, 사용자 경험을 향상시키기 위해 여러 구독자가 동시에 최신 정보를 공유하는 데 활용됩니다.
-
-따라서, 두 가지 스트림 유형은 각기 다른 요구 사항에 맞춰 선택할 수 있으며, 개발자는 애플리케이션의 특성에 따라 적절한 방식을 결정해야 합니다. Cold Stream은 개별적인 데이터 요청에 유리하고, Hot Stream은 실시간 데이터 전송 및 업데이트에 적합한 선택이 될 것입니다.
-
----
-
-![image](https://github.com/user-attachments/assets/27900462-c26c-44b4-a709-3e29af2195a9)
+![image](https://github.com/user-attachments/assets/c7b9ff9b-cfd2-4132-b9f6-14edc38085e7)
 
 
 
-# 3. **Flow의 주요 연산자**
 
-Kotlin Flow는 다양한 데이터 변환 및 처리를 위한 연산자를 제공하여 비동기 스트림을 효율적으로 다룰 수 있도록 합니다. 여기서는 가장 기본적인 연산자인 `map`, `filter`, `collect`와 함께, 비동기 처리 제어 및 최적화를 위한 `flatMapLatest`, `flowOn`에 대해 살펴보겠습니다.
 
-## 기본 연산자
+# 들어가며..
+이 글은 안드로이드 개발을 할 때 UI 이벤트 처리에 대해서 고민하는 개발자들을 위해 작성되었습니다. 안드로이드 애플리케이션에서 UI 이벤트는 사용자와 앱 간의 상호작용을 통해 발생하며, 이는 주로 `ViewModel`과 `UI` 레이어에서 처리됩니다. 이러한 이벤트를 적절히 처리하기 위해서는 사용 사례에 맞는 도구와 패턴을 선택하는 것이 중요합니다.  
 
-### **map**
+본 글에서는 `LiveData`, `SingleLiveEvent`, `Channel`, `SharedFlow`, 그리고 `EventFlow`와 같은 주요 이벤트 처리 기법을 소개하고, 각각의 장단점과 활용 사례를 살펴봅니다. 이를 통해 단발성 이벤트부터 여러 구독자가 참여하는 브로드캐스트 이벤트까지 다양한 요구 사항에 적합한 이벤트 처리 방식을 이해할 수 있습니다.  
 
-`map` 연산자는 각 요소를 변환하여 새로운 흐름을 생성하는 데 사용됩니다. 입력 데이터의 형태를 변경하고자 할 때 유용합니다. 예를 들어, 사용자 ID 리스트를 받아 사용자 객체 리스트로 변환할 수 있습니다.
+이 글은 안드로이드 앱 개발자들이 UI 이벤트 처리에서 직면하는 문제를 해결하고, 보다 효율적이고 안정적인 애플리케이션을 설계하는 데 도움을 주는 것을 목표로 합니다.
+
+
+# UI 이벤트 처리
+[공식 문서](https://developer.android.com/topic/architecture/ui-layer/events?hl=ko)에서 UI 이벤트는 다음과 같이 설명합니다.
+
+> UI 이벤트는 UI 레이어에서 처리해야 하는 동작으로, UI 또는 ViewModel에 의해 처리됩니다. 가장 일반적인 유형의 이벤트는 사용자 이벤트입니다. 사용자는 화면을 탭하거나 제스처를 생성하는 등의 방법으로 앱과 상호작용하여 사용자 이벤트를 발생시킵니다. 그런 다음 UI는 onClick() 리스너와 같은 콜백을 사용하여 이러한 이벤트를 소비합니다.
+>
+
+![image (5)](https://github.com/user-attachments/assets/d4f88982-d6b2-418c-ae5d-34c06564da70)
+
+
+
+그렇다면 `ViewModel`에서 `UI 이벤트`를 처리하는 다양한 방법에 대해 알아보겠습니다.
+
+
+
+# 1. LiveData
+
+![image (6)](https://github.com/user-attachments/assets/55c2a1fd-b38e-45ea-afd8-0602b68e0c13)
+
+
+일반적으로 LiveData는 데이터가 변경될 때 활성 옵저버에게만 업데이트를 전달합니다. 다만, 옵저버가 비활성 상태에서 활성 상태로 전환될 경우, 마지막으로 활성 상태였던 시점의 값으로 업데이트를 받습니다.
+ 
+ 
+ 
+> 💡 즉, `LiveData`는 옵저버가 비활성에서 활성으로 전환될 때 마지막 값을 전달하여 UI를 `최신 상태`로 유지합니다.
+
+
+
+
+
+그러나 LiveData를 사용하는 것은 문제가 있습니다.
+
+### 문제 발생 시나리오
+
+1. MainActivity에서 Toast를 띄우라는 UI 이벤트가 발생합니다.
+2. 이후, DetailActivity로 이동한 후 다시 MainActivity로 돌아옵니다.
+3. LiveData를 Observe하고 있던 옵저버는 비활성 상태에서 활성 상태로 전환되며 다시 관찰을 시작합니다.
+4. 이때, 1번에서 발생한 Toast 띄우기 이벤트가 다시 관찰되면서 의도하지 않게 Toast가 발생하는 문제가 발생합니다.
+
+
+
+# 2. SingleLiveEvent
+
+
+![image (7)](https://github.com/user-attachments/assets/7576ef09-240b-4135-a005-b3545eed5851)
+
+> 💡 `SingleLiveEvent`는 단발성 이벤트를 처리하기 위해 고안된 개념으로, 이벤트를 한 번만 전파하고 소모할 수 있도록 LiveData와 결합된 이벤트 래퍼입니다.
+
+
+
 
 ```kotlin
+open class Event<out T>(private val content: T) {
 
-flowOf(1, 2, 3)
-    .map { id -> User(id) }
-    .collect { user -> println(user) }
+    var hasBeenHandled = false
+        private set
 
-```
-
-### **filter**
-
-`filter` 연산자는 조건을 만족하는 요소만을 포함하여 새로운 흐름을 생성합니다. 특정 조건에 부합하는 데이터를 선택하고자 할 때 사용됩니다. 예를 들어, 양수만 필터링할 수 있습니다.
-
-```kotlin
-flowOf(-1, 0, 1, 2, 3)
-    .filter { it > 0 }
-    .collect { positiveNumber -> println(positiveNumber) }
-
-```
-
-### **collect**
-
-`collect` 연산자는 흐름에서 발생한 요소를 수집하는 최종 연산자입니다. 데이터가 흐름에 따라 발생할 때마다 호출되며, 일반적으로 UI 업데이트나 데이터 처리를 위해 사용됩니다.
-
-```kotlin
-flowOf("A", "B", "C")
-    .collect { value -> println(value) }
-
-```
-
-## **비동기 처리 제어 및 최적화 연산자**
-
-### **flatMapLatest**
-
-`flatMapLatest` 연산자는 내부 흐름을 flatten하고, 새로운 데이터가 들어올 때 이전 데이터 처리를 취소하고 최신 데이터만을 처리합니다. 주로 API 요청과 같은 비동기 작업을 다룰 때 유용합니다. 사용자가 여러 번 버튼을 클릭하는 경우에 마지막 클릭만을 처리하고 싶을 때 사용할 수 있습니다.
-
-```kotlin
-buttonClicks
-    .flatMapLatest { searchQuery ->
-        searchDataFromApi(searchQuery)
+    fun getContentIfNotHandled(): T? {
+        return if (hasBeenHandled) {
+            null
+        } else {
+            hasBeenHandled = true
+            content
+        }
     }
-    .collect { result -> println(result) }
 
+    fun peekContent(): T = content
+}
 ```
 
-### **flowOn**
+이 Event Wrapper 개념은 LiveData 공식 문서의 [추천 자료](https://medium.com/androiddevelopers/livedata-with-snackbar-navigation-and-other-events-the-singleliveevent-case-ac2622673150)에 있습니다.
 
-`flowOn` 연산자는 흐름의 특정 부분에서 컨텍스트를 변경할 수 있게 해줍니다. 일반적으로 흐름의 비동기 작업이 메인 스레드에서 발생하지 않도록 백그라운드 스레드에서 처리할 수 있게 도와줍니다. 이 연산자는 데이터의 생성과 처리를 분리할 때 유용합니다.
+
+
+# ViewModels and LiveData: Patterns + AntiPatterns
+
+![image \(8\).png](https://techcourse-storage.s3.ap-northeast-2.amazonaws.com/cc9871e901314a68ad3a36a278c19a60)
+
+LiveData 공식 문서의 [추천 자료](https://medium.com/androiddevelopers/viewmodels-and-livedata-patterns-antipatterns-21efaef74a54)에서 ViewModel과 LiveData를 함께 사용하는 것은 다음과 같다고 설명합니다.
+
+> 이상적으로, ViewModel은 Android에 대한 참조를 가지지 않아야 합니다. 참조를 가지지 않으면 테스트 용이성, 메모리 누수 방지, 모듈화가 향상됩니다. 일반적인 규칙은 ViewModel에 `android.*` 임포트가 없도록 하는 것입니다.(단, `android.arch.*`와 같은 예외는 허용됩니다)
+> 
+
+
+
+> 💡 즉, `ViewModels`과 `LiveData`를 사용하는 패턴은 안티 패턴이라고 설명합니다.
+
+
+
+
+# 3. Channel
+
+### ViewModel에서 안드로이드 프레임워크의 종속성을 벗어나기 위해 Channel을 도입하여 문제를 개선할 수 있습니다.
+
+- Channel은 Android 프레임워크와 독립적으로 동작하며, **코루틴 기반의 비동기 데이터 전송**을 지원하여 테스트 시 Android 의존성을 줄이고, 모듈화 및 유지보수성을 향상시킵니다.
+- Channel은 **라이프사이클에 구애받지 않고** 데이터를 **단일 소비자**에게 전달할 수 있어 이벤트 처리에 더욱 유연하게 대응할 수 있습니다.
+
+
+
+> 💡 즉,` Channel`을 도입함으로써 ViewModel에서 `안드로이드 의존성`을 줄이고, `단일 소비자 기반`의 `효율적인 데이터 처리`를 할 수 있습니다.
+
+
+
+
+### 이전 코드
 
 ```kotlin
-flow {
-    // 데이터 생성
+// sealed interface
+sealed interface Toast {
+    data object ShowToast
+    data object ShowXXX
+    data object ShowYYY
 }
-.flowOn(Dispatchers.IO) // 비동기 작업을 IO 스레드에서 실행
-.collect { value -> println(value) }
+
+// ViewModel
+private val _showToastEvent: MutableLiveData<Event<Toast>> = MutableLiveData(null)
+val showToastEvent: LiveData<Event<Toast>> get() = _showToastEvent
+
+// UI
+viewModel.showToastEvent.observeEvent(this) { toastEvent ->
+    when (toastEvent) {
+        is Event.ShowToast -> // TODO
+        is Event.ShowXXX -> // TODO
+        is Event.ShowYYY -> // TODO
+    }
+}
 ```
 
-이처럼 Kotlin Flow의 기본 연산자와 비동기 처리 제어 연산자는 개발자가 데이터 스트림을 효율적으로 관리하고 변환하는 데 필수적인 도구입니다. 이러한 연산자를 적절히 활용함으로써 복잡한 비동기 작업을 간결하고 명확하게 처리할 수 있습니다. 각 연산자의 특징과 사용법을 이해하면, 더 나은 반응형 프로그래밍이 가능해질 것입니다.
 
----
 
-![image](https://github.com/user-attachments/assets/77904baa-7157-461b-acc4-d6571721a6f6)
+### 이후 코드
 
-# 4. **안드로이드에서 Flow의 등장 배경**
+```kotlin
+// ViewModel
+private val _showToastEvent = Channel<Toast>()
+val showToastEvent = _showToastEvent.receiveAsFlow() 
 
-Kotlin은 2017년 구글의 공식 안드로이드 개발 언어로 채택되면서, 안드로이드 개발자들 사이에서 큰 인기를 얻었습니다. Kotlin의 간결한 문법과 기능들은 개발자들이 보다 효율적으로 코드를 작성할 수 있게 해주었으며, 특히 비동기 프로그래밍에 대한 접근 방식을 혁신적으로 변화시켰습니다. 이에 따라, 반응형 프로그래밍의 필요성이 급증하였습니다.
+// UI
+lifecycleScope.launch {
+    viewModel.showToastEvent.collect { toastEvent ->
+        when (toastEvent) {
+            is Event.ShowToast -> // TODO
+            is Event.ShowXXX -> // TODO
+            is Event.ShowYYY -> // TODO
+        }
+    }
+}
+```
 
-## **반응형 프로그래밍의 필요성**
+기존의 SingleLiveEvent를 Channel로 변경하고, observe 대신 collect하는 방식으로 수정하면 됩니다. 이제 UI에서는 하나의 showToastEvent를 collect하여 Toast 유형에 맞게 처리하는 방식으로 간단히 구현할 수 있습니다.
 
-반응형 프로그래밍은 데이터가 변경될 때 자동으로 UI가 업데이트되는 방식으로, 사용자 경험을 크게 향상시킬 수 있습니다. 사용자가 앱에서 데이터를 입력하거나 변경할 때, 그에 따라 UI가 즉각적으로 반응하면 보다 직관적이고 매끄러운 경험을 제공합니다. 기존의 콜백 기반 방식에서는 비동기 작업을 처리하는 데 복잡성과 가독성 문제가 발생하기 쉽습니다. 이러한 문제를 해결하기 위해, Kotlin은 Coroutine과 함께 Flow라는 새로운 비동기 데이터 스트림 처리 방식을 도입하였습니다.
 
-## **Flow와 LiveData의 한계 보완**
 
-기존의 LiveData는 안드로이드에서 상태 관리를 위해 많이 사용되었지만, 몇 가지 한계가 존재했습니다.
+하지만 Channel만을 사용하는 것도 문제가 있습니다.
 
-### **제한된 데이터 변환 기능**
+### 문제 발생 시나리오
 
-LiveData는 기본적인 데이터 흐름 관리에는 유용하나, 복잡한 데이터 변환이나 비동기 작업을 다루기에는 기능이 부족했습니다. 반면 Flow는 다양한 연산자를 제공하여 데이터 변환 및 처리를 보다 유연하게 수행할 수 있습니다.
+1. ViewModel에서 서버와 통신하면서 위치 데이터를 주기적으로 `emit`합니다.
+2. UI에서는 위치 데이터가 변경되는것을 감지하고 있다가 변경될 때마다 화면에 새로 그리게 됩니다.
+3. 이때, 홈 버튼을 눌러 앱을 백그라운드로 내린다면, 위치 데이터를 계속해서 감지하며 화면을 새로 그리게 되는 문제가 발생합니다.
 
-### **스레드 처리**
+> 💡즉, 사용자가 UI를 보고 있지 않을 때도 데이터를 `observe`하고 있어 `메모리 누수`가 발생합니다.
 
-LiveData는 주로 메인 스레드에서 동작하므로, 비동기 작업을 수행할 때 별도의 스레드 관리를 요구합니다. Flow는 Coroutine을 기반으로 하여 스레드 관리를 간편하게 해주며, 필요에 따라 작업을 다른 스레드에서 실행할 수 있습니다.
 
-### **백프레셔 처리**
 
-LiveData는 소비자 측에서 데이터를 처리할 수 있는 방식이 없어 데이터가 급격히 쌓일 경우 소비되지 못하고 손실될 수 있습니다. Flow는 구독자가 생길 때마다 새로운 데이터를 생성하는 Cold Stream 방식과 여러 구독자가 동시에 데이터 수신이 가능한 Hot Stream 방식을 모두 지원하여 이러한 문제를 해결할 수 있습니다.
+### 해결 방안
 
-### **리소스 관리**
+Lifecycle에서 `repeatOnLifecycle()` 이라는 함수를 사용하면 됩니다.
 
-Flow는 자원의 자동 관리가 가능하여, 데이터 스트림의 구독이 종료될 때 자동으로 리소스를 해제합니다. 반면, LiveData는 수명 주기를 인식하긴 하지만, 복잡한 리소스 관리에는 한계가 있었습니다.
 
-결론적으로, Kotlin Flow는 LiveData의 한계를 보완하고, 반응형 프로그래밍의 필요성을 충족시키는 데 최적화된 도구입니다. Flow의 도입으로 안드로이드 개발자들은 보다 유연하고 효과적으로 상태 관리와 비동기 프로그래밍을 수행할 수 있게 되었습니다. 이는 사용자 경험을 극대화하는 데 기여하며, 현대적인 앱 개발의 요구에 부응하는 중요한 발전이라고 할 수 있습니다.
 
----
+### repeatOnLifecycle()
 
-# 5. StateFlow와 SharedFlow
+`repeatOnLifecycle()`은 `Lifecycle` 상태에 맞춰 코루틴을 자동으로 관리하는 기능을 제공합니다. 이 함수는 지정된 `Lifecycle.State`(보통 `STARTED`나 `RESUMED`)에 도달하면 코루틴을 실행하고, 해당 상태에서 벗어나면 자동으로 중단합니다. 이러한 자동 관리를 통해 개발자는 코루틴의 시작과 중지를 일일이 처리할 필요가 없게 됩니다.
 
-## StateFlow: 상태 관리 최적화
 
-StateFlow는 Kotlin Flow의 한 종류로, 애플리케이션의 상태를 효율적으로 관리하는 데 사용됩니다. 상태를 나타내는 데이터의 변경 사항을 관찰할 수 있는 기능을 제공하며, 이는 UI 요소와의 연동에 유리합니다. StateFlow는 **Hot Stream**으로 분류되며, 항상 현재 상태를 유지하고 있어 구독자가 있을 때 즉시 최신 상태를 받을 수 있습니다.
 
-기존 LiveData와 비교했을 때, StateFlow는 몇 가지 장점을 가지고 있습니다. 첫째, StateFlow는 스레드 안전성을 보장하며, 비동기 데이터 흐름을 처리하는 데 적합합니다. 둘째, 수명 주기 인식 처리를 자동으로 지원하여, Activity나 Fragment의 생명 주기와 연동되어 데이터 흐름을 관리할 수 있습니다. 이를 통해, 더 많은 자원을 절약하면서도 안정적인 상태 관리를 실현할 수 있습니다.
+### **이후 코드**
 
-상태 보존 측면에서도 StateFlow는 뛰어난 성능을 보여줍니다. 애플리케이션이 백그라운드로 전환되거나 다시 활성화될 때에도 현재 상태를 유지할 수 있어 사용자 경험을 개선합니다.
+```kotlin
+// UI
+lifecycleScope.launch {
+    repeatOnLifecycle(Lifecycle.State.STARTED) {
+        viewModel.showToastEvent.collect { toastEvent ->
+            when (toastEvent) {
+                is Event.ShowToast -> // TODO
+                is Event.ShowXXX -> // TODO
+                 is Event.ShowYYY -> // TODO
+            }
+        }
+    }
+}
+```
 
-## SharedFlow: 이벤트 스트림 처리
 
-SharedFlow는 다수의 구독자가 동시에 사용할 수 있는 이벤트 스트림을 처리하기 위한 메커니즘입니다. 이벤트를 발생시키고, 여러 구독자가 이 이벤트를 동시에 수신할 수 있도록 설계되었습니다. 이는 UI 이벤트나 사용자 입력 같은 비동기적이고 일회성인 데이터를 처리하는 데 적합합니다.
 
-SharedFlow의 특징 중 하나는 버퍼링 기능입니다. 이벤트가 발생했을 때, 구독자가 없다 하더라도 이전 이벤트를 저장할 수 있어, 이후 구독자가 추가될 경우 해당 이벤트를 받을 수 있도록 합니다. 이로 인해 비동기적인 처리 흐름이 더 유연해지고, 다양한 유스케이스에서 유용하게 활용될 수 있습니다. 예를 들어, 실시간 채팅 애플리케이션이나 알림 시스템 등에서 효과적으로 사용될 수 있습니다.
+그러나, Channel은 여러 개의 구독자에게 동일한 이벤트를 수신하지 못한다는 단점이 있습니다.
 
-결론적으로, StateFlow와 SharedFlow는 각각의 용도에 맞춰 최적화된 기능을 제공하며, 상태 관리와 이벤트 스트림 처리에서 강력한 도구로 자리 잡고 있습니다. 두 기능을 적절히 활용하면, Kotlin을 이용한 애플리케이션 개발에서 비동기 데이터 흐름을 더욱 효율적으로 관리할 수 있습니다.
+
+
+# 4. SharedFlow
+
+- SharedFlow는 **코루틴 기반의 Flow**를 사용하여 **여러 구독자에게 데이터를 동시에** 전달할 수 있습니다.
+- SharedFlow는 **브로드캐스트 방식**으로 여러 구독자가 동일한 데이터를 받아 처리할 수 있습니다.
+
+
+
+
+> 💡 즉, SharedFlow는 `복수의 구독자`에게 데이터를 `브로드캐스트 방식`으로 전달하며, 라이프사이클에 의존하지 않는 이벤트 처리가 가능합니다.
+
+
+
+
+### **이후 코드**
+
+```kotlin
+
+// ViewModel
+private val _showToastEvent = MutableSharedFlow<Toast>()
+val showToastEvent = _showToastEvent.asSharedFlow() 
+
+// UI
+lifecycleScope.launch {
+    repeatOnLifecycle(Lifecycle.State.STARTED) {
+        viewModel.showToastEvent.collect { toastEvent ->
+            when (toastEvent) {
+                is Event.ShowToast -> // TODO
+                is Event.ShowXXX -> // TODO
+                is Event.ShowYYY -> // TODO
+            }
+        }
+    }
+}
+
+```
+
+기존의 Channel에서 SharedFlow로만 수정하면 됩니다.
+
+
+
+그러나 SharedFlow만 사용하는 것도 문제가 있습니다.
+
+### 문제 발생 시나리오
+
+목록에서 item을 선택하고 서버의 응답에 따라 상세 화면으로 이동하는 로직이라고 가정해봅시다.
+
+1. 목록에서 특정 item을 선택합니다.
+2. 서버에서 Item에 대한 상태 체크가 끝나기전에 홈 버튼을 눌러 앱을 백그라운드로 내립니다.
+3. 이때, 상세 화면으로 이동하라는 이벤트를 `emit`해도 `onStop()` 상태이기 때문에 이벤트를 받지 못하는 문제가 발생합니다.
+
+
+
+
+
+
+> 💡 즉, event를 observe하고 있는 곳이 아무데도 없다면, 해당 event는 `유실`된다는 것입니다.
+
+
+
+# 5. EventFlow
+
+EventFlow는 이벤트가 발생했을 때 이를 캐시한 후, 해당 이벤트가 소비(consume)되었는지 여부에 따라 새로운 옵저버가 구독할 때 이벤트를 전달할지를 결정하는 구조입니다.
+
+
+> 💡 즉, 소비되지 않은 이벤트를 `캐시`하고 있다가 `소비`하는 형태입니다.
+
+
+```kotlin
+interface EventFlow<out T> : Flow<T> {
+
+    companion object {
+
+        const val DEFAULT_REPLAY: Int = 3
+    }
+}
+
+interface MutableEventFlow<T> : EventFlow<T>, FlowCollector<T>
+
+@Suppress("FunctionName")
+fun <T> MutableEventFlow(
+    replay: Int = EventFlow.DEFAULT_REPLAY
+): MutableEventFlow<T> = EventFlowImpl(replay)
+
+fun <T> MutableEventFlow<T>.asEventFlow(): EventFlow<T> = ReadOnlyEventFlow(this)
+
+private class ReadOnlyEventFlow<T>(flow: EventFlow<T>) : EventFlow<T> by flow
+
+private class EventFlowImpl<T>(
+    replay: Int
+) : MutableEventFlow<T> {
+
+    private val flow: MutableSharedFlow<EventFlowSlot<T>> = MutableSharedFlow(replay = replay)
+
+    @InternalCoroutinesApi
+    override suspend fun collect(collector: FlowCollector<T>) = flow
+        .collect { slot ->
+            if (!slot.markConsumed()) {
+                collector.emit(slot.value)
+            }
+        }
+
+    override suspend fun emit(value: T) {
+        flow.emit(EventFlowSlot(value))
+    }
+}
+
+private class EventFlowSlot<T>(val value: T) {
+
+    private val consumed: AtomicBoolean = AtomicBoolean(false)
+
+    fun markConsumed(): Boolean = consumed.getAndSet(true)
+}
+
+```
+
+그러나 EventFlow만 사용하는 것도 문제가 있습니다.
+
+### 문제 발생 시나리오
+
+이벤트 객체가 있고 이를 AFragment, BFragment에서 collect하고 있다고 가정해봅시다.
+
+1. 이벤트가 `emit`되면 AFragment, BFragment에서 collect 됩니다. 
+(근소한 차이로 AFragment에서 먼저 collect 되었다고 가정)
+2. 이때 AFragment에서 이벤트의 comsumed는 true가 됩니다.
+3. 그 이후 BFragment에서 이벤트가 collect되어야하지만, 이벤트는 이미 comsumed 되었기 때문에 collect되지 않는 문제가 발생합니다.
+
+
+
+> 💡 즉, 여러 구독자에게 데이터를 동시에 전달하는 SharedFlow의 장점이 사라집니다.
+
+
+
+# 6. EventFlow + HashMap
+
+EventFlow + HashMap은 이벤트가 발생했을 때 이를 캐시하고, 이벤트의 소비 여부에 따라 새로 구독하는 옵저버에게 이벤트를 전파할지 여부를 결정하는 구조입니다.
+
+> 💡 즉, 소비되지 않은 `이벤트`를 `캐시`하고 있다가, `새로운 옵저버`가 `구독`할 때 해당 이벤트를 `전달`하는 형태입니다.
+
+
+```kotlin
+private class EventFlowImpl<T>(
+    replay: Int
+) : MutableEventFlow<T> {
+
+    private val flow: MutableSharedFlow<EventFlowSlot<T>> = MutableSharedFlow(replay = replay)
+
+    private val slotStore: ArrayDeque<Slot<EventFlowSlot<T>>> = ArrayDeque()
+
+    @InternalCoroutinesApi
+    override suspend fun collect(collector: FlowCollector<T>) = flow
+        .collect { slot ->
+
+            val slotKey = collector.javaClass.name + slot
+
+            if(isContainKey(slotKey)) {
+                if(slotStore.size > MAX_CACHE_EVENT_SIZE) slotStore.removeFirst()
+                slotStore.addLast(Slot(slotKey, EventFlowSlot(slot.value)))
+            }
+
+            val slotValue = slotStore.find { it.key == slotKey }?.value ?: slot
+
+            if (slotValue.markConsumed().not()) {
+                collector.emit(slotValue.value)
+            }
+        }
+
+    override suspend fun emit(value: T) {
+        flow.emit(EventFlowSlot(value))
+    }
+
+    fun isContainKey(findKey: String): Boolean {
+        return slotStore.find { it.key == findKey } == null
+    }
+}
+
+private data class Slot<T>(
+    val key: String,
+    val value: T
+)
+
+```
+
+
+### HashMap의 역할
+
+이 구조에서 `HashMap`은 각 이벤트와 해당 이벤트를 소비하는 옵저버의 상태를 관리하는 데 사용됩니다.
+
+- `HashMap`의 키는 현재 `collect`하고 있는 옵저버의 이름과 해당 슬롯의 `toString()` 값을 결합하여 생성됩니다. 이를 통해 각 옵저버를 고유하게 식별할 수 있으며, 어떤 옵저버가 어떤 이벤트를 수신할 자격이 있는지를 명확히 알 수 있습니다.
+- `HashMap`의 값은 이벤트와 동일한 값을 가지는 새로운 이벤트가 저장됩니다. 이 구조 덕분에 새로운 옵저버가 구독할 때, 이전에 발생한 이벤트를 적절히 전달받을 수 있습니다.
+
+
+
+# 정리하면..
+- **LiveData**는 이벤트 발생 후 구독자가 활성화되면 가장 최근 값을 재전달하기 때문에 `단발성 이벤트 처리`에는 `적합`하지 `않`습니다.
+- **SingleLiveEvent**는 `한 번만 이벤트`를 전송할 수 있지만, `안티 패턴`입니다.
+- **Channel**은 `단일 소비자`에게 이벤트를 효율적으로 `전달`할 수 있지만, `여러 소비자`에게 데이터를 `전달`할 수 `없`습니다.
+- **SharedFlow**는 `여러 소비자`에게 브로드캐스트 방식으로 데이터를 `전달`할 수 있지만, 데이터 `유실`이 발생할 수 있습니다.
+- **EventFlow**는 소비되지 않은 이벤트를 `캐시`하여 `새로운 옵저버`에게 `전달`할 수 있지만, `복수 소비자 환경`에서는 한계가 있습니다.
+- **EventFlow + HashMap**은 캐시된 이벤트를 새로운 옵저버에게 전달하면서, `복수 소비자 환경`에서도 이벤트 관리가 가능하지만, 코드가 `복잡`할 수 있습니다.
+
+
+
+# 결론적으로..
+> 💡 이벤트 처리는 보통 한 곳에서 이루어지므로, 코드가 간결하고 이해하기 쉬운 `Channel`을 사용하는 것이 적합 할 것 같다고 생각합니다. 그 외에 특별한 요구 사항이 있을 때는 `EventFlow + HashMap`을 사용하는 것이 좋을 것 같습니다.
+
+
+
+
+# 참고문헌
+
+https://developer.android.com/topic/architecture/ui-layer/events
+
+https://developer.android.com/topic/libraries/architecture/livedata
+
+https://medium.com/androiddevelopers/livedata-with-snackbar-navigation-and-other-events-the-singleliveevent-case-ac2622673150
+
+https://medium.com/androiddevelopers/viewmodels-and-livedata-patterns-antipatterns-21efaef74a54
+
+https://medium.com/prnd/mvvm의-viewmodel에서-이벤트를-처리하는-방법-6가지-31bb183a88ce
+
+https://jinukeu.hashnode.dev/android-channel-vs-sharedflow
