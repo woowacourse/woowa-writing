@@ -4,15 +4,11 @@
 
 ## Suspense란,
 
----
-
 Suspense란, 리액트에서 비동기 작업이 완료될 때 까지 대체 컴포넌트를 보여주고, 작업이 완료되면 실제 컴포넌트로 교체해주는 기능입니다. 웹사이트에서 데이터를 불러오기 전, 흔히 보게 되는 로딩 애니메이션이나 메시지가 바로 이 Suspense를 통해 구현됩니다.
 
 <img src="./image/tech/pending.png" style="height: 350px">
 
 ## Suspense 기본 문법
-
----
 
 Suspense는 두 가지 주요 props를 받습니다. 첫 번째는 Promise를 catch 했을 때, 보여줄 fallback UI이고, 두 번째는 Promise를 던질 자식 컴포넌트입니다. 즉, fallback 속성에는 로딩 중에 표시될 컴포넌트를 지정하고, children에는 비동기 작업을 수행하는 자식 컴포넌트를 배치합니다.
 
@@ -79,8 +75,6 @@ React는 Suspense로 감싸진 두 컴포넌트 중 트리 구조에서 더 빨�
 <img src="./image/tech/suspense5.png" style="height: 250px">
 
 ## Suspense 사용 이유
-
----
 
 Suspense를 적절히 사용하면 사용자 경험을 향상시킬 수 있습니다. 몇 가지 장점들을 살펴보겠습니다.
 
