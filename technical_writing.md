@@ -133,7 +133,7 @@ IAM→역할→역할생성을 한다.
 ![image6](https://github.com/user-attachments/assets/96e0821c-550c-43b6-9b75-8903e48c4604)
 
 
-아까 생성한 **정책이름을 검색해서 선택**하고 **다음**을 눌린다
+아까 생성한 **정책이름을 검색해서 선택**하고 **다음**을 선택한다
 
 ![image7](https://github.com/user-attachments/assets/0cc74bdc-d709-4ab7-95e7-1587a72abbc5)
 
