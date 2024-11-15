@@ -22,7 +22,8 @@ MultipleBagFetchException을 해결하고자 하는 개발자.
 # 문제 상황
 
 
-반갑개의 모임(Club) 엔티티는 모임에 참여한 회원(ClubMember), 모임에 참여한 강아지(ClubPet)을 OneToMany 연관 관계를 가지고 있습니다. 
+반갑개의 모임(Club) 엔티티는 모임에 참여한 회원(ClubMember), 모임에 참여한 강아지(ClubPet)을 OneToMany 연관 관계를 가지고 있습니다.  
+
 아래는 실제 Club 엔티티를 간략환 예시 엔티티입니다.
 
 ```java
@@ -59,8 +60,8 @@ public class Club {
 
 ```
 
-OneToMany의 기본 로딩 전략은 LAZY이며, 반갑개 백엔드 팀의 JPA 연관 관계 컨벤션은 특별한 이유가 없는 한 **지연 로딩(LAZY)** 을 기본으로 사용합니다. API 응답에 필요한 연관된 엔티티는 Repository 계층에서 Join Fetching 또는 EntityGraph를 통해 명시적으로 로드하기로 했습니다.
-
+OneToMany의 기본 로딩 전략은 LAZY이며, 반갑개 백엔드 팀의 JPA 연관 관계 컨벤션은 특별한 이유가 없는 한 **지연 로딩(LAZY)** 을 기본으로 사용합니다.  
+API 응답에 필요한 연관된 엔티티는 Repository 계층에서 Join Fetching 또는 EntityGraph를 통해 명시적으로 로드하기로 했습니다.  
 따라서, MVC 단계 요구사항 중 "내가 참여한 모임 리스트" API를 개발하기 위해 다음과 유사한 JPQL을 사용하게 됐습니다.
 
   
@@ -205,15 +206,23 @@ JPA의 영속성 컨텍스트는 기본적으로  특정 ID를 가진 엔티티�
 ### 1. Collection 변경(중복 제거하기)
 
 단편적으로 MultipleBagFetchException을 방지하기 위해서는 중복을 허용하지 않으면 됩니다.  
-결국 Hibernate는 List를 BagType으로 매핑하기 때문에 이를 Set으로 변경하면 문제가 해결 됩니다. 
+결국 Hibernate는 List를 *BagType으로 매핑하기 때문에 이를 Set으로 변경하면 문제가 해결 됩니다. 
 ![image](tech-write-img/7.PNG)
 
 ### 2. OrderCoulmn(순서 부여하기)
 
 @OrderColumn은 JPA에서 컬렉션의 요소들을 특정 순서로 저장하고 관리할 수 있게 해주는 어노테이션입니다. 엔티티가 연결된 컬렉션의 순서를 유지할 수 있도록 합니다.  
-또, OrderColumn 을 쓰게되면 hibernate 에서는 ListType 으로 잡게 됩니다. 이로 인해 MultipleBagFetchException을 방지할 수 있습니다. 
+또, OrderColumn 을 쓰게되면 hibernate 에서는 *ListType 으로 잡게 됩니다. 이로 인해 MultipleBagFetchException을 방지할 수 있습니다. 
 
 ![image](tech-write-img/8.PNG)
+
+> 참고 Hibernate Collection Wrapper Class
+> | **컬렉션 타입**          | **Hibernate 컬렉션 클래스** | **중복 허용** | **순서 유지** |
+> |-------------------------|----------------------------|---------------|---------------|
+> | `Collection`, `List`   | `PersistentBag`           | O             | X             |
+> | `Set`                  | `PersistentSet`           | X             | X             |
+> | `List` + `@OrderColumn`| `PersistentList`          | O             | O             |
+
 
 ### 1,2번의 문제점
 
