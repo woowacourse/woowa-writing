@@ -1,43 +1,29 @@
-# 쿠폰 발급 기능으로 알아보는 동시성 문제와 해결방법
+# 파산을 막기 위한 동시성 문제 해결 방법 총망라!
 
-<!-- TOC -->
+> 예제 코드는 [이곳](https://github.com/le2sky/spring-atom/tree/main/spring-concurrency-coupon)에서 확인하실 수 있습니다!
 
-* [쿠폰 발급 기능으로 알아보는 동시성 문제와 해결방법](#쿠폰-발급-동시성-문제를-슬기롭게-막아보자)
-    * [1. 쿠폰 발급 API로 알아보는 동시성 문제](#1-쿠폰-발급-api로-알아보는-동시성-문제)
-        * [동시성 문제란 무엇인가?](#동시성-문제란-무엇인가)
-        * [동시성 문제 사례 - 쿠폰 발급 API](#동시성-문제-사례---쿠폰-발급-api)
-        * [쿠폰 발급 API 원인 부검](#쿠폰-발급-api-원인-부검)
-    * [2. 해결책을 저울질하자](#2-해결책을-저울질하자)
-        * [동시성 문제를 처리율 제한으로 해결하려는 접근 방식](#동시성-문제를-처리율-제한으로-해결하려는-접근-방식)
-        * [동시성 문제를 자바에서 제공하는 동기화 도구로 해결하려는 접근 방식](#동시성-문제를-자바에서-제공하는-동기화-도구로-해결하려는-접근-방식)
-        * [동시성 문제를 트랜잭션 격리 수준으로 해결하려는 방식(READ_UNCOMMITED편)](#동시성-문제를-트랜잭션-격리-수준으로-해결하려는-방식read_uncommited편)
-        * [동시성 문제를 트랜잭션 격리 수준으로 해결하려는 방식(SERIALIZABLE편)](#동시성-문제를-트랜잭션-격리-수준으로-해결하려는-방식serializable편)
-        * [동시성 문제를 비관적 락으로 해결하려는 방식](#동시성-문제를-비관적-락으로-해결하려는-방식)
-        * [동시성 문제를 유니크 인덱스로 해결하려는 방식](#동시성-문제를-유니크-인덱스로-해결하려는-방식)
-        * [동시성 문제를 분산락으로 해결해보자 (MySQL 네임드락편)](#동시성-문제를-분산락으로-해결해보자-mysql-네임드락편)
-        * [동시성 문제를 분산락으로 해결해보자 (Redis 활용편)](#동시성-문제를-분산락으로-해결해보자-redis-활용편)
-    * [3. 고민해볼 지점](#3-고민해볼-지점)
-    * [참고](#참고)
-
-<!-- TOC -->
-
-동시성은 성능을 높이는 기술이기도 하지만, 제대로 알고 사용하지 않으면 독이 되기도 합니다.
-저는 우아한테크코스 6기 데벨업 프로젝트를 진행하면서 이 동시성 때문에 난항을 겪었었는데요.
-설명의 편의를 위해 모두에게 친숙한 쿠폰 발급 예제로 어떤 문제였는지, 어떻게 해결해볼 수 있는지 이야기해보려 합니다.
-문장의 간결함을 위해 높임말은 생략할게요.
+동시성은 성능을 높이는 기술이기도 하지만, 제대로 알고 사용하지 않으면 독이 되기도 합니다. 저는 우아한테크코스 6기 데벨업 프로젝트를 진행하면서 이 동시성 때문에 난항을 겪었었는데요. 설명의 편의를 위해 모두에게
+친숙한 **쿠폰 발급 예제로 동시성 문제를 어떻게 해결해 볼 수 있는지 이야기**해보려 합니다. 문장의 간결함을 위해 높임말은 생략할게요. 그리고, 데벨업 프로젝트에서는 MySQL 8.0을 사용했기 때문에 이 글의
+데이터베이스와 관련된 이야기는 MySQL 8.0 InnoDB를 기준으로 작성되었다는 점 참고 부탁드립니다. 😀
 
 ## 1. 쿠폰 발급 API와 동시성 문제
 
-### 동시성 문제란 무엇인가?
+### 1.1 동시성 문제란 무엇인가?
 
 동시성(Concurrency)이란 여러 작업들이 빠르게 전환되면서 실행되어 마치 동시에 실행되는 것처럼 보이는 것을 일컫는다.
-예를 들어, 손은 2개이지만 저글링을 하면 3개의 공을 한 번에 다룰 수 있는 것과 비슷한 이치이다. 동시성은 스레드로 달성할 수 있다.
-동시에 여러 스레드가 실행되는 경우 데이터 정합성이 맞지 않는 문제가 발생할 수 있는데 이를 동시성 문제라고 한다.
+예를 들어, 손은 2개이지만 저글링을 하면 3개의 공을 한 번에 다룰 수 있는 것과 비슷한 이치이다.
+동시성은 스레드로 달성할 수 있다. 동시에 여러 스레드가 실행되는 경우 데이터 정합성이 맞지 않는 문제가 발생할 수 있는데 이를 동시성 문제라고 한다.
 
-### 동시성 문제 사례 - 쿠폰 발급 API
+### 1.2 동시성 문제 사례 - 쿠폰 발급 API
 
-쿠폰 발급 기능을 구현하려고 한다. 쿠폰 발급 기능의 가장 중요한 요구사항은 1명의 사용자는 1개의 쿠폰만 발급받을 수 있다는 것이다. 만약, 그렇지 않는다면 쿠폰을 발급한 회사는 처참하게 파산할 것이다.
+쿠폰 발급 기능을 구현하려고 한다. 쿠폰 발급 기능의 가장 중요한 요구사항은 1명의 사용자는 1개의 쿠폰만 발급받을 수 있다는 것이다.
+만약, 그렇지 않는다면 쿠폰을 발급한 회사는 **파산**할 것이다.
+<p align="center">
+    <img src="./tech-coupon-intro.png"/>
+</p>
+
 쿠폰 발급 API는 다음과 같이 쿠폰 발급 서비스의 기능을 사용한다.
+그리고 쿠폰 발급 서비스는 사용자가 1개의 쿠폰만 발급받을 수 있도록 다음과 같이 검증 메서드인 validateAlreadyIssued 를 구현했다.
 
 ```java
 
@@ -56,11 +42,8 @@ class MemberCouponApi {
 }
 ```
 
-그리고 쿠폰 발급 서비스는 사용자가 1개의 쿠폰만 발급받을 수 있도록 다음과 같이 검증 메서드를 추가했다.
-
 ```java
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class MemberCouponService {
@@ -88,311 +71,224 @@ public class MemberCouponService {
 
 하지만, 사용자가 동시에 API에 요청을 보내게 된다면 1명의 사용자는 1개 이상의 쿠폰을 발급 받을 수 있게 된다.
 
-### 쿠폰 발급 API 원인 부검
+### 1.3 쿠폰 발급 API 원인 간단하게 알아보기!
 
 <p align="center">
-<img src="./tech-coupon-reason.png" alt=""/>
+    <img src="./tech-coupon-reason.png"/>
 </p>
 
-
-만약 사용자가 동시에 API에 요청을 보내게 된다면, 1개 이상의 스레드가 동시에 MemberCouponService의 issue 메서드를 읽게 된다. 이때, 각 스레드는 데이터베이스 트랜잭션을 커밋하기 이전이기
-때문에 각 스레드는 모두 검증에 통과하고 결과적으로 1개 이상의 쿠폰을 발급 받을 수 있게 되는 것이다.
+만약 사용자가 동시에 API에 요청을 보내게 된다면, 1개 이상의 스레드가 동시에 MemberCouponService의 issue 메서드를 읽게 된다.
+이때, 각 스레드는 DB 트랜잭션을 커밋하기 이전이기 때문에 각 스레드는 모두 검증에 통과하고 결과적으로 1개 이상의 쿠폰을 발급 받을 수 있게 되는 것이다.
 
 ## 2. 해결책을 저울질하자
 
 위 문제를 해결하기 위해서는 동시성을 희생시키는 모든 방식을 고려해볼 수 있다.
-하지만, 여러 방식 중에서 현재 상황에 맞는 가장 효율적인 방식을 선택하는 것이 중요하다. 이를 위해서 다양한 접근 방식을 생각해보고 비교해 볼 필요성이 있다.
+하지만, 여러 방식 중에서 현재 상황에 맞는 가장 효율적인 방식을 선택하는 것이 중요하다.
+이를 위해서 다양한 접근 방식을 생각해 보고 비교해 볼 필요성이 있다.
 
-### 동시성 문제를 처리율 제한으로 해결하려는 접근 방식
+### 2.1 처리율 제한를 이용한 해결 방식
 
-#### 가설
-
-처리율 제한 장치의 장점은 근본적으로 다음과 같다.
+처리율 제한 장치의 장점은 다음과 같다.
 
 - DOS 공격에 의한 자원 고갈과 서버 과부하(사용자의 잘못된 사용 패턴, 봇 트래픽)를 방지한다.
-- 서드파티 API 사용료 뻥튀기를 예방한다.
+- 서드파티 API 사용료 증가를 예방한다.
 
-그렇다면 위와 같은 장점을 취하면서 동시성 문제를 해결하면 일석이조이지 않을까라는 생각을 했다.
-아이디어는 다음과 같다.
-
-- 기본적으로 동시성 문제는 서버의 동시 처리 능력과 연관이 있다.
-- 극단적으로 생각했을 때, 서버의 스레드를 한 개로 제한하면 동시성 문제는 절대 발생하지 않는다.
-- (가설) 특정 API의 동시 처리 능력을 희생시키면 동시성 문제가 발생하지 않고, 처리율 제한의 이점도 얻어갈 수 있을 것이다.
+동시성 문제는 서버의 동시 처리 능력과 연관이 있다. 극단적으로 생각했을 때 서버의 스레드를 한 개로 제한하면 동시성 문제는 발생하지 않는다.  
+처리율 제한 장치를 이용하여 특정 API의 동시 처리 능력을 희생시키면 동시성 문제가 발생하지 않고 처리율 제한의 이점도 얻어갈 수 있을 것이다.
 
 #### 적용
-
-- 쿠폰 발급 API에 처리율 제한을 설정한다. (Guava 라이브러리의 처리율 제한 기능을 사용)
-- Guava를 이용하였기 때문에, 처리율 제한은 각 was에서 처리한다.
-- 100개 스레드에 같은 사용자와 같은 쿠폰의 ID로 동시에 쿠폰 발급 API에 요청한다.
-- 처리율 제한에 막히는 경우 429 (Too Many Request) 응답을 내려주고 요청을 무시한다.
-- 사용자는 쿠폰을 단 한번만 발급할 수 있다.
-
-#### 장점과 한계
-
-장점 :
-
-- 이미 시스템에 처리율 제한 장치가 있다면 적용이 유리할 수 있다.
-    - 예를 들어, 한 시스템에서 처리율 제한 장치가 이미 존재한다고 가정하자.
-    - 1초에 한 IP를 가진 사용자는 쿠폰 발급 API를 1번만 요청하도록 처리율을 제한할 수 있다.
-- 커넥션을 사용하지 않는다.
-    - 처리율 제한에 막히는 경우 spring trasaction aop 프록시를 호출하지 않으니 커넥션을 점유하지 않고 동시성 문제를 해결한다.
-    - 하지만, 이는 처리율 제한 장치만의 이점은 아니다. 자바 동기화 방식으로도 커넥션을 점유하지 않을 수 있을 것이다
-
-한계 :
-
-- 분산 환경에서 동시성 문제가 발생한다.
-    - 가령, 동시 요청 [1, 2]가 있을 때, 1은 a was, 2는 b was로 가는 경우 무용이다.
-    - 이런 경우, 처리율 제한 장치가 레디스와 같은 카운터 저장소를 사용하도록 할 수 있지만, 유지보수대상이 증가한다.
-    - 이 경우 차라리 분산락을 도입하는 것이 합리적이다.
-- 단순 동시성 문제를 해결하기 위해서 도입하기에는 애매한 지점이 있다.
-    - 처리율 제한 장치 설계에 대한 고려가 필요하다.
-    - 동시성 문제 해결을 위한 처리율 제한 수치와 근본적으로 사용해야하는 처리율 제한의 수치가 다를 수 있다.
-
-### 동시성 문제를 자바에서 제공하는 동기화 도구로 해결하려는 접근 방식
-
-#### 가설
-
-- (가설) 자바에서 제공하는 동기화 도구를 사용해서 동시성 문제를 해결하면 데이터베이스 커넥션을 점유하지 않으면서, 문제를 해결할 수 있지 않을까?
-
-#### 적용
-
-- 암묵적인 락을 사용하거나, 명시적인 락을 사용할 수 있다.
-- 명시적인 락
-    - memberId와 couponId를 Map의 키로 관리한다.
-    - Map의 값은 ReentrantLock을 사용한다.
-    - Map은 ConcurrentHashMap을 사용한다.
-    - MemberCouponIssueLock 인터페이스를 구현하는 JavaMemberCouponIssueLock에서 Map을 관리한다.
-    - MemberCouponIssueLock은 응용 계층에 존재하여 다른 개발자가 제어할 수 있고, 구현체를 변경할 수 있다.
-    - finally 구문에서 lock을 릴리즈해줘야 한다.
-
-- 암묵적인 락
-    - synchronized 키워드를 이용한다.
-
-#### 적용 시 주의사항
-
-- 데이터베이스 트랜잭션의 시점을 주의해야 한다.
-- 데이터베이스 트랜잭션이 커밋하기 이전에 락을 릴리즈하면 동시성 문제가 다시 발생한다.
-    - 이를 위해서 상위 계층 코드(파사드 같은)에서 락을 릴리즈하거나, synchronized를 설정해야 한다.
-- 만약 부모 트랜잭션에 합류하고 있는 경우에는 부모 트랜잭션이 종료되는 경우 커밋이 된다. 즉, 커밋을 수행하기 이전에 락을 릴리즈하여 동시성 문제가 발생한다.
-    - 이 경우에는 트랜잭션 전파 옵션(ex. REQUIRES_NEW)으로 해결할 수 있다. 하지만, 스레드가 두 개 이상의 커넥션을 동시에 점유하려는 경우, 부하 환경에서 히카리 커넥션 풀 데드락이 발생할 수
-      있다.
-- 명시적인 락의 경우에는 락을 릴리즈해야한다. 릴리즈하지 않으면 다른 스레드가 대기 상태로 머무르고, 예기치 못한 동작이 발생할 수 있다.
-
-#### 장점과 한계
-
-- lock을 사용하는 경우, 애플리케이션 레이어에서 동시성을 제어할 수 있기 때문에 확장성있는 코드를 작성할 수 있다.
-    - 가령, MemberCouponIssueLock 인터페이스의 구현체를 분산락이나 다른 것으로 대체 가능하다.
-- synchronized를 사용하는 경우, 락 릴리즈에 대한 걱정을 덜어낼 수 있다.
-- 두 방식 모두 트랜잭션 없는 상위 계층에서 락 획득 시도를 하면 데이터베이스 커넥션을 점유하지 않고 스레드가 대기한다.
-- (한계) 두 방식은 서버가 다중화되어있는 환경에서 다시 동시성 문제가 발생할 수 있다.
-    - (가설) 스티키 세션을 이용하면 한 사용자에 대한 동시 호출 문제는 예방할 수 있을 것이다.
-
-### 동시성 문제를 트랜잭션 격리 수준으로 해결하려는 방식(READ_UNCOMMITED편)
-
-#### 가설
-
-- 데이터베이스를 활용하여 풀 수 있는 방법 중에서 트랜잭션 격리 수준이 생각났다.
-- 다른 트랜잭션이 커밋하기 이전이라 기존재 여부 검증에 실패한다.
-- (가설) 그렇다면, 다른 트랜잭션이 무슨 작업을 하고 있는지 알고 있다면 풀어볼 수 있지 않을까?
-
-#### 적용
-
-- @Transactional 어노테이션에 isolation 속성을 READ_UNCOMMITED로 설정한다.
-- 더티 리드와 spring data jpa의 repository을 이용한다.
 
 ```java
 
-@Transactional(isolation = Isolation.READ_UNCOMMITTED)
-public Long issue(Long memberId, Long couponId) {
-    log.info("신규 쿠폰 발급 coupon = {}, member = {}", couponId, memberId);
+@RestController
+@RequiredArgsConstructor
+class MemberCouponApi {
 
-    Member member = memberRepository.findById(memberId).orElseThrow();
-    Coupon coupon = couponRepository.findById(couponId).orElseThrow();
-    MemberCoupon memberCoupon = MemberCoupon.issue(member, coupon);
+    private final RateLimiter rateLimiter = RateLimiter.create(1);
+    private final MemberCouponService memberCouponService;
 
-    // 1. IDENTITY에 의한 채번 insert 쿼리가 발생한다.
-    memberCouponRepository.save(memberCoupon);
-    validateAlreadyIssued(memberId, couponId);
+    @PostMapping("/member-coupon")
+    public ResponseEntity<Void> issueCoupon(@RequestBody IssueCouponRequest request) {
+        if (rateLimiter.tryAcquire()) {
+            memberCouponService.issue(request.memberId(), request.couponId());
+            return ResponseEntity.noContent().build();
+        }
 
-    log.info("쿠폰 발급 종료 member = {}", memberId);
-    return memberCoupon.getId();
-}
-
-// 2. 더티 리드를 이용해서 다른 트랜잭션에서 삽입한 데이터 알 수 있다.
-private void validateAlreadyIssued(Long memberId, Long couponId) {
-    try {
-        // 3. 가장 먼저 insert를 수행하고 조회를 한 스레드는 1개를 반환할 것이고, 나머지는 그 이상의 데이터를 반환하니 예외가 발생
-        memberCouponRepository.findByMemberIdAndCouponId(memberId, couponId);
-    } catch (IncorrectResultSizeDataAccessException e) {
-        // 4. 예외가 발생한 트랜잭션은 롤백된다.
-        throw new IllegalStateException("해당 사용자는 이미 쿠폰을 발급했습니다.");
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).build();
     }
 }
 ```
 
-#### 장점과 한계
-
-장점 :
-
-- WAS가 분산되어 있는 환경에서도 동작한다.(일반적인 방식은 아니다.)
-- 동시성 제어 구간을 축소할 수 있다. 가령, memberId = 1, couponId = 1과 memberId = 2, couponId = 2는 동시에 수행할 수 있다.
-
-한계 :
-
-- 정확하게 여러 스레드가 동시에 save를 호출하고, find를 수행하는 경우, 접근한 모든 스레드가 실패한다.
-- repository.save 시점에 insert 쿼리가 바로 전송되어야 한다.
-- 연산의 순서가 일반적이지 않아 다른 개발자가 이해하기 어려울 수 있다. -> 왜 validate가 아래에 있지? -> 위로 올린다. -> 동시성 문제가 발생한다.
-
-### 동시성 문제를 트랜잭션 격리 수준으로 해결하려는 방식(SERIALIZABLE편)
-
-#### 가설
-
-- 트랜잭션 격리수준 serializable을 사용하면 내부적으로 단순 읽기 작업인 경우에도 락을 획득한다.
-- (가설) 이를 잘 이용하면 동시처리능력을 희생시켜 동시성 문제를 해결할 수 있지 않을까?
-
-#### 적용
-
-- `@Transactional`의 격리 레벨 설정을 serializable로 변경한다.
-
-- validate 로직에서 다음과 같은 쿼리가 발생한다.
-
-```mysql
- select mc1_0.id
- from member_coupon mc1_0
- where mc1_0.`member_id` = ?
-   and mc1_0.coupon_id = ?
- limit ?
-```
-
-- serializable인 경우 발생하는 레코드 잠금을 재연하기 위해 다음과 같은 쿼리를 작성한다.
-
-```mysql
-select member_coupon.id
-from member_coupon
-where member_id = 2
-  and coupon_id = 2
-limit 1;
-```
-
-- 이 경우 S,GAP 잠금을 확인할 수 있다. (넥스트 키락이 아닌 Shrared Gap Lock)
-- 만약 member_coupon(memberId, couponId) 조합이 (1, 2), (6, 2) 두 개 존재하는 경우에는
-- 2(존재하지 않은 member_id)보다 큰 6을 기준으로 S,GAP(gap lock) 이 걸린다.
-- member_id가 5인 경우까지 갭락을 건다.
-- 위 예시의 경우 member_id 인덱스를 사용하는데, 세컨더리 인덱스 member_id에서 1,6 순서로 저장되어 있다.
-- 이때 반복 읽기를 보장하려면 member_id 1부터 5까지는 모두 막아야 1,6 순서를 보장한다.
-- 즉, member_id가 1부터 5까지 들어가는 member_coupon을 막으면, member_coupon(1, 2), member_coupon(6, 2) 사이에 새로운 값이 insert되는 것을 막을 수
-  있다.
-- 핵심은 락으로 인해 다른 트랜잭션에서 경합이 발생해 동시성 문제를 해결할 수 있다는 것이다.
+Guava 라이브러리의 처리율 제한 기능을 사용했다. 100개 스레드에 같은 사용자, 같은 쿠폰의 ID로 동시에 쿠폰 발급 API에 요청했다.  
+처리율 제한에 막히는 경우 429(Too Many Requests) 응답을 내려주고 요청을 무시한다. 따라서, 사용자는 쿠폰을 단 한 번만 발급할 수 있게 된다.
 
 #### 장점과 한계
 
-장점 :
+**장점** :
 
-- WAS가 분산되어 있는 환경에서도 동작한다.
-- 적용이 간단하다.
+- 이미 시스템에 처리율 제한 장치가 있다면 적용이 유리할 수 있다. 예를 들어, 한 시스템에서 처리율 제한 장치가 이미 존재한다고 가정하자. 사용자 IP 별로 1초에 1번만 요청하도록 처리율을 제한할 수 있다.
+- DB 커넥션을 점유하지 않고 동시성 문제를 해결한다.
 
-한계 :
+**한계** :
 
-- 불필요한 공간까지 잠금하기 때문에 상대적인 성능 저하와 데드락을 야기할 수 있다.
-    - 상대적인 성능 저하라는 의미는 동시성 문제를 해결하는 모든 방식의 아이디어가 처리량을 희생하는 방법이기 때문이다.
+- Guava를 이용한 구현의 경우, 분산된 서버에서 동시 요청이 들어온다면 첫 요청은 A 서버, 두번째 요청은 B서버로 가는 경우 동시성 문제가 발생한다.
+- 단순 동시성 문제를 해결하기 위해서 도입하기에는 애매한 지점이 있다.
+- 처리율 제한 장치 설계에 대한 고려가 필요하다.
+- 동시성 문제 해결을 위한 처리율 제한 수치와 근본적으로 사용해야하는 처리율 제한의 수치가 다를 수 있다.
 
-### 동시성 문제를 비관적 락으로 해결하려는 방식
+### 2.2 자바 동기화 도구를 이용한 해결 방식
 
-#### 가설
-
-- 트랜잭션 격리수준 serializable을 사용하는 것은 내부적으로 락을 사용하기 때문에 명시적으로 레코드 잠금을 구하는 방식과 원리는 동일하다.
-- 다만, serializable은 한 트랜잭션에서 불필요한 부분까지 잠금을 구하기 때문에(모든 조회가 락을 잡고 조회된다.) 비효율적이다.
-- (가설) 비관적 락을 사용하면 serializable 보다는 상대적으로 효율적으로 동시성 문제를 해결할 수 있을 것이다.
+자바에서는 sysncronized 키워드나 ReetrantLock와 같은 동기화 도구를 제공한다.
+동기화 도구를 사용하면 한 스레드가 어떤 행위를 수행하고 있을 때, 다른 스레드를 대기시킬 수 있다.
+따라서, 동시성 문제를 해결할 수 있는 대안이 될 수 있다.
 
 #### 적용
-
-- repository에서 다음과 같이 lock을 설정한다.
 
 ```java
 
-@Lock(LockModeType.PESSIMISTIC_READ)
-@QueryHints({@QueryHint(name = "javax.persistence.lock.timeout", value = "10000")})
-boolean existsMemberCouponByMemberIdAndCouponId(Long memberId, Long couponId);
+@Service
+@RequiredArgsConstructor
+public class MemberCouponService {
+
+    // ... 중략 ...
+
+    public synchronized Long issue(Long memberId, Long couponId) {
+        return memberCouponIssuer.issue(memberId, couponId);
+    }
+}
 ```
 
-- validate 로직에서 다음과 같은 쿼리가 발생한다.
+기존 쿠폰 발급 로직을 MemberCouponIssuer 내부로 위임했다.
+그리고, MemberCouponService issue 메서드에 synchronized 키워드를 추가했다.
+이렇게 변경한 이유는 DB 트랜잭션의 커밋한 이후에 잠금을 해제하기 위함이다.
 
-```mysql
-    select mc1_0.id
-    from member_coupon mc1_0
-    where mc1_0.`member_id` = 2
-      and mc1_0.coupon_id = 2
-    limit 1
-    for
-    share
-```
+<p align="center">
+    <img src="./tech-coupon-aop-proxy.png"/>
+</p>
 
-- 위 경우에도 serializable과 마찬가지로 gap락을 이용해 insert를 막는다.
+`@Transactional` 어노테이션이 추가된 메서드는 프록시 기반으로 동작한다.
+우선 MemberCouponService issue 메서드를 호출하면 프록시가 요청을 받아 DB 트랜잭션을 진행하고 실제 객체를 호출한다.
+따라서, 잠금이 해제되고 DB 트랜잭션이 커밋되므로 동시성 문제가 다시 발생할 수 있다. 이를 해결하기 위해서는 객체를 분리하거나 `@Transactional` 어노테이션을 제거할 수 있다.
 
 #### 장점과 한계
 
-장점 :
+**장점** :
 
-- WAS가 분산되어 있는 환경에서도 동작한다.
-- serializable에 비해 불필요한 레코드에 잠금을 설정하지 않는다.
+- synchronized를 사용하는 경우 잠금 해제에 대한 고민을 하지 않아도 된다.
+- 트랜잭션 없는 상위 계층에서 잠금 획득을 시도하기 때문에 DB 커넥션을 점유하지 않고 스레드가 대기한다.
 
-한계 :
+**한계** :
 
-- 불필요한 공간까지 잠금하기 때문에 상대적인 성능 저하와 데드락을 야기할 수 있다.
-    - 여기서 말하는 불필요한 공간이란 충돌이 나는게 어색한 구간에도 gap락에 의해 insert가 불가능한 부분이다.
-    - 가령, `insert into member_coupon(is_used, coupon_id, member_id)
-    values (false, 3, 12);` 과 같은 쿼리는 coupon_id와 member_id가 전혀 다르다.
-    - 하지만 gap락에 의해서 위 쿼리 또한 막히게 되니 동시 처리 능력이 상당히 희생된다.
+- 분산 서버 환경에서 동시성 문제가 발생할 수 있다.
 
-데드락 예시 - 세션 1
+### 2.3 트랜잭션 격리 수준(READ_UNCOMMITED)을 이용한 해결 방식
 
-```mysql
-begin;
-
-## 1. coupon 4, member coupon 4 gap == coupon 1 ~ 3 충돌
-select id
-from member_coupon
-where member_id = 2
-  and coupon_id = 2
-    for share;
-
-## 3. 세션 2 gap락 대기
-insert into member_coupon(is_used, coupon_id, member_id)
-values (false, 2, 2);
-
-rollback;
-```
-
-데드락 예시 - 세션 2
-
-```mysql
-begin;
-
-### 2. coupon 4, member coupon 4 gap == coupon 1 ~ 3 충돌
-select id
-from member_coupon
-where member_id = 2
-  and coupon_id = 2
-    for share;
-
-## 4. 세션 1 gap락 대기 = 데드락
-insert into member_coupon(is_used, coupon_id, member_id)
-values (false, 2, 2);
-
-rollback;
-```
-
-### 동시성 문제를 유니크 인덱스로 해결하려는 방식
-
-#### 가설
-
-- 유니크 제약조건을 사용하면 중복 저장이 불가능하다.
-- (가설) 유니크 제약조건을 도입하면 간단하게 동시성 문제를 해결할 수 있지 않을까?
+다른 DB 트랜잭션이 커밋하기 이전에 검증을 통과하기 때문에 사용자는 쿠폰을 1개 이상 발급받을 수 있었다.
+트랜잭션 격리 수준 READ_UNCOMMITED에서 발생하는 더티 리드를 이용하면 다른 스레드가 삽입한 데이터를 읽을 수 있기 때문에 동시성 문제를 해결할 수 있다.
 
 #### 적용
 
-- JPA에서는 다음과 같이 인덱스 제약조건을 추가할 수 있다.
-- 중복 저장이 불가하므로 한 사용자는 쿠폰을 한 번만 지급받을 수 있게 된다.
+```java
+
+@Service
+@RequiredArgsConstructor
+public class MemberCouponService {
+
+    // .. 중략 ..
+
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
+    public Long issue(Long memberId, Long couponId) {
+        Member member = memberRepository.findById(memberId).orElseThrow();
+        Coupon coupon = couponRepository.findById(couponId).orElseThrow();
+        MemberCoupon memberCoupon = MemberCoupon.issue(member, coupon);
+
+        // 1. INSERT 쿼리가 발생한다.
+        memberCouponRepository.save(memberCoupon);
+        validateAlreadyIssued(memberId, couponId);
+
+        return memberCoupon.getId();
+    }
+
+    // 2. 더티 리드를 이용해서 다른 트랜잭션에서 삽입한 데이터 알 수 있다.
+    private void validateAlreadyIssued(Long memberId, Long couponId) {
+        try {
+            // 3. 가장 먼저 INSERT를 수행하고 조회를 한 스레드는 1개를 반환할 것이고, 나머지는 그 이상의 데이터를 반환하니 예외가 발생한다.
+            memberCouponRepository.findByMemberIdAndCouponId(memberId, couponId);
+        } catch (IncorrectResultSizeDataAccessException e) {
+            // 4. 예외가 발생한 트랜잭션은 롤백된다.
+            throw new IllegalStateException("해당 사용자는 이미 쿠폰을 발급했습니다.");
+        }
+    }
+}
+```
+
+`@Transactional` 어노테이션에 isolation 속성을 READ_UNCOMMITED로 설정하고, 연산의 순서를 변경했다.
+INSERT 쿼리를 가장 먼저 수행하고 그 이후에 검증 로직을 실행한다.
+만약 1개 이상의 스레드가 동시에 데이터를 삽입하고 검증을 수행하면 충돌된 모든 스레드는 예외가 발생한다.
+
+#### 장점과 한계
+
+**장점** :
+
+- 분산 서버 환경에서도 동시성 문제를 해결한다.
+
+**한계** :
+
+- 충돌한 모든 스레드가 실패한다.
+- INSERT 쿼리가 바로 데이터베이스로 전송되어야 한다.
+- 연산의 순서가 일반적이지 않아 다른 개발자에게 혼란을 야기한다.
+
+### 2.4 MySQL 스토리지 잠금을 이용한 해결 방식
+
+MySQL의 `select .. for update, shared`, 그리고 트랜잭션 격리 수준 SERIALIZABLE을 사용하면 MySQL 스토리지 잠금을 사용한다.  
+이 잠금을 사용하면 다른 트랜잭션을 대기시킬 수 있으므로 동시성 문제를 해결할 수 있는 대안이 될 수 있다.
+
+#### 적용
+
+```java
+public interface MemberCouponRepository extends JpaRepository<MemberCoupon, Long> {
+
+    @Lock(LockModeType.PESSIMISTIC_READ)
+    @QueryHints({@QueryHint(name = "javax.persistence.lock.timeout", value = "10000")})
+    boolean existsMemberCouponByMemberIdAndCouponId(Long memberId, Long couponId);
+}
+```
+
+`@Transactional`의 격리 레벨 설정을 SERIALIZABLE로 변경하거나 공유 혹은 배타 잠금 쿼리를 작성한다.
+MySQL의 SERIALIZABLE은 내부적으로 단순 조회의 경우에도 잠금을 수행한다.
+따라서 명시적으로 공유 잠금과 배타 잠금을 사용하는 쿼리를 사용하는 것이 상대적으로 나은 성능을 보인다.
+따라서, 위 예시에서는 `@Lock` 어노테이션을 이용하여 공유 잠금을 설정했다.
+
+위 메서드는 다음과 같은 쿼리가 발생한다.
+
+```postgresql
+select mc.id
+from member_coupon mc
+where mc.member_id = 2
+  and mc.coupon_id = 2
+limit 1 for share
+```
+
+이 경우 S, GAP 잠금이 확인할 수 있다. 만약 member_coupon 테이블에 member_coupon(1, 2), member_coupon(6, 2) 조합인 두 개의 레코드가 존재한다면,
+member_id가 2보다 큰 6을 기준으로 S, GAP 잠금이 걸린다. 따라서 member_id가 1부터 5인 INSERT 쿼리를 대기시키므로 동시성 문제를 해결할 수 있다.
+
+#### 장점과 한계
+
+**장점** :
+
+- 분산 서버 환경에서도 동시성 문제를 해결한다.
+- 다른 방식에 비해 적용이 편리하다.
+
+**한계** :
+
+- 불필요한 공간까지 잠금하기 때문에 상대적인 성능 저하가 발생한다.
+- 데드락을 야기할 수 있다.
+
+### 2.5 유니크 제약 조건을 이용한 해결 방식
+
+유니크 제약 조건을 사용하면 중복 저장이 불가능하다. 따라서, 동시 호출이 발생하더라도 실제 테이블에는 1건만 저장될 수 있으니 동시성 문제를 해결할 수 있는 대안이 될 수 있다.
+
+#### 적용
 
 ```java
 
@@ -407,51 +303,136 @@ rollback;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class MemberCoupon {
+
+    // ... 중략 ...
 }
 ```
 
+JPA에서는 위와 같이 인덱스 제약을 추가할 수 있다. 이 경우 중복 저장이 불가하므로 한 사용자는 쿠폰을 한 번만 받을 수 있다.
+
 #### 장점과 한계
 
-장점 :
+**장점** :
 
+- 분산 서버 환경에서도 동시성 문제를 해결한다.
 - 적용이 간단하다.
-- 추가적인 작업(잠금, 지연, 잠금 해제)이 필요없다.
+- 잠금을 관리하기 위한 추가적인 작업이 필요하지 않다.
 
-한계 :
+**한계** :
 
-- 기획적인 한계가 있을 수 있다.
-    - 가령 member_coupon에 used 컬럼이 있다고 가정하자.
-    - member_id(2), coupon_id(2), used
-    - member_id(2), coupon_id(3), used
-    - member_id(2), coupon_id(4), not_used
-    - 위 경우에서 used는 여러개를 가질 수 있고, not_used는 1개만 가질 수 있다면 어떨까?
-    - 데벨업의 경우는 mission_id, solution_id, status 조합으로 solution 레코드를 삽입한다.
-    - 이때, 동시 호출시 문제가되는 경우는 in_progress status가 동시에 2개가 생기는 경우이다.
-    - 그리고, solution status가 completed인 경우는 과거 내역 관리를 위해서 중복을 허용한다.
+- 기획적인 한계가 있을 수 있다. 가령, 한 사용자는 5개 쿠폰을 발급받을 수 있다면 유니크 인덱스는 적절하지 않을 수 있다.
 - 비즈니스 제약 조건이 DB에 의존적인 것은 단점일 수 있다.
-    - (고민해볼 지점) DB를 다른 저장소로 변경해야하는 경우는 어떻게 되는가?
 
-### 동시성 문제를 분산락으로 해결해보자 (MySQL 네임드락편)
+### 2.6 분산 잠금(MySQL 네임드락)을 이용한 해결 방식
 
-#### 가설
+```mysql
+select get_lock('mylock', 2); # n 초동안 잠금 획득을 시도한다.
+select is_free_lock('mylock'); # 잠금을 획득할 수 있는지 확인한다.
+select is_used_lock('mylock'); # 사용되고 있는 잠금인지 체크한다.
+select release_lock('mylock'); # 특정 잠금을 해제한다.
+select release_all_locks(); # 세션에서 획득한 모든 잠금을 해제한다.
+```
 
-- MySQL에 네임드락을 이용하면 임의의 문자열에 잠금을 걸 수 있다.
-- (가설) 네임드락을 이용한 분산락을 구현하면, 레코드 잠금에 비해 적은 공간을 잠금하고 동시성 문제를 해결할 수 있을 것이다.
+MySQL의 네임드락 기능을 활용하여 분산 잠금을 구현할 수 있다. 네임드락은 임의의 문자열에 잠금을 거는 기능이며, 위와 같이 사용할 수 있다.
+네임드락은 몇 가지 특징이 있다. 우선 한 세션에서 잠금을 유지하고 있으면, 다른 세션에서 해당 잠금을 획득할 수 없다.
+그리고, 획득한 잠금은 트랜잭션이 종료되어도 해제되지 않는다.
+해제의 경우는 현재 세션에서 획득한 잠금만 릴리즈할 수 있다. 이러한 네임드락의 특징을 활용하여 분산 잠금을 구현하면 동시성 문제를 해결할 수 있다.
 
 #### 적용
 
-```mysql
-select get_lock('mylock', 2);
-select is_free_lock('mylock');
-select is_used_lock('mylock');
-select release_lock('mylock');
-select release_all_locks();
+```java
+
+@Service
+@RequiredArgsConstructor
+public class MemberCouponService {
+
+    // ... 중략 ...
+
+    public Long issue(Long memberId, Long couponId) {
+        String key = memberId + "-" + couponId;
+
+        DataSource lockDataSource = getLockDataSource();
+        try (Connection connection = lockDataSource.getConnection()) {
+            distributedLock.tryLock(connection, key, 3);
+            try {
+                return memberCouponIssuer.issue(memberId, couponId);
+            } finally {
+                distributedLock.releaseLock(connection, key);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private DataSource getLockDataSource() {
+        return applicationContext.getBean(DataSourceConfig.LOCK_DATA_SOURCE, DataSource.class);
+    }
+}
 ```
 
-- 네임드락은 위와 같은 쿼리로 얻거나, 릴리즈할 수 있다.
-- 응용 계층에 MembercouponIsusueLock을 정의한다.(java-lock 참고)
-- 인프라 계층에서 이를 구현하는 MySqlMemberCouponIssueLock을 만든다.
-- MySqlMemberCouponIssueLock은 네임드락을 사용하는 MySqlLockRepository를 사용한다.
+```java
+
+@Component
+public class MySqlDistributedLock {
+
+    public void tryLock(Connection connection, String key, int timeout) {
+        String sql = "select get_lock(?, ?)";
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setString(1, key);
+            preparedStatement.setInt(2, timeout);
+            preparedStatement.execute();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void releaseLock(Connection connection, String key) {
+        String sql = "select release_lock(?)";
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setString(1, key);
+            preparedStatement.execute();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+}
+```
+
+MySqlDistributedLock 클래스는 잠금을 획득하고 해제하는 역할을 가진다.
+이때 tryLock, releaseLock 메서드에서 커넥션을 주입받도록 구현했다. 왜냐하면, 잠금을 획득한 커넥션으로 잠금을 해제해야 하기 때문이다. 
+만약, 그렇지 않는다면 잠금 해제가 실패할 것이고 더 나아가 커넥션 풀링을 하는 경우에는 다른 스레드가 잠금을 획득한 커넥션을 사용하여 예기치 못한 상황이 발생할 수 있다.
+
+MemberCouponService 내부를 확인하면 DataSource 또한 분리했다. MemberCouponIssuer의 issue 메서드에서 하나의 커넥션을 점유한다. 그리고, 잠금을 획득하는 부분에서도 하나의 커넥션을 사용한다. 
+만약, 10개의 커넥션이 풀에 존재한다고 가정하자. 10개의 스레드가 동시에 잠금을 획득하는 커넥션 획득하면 각 스레드가 issue 메서드를 실행할 커넥션을 얻을 수 없기 때문에 커넥션 풀 데드락이 발생한다. 
+이를 예방하기 위해서 DataSource를 분리했다.
+
+또한, 잠금을 수행하기 위해서는 대기가 필요할 수 있다. 이때 커넥션을 점유하고 대기를 수행하기 때문에 커넥션 풀이 고갈이 발생하여 전체 서비스의 장애로 이어질 수 있다. 
+따라서 리소스를 분리하여 서비스 전체의 장애로 퍼지는 것을 어느 정도 완화할 수 있다.
+
+번외로 Spring Data Jpa를 이용하면 아래와 같이 더욱 간단하게 구현할 수 있다. 
+하지만, OSIV(Open Session In View) 옵션이 비활성화되어 있는 경우에는 잠금을 점유한 커넥션과 다른 커넥션으로 잠금을 해제할 수 있기 때문에 주의해야한다.
+
+```java
+
+@Service
+@RequiredArgsConstructor
+public class MemberCouponService {
+
+    // ... 중략 ...
+
+    public Long issue(Long memberId, Long couponId) {
+        // lock 메서드는 MysqlLockRepository를 사용한다.
+        memberCouponIssueLock.lock(memberId, couponId);
+        try {
+            return memberCouponIssuer.issue(memberId, couponId);
+        } finally {
+            memberCouponIssueLock.unlock(memberId, couponId);
+        }
+    }
+}
+```
 
 ```java
 public interface MySqlLockRepository extends JpaRepository<MemberCoupon, Long> {
@@ -464,164 +445,133 @@ public interface MySqlLockRepository extends JpaRepository<MemberCoupon, Long> {
 }
 ```
 
-#### 적용 시 주의사항
-
-```java
-public Long issue(Long memberId, Long couponId) {
-    memberCouponIssueLock.lock(memberId, couponId);
-    try {
-        return memberCouponIssuer.issue(memberId, couponId);
-    } finally {
-        memberCouponIssueLock.unlock(memberId, couponId);
-    }
-}
-```
-
-- 데이터베이스 트랜잭션의 시점을 주의해야 한다.
-- 데이터베이스 트랜잭션이 커밋하기 이전에 락을 릴리즈하면 동시성 문제가 다시 발생한다.
-    - 이를 위해서 상위 계층 코드(파사드 같은)에서 락을 릴리즈하거나, synchronized를 설정해야 한다.
-- 만약 부모 트랜잭션에 합류하고 있는 경우에는 부모 트랜잭션이 종료되는 경우 커밋이 된다. 즉, 커밋을 수행하기 이전에 락을 릴리즈하여 동시성 문제가 발생한다.
-    - 이 경우에는 트랜잭션 전파 옵션(ex. REQUIRES_NEW)으로 해결할 수 있다. 하지만, 스레드가 두 개 이상의 커넥션을 동시에 점유하려는 경우, 부하 환경에서 히카리 커넥션 풀 데드락이 발생할 수
-      있다.
-- 네임드 락의 경우에는 락을 얻은 세션에서 릴리즈해야한다. 만약, OSIV가 꺼져있는 환경이라면 lock을 점유한 커넥션과 릴리즈한 커넥션이 다를 수 있다. 이 경우 예기치 못한 동작이 발생할 수 있다.
-
 #### 장점과 한계
 
-장점 :
+**장점** :
 
-- WAS가 분산되어 있는 환경에서도 동작한다.
-- 응용 계층에서 추상화된 Lock 인터페이스를 사용할 수 있어, 다른 방식으로 전환할 수 있다.
-- serializable이나 비관적락보다 상대적으로 적은 수의 잠금을 사용한다.
+- 분산 서버 환경에서도 동시성 문제를 해결한다.
+- 상대적으로 작은 잠금의 범위를 가진다.
 - 기존에 MySQL을 운영하고 있는 경우 추가 비용 없이 구축이 가능하다.
 
-한계 :
+**한계** :
 
 - MySQL 기능에 의존적인 방식이며, 다른 DB로 변경되는 경우 한계가 있다.
-- 커넥션을 점유하고 스레드가 대기하는 비효율이 생긴다. 이 경우, 커넥션 풀을 분리하거나 락을 점유하지 못하는 경우 빠른 실패를 유도할 수 있다. 빠른 실패를 유도하는 경우, 최초에 락을 점유한 스레드가 실패한
-  경우 모든 동시 요청이 실패한다. 락 타임 아웃을 짧게 가져가는 경우에도 빠른 실패와 비슷하다.
-- 데이터베이스를 한 번 더 찍어야 하므로 Redis를 이용한 분산락이나 레코드 잠금보다 지연이 발생한다.
-- (고민해볼 지점) 레코드 잠금을 사용해 불필요한 동시성 제어까지 수행 vs 제어 구간은 핏하지만, 데이터베이스 왕복 시간과 커넥션 점유 대기 시간에서 비효율이 발생하는 네임드락
-    - 전자의 경우 데드락 발생 위험이 있고, 후자는 없다.
-    - 전자의 경우도 커넥션 점유 및 대기는 존재한다.
-    - db 응답 시간은 db를 상대적으로 적게 요청하는 레코드 잠금 쪽이 우세하다.
-    - 다만 서버의 동시 처리 능력은 후자를 선택하는 경우가 우세하다. 왜냐하면, 특정 api 요청 내부에서 member_id, coupon_id 조합으로 동시성을 제어하는 것과 대기하지 않아도 괜찮은 부분에서도
-      대기하는 레코드 잠금 중에서 전자가 더 많은 요청을 처리할 수 있기 때문이다.
-    - 전자의 경우에는 member-coupon issue api가 아닌 다른 api와도 충돌이 발생할 수 있다.
+- DB 커넥션을 점유하고 스레드가 대기하는 비효율이 생긴다.
+- 잠금 획득과 해제를 위한 데이터베이스 추가 요청이 발생한다.
 
-### 동시성 문제를 분산락으로 해결해보자 (Redis 활용편)
+### 2.7 분산 잠금(Redis)을 이용한 해결 방식
 
-#### 가설
-
-- (가설) Redis를 이용하면 DB 커넥션을 점유하지 않고 동시성 문제를 해결할 수 있을 것이다.
+Redis는 분산 잠금과 아토믹 연산을 지원한다. 따라서, Redis를 활용하여 동시성 문제를 해결할 수 있다. Redis 클라이언트 별로 분산 잠금을 사용하는 양상이 다르다. 
+분산 잠금을 사용하기 위한 Redis 클라이언트는 대표적으로 Lettuce와 Redission이 있다. Lettuce의 경우에는 따로 지원해 주는 것이 없기 때문에 SETNX 명령어를 이용해 직접 구현해야 하며, 
+Redisson의 경우에는 RLock이라는 클래스를 통해서 분산 잠금을 사용할 수 있도록 지원한다.
 
 #### 적용
 
+Lettuce 구현 방식은 다음과 같다. 잠금을 획득하는데 필요한 타임아웃을 직접 구현해야 한다. 
+스핀락 방식으로 Redis에 부하를 주니 Thread.Sleep을 추가했다. 
+잠금 해제의 경우 키에 해당되는 값을 제거하면 된다.
+
 ```java
 
-public Long issue(Long memberId, Long couponId) {
-    // 락을 획득하지 못했는데, 락을 릴리즈하는 것을 경계해야 한다.
-    memberCouponIssueLock.lock(memberId, couponId);
-    try {
-        return memberCouponIssuer.issue(memberId, couponId);
-    } finally {
-        memberCouponIssueLock.unlock(memberId, couponId);
+@Component
+@RequiredArgsConstructor
+class LettuceMemberCouponIssueLock implements MemberCouponIssueLock {
+
+    // ... 중략 ...
+
+    @Override
+    public void lock(Long memberId, Long couponId) {
+        int tryCount = 10;
+
+        tryLockWithSpin(memberId, couponId, tryCount);
+    }
+
+    private void tryLockWithSpin(Long memberId, Long couponId, int tryCount) {
+        while (!requestLock(memberId, couponId)) {
+            if (tryCount-- == 0) {
+                // lock 획득 실패 처리
+                throw new RuntimeException();
+            }
+
+            try {
+                // redis에 너무 많은 부하를 주지 않기 위해 sleep을 설정
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    private boolean requestLock(Long memberId, Long couponId) {
+        Boolean result = redisTemplate
+                .opsForValue() // opsForX는 커맨드를 호출할 수 있는 기능을 모은 인터페이스를 반환
+                .setIfAbsent(generateKey(memberId, couponId), "empty", Duration.ofSeconds(3));
+
+        return Boolean.TRUE.equals(result);
     }
 }
 ```
 
-- Redis Client인 Lettuce와 Redisson을 사용하는 방식이 대표적이다.
-- Lettuce의 경우에는 따로 지원해주는 것이 없기 때문에 SETNX 명령어를 이용해 직접 구현해야 한다.
-- Redisson의 경우에는 RLock이라는 클래스를 통해서 분산락을 사용할 수 있도록 지원한다.
-
-#### Lettuce 분산락
-
-Lettuce 적용 방식은 다음과 같다. (MemberCouponIssueLock의 구현체인 LettuceMemberCouponIssueLock)
+Redisson은 RLock 클래스를 제공한다. 이는 타임아웃과 같은 설정을 지원하며 Lettuece 방식에 비해 편리하다. 
+Pub/Sub 방식으로 락이 해제되면 잠금을 구독하는 클라이언트에게 신호를 전달하는 방식으로 작동한다.
 
 ```java
 
-@Override
-public void lock(Long memberId, Long couponId) {
-    int tryCount = 10;
+@Component
+@RequiredArgsConstructor
+class RedissonMemberCouponIssueLock implements MemberCouponIssueLock {
 
-    tryLockWithSpin(memberId, couponId, tryCount);
-}
-
-private void tryLockWithSpin(Long memberId, Long couponId, int tryCount) {
-    while (!requestLock(memberId, couponId)) {
-        if (tryCount-- == 0) {
-            // lock 획득 실패 처리
-            throw new RuntimeException();
-        }
-
+    @Override
+    public void lock(Long memberId, Long couponId) {
+        RLock lock = redissonClient.getLock(generateKey(memberId, couponId));
         try {
-            // redis에 너무 많은 부하를 주지 않기 위해 sleep을 설정
-            Thread.sleep(100);
+            boolean acquired = lock.tryLock(5, TimeUnit.SECONDS);
+            if (!acquired) {
+                // lock 획득 실패 처리
+                throw new RuntimeException();
+            }
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
     }
-}
 
-private boolean requestLock(Long memberId, Long couponId) {
-    Boolean result = redisTemplate
-            .opsForValue() // opsForX는 커맨드를 호출할 수 있는 기능을 모은 인터페이스를 반환
-            .setIfAbsent(generateKey(memberId, couponId), "empty", Duration.ofSeconds(3));
+    @Override
+    public void unlock(Long memberId, Long couponId) {
+        RLock lock = redissonClient.getLock(generateKey(memberId, couponId));
+        lock.unlock();
+    }
 
-    return Boolean.TRUE.equals(result);
-}
-```
-
-#### Lettuce 주의 사항
-
-- 락을 획득하는데 필요한 타임아웃을 직접 구현해야한다.
-- 스핀락 방식으로 Redis에 부하를 준다.
-
-#### Redisson 분산락
-
-```java
-
-@Override
-public void lock(Long memberId, Long couponId) {
-    RLock lock = redissonClient.getLock(generateKey(memberId, couponId));
-    try {
-        boolean acquired = lock.tryLock(5, TimeUnit.SECONDS);
-        if (!acquired) {
-            // 락 획득 실패
-            throw new RuntimeException();
-        }
-    } catch (InterruptedException e) {
-        throw new RuntimeException(e);
+    private String generateKey(Long memberId, Long couponId) {
+        return "memberCoupon-" + memberId.toString() + couponId.toString();
     }
 }
 ```
 
-- Redisson은 RLock을 제공한다. 이는 락에 대해 타임아웃과 같은 설정을 지원한다.
-- Pub/Sub 방식으로 락이 해제되면 락을 구독하는 클라이언트에게 신호를 전달한다.
-
 #### 장점과 한계
 
-장점 :
+**장점** :
 
-- WAS가 분산되어 있는 환경에서도 동작한다.
-- 응용 계층에서 추상화된 Lock 인터페이스를 사용할 수 있어, 다른 방식으로 전환할 수 있다.
+- 분산 서버 환경에서도 동시성 문제를 해결한다.
 - 기존에 Redis를 운영하고 있는 경우 추가 비용 없이 구축이 가능하다.
 - DB 커넥션을 점유하고 대기하지 않아도 된다.
+- MySQL 분산 잠금에 비해서 신경 써야 할 부분이 적다.
 
-한계 :
+**한계** :
 
-- 단순히 동시성 문제를 해결하기 위해서 도입하는 것은 애매한 지점이 있다. Redis에 대한 학습 비용과 인프라 비용, 유지보수 비용이 추가로 발생한다.
+- Redis에 대한 인프라 비용, 유지보수 비용이 추가로 발생하므로 단순 동시성 문제 해결을 위한 방법으로는 적합하지 않을 수 있다.
 
-## 3. 고민해볼 지점
+## 3. 고민해 볼 지점
 
-동시성 문제를 해결하기 위해서 여러 대안을 생각해봤다. 하지만, 동시성 문제를 해결하기 위해서는 몇 가지 추가적으로 고민해볼 부분들이 존재한다.
+동시성 문제를 해결하기 위해서 여러 대안을 생각해 봤다. 하지만, 동시성 문제를 해결하기 위해서는 몇 가지 추가적으로 고민해 볼 부분들이 존재한다.
 
-- 추가적인 인프라 구축 비용을 발생 시킬 수 있다.
+- 추가적인 인프라 구축 비용을 발생시킬 수 있다.
 - 병목지점을 만들 수 있다.
 - 상황에 따라서 데드락을 발생 시킬 수 있다.
 - 코드의 복잡도를 증가시킬 수 있다.
 - 막지 않아도 괜찮을 수도 있다.
 
-위와 같은 부분들을 충분히 고민해봤는데도 꼭 막아야하는 경우도 있을 것이다. 이러한 경우에는 오늘 접근해본 방식보다 나은 대안이 있을 것이라 생각하고 끊임없이 탐구하는 자세가 필요하다.
+위와 같은 부분들을 충분히 고민해 봤는데도 꼭 막아야 하는 경우도 있을 것이다.
+이러한 경우에는 오늘 접근해 본 방식보다 나은 대안이 있을 것이라 생각하고 끊임없이 탐구하는 자세가 필요하다.
 
 ## 참고
 
@@ -650,7 +600,7 @@ public void lock(Long memberId, Long couponId) {
 - [우아한 기술 블로그 - WMS 재고 이관을 위한 분산 락 사용기](https://techblog.woowahan.com/17416/)
 - [우아한 기술 블로그 - HikariCP Dead lock에서 벗어나기 (이론편)](https://techblog.woowahan.com/2664/)
 - [우아한 기술 블로그 - HikariCP Dead lock에서 벗어나기 (실전편)](https://techblog.woowahan.com/2663/)
-- [당근 기술 블로그 - MySQL Gap Lock 다시보기](https://medium.com/daangn/mysql-gap-lock-%EB%8B%A4%EC%8B%9C%EB%B3%B4%EA%B8%B0-7f47ea3f68bc)
-- [당근 기술 블로그 - MySQL Gap Lock (두번째 이야기)](https://medium.com/daangn/mysql-gap-lock-%EB%91%90%EB%B2%88%EC%A7%B8-%EC%9D%B4%EC%95%BC%EA%B8%B0-49727c005084)
+- [당근 기술 블로그 - MySQL Gap Lock 다시 보기](https://medium.com/daangn/mysql-gap-lock-%EB%8B%A4%EC%8B%9C%EB%B3%B4%EA%B8%B0-7f47ea3f68bc)
+- [당근 기술 블로그 - MySQL Gap Lock (두 번째 이야기)](https://medium.com/daangn/mysql-gap-lock-%EB%91%90%EB%B2%88%EC%A7%B8-%EC%9D%B4%EC%95%BC%EA%B8%B0-49727c005084)
 - [컬리 기술 블로그 - 풀필먼트 입고 서비스팀에서 분산락을 사용하는 방법 - Spring Redisson](https://helloworld.kurly.com/blog/distributed-redisson-lock/)
 - [하이퍼커넥트 기술 블로그 - 레디스와 분산 락(1/2) - 레디스를 활용한 분산 락과 안전하고 빠른 락의 구현](https://hyperconnect.github.io/2019/11/15/redis-distributed-lock-1.html)
