@@ -24,6 +24,7 @@
 - **Context 사용 예시: 코드로 이해하기**
   - Activity Context가 필요한 상황
   - Application Context가 필요한 상황
+- **결론**
 
 ---
 
@@ -282,7 +283,7 @@ Application의 테마란 애플리케이션 전역에 설정된 기본 테마를
 
 <br>
 
-_# Chapter 3: Context 올바르게 사용하기
+# Chapter 3: Context 올바르게 사용하기
 
 ## Context 사용의 기준: Lifecycle
 
