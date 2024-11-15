@@ -29,9 +29,9 @@
 
 ## 가비아를 통한 DNS 설정
 
- DNS(Domain Name Server)란 사람이 읽을 수 있는 도메인 이름(예: ddangkong.kr)을 머신이 읽을 수 있는 IP 주소(예: 192.0.2.44)로 변환하는 서버를 말한다. 사람이 인지하기 쉬운 문자를 통해 숫자 4개로 되어있는 서버 주소로 변환하도록 하여, 사용자는 IP 주소를 알지 않아도 원하는 사이트에 접속할 수 있다. 그리고 IP 주소가 바뀌더라도 DNS를 설정해준다면, 같은 도메인 이름을 통해 언제든지 같은 서비스에 접속할 수 있다.
+ DNS(Domain Name System)란 사람이 읽을 수 있는 도메인 이름(예: ddangkong.kr)을 머신이 읽을 수 있는 IP 주소(예: 192.0.2.44)로 변환하는 서버를 말한다. 사람이 인지하기 쉬운 문자를 통해 숫자 4개로 되어있는 서버 주소로 변환하도록 하여, 사용자는 IP 주소를 알지 않아도 원하는 사이트에 접속할 수 있다. 그리고 IP 주소가 바뀌더라도 DNS를 설정해준다면, 같은 도메인 이름을 통해 언제든지 같은 서비스에 접속할 수 있다.
 
- 가비아(Gabia)는 IT 환경을 필요로 하는 기업을 대상으로 클라우드, 그룹웨어, 보안, 도메인, 호스팅에 이르는 통합적인 인프라 서비스를 제공하는 기업이다. 도메인, 웹호스팅, 홈페이지 서비스에서 나아가 자체 기술 스텍으로 개발한 IaaS(Infrastructure-as-a-Service) ‘g클라우드’와 클라우드 운영에 꼭 필요한 전반의 서비스를 제공한다. 우리 서비스에서는 도메인 구매 및 DNS 설정을 위해 해당 서비스를 사용했다. 그렇다면 가비아를 통해 DNS를 설정하는 방법에 대해 알아보자.
+ 가비아(Gabia)는 IT 환경을 필요로 하는 기업을 대상으로 클라우드, 그룹웨어, 보안, 도메인, 호스팅에 이르는 통합적인 인프라 서비스를 제공하는 기업이다. 도메인, 웹호스팅, 홈페이지 서비스에서 나아가 자체 기술 스텍으로 개발한 IaaS(Infrastructure-as-a-Service) ‘G-클라우드’와 클라우드 운영에 꼭 필요한 전반의 서비스를 제공한다. 우리 서비스에서는 도메인 구매 및 DNS 설정을 위해 해당 서비스를 사용했다. 그렇다면 가비아를 통해 DNS를 설정하는 방법에 대해 알아보자.
 
 ### DNS 설정
 
@@ -99,12 +99,12 @@ EC2를 간단히 말하자면, OS가 설치된 하나의 컴퓨터를 대여해�
 
 현재 ELB에서 들어온 HTTPS 요청을 EC2에게 80 포트로 요청을 넘긴다. 그리고 WAS는 EC2 내에서 8422 포트에서 실행되어고 있다. 그래서 80 포트로 들어온 요청을 8422 포트로 포드 포워딩 해야 한다. 포트 포워딩에는 여러 방법이 있지만, 땅콩 조에서는 명령어를 통해 ip table을 설정하는 방법을 사용했다.
 
-```shell
+```bash
 iptables -A PREROUTING -t nat -i eth0 -p tcp --dport 80 -j REDIRECT --to-port 8422
 ```
 
 그리고 아래 명령어를 통해 포트 포워딩이 잘 설정되었는지 확인할 수 있다.
-```shell
+```bash
 sudo iptables -t nat -L PREROUTING -n -v
 ```
 
@@ -112,9 +112,9 @@ sudo iptables -t nat -L PREROUTING -n -v
 
 EC2는 사용하는 CPU, 메인 메모리에 따라 사용 가격이 다르기 때문에, 효율적으로 사용하기 위해서는 스왑 메모리 설정이 필수다. 스왑 메모리는 컴퓨터의 메인 메모리가 부족할 때, 일시적으로 하드 디스크나 SSD 같은 저장 장치를 마치 메모리처럼 사용하는 공간이다. 하드 디스크나 SSD를 사용하기 때문에 속도는 매우 느려질 수 있으나 메인 메모리가 부족할 때 여유 공간을 두고 활용할 수 있다.
 
-스왑 메모리는 ubuntu 20.04 기준 아래와 같이 설정한다. 현재 사용하는 EC2의 메인 메모리 크기의 2배인 2GB로 설정하는 명령어이다.
+스왑 메모리는 ubuntu 24.04 기준 아래와 같이 설정한다. 현재 사용하는 EC2의 메인 메모리 크기의 2배인 2GB로 설정하는 명령어이다.
 
-```shell
+```bash
 sudo dd if=/dev/zero of=/swapfile bs=128M count=16
 sudo chmod 600 /swapfile
 sudo mkswap /swapfile
@@ -139,7 +139,7 @@ ELB는 현재 어플리케이션이 정상 작동하고 있는지 WAS에게 주�
 	```gradle
 	dependencies { 
 		implementation 'org.springframework.boot:spring-boot-starter-actuator'
-		...
+		// ...
 	}
 	```
 - application.yml 설정
@@ -180,3 +180,4 @@ WAF란 고객이 정의한 조건에 따라 웹 요청을 허용, 차단 또는 
 - 기타
 	- [AWS WAF FAQ](https://aws.amazon.com/ko/waf/faq/) (검색 일자 : 24.10.01)
 	- [Amazon CloudWatch란 무엇인가요?](https://docs.aws.amazon.com/ko_kr/AmazonCloudWatch/latest/monitoring/WhatIsCloudWatch.html) (검색 일자 : 24.10.01)
+- thanks to : 우테코 6기 땅콩 (프린의 사진, 이든의 가비아 DNS 설명)
