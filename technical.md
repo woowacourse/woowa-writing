@@ -104,6 +104,9 @@ ssh -i [key-file-name.pem] ubuntu@[ip.address]
 
 아래 사이트에서 확인되는 것으로 `Cloudflare` 는 굉장히 전국 권에서 꽤나 좋은 성능을 보유한 업체로써 `DNS Resolve` 나 `DNS Propagation` 등에서 빠른 속도를 자랑하며 `DDNS` 에 필요한 레코드 변경 `API` 도 제공해주고 있었습니다.
 
+> **DDNS(Dynamic DNS)란?**
+> 인터넷의 IP 주소가 바뀌어도 고정된 도메인 이름으로 접속할 수 있게 해주는 서비스입니다. IP가 바뀔 때마다 자동으로 도메인과 새 IP를 연결해줍니다.
+
 https://www.dnsperf.com/
 ![](https://velog.velcdn.com/images/chch1213/post/f58d168c-7462-4f09-80d7-73f474c26f72/image.png)
 
