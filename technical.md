@@ -205,8 +205,11 @@ EC2 의 `Public IP Address` 가 변경되는 시점은 딱 한가지 **부팅될
 홈 폴더에 `.cloudflare` 폴더를 만들고 `ddns.sh` 이라는 쉘 스크립트 파일을 실행 권한을 부여하여 `vim` 을 통해 작성합니다.
 
 ```shell
+# 홈 폴더에 cloudflare 시크릿 폴더를 생성하고 접속
 mkdir ~/.cloudflare
 cd ~/.cloudflare
+
+# 현재 외부 IP를 cloudflare에 등록하는 쉘 스크립트 작성을 시작
 touch ddns.sh
 chmod u+x ddns.sh
 vim ddns.sh
