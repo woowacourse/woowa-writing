@@ -227,7 +227,7 @@ Client secrets
 - Authorization Server에서 Resource Server로 api를 요청할 때 사용합니다.
 - Authorization Server는 보안된 환경(서브 모듈)에 Client secrets를 저장합니다.
 
-![4](https://github.com/user-attachments/assets/9beee5dc-8cd8-4981-b431-82f4b140239d)
+![ci, cs](https://github.com/user-attachments/assets/09e359ab-32f2-463a-8f8f-0f0f4827b4ad)
 
 <br>
 <br>
@@ -238,7 +238,7 @@ Client secrets
 - 로그인을 클릭하면 Github OAuth로 리다이렉트 되는 코드를 구현합니다.
 - 발급 받은 `client_id`와 백엔드와 정한 `scope`로 Github OAuth URL를 생성합니다.
 
-![6](https://github.com/user-attachments/assets/34578ed3-569a-46aa-813b-e1c02d4007b8)
+![login 전](https://github.com/user-attachments/assets/369e8e64-d302-43f4-82eb-093d95dfaea8)
 
 <br>
 
@@ -268,8 +268,7 @@ export default Header;
 - Resource Owner(사용자)에게 인증을 요청합니다.
 - Github OAuth에서 로그인을 성공하면 Github Authorization callback URL에 지정한 callback 페이지로 이동합니다.
 
-![7](https://github.com/user-attachments/assets/09940612-5417-43e0-a7cb-34aac53b14fc)
-
+![로그인 중](https://github.com/user-attachments/assets/296cec61-ad04-47ef-9e37-782e87483249)
 <br>
 
 <br>
@@ -287,7 +286,7 @@ export default Header;
 
 3\. 이 code를 추출하여 Authorization Server에 로그인 post 요청을 합니다.
 
-![8](https://github.com/user-attachments/assets/8ec505c7-00ca-4e7b-a804-a708194988cb)
+![로그인 중2](https://github.com/user-attachments/assets/16271456-eb3c-4ec8-b13b-05d15c3bc40f)
 
 <br>
 
@@ -309,7 +308,7 @@ export default Header;
 
 7\. Client는 이를 기기에 저장한 후 Access Token을 header에 담아서 api를 요청하는 데에 사용합니다.
 
-![9](https://github.com/user-attachments/assets/7c294a7b-c2e4-4fd6-8451-26a1b1df349a)
+![로그인 후](https://github.com/user-attachments/assets/c4cbd2cd-b528-42d5-86b3-559763919ee0)
 
 <br>
 
@@ -442,3 +441,13 @@ export default Header;
 이번 글에서는 OAuth의 주요 개념부터 Github OAuth 로그인과 로그아웃 구현까지, 실제로 애플리케이션에 적용할 수 있는 예시를 통해 알아보았습니다.
 
 OAuth는 소셜 로그인, API 호출, 인증된 자원 접근 등 다양한 곳에서 유용하게 쓰일 수 있습니다. 이제 여러분도 이 가이드를 기반으로 자신의 애플리케이션에서 OAuth 로그인과 토큰 기반 인증을 안전하게 구현해보세요!
+
+<br>
+<br>
+
+### 참고 및 이미지 출처
+
+- 모든 이미지는 [GitHub 공식 문서](https://docs.github.com/en)에서 제공된 자료와 [CoReA 사이트](https://code-review-area.com/) 화면 자료를 사용하였습니다.
+- 참고 문서:
+  - "Registering a GitHub App": [https://docs.github.com/en/apps/creating-github-apps/registering-a-github-app/registering-a-github-app](https://docs.github.com/en/apps/creating-github-apps/registering-a-github-app/registering-a-github-app)
+  - "Authorizing OAuth Apps": [https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps)
