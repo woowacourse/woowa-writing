@@ -207,6 +207,7 @@ JPA의 영속성 컨텍스트는 기본적으로  특정 ID를 가진 엔티티�
 
 단편적으로 MultipleBagFetchException을 방지하기 위해서는 중복을 허용하지 않으면 됩니다.  
 결국 Hibernate는 List를 *BagType으로 매핑하기 때문에 이를 Set으로 변경하면 문제가 해결 됩니다. 
+
 ![image](tech-write-img/7.PNG)
 
 ### 2. OrderCoulmn(순서 부여하기)
@@ -216,7 +217,7 @@ JPA의 영속성 컨텍스트는 기본적으로  특정 ID를 가진 엔티티�
 
 ![image](tech-write-img/8.PNG)
 
-> 참고 Hibernate Collection Wrapper Class
+> *참고 Hibernate Collection Wrapper Class
 > | **컬렉션 타입**          | **Hibernate 컬렉션 클래스** | **중복 허용** | **순서 유지** |
 > |-------------------------|----------------------------|---------------|---------------|
 > | `Collection`, `List`   | `PersistentBag`           | O             | X             |
@@ -296,6 +297,6 @@ Club 엔티티를 개발할 당시에는 JPA를 처음 접한 후 얼마 되지 
 
 # 참고자료
 
-[Hibernate](https://github.com/hibernate/hibernate-orm).  
+[Hibernate Github](https://github.com/hibernate/hibernate-orm).  
 [기억보다 기록을 - 향로님 블로그](https://jojoldu.tistory.com/457).  
-[Baeldung](https://www.baeldung.com/java-hibernate-multiplebagfetchexception).  
+[Baeldung-java-hibernate-multiplebagfetchexception](https://www.baeldung.com/java-hibernate-multiplebagfetchexception).  
