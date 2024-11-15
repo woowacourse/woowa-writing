@@ -143,7 +143,7 @@ ssh -i [key-file-name.pem] ubuntu@[ip.address]
 
 ### 접속 테스트
 
-아래 명령어를 그림과 같이 터미널에 입력하면 연결된 IP가 확인되는데 Cloudflare 에 등록한 것과 동일한지 확인합니다.
+아래 명령어를 그림과 같이 터미널에 입력하면 연결된 IP를 알 수 있는데, 이것이 Cloudflare 에 등록한 것과 동일한지 확인합니다.
 
 ```shell
 nslookup [domain.address]
