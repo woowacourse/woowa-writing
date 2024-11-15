@@ -4,7 +4,7 @@
 
 > 이 글은 Lighthouse v12.2.1 기준으로 하고 있습니다.
 
-> node기반 Lighthouse는 크롬에서의 Lighthouse와 측정 값이 다를 수 있습니다. 대부분의 점수 차이는 크롬 Lighthouse에서 제공하는 쓰로틀링 기능의 오해에서 발생합니다.  **크롬의 네트워크와 성능 탭에서 성능 제한을 두더라도 lighthouse 측정 결과에 반영되지 않습니다.** 자세한 사항은 본문을 참고하세요.
+> node기반 Lighthouse는 크롬에서의 Lighthouse와 측정값이 다를 수 있습니다. 대부분의 점수 차이는 크롬 Lighthouse에서 제공하는 쓰로틀링 기능의 오해에서 발생합니다.  **크롬의 네트워크와 성능 탭에서 성능 제한을 두더라도 lighthouse 측정 결과에 반영되지 않습니다.** 자세한 사항은 본문을 참고하세요.
 
 ## LightHouse란
 
@@ -53,7 +53,7 @@ lighthouse <url> <options>
 
 ### CLI 설정
 
-CLI가 동작하는데에 있어 필요한 설정을 추가할 수 있습니다.
+CLI가 동작하는 데에 있어 필요한 설정을 추가할 수 있습니다.
 
 우선 빈 설정 파일을 만들어줍니다.
 
@@ -80,16 +80,16 @@ lighthouse https://www.google.com/ --config-path=./lighthouse-config.js
 
 `lighthouse:default` 의 설정을 확인하기 위해서는  [default-config.js](https://github.com/GoogleChrome/lighthouse/blob/main/core/config/default-config.js)에서 확인하실 수 있습니다.
 
-이 설정이 없으면 일일이 모든 `artifacts` , `audits` 등 원하는 옵션 설정을 다 해주어야 하기 때문에, 무조건 이 설정을 넣는 것을 추천드립니다.
+이 설정이 없으면 일일이 모든 `artifacts` , `audits` 등 원하는 옵션 설정을 다 해주어야 하기 때문에, 무조건 이 설정을 넣는 것을 추천합니다.
 
 #### settings
 
-`locale` : 결과물의 언어를 설정합니다. (영어의 경우 ‘en-US’, 한국어의 경우 ‘ko’, 기본값은 영어)
+`locale` : 결과물의 언어를 설정합니다. (영어는 ‘en-US’, 한국어는 ‘ko’, 기본값은 영어)
 
 `throttlingMethod`:네트워크 쓰로틀링 방법을 설정할 수 있습니다.(기본값은 `simulate`)
 
 - `simulate` ,`devtools` , `provided`
-- `provided` 는 네트워크 쓰로틀링을 없앲니다.
+- `provided` 는 네트워크 쓰로틀링을 없앱니다.
 - `simulate` ,`devtools` 의 차이는 [Network Throttling](https://github.com/GoogleChrome/lighthouse/blob/main/docs/throttling.md)에서 확인하세요.
 
 `throttling` : 쓰로틀링 정도를 설정할 수 있습니다.(기본값은 아래에서 설명하는 느린 4G)
@@ -139,13 +139,13 @@ lighthouse https://www.google.com/ --config-path=./lighthouse-config.js
 
 > 크롬의 네트워크 탭에서 다음과 같은 설정을 두고 크롬에서 lighthouse를 사용하는 것과는 다른 방식입니다. 크롬의 네트워크 탭에서 성능 제한을 두더라도 lighthouse 측정에 반영되지 않습니다.
 
-> 이는 리포트 하단을 보면 알 수 있습니다. 아래의 두 스크린샷에서 확인할 수 있듯이, 네트워크 탭과 쓰로틀링은 관련이 없습니다.(네트워크 탭의 주의 문구를 보면 쓰로틀링여부를 확인할 수 있습니다)
+> 이는 리포트 하단을 보면 알 수 있습니다. 아래의 두 스크린 샷에서 확인할 수 있듯이, 네트워크 탭과 쓰로틀링은 관련이 없습니다.(네트워크 탭의 주의 문구를 보면 쓰로틀링여부를 확인할 수 있습니다)
 
 ![image.png](image%201.png)
 
 ![image.png](image%202.png)
 
-> 만약 크롬 lighthouse와 동일한 성능으로 측정을 하고 싶으면 `throttling` 에 다음과 같은 값을 넣으십시오.
+> 만약 크롬 lighthouse와 같은 성능으로 측정을 하고 싶으면 `throttling` 에 다음과 같은 값을 넣으십시오.
 
 ```jsx
 // 모바일 (느린 4G + cpu 4배 감소)
@@ -158,7 +158,7 @@ lighthouse https://www.google.com/ --config-path=./lighthouse-config.js
   cpuSlowdownMultiplier: 4
  }
  
- // 데스크탑 (빠른 4G)
+ // 데스크톱 (빠른 4G)
  {
   rttMs: 40,
   throughputKbps: 10240,
@@ -172,7 +172,7 @@ lighthouse https://www.google.com/ --config-path=./lighthouse-config.js
 
 `skipAudits` : 검사하지 않을 audits를 설정합니다. 검사하는 audit의 리스트는 [default-config.js의 categories](https://github.com/GoogleChrome/lighthouse/blob/0c7c183ad25d41192aad23a37a37281d5aa364f4/core/config/default-config.js#L376) 배열 내의 id 값들 입니다.
 
-`extraHeaders` : 네트워크 요청시에 특정 헤더를 추가해서 보냅니다. 이 설정을 사용하여 로그인 등 인증 상태를 구현할 수 있습니다. 값은 객체 형태로 설정합니다.
+`extraHeaders` : 네트워크 요청 시에 특정 헤더를 추가해서 보냅니다. 이 설정을 사용하여 로그인 등 인증 상태를 구현할 수 있습니다. 값은 객체 형태로 설정합니다.
 
 위 설정을 활용한 설정파일의 예시는 다음과 같습니다.
 
@@ -223,13 +223,13 @@ CLI의 주요 플래그에 대해 알아보겠습니다. 이 글에서 다루지
 
 결과값을 저장할 확장자입니다. 기본값은 html입니다
 
-`json` 과 `csv` , `html` 이 가능하며, 복수의 값도 가능합니다. 구분은 `,` 로 합니다.
+`json` 과 `csv` , `html`이 가능하며, 복수의 값도 가능합니다. 구분은 `,`로 합니다.
 
 ex) `--output=html,json` 
 
 `--output-path` 
 
-결과값을 생성할 위치입니다. `--output` 의 값이 여러 개일 경우 선택한 생성 위치 뒤에 `.report.확장자` 가 붙어서 저장됩니다
+결과값을 생성할 위치입니다. `--output` 의 값이 여러 개일 경우 선택한 생성 위치 뒤에 `.report.확장자` 가 붙어서 저장됩니다.
 
 `--view`
 
@@ -259,11 +259,11 @@ lighthouse https://www.google.com/ --config-path=./lighthouse-config.js --cli-fl
 
 ### Lighthouse Node module 사용
 
-앞서 설명한 Lighthouse CLI를 활용하면 스크립트를 활용해 Lighthouse를 사용할 수 있습니다. 그런데 돌이켜보면 CLI만 사용했을 때에는 chrome Lighthouse와 차이가 크게 나지 않아보입니다(특히 자동화 관점에서).
+앞서 설명한 Lighthouse CLI를 활용하면 스크립트를 활용해 Lighthouse를 사용할 수 있습니다. 그런데 돌이켜보면 CLI만 사용했을 때에는 chrome Lighthouse와 차이가 크게 나지 않아 보입니다(특히 자동화 관점에서).
 
-Lighthouse를 더 프로그래머스럽게 사용하기 위해, Lighthouse Node module을 사용할 수 있습니다.
+Lighthouse를 더 프로그래머답게 사용하기 위해, Lighthouse Node module을 사용할 수 있습니다.
 
-Lighthouse Node module을 사용하기 위해서는 별도의 브라우저 환경이 필요합니다. 테스트하려는 환경이 localstorage 설정이나 브라우저 권한 설정 등이 필요없다면 `chrome-launcher`를 통해 브라우저 환경을 만들어줄 수 있습니다.
+Lighthouse Node module을 사용하기 위해서는 별도의 브라우저 환경이 필요합니다. 테스트하려는 환경이 localstorage 설정이나 브라우저 권한 설정 등이 필요 없다면 `chrome-launcher`를 통해 브라우저 환경을 만들어줄 수 있습니다.
 
 아래 명령어는 개발 의존성을 가진 플래그(-D)를 사용합니다. 필요에 따라 다른 플래그를 사용하셔도 무방합니다.
 
@@ -316,7 +316,7 @@ node ./lighthouse.js
 }
 ```
 
-> 아직까지 JSON파일을 모듈처럼 사용하는 것은 실험적인 기능입니다. 다음과 같은 경고 문구가 나올 수 있습니다.
+> 아직 JSON파일을 모듈처럼 사용하는 것은 실험적인 기능입니다. 다음과 같은 경고 문구가 나올 수 있습니다.
 
 ![image.png](image%204.png)
 
@@ -324,11 +324,11 @@ node ./lighthouse.js
 
 ## puppeteer로 브라우저 기능 적극 활용하기
 
-앞서 작성된 코드를 활용해 lighthouse를 사용할 수 있었습니다. 그런데 해당 코드에서는 chrome-launcher를 사용해 브라우저를 추가적으로 조작하는 것이 어려웠습니다.
+앞서 작성된 코드를 활용해 lighthouse를 사용할 수 있었습니다. 그런데 해당 코드에서는 chrome-launcher를 사용해 브라우저를 추가로 조작하는 것이 어려웠습니다.
 
 chrome-launcher를 이용하면 브라우저의 권한이 필요한 페이지를 테스트하는 경우 등 일부 상황에서는 제한적인 테스트를 진행해야 합니다.
 
-이런 지점을 해소하기 위해, puppeteer를 이용할 수 있습니다.
+이런 지점을 해결하기 위해, puppeteer를 이용할 수 있습니다.
 
 puppeteer는 node 환경에서 Chrome 또는 Firefox를 제어할 수 있는 높은 수준의 API를 제공합니다. puppeteer는 그 자체로 훌륭한 테스트 도구입니다. 이번 포스트에서는 lighthouse를 사용하기 위한 보조 도구로써 사용해보겠습니다.
 
@@ -445,15 +445,15 @@ await browser.close();
 
 ### 얻게 된 점
 
-이로써 lighthouse를 조금 더 프로그래머스럽게 사용할 수 있게 되었습니다.
+이로써 lighthouse를 조금 더 프로그래머답게 사용할 수 있게 되었습니다.
 
-어떤 면에 있어서 lighthouse를 프로그래머스럽게 쓸 수 있게 되었을까요?
+어떤 면에 있어서 lighthouse를 프로그래머답게 쓸 수 있게 되었을까요?
 
 1. lighthouse 테스트를 돌리는 과정이 한 줄의 스크립트 실행으로 줄어듦
 2. lighthouse 테스트 시 얻는 성능 제한을 잘 둘 수 있게 됨
 3. 특정 상황(로컬스토리지, 권한 설정이 필요한 상황)에서도 lighthouse를 사용할 수 있게 됨
 
-이제부터 lighthouse를 통해 자동화된 테스팅을 누려보세요~!
+축하합니다! 이제부터 lighthouse를 이용한 자동화된 웹 성능 테스팅 도구를 사용하실 수 있게 되셨습니다.
 
 ## 참고자료
 
