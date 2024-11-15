@@ -1,7 +1,10 @@
-# 개요
+# MultipleBagFetchException 파헤치기
+
+### 개요
 
 반려견 친구 찾기 및 사회화 장려 앱 "반갑개"의 모임(Club) 도메인의 기능을 개발하는 단계에서 마주쳤던 문제에 대해 공유하는 글입니다.
 Spring boot 3.3.x / Hibernate 6.x / MYSQL 8.x 이상 버전 기준으로 작성되었습니다.
+
 ### 문서 주제
 다중 ToMany 연관관계를 포함한 JPA 엔티티 N+1 해결하기
 
@@ -20,98 +23,7 @@ MultipleBagFetchException을 해결하고자 하는 개발자.
 
 
 반갑개의 모임(Club) 엔티티는 모임에 참여한 회원(ClubMember), 모임에 참여한 강아지(ClubPet)을 OneToMany 연관 관계를 가지고 있습니다. 
-
-```java
-@Entity
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Getter
-public class Club {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Embedded
-    private Title title;
-            .
-          (중략)
-            .
-    @OneToMany(mappedBy = "clubMemberId.club", orphanRemoval = true, cascade = CascadeType.ALL)
-    @OrderBy("createdAt")
-    private List<ClubMember> clubMembers = new ArrayList<>(); //모임에 참여한 회원 리스트
-
-    @OneToMany(mappedBy = "clubPetId.club", orphanRemoval = true, cascade = CascadeType.ALL)
-    @OrderBy
-    private List<ClubPet> clubPets = new ArrayList<>(); //모임에 참여한 강아지 리스트
-            .
-          (중략)
-            .
-```
-OneToMany의 기본 로딩 전략은 LAZY이며, 반갑개 백엔드 팀의 JPA 연관 관계 컨벤션은 특별한 이유가 없는 한 **지연 로딩(LAZY)** 을 기본으로 사용합니다. API 응답에 필요한 연관된 엔티티는 Repository 계층에서 Join Fetching 또는 EntityGraph를 통해 명시적으로 로드하기로 했습니다.
-
-따라서, MVC 단계 요구사항 중 "내가 참여한 모임 리스트" API를 개발하기 위해 다음과 같은 JPQL을 사용하게 됐습니다.
-
-  
-```java
-
-@Query(value = """
-                SELECT C
-                FROM Club AS C
-                JOIN FETCH C.allowedGenders
-                JOIN FETCH C.allowedSizes
-                JOIN FETCH C.clubMembers AS CM
-                JOIN FETCH CM.clubMemberId.member AS M
-                JOIN FETCH C.clubPets AS CP
-                JOIN FETCH CP.clubPetId.pet
-                WHERE C.id IN (
-                    SELECT C2.id
-                    FROM Club AS C2
-                    JOIN ClubMember AS CM2 ON CM2.clubMemberId.club = C2
-                    JOIN Member AS M2 ON CM2.clubMemberId.member = M2
-                    where M2.id = :memberId
-                    JOIN C2.clubMembers AS CM2
-                    JOIN CM2.clubMemberId.member AS M2
-                    WHERE M2.id = :memberId
-                )
-List<Club> findAllByParticipatingMemberId(@Param("memberId") Long memberId);
-```
-
-위 JPQL 사용하는 서비스의 테스트를 작성하던 중 다음과 같은 예외가 발생했습니다.
-
-![image](tech-write-img/1.PNG)
-
-그렇다면 아래처럼 EntityGraph 어노테이션을 사용하면 문제가 해결될까요?
-
-```java
-    @EntityGraph(attributePaths = {
-            "allowedGenders",
-            "allowedSizes",
-            "clubMembers.clubMemberId.member",
-            "clubPets.clubPetId.pet"
-    })
-    @Query(value = """
-                SELECT C
-                FROM Club AS C
-                WHERE C.id IN (
-                    SELECT C2.id
-                    FROM Club AS C2
-                    JOIN C2.clubMembers AS CM2
-                    JOIN CM2.clubMemberId.member AS M2
-                    WHERE M2.id = :memberId
-                )
-                ORDER BY C.createdAt DESC
-            """)
-    List<Club> findAllByParticipatingMemberId(@Param("memberId") Long memberId);
-```
-
-여전히 **MultipleBagFetchException** 이라는 예외가 발생합니다.  
-사실 EntityGraph의 경우 기본 로딩 전략을 즉시 로딩으로 전환하고, 내부적으로 Fetch Join(Left Outer Join)을 사용하여 연관 엔티티를 한꺼번에 가져오게 됩니다.  
-따라서, **cannot simultaneously fetch multiple bags** 라는 상황은 변함이 없습니다. 
-
-### 문제 상황 분석
-
-그렇다면 MultipleBagFetchException은 어떤 예외 일지 알아보겠습니다.  
-실제 반갑개의 Club 엔티티는 복잡도가 있기 때문에 다음과 같은 간략화 된 Club 엔티티를 통해 문제 상황을 재연하도록 하겠습니다.  
+아래는 실제 Club 엔티티를 간략환 예시 엔티티입니다.
 
 ```java
 @Entity
@@ -147,7 +59,32 @@ public class Club {
 
 ```
 
-Spring Data JPA를 통해 ClubRepository를 생성 후 @DataJpaTest로 Club 엔티티에 관한 findAll()을 테스트 해보았습니다.
+OneToMany의 기본 로딩 전략은 LAZY이며, 반갑개 백엔드 팀의 JPA 연관 관계 컨벤션은 특별한 이유가 없는 한 **지연 로딩(LAZY)** 을 기본으로 사용합니다. API 응답에 필요한 연관된 엔티티는 Repository 계층에서 Join Fetching 또는 EntityGraph를 통해 명시적으로 로드하기로 했습니다.
+
+따라서, MVC 단계 요구사항 중 "내가 참여한 모임 리스트" API를 개발하기 위해 다음과 유사한 JPQL을 사용하게 됐습니다.
+
+  
+```java
+@Query(value = """
+                SELECT C
+                FROM Club AS C
+                JOIN FETCH C.clubMembers AS CM
+                JOIN FETCH C.clubPets AS CP
+                WHERE C.id IN (# 내가 참여한 모임 테이블)
+List<Club> findAllByParticipatingMemberId(@Param("memberId") Long memberId);
+```
+
+위 JPQL 사용하는 서비스의 테스트를 작성하던 중 다음과 같은 예외가 발생했습니다.
+
+![image](tech-write-img/1.PNG)
+
+여러 개의 bag을 Fetch할 수 없다라는 **MultipleBagFetchException**이 발생 했습니다.
+
+### 문제 상황 분석
+
+그렇다면 MultipleBagFetchException은 어떤 예외 일지 알아보겠습니다.  
+
+시작하기 앞서, Spring Data JPA를 통해 ClubRepository를 생성 후 @DataJpaTest로 Club 엔티티에 관한 findAll()을 테스트하며 문제 상황을 재연 했습니다.
 ```java
 @Repository
 public interface ClubRepository extends JpaRepository<Club,Long> {
