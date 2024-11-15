@@ -122,15 +122,13 @@ B-tree는 자녀 노드 개수가 더 많으므로 데이터를 찾을 때 탐�
 
 ## 인덱스는 어떻게 사용할까?
 
-### 사용법
-
 MySQL을 기준으로 사용법을 알아보자.
 
-#### 생성
+### 생성
 
-`CREATE INDEX` 구문을 사용하거나 테이블 생성 시 `CREATE TABLE` 구문에 인덱스를 포함시키는 방법이 있다.
+`CREATE INDEX` 구문을 사용하거나, 테이블 생성 시 `CREATE TABLE` 구문에 인덱스를 포함시키는 방법이 있다.
 
-**구문**
+- **구문**
 
 ```sql
 CREATE INDEX 인덱스_이름 ON 테이블_이름(열_이름1, 열_이름2);
@@ -143,87 +141,90 @@ CREATE TABLE 테이블_이름 (
 	INDEX (열_이름1, 열_이름2) 
 );
 ```
-#### 삭제
 
-**구문**
+<br>
 
-```sql
-DROP INDEX 인덱스_이름 ON 테이블_이름
-```
+### 삭제
 
-**예시**
-
-외래키가 포함된 인덱스를 제거하려고 하면 에러가 발생한다. 이때, 외래키 제약조건을 먼저 제거한 후 인덱스를 제거해줘야 하는데, 외래키를 제거하고 싶다면 아래 구문을 이용하면 된다.
-
-<img width="1008" alt="image" src="https://github.com/user-attachments/assets/d75c7bc0-249c-4af9-9444-d75ff7b20e78">
-<img width="1003" alt="image" src="https://github.com/user-attachments/assets/731a73d7-68b2-4ba6-8233-985c9bdf9bac">
-<img width="1004" alt="image" src="https://github.com/user-attachments/assets/249e9fe0-b157-4eda-8f7a-a26a5af6404a">
-
-**구문**
+- **구문**
 
 ```sql
-ALTER TABLE 테이블_이름 
-ADD CONSTRAINT 제약조건_이름 FOREIGN KEY (열_이름) 
-REFERENCES 테이블_이름 (열_이름)
+DROP INDEX 인덱스_이름 ON 테이블_이름;
 ```
 
-#### 수정
+- **참고**
+
+외래키가 포함된 인덱스를 삭제하려고 하면 에러가 발생한다.
+
+<img width="1373" alt="image" src="https://github.com/user-attachments/assets/8a9e9727-acb6-4630-8753-042653f4532f">
+
+이때는 외래키 제약조건을 먼저 삭제한 후 외래키 삭제를 진행하면 된다.
+
+  - **구문**
+
+```sql
+ALTER TABLE 테이블_이름 DROP FOREIGN KEY 제약조건_이름;
+```
+
+```sql
+ALTER TABLE 테이블_이름 ADD CONSTRAINT 제약조건_이름 
+    FOREIGN KEY (외래키_열_이름) REFERENCES 참조_테이블_이름 (참조_열_이름);
+```
+  - **예시**
+
+<img width="1302" alt="image" src="https://github.com/user-attachments/assets/21a27440-da33-48e9-87d3-fd8ae6ad5fbb">
+<img width="1279" alt="image" src="https://github.com/user-attachments/assets/5747ef2b-871a-43c9-9be1-4157380b0b2c">
+<img width="1278" alt="image" src="https://github.com/user-attachments/assets/0490b1ae-4e11-4d3c-8745-9191883f60ad">
+
+<br>
+
+### 수정
 
 인덱스를 수정하는 구문은 없다. 인덱스를 수정하려면 기존 인덱스를 삭제한 후, 다시 생성해야 한다.
 
-#### 조회
+<br>
 
-**구문**
+### 조회
+
+- **구문**
 
 ```sql
 SHOW INDEX FROM 테이블_이름;
 ```
 
-**예시**
+- **예시**
 
 구문을 통해 member 테이블에 composite index가 있음을 확인할 수 있다.
 
 <img width="1004" alt="image" src="https://github.com/user-attachments/assets/f7528e5d-0c36-41d7-ae07-bb6b02829c3d">
 
-#### 성능 최적화
+<br>
 
-쿼리 성능을 향상하고 싶다면 실행 계획을 통해 진단해 볼 수 있다.
+### 성능 최적화
 
-실행 계획이란 데이터베이스가 데이터를 찾아가는 일련의 과정을 사람이 알아보기 쉽게 DB 결과 셋으로 보여주는 것이다.
-- SQL을 실행하도록 데이터베이스에 명령을 내리면
-- 데이터베이스는 내부적으로 SQL 파싱을 하고(문법 체크 및 DB에서 실행하기 위한 형태로 변환)
-- 옵티마이징(데이터를 찾는 가장 빠른 방법을 도출)을 거친 후 실제로 데이터를 찾는다.
+쿼리 성능을 향상하고 싶다면 **실행 계획**을 통해 진단해 볼 수 있다.
+
+**실행 계획**이란 데이터베이스가 데이터를 찾아가는 일련의 과정을 사람이 알아보기 쉽게 DB 결과 셋으로 보여주는 것이다.
+
+- **구문**
 
 사용 방법은 쿼리 앞에 `EXPLAIN` 키워드를 사용하면 된다.
-
-- `possible_keys`
-    - 옵티마이저는 여러 가지 처리 방법 중 비용이 가장 낮을 것으로 예상하는 실행 계획을 선택한다.
-    - 해당 컬럼은 후보 인덱스 목록이다.
-- `key`
-    - 최종 선택된 인덱스를 의미한다.
-    - 쿼리 튜닝을 할 때는 해당 컬럼에 의도했던 인덱스가 표시되는지 확인하는 것이 중요하다.
-
-**구문**
 
 ```sql
 EXPLAIN 쿼리;
 ```
 
-MySQL 8.0.18 부터는 `EXPLAIN ANALYZE`로도 쿼리를 분석할 수 있다. `EXPLAIN ANALYZE`은 실행 계획(estimated cost)뿐만 아니라 실제 실행했을 때 비용도 같이 보여준다.
+MySQL 8.0.18 부터는 `EXPLAIN ANALYZE`로도 쿼리를 분석할 수 있다. 이는 실행 계획(estimated cost)뿐만 아니라 실제 실행했을 때 비용도 같이 보여준다.
 
 ```sql
 EXPLAIN ANALYZE 쿼리;
 ```
 
-**예시**
-
-<img width="1006" alt="image" src="https://github.com/user-attachments/assets/b4d4e495-718c-48cc-9869-2eb75f34ae04">
-
-<img width="1004" alt="image" src="https://github.com/user-attachments/assets/a0aad0de-2bf3-4115-ae67-e8c7934ea441">
+<br>
 
 보통 옵티마이저가 적절하게 인덱스를 선택한다. 하지만 직접 인덱스를 고르고 싶다면 아래 구문을 활용할 수 있다.
 
-**구문**
+- **구문**
 
 `USE INDEX`는 쿼리에서 특정 인덱스만 사용하도록 힌트를 준다. 여러 인덱스가 있을 때, 특정 인덱스를 선택해서 성능을 개선할 수 있다.
 
