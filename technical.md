@@ -163,7 +163,8 @@ ssh -i [key-file-name.pem] ubuntu@[domain.address]
 
 AWS EC2 는 인스턴스를 종료했다 다시 실행할 경우 `Public IP Address` 가 변경되는 단점이 있습니다.
 
-도메인을 사용할 경우 이 아이피 주소가 종종 바뀔 경우 `Cloudflare` 에 직접 들어가서 수정해주어야 하는 불편함이 있는데 이러한 불편함을 해결하기 위해 아래 2가지 방법이 있습니다.
+도메인을 사용할 경우 아이피 주소가 변경될 때 마다 `Cloudflare` 에 직접 들어가서 수정해주어야 하는 불편함이 있있습니다.
+이러한 불편함을 해결하기 위해 아래 2가지 방법이 있습니다.
 
 ### Case 1. AWS Elastic IP
 
