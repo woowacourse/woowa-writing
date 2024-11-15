@@ -168,7 +168,7 @@ Application Context의 특징에 대해 살펴보겠습니다.
 > This generally should only be used if you need a Context whose lifecycle is separate from the current context, 
 > that is tied to the lifetime of the process rather than the current component.
 
-위에서 설명한 Application Context의 특징을 하나씩 살펴보겠습니다.
+위 공식 문서의 설명을 바탕으로, Application Context의 특징을 하나씩 살펴보겠습니다.
 
 - 단일 전역 Application 객체의 Context를 반환
 
@@ -180,7 +180,8 @@ Application 의 생명 주기와 연결되어있다는 것을 의미하며, 앱�
 
 - 현재 화면 흐름과 별도의 생명 주기를 가진 Context가 필요한 경우에만 사용
 
-이는 Application Context를 사용할 때의 주의점에 관한 것인데, 무척 중요한 내용이므로 잠시 뒤에 자세히 살펴보도록 하겠습니다.
+이는 Application Context를 사용할 때의 주의점에 관한 것인데, **무척 중요한 내용입니다.**  
+잠시 뒤에 자세히 살펴볼게요!
 
 <br/>
 
@@ -188,27 +189,22 @@ Application 의 생명 주기와 연결되어있다는 것을 의미하며, 앱�
 
 다음으로는 Activity Context의 특징을 살펴보겠습니다.
 
-- Activity에서 사용되는 Context
+- Activity에서 사용되는 Context 입니다.
+- 특정 Activitiy의 생명 주기에 종속됩니다.  
+Activity 안에서만 사용이 가능하며, 특정 Activitiy의 생명 주기에 종속되어 있습니다.
+- Activity 범위 안에서 사용되거나, Activity와 같은 생명 주기를 가진 객체를 생성할 때 사용합니다.
 
-말 그대로 Activity에서 사용되는 Context 입니다.
-
-- 특정 Activitiy의 생명 주기에 종속
-
-Activity 안에서만 사용이 가능하며, 특정 Activitiy의 생명 주기에 종속되어 있습니다.  
-
-- Activity 범위 안에서 사용되거나, Activity와 같은 생명 주기를 가진 객체를 생성할 때 사용
-
-이 역시 Activity Context를 사용할 때의 주의점입니다. 곧 이에 대해서도 설명을 이어나가겠습니다.
+마지막 특징은 Activity Context를 사용할 때의 주의점입니다. 
 
 ## 두 Context의 차이점: 비유를 들어 이해하기
 
 Context에는 Application Context와 Activity Context 두 종류가 있다는 것을 알았습니다.  
 그렇다면, 둘 중에 어떤 것을 사용해야 할까요? 아무 것이나 사용해도 되는 것일까요?  
-아닙니다. Context를 잘못 사용했다가는 애플리케이션의 비정상적인 종료를 유발할 수 있으므로, 각별한 주의가 필요합니다.  
+아닙니다. 적절한 Context를 사용하지 않은 경우, 애플리케이션의 비정상적인 종료를 유발할 수 있으므로 각별한 주의가 필요합니다.  
 
 그렇다면 어떤 상황에서 어느 것을 사용해야 할까요? 이를 이해하기 위해서는 두 Context의 중요한 차이점에 대해 짚고 넘어가야 합니다.  
 두 Context의 가장 큰 차이점은 바로 Lifecycle, 즉 **생명 주기**입니다.  
-위에서 언급되었던 두 Context의 사용 시 주의점을 살펴보면 각각의 생명 주기에 연관되어있는 것을 알 수 있습니다.
+위에서 언급했던 두 Context의 사용 시 주의점을 살펴보면, 모두 생명 주기에 연관되어있는 것을 알 수 있습니다.
 
 - Application Context : **_현재 화면 흐름과 별도의 생명 주기_** 를 가진 Context 가 필요한 경우에만 사용
 - Activity Context : **_Activity 범위 안에서 사용_** 되거나, **_Activity 와 같은 생명 주기_** 를 가진 객체를 생성할 때 사용
@@ -217,15 +213,15 @@ Context에는 Application Context와 Activity Context 두 종류가 있다는 �
 
 <br>
 
-사실 위의 두 주의점을 보아서는, 잘못 사용하게 되었을 때 어떠한 문제점이 나타날 수 있는지를 알기 어렵습니다.  
-그래서, 이번에도 간단한 비유를 들어서 쉽게 접근해보겠습니다.
+위의 두 주의점을 보아서는 Context를 잘못 사용했을 때 어떤 문제점이 나타날지 이해하기 어렵습니다.  
+그러니 이번에도 간단한 비유를 들어서 조금 더 쉽게 알아볼게요!
 
 ### Application Context 대신 Activity Context를 사용한다면?
 
 ![activity_context의_잘못된_사용_비유](./technical_writing_images/activity_context의_잘못된_사용_비유.png)
 영화 촬영에 빗대어 보겠습니다.  
-그리고 Application Context를 영화 전체 줄거리와 촬영에 필요한 장비들을 잘 알고 있는 감독 및 본부 팀이라 가정하고,  
-Activity Context는 한 장면에서 배역에 따라 연기를 하는 배우들이라고 가정해보겠습니다.
+그리고 Application Context를 영화 전체 줄거리와 촬영에 필요한 장비들을 잘 알고 있는 **감독 및 본부 팀**이라 가정하고,  
+Activity Context는 한 장면에서 **배역에 따라 연기를 하는 배우들**이라고 가정해보겠습니다.
 
 촬영에 사용될 새로운 조명이 들어왔습니다. 이 조명을 관리할 인원이 필요한 상황입니다.   
 일반적으로는 감독 또는 본부 팀(Application Context)에게 관리를 맡길 텐데,  
@@ -381,6 +377,7 @@ Context가 필요한 객체가 Activity의 생명주기에 속하거나, UI 작�
 
 ### Activity Context와 Application Context에 구애받지 않는 경우
 
+반면 두 Context 중 아무 Context를 사용해도 괜찮은 경우도 존재합니다.   
 `drawables`, `strings`, `colors` 등 애플리케이션에 정의된 리소스에 접근하는 경우에는 어떤 Context를 사용하는가가 큰 상관이 없습니다.
 
 - **리소스 접근**
