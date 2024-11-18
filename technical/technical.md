@@ -152,7 +152,6 @@ class OfferingPagingSource(
 > 데이터를 불러오는 방식은 No Offest방식으로 마지막 id를 기준으로 pageSize만큼 데이터를 가져오고 있다.
 
 `PagingSource<Key, Value>`는 두 가지 유형 매개변수를 사용합니다. `Key`는 데이터를 로드하는 데 필요한 식별자, `Value`는 실제 데이터 유형을 나타냅니다. 현재 코드에서는 `Long` 타입의 ID를 식별자로, `Offering` 타입의 데이터를 사용하므로 `PagingSource<Long, Offering>()`로 정의되어 있다.
-
 ### load()
 `load()` 메서드는 `PagingSource`의 핵심 메서드로, 데이터를 비동기적으로 로드하여 `RecyclerView`에 제공합니다. 성공 시 `LoadResult.Page` 객체를 반환하고, 실패 시 `LoadResult.Error`를 반환합니다.
 
@@ -504,7 +503,6 @@ class PostAdapter() : PagingDataAdapter<Post, PostiewHolder>(postComparator) {
 **단점**은 라이브러리의 특성상 추상화가 되어있다 보니 내부 동작이 정확히 어떻게 되어있는지 몰라서 우리 서비스에 맞게 커스텀하기가 어렵다는 것이다.
 
 새로운 라이브러리를 적용해보는 경험을 통해 라이브러리를 사용하는 것이 만능은 아니라는 것을 느낄 수 있었다.
-
 
 ## 참고자료
 
