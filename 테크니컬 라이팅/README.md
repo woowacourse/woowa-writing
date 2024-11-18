@@ -111,7 +111,7 @@ sudo vi /etc/fstab # 아래 내용 추가
 
 **[스키마]**
 
-![image.png](images/image%201.png)
+![image.png](images/image 1.png)
 
 | **테이블명** | **설명** |
 | --- | --- |
@@ -197,11 +197,11 @@ WHERE uuid = ?;
 
 **[ 인덱스 설정 전 ]**
 
-![image.png](images/image%202.png)
+![image.png](images/image 2.png)
 
 실행 계획의 rows 칼럼에 약 10만건의 레코드를 조회한 것을 보면 Full Table Scan 발생했다는 것을 알 수 있다.
 
-![image.png](images/image%203.png)
+![image.png](images/image 3.png)
 
 쿼리 처리 시간은 7.66ms였다.
 
@@ -211,11 +211,11 @@ WHERE uuid = ?;
 CREATE INDEX idx_uuid ON room(uuid);
 ```
 
-![image.png](images/image%204.png)
+![image.png](images/image 4.png)
 
 rows 칼럼에 1건의 레코드만 조회한 것을 보면 인덱스가 성공적으로 적용된 것을 볼 수 있다. uuid는 유니크한 값이기 때문에 해당 칼럼에 인덱스를 적용하면 1건만 조회된다.
 
-![image.png](images/image%205.png)
+![image.png](images/image 5.png)
 
 쿼리 실행 속도는 0.0324ms였다.
 
@@ -223,9 +223,9 @@ rows 칼럼에 1건의 레코드만 조회한 것을 보면 인덱스가 성공�
 
 **[ 인덱스 설정 전 ]**
 
-![image.png](images/image%206.png)
+![image.png](images/image 6.png)
 
-![image.png](images/image%207.png)
+![image.png](images/image 7.png)
 
 여기서도 실행 계획의 rows 칼럼에 약 100만건의 데이터를 조회한 것을 보면 Full Table Scan 발생했다는 것을 알 수 있다.
 
@@ -237,9 +237,9 @@ rows 칼럼에 1건의 레코드만 조회한 것을 보면 인덱스가 성공�
 CREATE INDEX idx_uuid ON room(uuid);
 ```
 
-![image.png](images/image%208.png)
+![image.png](images/image 8.png)
 
-![image.png](images/image%209.png)
+![image.png](images/image 9.png)
 
 쿼리 실행 속도는 0.035ms였다.
 
@@ -276,7 +276,7 @@ WHERE category = ?;
 
 ![스크린샷 2024-09-25 오후 7.43.33.png](images/AE_7.43.33.png)
 
-![image.png](images/image%2010.png)
+![image.png](images/image 10.png)
 
 - 풀 스캔 발생
 
@@ -288,9 +288,9 @@ WHERE category = ?;
 CREATE INDEX idx_category ON balance_content(category);
 ```
 
-![image.png](images/image%2011.png)
+![image.png](images/image 11.png)
 
-![image.png](images/image%2012.png)
+![image.png](images/image 12.png)
 
 - 인덱스 컨디션 푸시 다운 수행
 
@@ -300,9 +300,9 @@ CREATE INDEX idx_category ON balance_content(category);
 
 **[ 인덱스 설정 전 ]**
 
-![image.png](images/image%2013.png)
+![image.png](images/image 13.png)
 
-![image.png](images/image%2014.png)
+![image.png](images/image 14.png)
 
 쿼리 실행 속도는 47.9ms였다.
 
@@ -312,9 +312,9 @@ CREATE INDEX idx_category ON balance_content(category);
 CREATE INDEX idx_category ON balance_content(category);
 ```
 
-![image.png](images/image%2015.png)
+![image.png](images/image 15.png)
 
-![image.png](images/image%2016.png)
+![image.png](images/image 16.png)
 
 쿼리 실행 속도는 65.545ms였다.
 
@@ -358,7 +358,7 @@ WHERE room_id = ? AND balance_content_id = ?;
 
 ![스크린샷 2024-09-25 오후 9.17.05.png](images/AE_9.17.05.png)
 
-![스크린샷 2024-09-26 오전 11.15.39.png](images/%25E1%2584%2589%25E1%2585%25B3%25E1%2584%258F%25E1%2585%25B3%25E1%2584%2585%25E1%2585%25B5%25E1%2586%25AB%25E1%2584%2589%25E1%2585%25A3%25E1%2586%25BA_2024-09-26_%25E1%2584%258B%25E1%2585%25A9%25E1%2584%258C%25E1%2585%25A5%25E1%2586%25AB_11.15.39.png)
+![스크린샷 2024-09-26 오전 11.15.39.png](images/AB_11.15.39.png)
 
 - 인덱스 머지 발생
 
@@ -380,9 +380,9 @@ CREATE INDEX idx_room_balance_content ON room_content(room_id, balance_content_i
 
 **[ 인덱스 설정 전 ]**
 
-![image.png](images/image%2017.png)
+![image.png](images/image 17.png)
 
-![image.png](images/image%2018.png)
+![image.png](images/image 18.png)
 
 쿼리 실행 속도는 평균 0.083ms였다.
 
@@ -392,9 +392,9 @@ CREATE INDEX idx_room_balance_content ON room_content(room_id, balance_content_i
 CREATE INDEX idx_room_balance_content ON room_content(room_id, balance_content_id);
 ```
 
-![image.png](images/image%2019.png)
+![image.png](images/image 19.png)
 
-![image.png](images/image%2020.png)
+![image.png](images/image 20.png)
 
 쿼리 실행 속도는 평균 0.030ms였다.
 
