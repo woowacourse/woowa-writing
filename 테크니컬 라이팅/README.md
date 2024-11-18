@@ -113,6 +113,7 @@ sudo vi /etc/fstab # 아래 내용 추가
 
 ![image.png](images/image 1.png)
 
+
 | **테이블명** | **설명** |
 | --- | --- |
 | `BALANCE_CONTENT` | 밸런스 게임 주제에 대한 테이블 |
@@ -197,6 +198,7 @@ WHERE uuid = ?;
 
 **[ 인덱스 설정 전 ]**
 
+
 ![image.png](images/image 2.png)
 
 실행 계획의 rows 칼럼에 약 10만건의 레코드를 조회한 것을 보면 Full Table Scan 발생했다는 것을 알 수 있다.
@@ -211,11 +213,13 @@ WHERE uuid = ?;
 CREATE INDEX idx_uuid ON room(uuid);
 ```
 
+
 ![image.png](images/image 4.png)
 
 rows 칼럼에 1건의 레코드만 조회한 것을 보면 인덱스가 성공적으로 적용된 것을 볼 수 있다. uuid는 유니크한 값이기 때문에 해당 칼럼에 인덱스를 적용하면 1건만 조회된다.
 
 ![image.png](images/image 5.png)
+
 
 쿼리 실행 속도는 0.0324ms였다.
 
@@ -223,9 +227,11 @@ rows 칼럼에 1건의 레코드만 조회한 것을 보면 인덱스가 성공�
 
 **[ 인덱스 설정 전 ]**
 
+
 ![image.png](images/image 6.png)
 
 ![image.png](images/image 7.png)
+
 
 여기서도 실행 계획의 rows 칼럼에 약 100만건의 데이터를 조회한 것을 보면 Full Table Scan 발생했다는 것을 알 수 있다.
 
@@ -237,9 +243,11 @@ rows 칼럼에 1건의 레코드만 조회한 것을 보면 인덱스가 성공�
 CREATE INDEX idx_uuid ON room(uuid);
 ```
 
+
 ![image.png](images/image 8.png)
 
 ![image.png](images/image 9.png)
+
 
 쿼리 실행 속도는 0.035ms였다.
 
@@ -276,7 +284,9 @@ WHERE category = ?;
 
 ![스크린샷 2024-09-25 오후 7.43.33.png](images/AE_7.43.33.png)
 
+
 ![image.png](images/image 10.png)
+
 
 - 풀 스캔 발생
 
@@ -287,6 +297,7 @@ WHERE category = ?;
 ```sql
 CREATE INDEX idx_category ON balance_content(category);
 ```
+
 
 ![image.png](images/image 11.png)
 
@@ -300,9 +311,11 @@ CREATE INDEX idx_category ON balance_content(category);
 
 **[ 인덱스 설정 전 ]**
 
+
 ![image.png](images/image 13.png)
 
 ![image.png](images/image 14.png)
+
 
 쿼리 실행 속도는 47.9ms였다.
 
@@ -315,6 +328,7 @@ CREATE INDEX idx_category ON balance_content(category);
 ![image.png](images/image 15.png)
 
 ![image.png](images/image 16.png)
+
 
 쿼리 실행 속도는 65.545ms였다.
 
@@ -358,7 +372,9 @@ WHERE room_id = ? AND balance_content_id = ?;
 
 ![스크린샷 2024-09-25 오후 9.17.05.png](images/AE_9.17.05.png)
 
+
 ![스크린샷 2024-09-26 오전 11.15.39.png](images/AB_11.15.39.png)
+
 
 - 인덱스 머지 발생
 
@@ -384,6 +400,7 @@ CREATE INDEX idx_room_balance_content ON room_content(room_id, balance_content_i
 
 ![image.png](images/image 18.png)
 
+
 쿼리 실행 속도는 평균 0.083ms였다.
 
 **[ 인덱스 설정 후 ]**
@@ -395,6 +412,7 @@ CREATE INDEX idx_room_balance_content ON room_content(room_id, balance_content_i
 ![image.png](images/image 19.png)
 
 ![image.png](images/image 20.png)
+
 
 쿼리 실행 속도는 평균 0.030ms였다.
 
@@ -418,4 +436,6 @@ CREATE INDEX idx_room_balance_content ON room_content(room_id, balance_content_i
 
 성능을 측정한 쿼리의 경우 모두 기준(0.25초)보다 빠른 쿼리 성능을 보여주었다. 하지만 실제 서비스로 런칭하는 경우 더 고려해야 할 점이 있다. **인덱스를 적용하게 되면 레코드 단위 잠금**으로 처리할 수 있다. 만약 인덱스를 적용하지 않으면 특정 레코드를 조회하기 위해 테이블 단위에서 잠금이 발생하게 된다. 만약 동시 요청이 많이 발생하는 경우 서로 다른 레코드가 필요하여도 테이블 단위 잠금이 발생하기 때문에 요청이 지연될 수 있다. 위 성능 측정의 경우 동시 쿼리 요청을 고려하지 않고 한 명의 유저가 요청을 보냈을 때로 가정하고 진행한 것이다. 따라서 실제 서비스의 경우와 요청 속도에 차이가 있을 수 있다.
 
+
 모든 것을 서비스 런칭 전에는 고려할 수 없다. 하지만 최소한 서비스에서 사용되는 쿼리를 정리해 두고 유저를 받았을 때를 가정하고 성능을 측정해 두는 것이 좋을 것 같다. 그래야 서비스 런칭 이후 특정 쿼리 성능이 떨어지는 경우 빠르게 대응이 가능할 것 같다.
+
