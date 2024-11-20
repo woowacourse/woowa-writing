@@ -196,6 +196,7 @@ def another_O_quadratic_algorithm(n):
 
 출처:&nbsp;https://blog.penjee.com/binary-vs-linear-search-animated-gifs/
 
+
 ## 순서대로 탐색해보자!
 ![이분탐색1](https://github.com/user-attachments/assets/ea00db10-2d03-4b16-a71b-0cb2a3fbed6a)
 ![이분탐색2](https://github.com/user-attachments/assets/0f15662d-0aec-4ba7-a02b-bc88eebcd9d3)
