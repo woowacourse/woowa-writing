@@ -478,8 +478,7 @@ await browser.close();
 3. 특정 상황(로컬스토리지, 권한 설정이 필요한 상황)에서도 lighthouse를 사용할 수 있게 됨
 
 
-축하합니다! 이제부터 lighthouse를 이용한 자동화된 웹 성능 테스팅 도구를 사용하실 수 있게 되셨습니다.
-
+이로써 lighthouse를 조금 더 프로그래머스럽게 사용할 수 있게 되었습니다.
 
 ## 참고자료
 
@@ -492,3 +491,4 @@ await browser.close();
 [https://stackoverflow.com/questions/46643345/answer-to-chromes-notifications-using-puppeteer](https://stackoverflow.com/questions/46643345/answer-to-chromes-notifications-using-puppeteer)
 
 [https://stackoverflow.com/questions/51789038/set-localstorage-items-before-page-loads-in-puppeteer](https://stackoverflow.com/questions/51789038/set-localstorage-items-before-page-loads-in-puppeteer)
+
