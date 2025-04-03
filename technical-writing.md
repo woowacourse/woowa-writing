@@ -1,9 +1,9 @@
 # 유연성 강화 스터디 회고
 
 **목차**
-1. [공유를 통해 약점을 발견하자](https://github.com/giovannijunseokim/woowa-writing/edit/giovannijunseokim/technical-writing.md#%EA%B3%B5%EC%9C%A0%EB%A5%BC-%ED%86%B5%ED%95%B4-%EC%95%BD%EC%A0%90%EC%9D%84-%EB%B0%9C%EA%B2%AC%ED%95%98%EC%9E%90)
-2. [경청을 통해 약점을 발견하자](https://github.com/giovannijunseokim/woowa-writing/edit/giovannijunseokim/technical-writing.md#%EA%B2%BD%EC%B2%AD%EC%9D%84-%ED%86%B5%ED%95%B4-%EC%95%BD%EC%A0%90%EC%9D%84-%EB%B0%9C%EA%B2%AC%ED%95%98%EC%9E%90)
-3. [약점을 발견하는 과정은 힘들다. 하지만…](https://github.com/giovannijunseokim/woowa-writing/edit/giovannijunseokim/technical-writing.md#%EC%95%BD%EC%A0%90%EC%9D%84-%EB%B0%9C%EA%B2%AC%ED%95%98%EB%8A%94-%EA%B3%BC%EC%A0%95%EC%9D%80-%ED%9E%98%EB%93%A4%EB%8B%A4-%ED%95%98%EC%A7%80%EB%A7%8C)
+1. 공유를 통해 약점을 발견하자
+2. 경청을 통해 약점을 발견하자
+3. 약점을 발견하는 과정은 힘들다. 하지만…
 
 ## 공유를 통해 약점을 발견하자
 
