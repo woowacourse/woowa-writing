@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectInspectionProfilesVisibleTreeState">
+    <entry key="Project Default">
+      <profile-state>
+        <expanded-state>
+          <State>
+            <id>Angular</id>
+          </State>
+          <State>
+            <id>DOM 문제JavaScript 및 TypeScript</id>
+          </State>
+          <State>
+            <id>ES2015 마이그레이션 지원JavaScript 및 TypeScript</id>
+          </State>
+          <State>
+            <id>GPathGroovy</id>
+          </State>
+          <State>
+            <id>GitHub 액션</id>
+          </State>
+          <State>
+            <id>Gradle</id>
+          </State>
+          <State>
+            <id>Groovy</id>
+          </State>
+          <State>
+            <id>HTTP 클라이언트</id>
+          </State>
+          <State>
+            <id>JPA</id>
+          </State>
+          <State>
+            <id>JUnitJava</id>
+          </State>
+          <State>
+            <id>JVM 언어</id>
+          </State>
+          <State>
+            <id>Java</id>
+          </State>
+          <State>
+            <id>Java 8Java 언어 수준 마이그레이션 지원Java</id>
+          </State>
+          <State>
+            <id>Java 상호운용성 문제Kotlin</id>
+          </State>
+          <State>
+            <id>Java 언어 수준 마이그레이션 지원Java</id>
+          </State>
+          <State>
+            <id>JavaBeans 문제Java</id>
+          </State>
+          <State>
+            <id>JavaScript 및 TypeScript</id>
+          </State>
+          <State>
+            <id>JavadocJava</id>
+          </State>
+          <State>
+            <id>Kotlin</id>
+          </State>
+          <State>
+            <id>Micronaut</id>
+          </State>
+          <State>
+            <id>Micronaut DataMicronaut</id>
+          </State>
+          <State>
+            <id>Quarkus</id>
+          </State>
+          <State>
+            <id>SQL</id>
+          </State>
+          <State>
+            <id>Spring</id>
+          </State>
+          <State>
+            <id>Spring DataSpring</id>
+          </State>
+          <State>
+            <id>TestNGJava</id>
+          </State>
+          <State>
+            <id>가시성Java</id>
+          </State>
+          <State>
+            <id>국제화</id>
+          </State>
+          <State>
+            <id>데이터 흐름Java</id>
+          </State>
+          <State>
+            <id>동시성 어노테이션 문제Java</id>
+          </State>
+          <State>
+            <id>리플렉티브 액세스Java</id>
+          </State>
+          <State>
+            <id>모범 사례Gradle</id>
+          </State>
+          <State>
+            <id>발생할 수 있는 버그Gradle</id>
+          </State>
+          <State>
+            <id>발생할 수 있는 버그Groovy</id>
+          </State>
+          <State>
+            <id>발생할 수 있는 버그Java</id>
+          </State>
+          <State>
+            <id>발생할 수 있는 버그JavaScript 및 TypeScript</id>
+          </State>
+          <State>
+            <id>발생할 수 있는 버그Kotlin</id>
+          </State>
+          <State>
+            <id>보안</id>
+          </State>
+          <State>
+            <id>보안Java</id>
+          </State>
+          <State>
+            <id>불필요한 구문Kotlin</id>
+          </State>
+          <State>
+            <id>상속 문제Java</id>
+          </State>
+          <State>
+            <id>선언 중복성Java</id>
+          </State>
+          <State>
+            <id>성능Java</id>
+          </State>
+          <State>
+            <id>숫자 문제Java</id>
+          </State>
+          <State>
+            <id>스레딩 문제Groovy</id>
+          </State>
+          <State>
+            <id>스레딩 문제Java</id>
+          </State>
+          <State>
+            <id>스타일 문제Kotlin</id>
+          </State>
+          <State>
+            <id>스타일Groovy</id>
+          </State>
+          <State>
+            <id>오류 처리Java</id>
+          </State>
+          <State>
+            <id>일반JavaScript 및 TypeScript</id>
+          </State>
+          <State>
+            <id>임베디드성능Java</id>
+          </State>
+          <State>
+            <id>장황하거나 중복 코드 구문Java</id>
+          </State>
+          <State>
+            <id>제어 흐름 이슈Groovy</id>
+          </State>
+          <State>
+            <id>제어 흐름 이슈Java</id>
+          </State>
+          <State>
+            <id>제어 흐름 이슈JavaScript 및 TypeScript</id>
+          </State>
+          <State>
+            <id>직렬화 문제Java</id>
+          </State>
+          <State>
+            <id>추상화 문제Java</id>
+          </State>
+          <State>
+            <id>캡슐화Java</id>
+          </State>
+          <State>
+            <id>코드 구문이 혼동될 수 있습니다.Groovy</id>
+          </State>
+          <State>
+            <id>코드 구문이 혼동될 수 있음JavaScript 및 TypeScript</id>
+          </State>
+          <State>
+            <id>코드 스타일 이슈Java</id>
+          </State>
+        </expanded-state>
+        <selected-state>
+          <State>
+            <id>사용자 정의</id>
+          </State>
+        </selected-state>
+      </profile-state>
+    </entry>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_23" default="true" project-jdk-name="openjdk-23" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/out" />
+  </component>
+</project>
