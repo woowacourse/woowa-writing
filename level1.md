@@ -1,6 +1,6 @@
 # 레벨 1 회고
 ## 어떻게든 되겠지
-<img src="https://github.com/user-attachments/assets/f285913b-8ffb-4a6d-8574-d61ac1450a8b" width="50%">
+<img src="https://github.com/user-attachments/assets/f285913b-8ffb-4a6d-8574-d61ac1450a8b" width="40%">
 
 <br>
 
@@ -15,7 +15,7 @@
 그래서 이제 원래의 나로 돌아가보려 한다! <br>
 
 ## Re: 제로부터 시작하는 우테코 생활
-<img src="https://github.com/user-attachments/assets/43b9cb32-c94a-4fa5-997e-f310981ea234" width="50%"/>
+<img src="https://github.com/user-attachments/assets/43b9cb32-c94a-4fa5-997e-f310981ea234" width="40%"/>
 
 <br>
 
@@ -32,6 +32,8 @@
 
 
 ## 오늘의 작은 한 걸음이 내일의 나를 만든다
+<img src="https://cdn.storymirror.com/cover/original/03a8cad279966711225ea51ad5d31a7d.jpg" width="40%"> <br>
+
 > Little drops of water make the mighty ocean
 
 사람이 갑자기 성장하기란 쉽지 않다고 생각한다. <br>
