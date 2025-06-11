@@ -2,7 +2,7 @@
 
 **2025년 6월 5일 목요일 - 방탈출 예약 대기 리뷰 요청 마감 D+8**
 
-![slack_img.png](/img/slack_img.png)
+<img src="./img/slack_img.png" width="474px" height="426px" title="slack"/>
 
 미션 종료 후 일주일이나 지난 시점에서 병합되지 않고 열려있는 PR은 내 것 하나 뿐이었다. 즉, 3번째 미션 종료 꼴찌가 된 것이다.
 
