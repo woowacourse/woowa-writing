@@ -1,3 +1,4 @@
+
 # 나는 어떠한 사람인가
 
 ### ground mind : 화살
@@ -102,6 +103,8 @@
 <br>
 <br>
 
-<img src="img_1.png" width="150"/>
-<img src="img_2.png" width="150"/>
-<img src="img_3.png" width="150"/>
+<div style="display: flex; gap: 10px;">
+  <img src="img_1.png" width="150">
+  <img src="img_2.png" width="150">
+  <img src="img_3.png" width="150">
+</div>
