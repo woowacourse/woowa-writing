@@ -1,3 +1,5 @@
+<img width="240" alt="image" src="https://github.com/user-attachments/assets/1caa9e2a-55dd-418c-859e-1503db36f720" />
+
 ⎻⎻ 도파민 중독자</br>
 </br>
 흔히 통용되는 단어이면서도 요즈음에는 유독 나를 뜻하는 단어인가도 싶다.</br>
