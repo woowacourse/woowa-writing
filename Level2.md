@@ -20,7 +20,7 @@ image: assets/images/thumbnail/default-img.png
 
 그보다는 내가 어떻게 성장해나가고 있는지를 적고싶은 마음이 더 커서, 이번 글의 주제를 **나의 새로운 목표**로 잡게 되었다.
 
-![목표를 찾아서](../assets/images/blog/2025-06-11-woowa-writing/goal.jpg)
+![목표를 찾아서](./goal.jpg)
 
 <br/>
 
