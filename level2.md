@@ -18,7 +18,7 @@
 
 이 학습 부채들을 하나의 미션이 끝날 동안 혹은 우테코가 끝날 동안 다 해결할 수 있을까? 정말 나에게 꼭 필요한 내용들일까?
 
-![453790774-5bba273e-9f4a-4a58-9a0f-9de2a903fab7.png](..%2F..%2F..%2F..%2F..%2F..%2FAppData%2FLocal%2FTemp%2F453790774-5bba273e-9f4a-4a58-9a0f-9de2a903fab7.png)
+![nop.png](img%2Fnop.png)
 
 결론은 NO였다.
 
