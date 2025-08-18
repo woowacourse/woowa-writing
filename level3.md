@@ -1,16 +1,14 @@
 # 포게더
+<img width="1868" height="372" alt="CleanShot 2025-08-12 at 12 42 20@2x" src="https://github.com/user-attachments/assets/7f8973f3-a762-4ae2-acfd-250f7ff3b3a2" />
 
 ## 팀 소개
-
-> 당신을 위한 순간, 흩어지지 않게
->
-> 주인공은 당신이니까, 사진은 우리가 책임질게요.
-
-<img width="1000" height="750" alt="Forgather" src="https://github.com/user-attachments/assets/35f736bb-9825-491e-9252-d03d4174e5ba" />
 
 안녕하세요 ‘Forgather’ 서비스를 만드는 팀 포게더입니다.
 
 레벨3 기간동안 팀프로젝트를 하며 어떤 감정을 느꼈는지를 담은 공통 질문 2가지와, 팀원별 특징을 담은 개인 질문 1가지로 인터뷰를 진행했어요.
+
+<img width="500" height="375" alt="Forgather" src="https://github.com/user-attachments/assets/35f736bb-9825-491e-9252-d03d4174e5ba" />
+
 
 ### 오시는 길
 
