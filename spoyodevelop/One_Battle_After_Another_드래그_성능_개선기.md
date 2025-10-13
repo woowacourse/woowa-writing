@@ -1,10 +1,12 @@
 ## 드래그 선택 기능의 역사
 
-![CleanShot 2025-10-08 at 17.05.15@2x.png](attachment:45c620e0-c1a6-4a83-a334-e77585c1519d:CleanShot_2025-10-08_at_17.05.152x.png)
+<img width="1512" height="982" alt="image" src="https://github.com/user-attachments/assets/4e18ce5b-2ca8-4c5b-8531-fb2ae8aab5db" />
+
 
 드래그 선택기능은 컴퓨터를 사용하는데 매우 당연하게 쓰이는 기능중 하나입니다. 드래그를 하면 그 안에 있는 내용물들이 ‘잡히고’ 선택됩니다.
 
-![image.png](attachment:c8fa5094-b633-4e18-981c-c1418aec56c8:image.png)
+<img width="1600" height="900" alt="image" src="https://github.com/user-attachments/assets/6e5185b0-5206-40cd-90e6-0f2302aadbdc" />
+
 
 잠깐 컴퓨터 역사에 대해서 이야기해볼까요? 1984년에 출시된 Macintosh에 대한 이야기입니다.
 
@@ -12,7 +14,8 @@
 
 광고는 이렇게 끝을 맺습니다. "1984년 1월 24일, Apple은 Macintosh를 공개합니다. 그리고 당신은 왜 1984년이 '1984'가 되지 않을 것인지 알게 될 것입니다."
 
-![CleanShot 2025-10-08 at 17.01.36@2x.png](attachment:aaebdfe3-a2b0-49c3-a641-db03e96c5333:CleanShot_2025-10-08_at_17.01.362x.png)
+<img width="834" height="648" alt="image" src="https://github.com/user-attachments/assets/3204da90-bcc7-46f9-b994-28dfbf395b6c" />
+
 
 당시 모든 컴퓨터가 채택한 CLI 환경은 모든 작업을 키보드로 처리해야 했습니다. 지금과 달리 컴퓨터 사용법이 비직관적이었고, 일반 사용자가 쉽게 접근하지 못하게 막는 높은 진입장벽을 만들고 있었죠. 반면 Apple은 GUI를 채택해 컴퓨터 사용 환경을 훨씬 더 직관적으로 만들었습니다.
 
@@ -31,17 +34,17 @@
 
 팀의 프로젝트에서도 드래그 선택이 사용되었는데요.
 
-![CleanShot 2025-10-08 at 17.46.12@2x.png](attachment:8454bfb8-1057-46a3-9728-3b9e6baedad2:CleanShot_2025-10-08_at_17.46.122x.png)
+<img width="1978" height="1186" alt="image" src="https://github.com/user-attachments/assets/a533dd4a-1ba7-45ab-b15f-0c39481d24ec" />
 
-아인슈타임은 사용자가 ‘자신의 참가 가능한 시간대’를 선택하면, 그것에 따라 일정을 히트맵 형식으로 보여주어 일정을 조율하는데 도움을 주는 서비스입니다.
 
-그 와중에 이 드래그 기능이 ‘버벅인다’라는 소리를 듣기 시작했습니다. 오래된 노트북을 사용하는 유저에게 이런 소리를 들었는데요. 한편, 이런 간단한 드래그가 버벅인다는 것에 한소리를 들었습니다.
+아인슈타임은 사용자가 ‘자신의 참가 가능한 시간대’를 선택하면, 그것에 따라 일정을 히트맵 형식으로 보여주어 일정을 조율하는데 도움을 주는 서비스입니다. 그 와중에 이 드래그 기능이 ‘버벅인다’라는 소리를 듣기 시작했습니다. 오래된 노트북을 사용하는 유저에게 이런 소리를 들었는데요. 한편, 이런 간단한 드래그가 버벅인다는 것에 한소리를 들었습니다.
 
 ‘왜 이런 당연한 기능이 제 기기에서 버벅이죠? 성능을 많이 잡아 먹는것은 아닌것 같은데…’
 
 사용자가 경험했던 문제는 드래그 스킵이였습니다.
 
-![CleanShot 2025-10-08 at 18.36.15@2x.png](attachment:d9cda39b-cade-40b6-a3d5-8e6eddb9dd36:CleanShot_2025-10-08_at_18.36.152x.png)
+<img width="1502" height="894" alt="image" src="https://github.com/user-attachments/assets/1946fb86-3e4e-4bb9-87fc-49f8df424379" />
+
 
 너무 빠르게 드래그를 하면 이렇게 중간에 있던 요소들이 물결무늬처럼 드래그에서 누락되는 현상이 일어났는데요. 이는 상당히 치명적인 문제였습니다.
 
@@ -59,11 +62,11 @@
 
 실제 적용 결과는 다음과 같습니다.
 
-![CleanShot 2025-10-08 at 22.07.57@2x.png](attachment:a2e5b93c-71b6-4a9c-aeb5-1cde49f81328:CleanShot_2025-10-08_at_22.07.572x.png)
+<img width="1906" height="410" alt="image" src="https://github.com/user-attachments/assets/46a2d686-e680-4f95-925e-641967c2b5bc" />
 
 시간표 셀이 번개 모양으로 선택되는 것을 확인할 수 있습니다. 시작점과 끝점을 연결해 그 사이를 채우면, 네모 박스처럼 반듯하게 선택되는 게 아니라 이렇게 번개처럼 구불구불한 형태로 선택됩니다.
 
-![CleanShot 2025-10-08 at 20.48.14@2x.png](attachment:183c5967-1d9f-447d-a461-61af6088385c:CleanShot_2025-10-08_at_20.48.142x.png)
+<img width="2048" height="161" alt="image" src="https://github.com/user-attachments/assets/6d37897f-5281-40d6-9d59-ee0f6b43c83b" />
 
 텍스트 선택도 비슷합니다. 커다란 네모 박스로 영역을 지정하는 것이 아니라, 양 끝점을 선택하여 드래그하면 이런 방식의 결과물이 나옵니다.
 
@@ -71,7 +74,8 @@
 
 ### 보이지 않는 드래그 박스
 
-![CleanShot 2025-10-09 at 17.50.09@2x.png](attachment:c97cbd5f-f1f0-47a9-8e4a-faa01bd313c8:CleanShot_2025-10-09_at_17.50.092x.png)
+<img width="1404" height="1244" alt="image" src="https://github.com/user-attachments/assets/6eb1ca7f-b38d-43ce-b932-67e38325dfdf" />
+
 
 보이지 않는 드래그 박스를 구현하여 드래그를 만드는 로직은 다음과 같습니다.
 
@@ -90,7 +94,8 @@ Document API를 사용한 구현 방식은 이렇습니다.
 
 ### 보이는 드래그 박스
 
-![CleanShot 2025-10-09 at 17.46.31@2x.png](attachment:dcdd2a49-50d5-413a-83e0-ef7fbd1c8fa9:CleanShot_2025-10-09_at_17.46.312x.png)
+<img width="1404" height="1244" alt="image" src="https://github.com/user-attachments/assets/4b11310e-750c-4e19-8bc0-e5ca004ad003" />
+
 
 위와 구현 방식은 거의 같으나, 한가지 차이가 있습니다. 드래그 박스가 보입니다.
 
@@ -139,11 +144,13 @@ Document API를 사용한 구현 방식은 이렇습니다.
 
 하지만 문제가 발생했습니다.
 
-![CleanShot 2025-10-09 at 18.31.44@2x.png](attachment:bdf3beab-96e8-4779-9426-c83f4838cfe4:CleanShot_2025-10-09_at_18.31.442x.png)
+<img width="1646" height="1502" alt="image" src="https://github.com/user-attachments/assets/242e0c15-20ea-4704-b055-bc41a1be6269" />
+
 
 SSOT를 지키기 위해 최상단으로 상태를 올리니, 드래그할 때마다 setter가 동작해 하위의 **모든 컴포넌트를 리렌더링**시키고 있었습니다. 또한 거의 모든 성능 병목이 scripting에서 발생하고 있었습니다. 끔찍하죠. 당장 해결해야 할 문제였습니다.
 
-![CleanShot 2025-10-09 at 18.39.47@2x.png](attachment:87046665-b2bc-4c1a-832d-23467b1f79ad:CleanShot_2025-10-09_at_18.39.472x.png)
+<img width="402" height="316" alt="image" src="https://github.com/user-attachments/assets/4a21b69d-15bc-4a91-92e4-0b61662ca487" />
+
 
 이때는 React의 일반적인 원칙을 거슬러야 합니다. 상태를 끌어올리는 대신, **끌어내려야** 합니다.
 
@@ -200,13 +207,15 @@ export default memo(TimeTableCell, areEqual);
 
 이제 상태를 내렸으니, 실제 handler가 위치한 page에 이 상태를 다시 올려주어야 합니다. 이는 Context API에 ref를 사용해 해결했습니다. 로컬에서 상태를 갱신한 뒤, 위로 올려주는 방식이죠. 이때 ref를 사용하기때문에 render는 발생하지 않습니다. 이런 최적화를 통해 **script 실행 시간을 5배 개선**할 수 있었습니다.
 
-![CleanShot 2025-10-09 at 19.02.55@2x.png](attachment:ca3e5b4f-c67b-423d-a6ca-90648d47de8e:CleanShot_2025-10-09_at_19.02.552x.png)
+<img width="416" height="308" alt="image" src="https://github.com/user-attachments/assets/7006f9a6-1d7e-4ccc-b2aa-a68303450161" />
+
 
 ### 충돌 감지 로직 개선과 layout thrashing 개선
 
 웹의 렌더는 다음과 같은 과정으로 일어납니다.
 
-![image.png](attachment:1cc1402d-570c-4fb1-97e1-a9bb6c7b71e2:image.png)
+
+<img width="1093" height="167" alt="image" src="https://github.com/user-attachments/assets/1fe4bbbd-8942-4884-a9de-6f5e4462f348" />
 
 여기서 중요한 것은 **Layout**입니다. Layout 이벤트를 최소화해야 성능 향상에 유리합니다.
 
@@ -388,15 +397,18 @@ const updateCellClasses = () => {
 
 렌더링 비용을 없앤 덕분에, 기존에 비싼 기능이라고 치부되었던 **애니메이션을 사용할 수 있게 되었습니다!**
 
-![CleanShot 2025-10-11 at 17.41.06@2x.png](attachment:f77e14cd-b9be-416c-87e1-95b3cd264c31:CleanShot_2025-10-11_at_17.41.062x.png)
+<img width="388" height="370" alt="image" src="https://github.com/user-attachments/assets/575d97e2-9515-4159-833e-dc70648f307e" />
 
-![CleanShot 2025-10-11 at 17.42.24@2x.png](attachment:e7851e56-f70d-4fbc-8f16-6e0b9ad79445:CleanShot_2025-10-11_at_17.42.242x.png)
+
+<img width="382" height="356" alt="image" src="https://github.com/user-attachments/assets/74e38920-7615-4121-b008-623c9c174fc5" />
+
 
 이 애니메이션을 딱 하나를 추가하니 25.2 프레임이었던 드래그를 **240 프레임까지** 올릴 수 있었습니다!
 
 어떻게 된 일까요?
 
-![CleanShot 2025-10-11 at 17.55.26@2x.png](attachment:56661cec-7dfb-4f42-bc3a-78f137d2c4fc:CleanShot_2025-10-11_at_17.55.262x.png)
+<img width="868" height="502" alt="image" src="https://github.com/user-attachments/assets/264b2876-0a54-4b6c-b260-cd41abd470bf" />
+
 
 이유는 단순합니다! **애니메이션이 중간값을 보간해서 프레임을 만들어냈기 때문**입니다.
 
@@ -482,7 +494,8 @@ will-change: background-color;
 
 `will-change`는 힌트일 뿐이고, `background-color`는 본질적으로 페인트가 필요한 속성입니다. `opacity`나 `transform`처럼 컴포지트 전용으로 처리되지 않습니다. 그래서 `will-change`를 적용해도 매 프레임마다 페인트가 발생하는 근본 문제는 해결되지 않습니다.
 
-![image.png](attachment:0858a0a4-e756-4a6f-9cc4-59f0891a8b9c:image.png)
+<img width="910" height="1008" alt="image" src="https://github.com/user-attachments/assets/622a7e12-9a23-4164-a5f9-a1bd16d417f2" />
+
 
 이 부분에서 상당히 혼란스러웠던 건 브라우저마다 동작이 달랐다는 점입니다. Safari와 Firefox는 잘 작동했는데 Chrome에서만 깜박임이 발생했습니다. 또한 저렇게 에러로그가 찍힌것은 chrome만이였습니다.
 
