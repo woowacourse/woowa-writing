@@ -53,8 +53,6 @@ public void copyFile(String src, String dest) throws IOException {
 ```java
 public void process() throws IOException {
     readFile(); // 내부에서 IOException 발생
-}public void execute() throws IOException {
-    process();
 }
 ```
 
@@ -197,7 +195,7 @@ try {
 
 이 계층은 단순한 분류표가 아니라, Checked Exception의 철학을 프레임워크의 구조로 옮긴 결과물이다. 자바가 컴파일러를 통해 “복구 가능한 실패를 명시하라”고 강제했다면, 스프링은 예외 계층을 통해 “복구 가능성의 정도를 구조적으로 표현하라”고 제시한다.
 
-즉, 이제는 예외를 **잡을 수 있는가?**가 아니라, **복구할 수 있는가?**가 기준이 된다. 이를 통해 스프링은 Checked Exception의 철학을 ‘형식의 강제’에서 ‘의미의 표현’으로 바꿔냈다.
+즉, 이제는 예외를 "잡을 수 있는가?"가 아니라, "복구할 수 있는가?"가 기준이 된다. 이를 통해 스프링은 Checked Exception의 철학을 ‘형식의 강제’에서 ‘의미의 표현’으로 바꿔냈다.
 
 ## 5.3 Checked Exception 철학의 계승
 
