@@ -1,6 +1,8 @@
-리액트가 19.2 버전으로 업데이트되며 새로운 기능들이 추가되었습니다. 그 중 제 눈에 가장 들어온 추가기능은 `<Activity />`  였습니다.
+리액트가 19.2 버전으로 업데이트되며 새로운 기능들이 추가되었습니다. 그 중 제 눈에 가장 들어온 추가기능은 `<Activity />` 였습니다.
 
 Activity는 서비스를 “활동 여부”에 따른 여러 요소로 쪼개는 기능입니다. 활동을 하고있는 요소만 보이고 활동을 하고 있지 않은 요소는 숨기는 기능이죠. 이번 글에서는 이 Activity를 이용해 프로젝트 내 사용자 입력 컴포넌트를 개선한 경험을 공유하고자 합니다.
+
+<br />
 
 ## Activity란?
 
@@ -23,20 +25,24 @@ function App() {
     <div className={S.Wrapper}>
       <button
         type="button"
-        onClick={() => {setIsOpen(true);}}>
+        onClick={() => {
+          setIsOpen(true);
+        }}>
         모달 열기
       </button>
-
-			// && 연산자를 이용해 조건부 표시
+      // && 연산자를 이용해 조건부 표시
       {isOpen && (
-        <Modal onClose={() => { setIsOpen(false); }} />
+        <Modal
+          onClose={() => {
+            setIsOpen(false);
+          }}
+        />
       )}
     </div>
   );
 }
 
 export default App;
-
 ```
 
 하지만 이번 19.2 업데이트로 추가된 Activity를 이용해서도 해당 모달을 만들 수 있습니다.
@@ -51,13 +57,18 @@ function App() {
     <div className={S.Wrapper}>
       <button
         type="button"
-        onClick={() => {setIsOpen(true);}}>
+        onClick={() => {
+          setIsOpen(true);
+        }}>
         모달 열기
       </button>
-			
-			// Activity를 이용해 조건부 표시
+      // Activity를 이용해 조건부 표시
       <Activity mode={isOpen ? 'visible' : 'hidden'}>
-        <Modal onClose={() => { setIsOpen(false); }} />
+        <Modal
+          onClose={() => {
+            setIsOpen(false);
+          }}
+        />
       </Activity>
     </div>
   );
@@ -67,6 +78,8 @@ export default App;
 ```
 
 그렇다면 여기서 한 가지 궁금증이 생깁니다. 지금까지는 && 연산자만으로 구현할 수 있었던 기능인데, 왜 새롭게 Activity를 추가했을까요? Activity로 구현한 요소의 특징을 알아보도록 하겠습니다.
+
+<br />
 
 ## Activity의 특징
 
@@ -97,6 +110,8 @@ Activity의 가장 큰 특징은 요소의 DOM 처리에 있습니다. && 연산
 또한 모달 내부 요소를 사전에 미리 렌더링할 수 있습니다. 리액트는 Activity의 mode가 hidden인 경우에도 자식 요소가 낮은 우선순위로 계속 렌더링합니다. 이러한 사전 렌더링 덕분에 코드나 데이터를 미리 로드할 수 있어 성능 상으로 이점을 가져올 수 있습니다.
 
 이 뿐만 아니라 요소 내부에서 useEffect 등으로 선언한 Effects는 자체적으로 정리합니다. 이를 통해 불필요한 사이드 이펙트를 방지할 수 있죠.
+
+<br />
 
 ## 포게더 프로젝트에 적용
 
@@ -182,7 +197,7 @@ const [form, setForm] = useState({
 
 ### Activity로 개선
 
-이제 위 코드에 Activity를 적용해보겠습니다. 작성한 && 연산자를 지우고 Activity로 대체합니다. 그리고 속성으로 mode를 계산하여 전달합니다. 
+이제 위 코드에 Activity를 적용해보겠습니다. 작성한 && 연산자를 지우고 Activity로 대체합니다. 그리고 속성으로 mode를 계산하여 전달합니다.
 
 ```tsx
 <Activity mode={Funnel.funnelStep === 'name' ? 'visible' : 'hidden'}>
@@ -212,6 +227,8 @@ DOM 구조를 확인해보면 CSS 속성을 이용해 잠시 숨기는 동작을
 
 ![steps.gif](https://github.com/MinSungJe/woowa-writing/blob/level4/images/steps.gif)
 
+<br />
+
 ## 마치며
 
 리액트의 19.2 업데이트로 생긴 Activity는 DOM에서 요소를 없애지 않고 숨기기만 합니다. 따라서 기존에 && 연산자를 이용해 요소를 만들었을 때와 비교해 많은 이점을 가져올 수 있습니다.
@@ -219,6 +236,8 @@ DOM 구조를 확인해보면 CSS 속성을 이용해 잠시 숨기는 동작을
 포게더 프로젝트에 적용하며 가장 크게 느낀 변화는 상태 관리의 단순화였습니다. Activity 덕분에 이제 초기값을 유지하기 위한 상태는 선언하지 않아도 됩니다. 오로지 입력값을 관리한다는 요소의 본분에 집중할 수 있게 되었죠.
 
 Activity는 조건부 렌더링이 필요한 컴포넌트의 성능과 개발 편의성을 동시에 높여주는 유용한 기능입니다.
+
+<br />
 
 ## 참고
 
