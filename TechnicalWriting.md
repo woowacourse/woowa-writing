@@ -485,13 +485,17 @@ if (isReload && !isConnected && joinCode && myName && startSocket) {
 
 ![새로고침구현전.png](assets/before.png)
 
-<video src="assets/before.mov" controls width="1200" />
+<!-- <video src="assets/before.mov" controls width="1200" /> -->
+
+[새로고침 구현 전 영상](assets/before.mov)
 
 ### 구현 후
 
 ![새로고침구현후.png](assets/after.png)
 
-<video src="assets/after.mov" controls width="1200" />
+<!-- <video src="assets/after.mov" controls width="1200" /> -->
+
+[새로고침 구현 후 영상](assets/after.mov)
 
 # 마무리하며
 
