@@ -45,8 +45,11 @@ ExoPlayer가 실제 환경에서 원하는 대로 동작하는지를 직접 실�
 이 경험을 바탕으로 ExoPlayer를 실제 서비스(hEARit)에도 본격적으로 적용하게 되었습니다.
 
 실제로, 하단 재생바와 더불어, 쇼츠 탐색 화면에서 자막에 맞게 소리가 나오고, 자막에 맞게 재생바가 제대로 작동하는 지를 테스트를 통해서 확인할 수 있었습니다.
-<img alt="img_3.png" src="img_3.png" width="50%"/>
-<video src="./technicalwriting.mp4" width="70%" controls></video>
+<img alt="img_3.png" src="img_3.png" width="30%"/>  
+
+https://github.com/user-attachments/assets/a7ff1f31-230a-4cb5-9818-80fd710c01c5
+
+
 
 ### 테스트 후 실제 앱에 적용해보기
 이후에는 본격적으로 앱의 핵심인 탐색(Explore) 화면 구현으로 넘어갔습니다.
