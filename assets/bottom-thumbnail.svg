@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080">
+  <defs>
+    <linearGradient id="grad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0ea5e9"/>
+      <stop offset="100%" stop-color="#ffd43b"/>
+    </linearGradient>
+    <linearGradient id="lineGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#fbfd93"/>
+      <stop offset="100%" stop-color="#f3d3a7"/>
+    </linearGradient>
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="6" stdDeviation="12" flood-color="#000000" flood-opacity="0.3"/>
+    </filter>
+    <style>
+      .title { font-family: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+                font-weight: 800; fill: #ffffff; }
+      .subtitle { font-family: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+                   font-weight: 600; fill:rgb(239, 245, 253); }
+      .tag { font-family: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+              font-weight: 700; fill: #0f172a; }
+      .pill { fill: #e2e8f0; rx: 20; }
+      .wire { stroke: url(#lineGrad); stroke-width: 3; fill: none; opacity: 0.8; }
+      .node { stroke: #fefcc7; fill: #111827; rx: 16; }
+      .icon { stroke: #fefcc7; stroke-width: 3; fill: none; }
+    </style>
+  </defs>
+
+  <!-- Background -->
+  <rect x="0" y="0" width="1920" height="1080" fill="url(#grad)"/>
+
+  <!-- Decorative network wires -->
+  <path d="M80,280 C280,260 360,420 560,400 S880,320 1080,340 1400,420 1600,400 1820,360 1820,360" class="wire"/>
+  <path d="M100,800 C300,740 420,860 620,800 S980,700 1200,740 1500,860 1700,780" class="wire"/>
+  <path d="M200,540 C440,500 520,600 760,560 1000,520 1160,620 1420,600 1680,580 1780,620 1820,640" class="wire"/>
+
+  <!-- Left icon group: browser + cloud -->
+  <g transform="translate(170,230)">
+    <rect x="0" y="0" width="300" height="200" class="node" />
+    <rect x="0" y="0" width="300" height="52" class="icon" />
+    <circle cx="36" cy="26" r="8" fill="#fefcc7"/>
+    <circle cx="64" cy="26" r="8" fill="#fefcc7"/>
+    <circle cx="92" cy="26" r="8" fill="#fefcc7"/>
+    <rect x="34" y="86" width="232" height="20" class="icon"/>
+    <rect x="34" y="122" width="180" height="20" class="icon"/>
+    <!-- cloud -->
+    <g transform="translate(40,250)">
+      <path d="M80,60a40,35 0 1,1 80,0h10a35,30 0 1,1 0,60H60a40,30 0 1,1 20,-60z" class="icon"/>
+    </g>
+  </g>
+
+  <!-- Right icon group: server rack -->
+  <g transform="translate(1450,260)">
+    <rect x="0" y="0" width="300" height="360" class="node"/>
+    <rect x="30" y="60" width="240" height="50" class="icon"/>
+    <circle cx="60" cy="85" r="6" fill="#fefcc7"/>
+    <rect x="30" y="140" width="240" height="50" class="icon"/>
+    <circle cx="60" cy="165" r="6" fill="#fefcc7"/>
+    <rect x="30" y="220" width="240" height="50" class="icon"/>
+    <circle cx="60" cy="245" r="6" fill="#fefcc7"/>
+    <rect x="30" y="300" width="240" height="50" class="icon"/>
+    <circle cx="60" cy="325" r="6" fill="#fefcc7"/>
+  </g>
+
+  <!-- Pill FIRST (moved up-left and rendered earlier to avoid overlap) -->
+  <g transform="translate(240, 520)">
+    <rect x="0" y="-52" width="380" height="64" class="pill" filter="url(#shadow)"/>
+    <text x="190" y="-10" class="tag" font-size="32" text-anchor="middle">useInfiniteQuery</text>
+  </g>
+
+  <!-- Title block (moved down for more spacing) -->
+  <g transform="translate(240, 720)">
+    <text x="0" y="0" class="title" font-size="72" text-anchor="start" filter="url(#shadow)">TanStack Query v5로 무한스크롤 끝장내기 🚀</text>
+    <text x="0" y="94" class="subtitle" font-size="48" text-anchor="start">IntersectionObserver를 활용한 무한스크롤 구현</text>
+  </g>
+</svg>
