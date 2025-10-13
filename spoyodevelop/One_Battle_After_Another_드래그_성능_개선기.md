@@ -1,0 +1,572 @@
+## 드래그 선택 기능의 역사
+
+![CleanShot 2025-10-08 at 17.05.15@2x.png](attachment:45c620e0-c1a6-4a83-a334-e77585c1519d:CleanShot_2025-10-08_at_17.05.152x.png)
+
+드래그 선택기능은 컴퓨터를 사용하는데 매우 당연하게 쓰이는 기능중 하나입니다. 드래그를 하면 그 안에 있는 내용물들이 ‘잡히고’ 선택됩니다.
+
+![image.png](attachment:c8fa5094-b633-4e18-981c-c1418aec56c8:image.png)
+
+잠깐 컴퓨터 역사에 대해서 이야기해볼까요? 1984년에 출시된 Macintosh에 대한 이야기입니다.
+
+이 컴퓨터의 출시를 알린 광고는 그 내용만큼이나 유명합니다. 조지 오웰의 소설 '1984'를 모티브로 한 이 광고는 1984년 슈퍼볼에서 방영되었는데요. 광고 속에서 한 여성이 거대한 스크린에 비친 빅브라더를 향해 슬래지해머를 던져 화면을 산산조각 냅니다. 당시 컴퓨터 생태계를 지배하던 [IBM](<https://en.wikipedia.org/wiki/1984_(advertisement)#cite_note-22>)을 전체주의적인 빅브라더로 묘사하고, Apple이 이를 타파하는 혁명가로 자리매김하는 내용이었습니다.
+
+광고는 이렇게 끝을 맺습니다. "1984년 1월 24일, Apple은 Macintosh를 공개합니다. 그리고 당신은 왜 1984년이 '1984'가 되지 않을 것인지 알게 될 것입니다."
+
+![CleanShot 2025-10-08 at 17.01.36@2x.png](attachment:aaebdfe3-a2b0-49c3-a641-db03e96c5333:CleanShot_2025-10-08_at_17.01.362x.png)
+
+당시 모든 컴퓨터가 채택한 CLI 환경은 모든 작업을 키보드로 처리해야 했습니다. 지금과 달리 컴퓨터 사용법이 비직관적이었고, 일반 사용자가 쉽게 접근하지 못하게 막는 높은 진입장벽을 만들고 있었죠. 반면 Apple은 GUI를 채택해 컴퓨터 사용 환경을 훨씬 더 직관적으로 만들었습니다.
+
+이 'marquee', 점선으로 된 사각형 선택 영역도 그때 함께 도입된 기능 중 하나입니다.(기원을 따지자면 제록스까지 올라가야겠지만, 대중에게 대규모로 출시된다는 상징성은 여기서 부터 시작 됩니다.) 당시 매뉴얼에는 이 기능에 대한 설명이 상세히 기록되어 있었습니다. 지금은 너무나 당연한 이 기능이 매뉴얼에 적혀 있었다는 사실 자체가, 그때는 드래그 선택이 얼마나 생소한 개념이었는지를 보여줍니다.
+
+그리고 2025년, 지금으로 돌아와 봅시다. 지금은 이 드래그가 너무나 당연해졌습니다. 그렇다면 이런 당연한 기능을 웹에서 구현하는 것은 쉬울까요?
+
+이는 생각보다 훨씬 어렵습니다. 그리고 제가 굳이 컴퓨터 역사를 언급하면서 드래그 선택을 소개한 이유가 바로 여기에 있습니다.
+
+일반 사용자들은 현재 운영체제에서 사용하는 드래그 선택 정도의 반응성을 웹에서도 당연히 기대합니다. Apple은 1984년부터 41년간 이 기능을 계속해서 발전시켜 왔습니다. 이 기능은 항상 '무조건 동작해야 하는' 필수 기능 리스트에 포함되어 있었을 것이고, 요구사항이 변해도 이 드래그 기능은 예전처럼, 혹은 그보다 더 발전된 형태로 동작해야 했을 겁니다.
+그 과정에서 개발자들은 일반 API로는 도달하지 못하는 로우레벨까지 조작하며 드래그를 개선해 나갔을 것입니다. 그 개선 사이클을 무려 41년간 반복해온 것이죠.
+
+저희 팀은 이제 41년의 역사를 따라잡으려고 합니다. 할 수 있을까요?
+
+## 아니, 왜 이런 간단한 기능이 제 기기에서 버벅이죠?
+
+팀의 프로젝트에서도 드래그 선택이 사용되었는데요.
+
+![CleanShot 2025-10-08 at 17.46.12@2x.png](attachment:8454bfb8-1057-46a3-9728-3b9e6baedad2:CleanShot_2025-10-08_at_17.46.122x.png)
+
+아인슈타임은 사용자가 ‘자신의 참가 가능한 시간대’를 선택하면, 그것에 따라 일정을 히트맵 형식으로 보여주어 일정을 조율하는데 도움을 주는 서비스입니다.
+
+그 와중에 이 드래그 기능이 ‘버벅인다’라는 소리를 듣기 시작했습니다. 오래된 노트북을 사용하는 유저에게 이런 소리를 들었는데요. 한편, 이런 간단한 드래그가 버벅인다는 것에 한소리를 들었습니다.
+
+‘왜 이런 당연한 기능이 제 기기에서 버벅이죠? 성능을 많이 잡아 먹는것은 아닌것 같은데…’
+
+사용자가 경험했던 문제는 드래그 스킵이였습니다.
+
+![CleanShot 2025-10-08 at 18.36.15@2x.png](attachment:d9cda39b-cade-40b6-a3d5-8e6eddb9dd36:CleanShot_2025-10-08_at_18.36.152x.png)
+
+너무 빠르게 드래그를 하면 이렇게 중간에 있던 요소들이 물결무늬처럼 드래그에서 누락되는 현상이 일어났는데요. 이는 상당히 치명적인 문제였습니다.
+
+‘간단한 기능이 동작하는것이 아무리 오래된 컴퓨터라도 당연히 동작해야한다’는 상당히 중요한 통찰을 던졌으며, 드래그 로직의 성능 개선의 신호탄이 되었습니다.
+
+## 드래그 전략 설정
+
+팀에서 검토한 드래그 전략은 세 가지였습니다.
+
+### 리니어(linear) 드래그
+
+리니어 드래그 방식은 시작점과 끝점을 선택하면, 그 사이에 있는 모든 요소를 선택하는 방식입니다. 말로 풀어서 설명하니 생소하게 들릴 수 있지만, 여러분은 이미 매일 이 방식을 사용하고 계십니다.
+
+바로 일반적인 텍스트 선택 기능이 리니어 드래그를 기반으로 동작합니다. [실제 구현은 살짝 다르지만, 기본적인 구현 원리는 결이 같습니다.](https://developer.mozilla.org/en-US/docs/Web/API/Selection) 이 드래그는 성능 면에서 가장 효율적입니다. 시작점과 끝점만 기억하면 되기 때문에 추가적인 상태 관리가 필요 없습니다.
+
+실제 적용 결과는 다음과 같습니다.
+
+![CleanShot 2025-10-08 at 22.07.57@2x.png](attachment:a2e5b93c-71b6-4a9c-aeb5-1cde49f81328:CleanShot_2025-10-08_at_22.07.572x.png)
+
+시간표 셀이 번개 모양으로 선택되는 것을 확인할 수 있습니다. 시작점과 끝점을 연결해 그 사이를 채우면, 네모 박스처럼 반듯하게 선택되는 게 아니라 이렇게 번개처럼 구불구불한 형태로 선택됩니다.
+
+![CleanShot 2025-10-08 at 20.48.14@2x.png](attachment:183c5967-1d9f-447d-a461-61af6088385c:CleanShot_2025-10-08_at_20.48.142x.png)
+
+텍스트 선택도 비슷합니다. 커다란 네모 박스로 영역을 지정하는 것이 아니라, 양 끝점을 선택하여 드래그하면 이런 방식의 결과물이 나옵니다.
+
+하지만 이 방법은 성능은 좋아도 유저 친화적이지 않았습니다. 사용자들은 텍스트를 선택하듯 드래그로 시간대를 선택하는 것을 기대하지 않을 테니까요.
+
+### 보이지 않는 드래그 박스
+
+![CleanShot 2025-10-09 at 17.50.09@2x.png](attachment:c97cbd5f-f1f0-47a9-8e4a-faa01bd313c8:CleanShot_2025-10-09_at_17.50.092x.png)
+
+보이지 않는 드래그 박스를 구현하여 드래그를 만드는 로직은 다음과 같습니다.
+
+1. 드래그 박스를 구현하되, 보이지 않게 처리합니다.
+2. 시간표 셀과 드래그 박스가 겹치면 셀을 칠해줍니다.
+
+Document API를 사용한 구현 방식은 이렇습니다.
+
+1. `onPointerDown`에서 드래그를 켭니다.
+2. `onPointerMove`에서 시간표 셀과 드래그 박스의 충돌을 실시간으로 계산합니다.
+3. `onPointerUp` 또는 `onPointerLeave`에서 드래그를 끕니다.
+
+이때 `onPointerMove`에서의 실시간 충돌 계산이 핵심입니다. 계산이 즉시 이루어지고 바로 뷰에 반영되어야 사용자에게 '해당 요소가 드래그되고 있다'는 것을 실시간으로 보여줄 수 있습니다.
+
+하지만 이 구현 방식은 성능 소비가 극심했습니다. 그래서 대안을 찾기 시작했습니다.
+
+### 보이는 드래그 박스
+
+![CleanShot 2025-10-09 at 17.46.31@2x.png](attachment:dcdd2a49-50d5-413a-83e0-ef7fbd1c8fa9:CleanShot_2025-10-09_at_17.46.312x.png)
+
+위와 구현 방식은 거의 같으나, 한가지 차이가 있습니다. 드래그 박스가 보입니다.
+
+1. 드래그 박스를 구현합니다.
+2. 드래그 박스를 끌면 선택된 영역의 범위만 계산합니다.
+3. 드래그를 놓을 때 선택된 영역과 겹치는 영역을 한꺼번에 계산합니다.
+
+이 구현의 핵심은 드래그를 놓을 때 충돌 영역 계산을 일괄 처리(batch update)한다는 점입니다.
+
+1. `onPointerDown`에서 드래그를 켭니다.
+2. `onPointerMove`에서 드래그 박스의 크기만 계산합니다.
+3. `onPointerUp` 또는 `onPointerLeave`에서 드래그를 끄고, 그때 시간표 셀과 드래그 박스의 충돌을 계산합니다.
+
+드래그 박스가 보이지 않는 것보다는 확실히 성능이 개선이 됩니다.
+
+### 최종 결정
+
+이렇게 보이는 드래그 박스로 구현을 마무리 하면 좋았을건데요. 이 방법에는 다음과 같은 문제가 있었습니다.
+
+1. 사용자가 드래그 박스를 보고 '어울리지 않는다'고 느낍니다.
+2. 드래그 박스와 셀 색상이 겹쳐 드래그 박스가 잘 보이지 않습니다.
+3. 드래그할 때 뷰가 즉시 업데이트되지 않아 비직관적입니다.
+
+1, 2번은 사용자마다 의견이 갈렸지만, 3번은 치명적이었습니다. 즉각적인 피드백이 주는 직관성이 중요했기 때문입니다.
+
+따라서 우리는 사용자 경험을 중시하여 **보이지 않는 드래그 박스** 방식을 채택하기로 했습니다.
+
+## 성능 개선
+
+성능보다는 감히 사용자 경험을 선택했으니, 이제 개발자가 고생할 차례입니다. 이 '보이지 않는 드래그'가 주는 기술 과제는 다음과 같습니다.
+
+1. `onMouseMove`마다 충돌 영역을 계산해야 합니다.
+2. `onMouseMove`는 마우스가 1px만 움직여도 발생합니다.
+3. `onMouseMove`가 발생할 때마다 모든 셀, 즉 **O(336)**의 충돌을 계산해야 합니다.
+
+여기서 336개의 셀은 다음과 같이 계산됩니다:
+
+- 24시간 × 30분 단위 = 48개 셀/일
+- 48개 × 7일 = **336개 셀**
+
+듣기만 해도 어지럽지 않나요? 이를 해결하기 위해서 쓴 방법들은 다음과 같습니다.
+
+### 상태 끌어내리기와 메모이제이션
+
+모범적인 React 사용자라면 `selectedTimes` state로 해당 셀들을 관리하고 있을 겁니다. 그리고 최대한 상태를 끌어올려 `selectedTimes`를 핸들러로 넘겨주겠죠. 이는 SSOT(Single Source of Truth)를 지키는 좋은 패턴입니다.
+
+하지만 문제가 발생했습니다.
+
+![CleanShot 2025-10-09 at 18.31.44@2x.png](attachment:bdf3beab-96e8-4779-9426-c83f4838cfe4:CleanShot_2025-10-09_at_18.31.442x.png)
+
+SSOT를 지키기 위해 최상단으로 상태를 올리니, 드래그할 때마다 setter가 동작해 하위의 **모든 컴포넌트를 리렌더링**시키고 있었습니다. 또한 거의 모든 성능 병목이 scripting에서 발생하고 있었습니다. 끔찍하죠. 당장 해결해야 할 문제였습니다.
+
+![CleanShot 2025-10-09 at 18.39.47@2x.png](attachment:87046665-b2bc-4c1a-832d-23467b1f79ad:CleanShot_2025-10-09_at_18.39.472x.png)
+
+이때는 React의 일반적인 원칙을 거슬러야 합니다. 상태를 끌어올리는 대신, **끌어내려야** 합니다.
+
+첫 번째로, 상태를 최대한 끌어내립니다. 상태는 필요한 곳까지만 존재해야 합니다. 현재 상태는 투표페이지에 있었습니다.
+
+```tsx
+<투표페이지>  // <- selectedTimes의 현재 위치
+  <타임테이블 컨테이너>
+    <타임테이블>
+		    <타임테이블셀>
+        </타임테이블셀>
+    </타임테이블>
+  </타임테이블 컨테이너>
+</투표페이지>
+```
+
+이를 타임테이블까지 끌어내렸습니다.
+
+```tsx
+<투표페이지>
+  <타임테이블 컨테이너>
+    <타임테이블> // <- selectedTimes를 옮긴 위치
+		    <타임테이블셀>
+        </타임테이블셀>
+    </타임테이블>
+  </타임테이블 컨테이너>
+</투표페이지>
+```
+
+이렇게 끌어내리면, 적어도 렌더링을 타임테이블 컴포넌트내로 제한 할수 있습니다.
+
+그래도 여전히 타임테이블 내부에서 불필요한 렌더링이 발생할 수 있습니다. 중간 경로의 컴포넌트들을 일일이 메모해주어야 하죠. 더 큰 문제는 `selectedTimes`가 갱신될 때마다 **선택하지 않은 타임테이블 셀**도 함께 렌더링된다는 점이었습니다.
+
+```tsx
+const areEqual = (
+  prevProps: TimeTableCellProps,
+  nextProps: TimeTableCellProps
+) => {
+  const prevKey = `${prevProps.date}T${prevProps.timeText}`;
+  const nextKey = `${nextProps.date}T${nextProps.timeText}`;
+
+  if (prevKey !== nextKey) return false;
+
+  const prevSelected = prevProps.selectedTimes.has(prevKey);
+  const nextSelected = nextProps.selectedTimes.has(nextKey);
+
+  return prevSelected === nextSelected;
+};
+
+export default memo(TimeTableCell, areEqual);
+```
+
+직접 값을 비교하는 커스텀 비교 함수로 TimeTableCell을 메모이제이션했습니다. 이를 통해 선택된 셀만 렌더링되고, 다른 셀들은 렌더링되지 않도록 했습니다. 물론 이 비교를 매 드래그마다 수행하기 때문에 오버헤드가 발생할 수 있습니다. 하지만 실제로 측정해본 결과 성능 향상이 확실했기에 이 방식을 채택했습니다.
+
+이제 상태를 내렸으니, 실제 handler가 위치한 page에 이 상태를 다시 올려주어야 합니다. 이는 Context API에 ref를 사용해 해결했습니다. 로컬에서 상태를 갱신한 뒤, 위로 올려주는 방식이죠. 이때 ref를 사용하기때문에 render는 발생하지 않습니다. 이런 최적화를 통해 **script 실행 시간을 5배 개선**할 수 있었습니다.
+
+![CleanShot 2025-10-09 at 19.02.55@2x.png](attachment:ca3e5b4f-c67b-423d-a6ca-90648d47de8e:CleanShot_2025-10-09_at_19.02.552x.png)
+
+### 충돌 감지 로직 개선과 layout thrashing 개선
+
+웹의 렌더는 다음과 같은 과정으로 일어납니다.
+
+![image.png](attachment:1cc1402d-570c-4fb1-97e1-a9bb6c7b71e2:image.png)
+
+여기서 중요한 것은 **Layout**입니다. Layout 이벤트를 최소화해야 성능 향상에 유리합니다.
+
+드래그 로직은 `getBoundingClientRect()`라는 API에 의존하고 있습니다. 이것은 Layout 이벤트를 일으키는 API인데요. 기존 로직에서는 `onPointerMove`마다 이 API를 호출해 매번 Layout 이벤트가 발생하고 있었습니다.
+
+이 부분을 `onPointerDown`으로 분리하면 어떨까요? `getBoundingClientRect()`를 미리 호출하는 것입니다.
+
+```tsx
+type TimeCellHitbox = {
+  key: string; // data-time
+
+  left: number;
+  right: number;
+  top: number;
+  bottom: number;
+};
+```
+
+이렇게 `TimeCellHitbox`를 미리 만들어 둡니다. 시간표 셀마다 고유한 날짜-시간 값을 가지고 있기 때문에, 모든 요소의 충돌 영역을 미리 계산할 수 있습니다. 이를 **히트박스(hitbox)**라고 부릅니다.
+
+```tsx
+const cacheDragHitboxes = () => {
+  const containerRect = container.getBoundingClientRect();
+  const hitboxes: TimeCellHitbox[] = [];
+  // 모든 heat-map-cell 요소를 순회하며
+  container
+    .querySelectorAll<HTMLElement>(".heat-map-cell")
+    .forEach((selectableElement) => {
+      const elementRect = selectableElement.getBoundingClientRect();
+      hitboxes.push({
+        key: dateTime,
+        left: elementRect.left - containerRect.left,
+        right: elementRect.right - containerRect.left,
+        top: elementRect.top - containerRect.top,
+        bottom: elementRect.bottom - containerRect.top,
+      });
+    });
+
+  return hitboxes;
+};
+```
+
+이 히트박스를 캐싱해 놓으면, 한 번의 계산으로 충돌 영역에 해당하는 범위를 미리 계산해 둘 수 있습니다.
+
+```tsx
+const handleDragMove = (event: React.PointerEvent) => {
+  // selectionRect는 client.X , client.Y로 계산
+  for (const cell of hitboxes) {
+    const overlaps =
+      cell.left < selectionRect.right &&
+      cell.right > selectionRect.left &&
+      cell.top < selectionRect.bottom &&
+      cell.bottom > selectionRect.top;
+
+    if (!overlaps) continue;
+
+    if (selectionModeRef.current === "add") {
+      if (!currentWorkingSet.has(cell.key)) {
+        currentWorkngSet.add(cell.key);
+      }
+    } else {
+      if (currentWorkingSetRef.has(cell.key)) {
+        currentWorkingSetRef.delete(cell.key);
+      }
+    }
+  }
+};
+```
+
+미리 계산된 히트박스는 `onPointerMove`에서 사용됩니다. 이때 `selectionRect`는 `clientX`, `clientY`로 계산하는데, 이 값들은 이벤트 객체에서 직접 읽어오는 값이므로 추가적인 Layout 이벤트를 발생시키지 않습니다.
+
+기존에 `onPointerMove`에서 빈번하게 일어났던 Layout 이벤트를 `onPointerDown`으로 격리했습니다. 드래그 한번에 딱 한번의 레이아웃 이벤트가 일어나게 되므로, 이는 상당한 성능 향상을 가져왔습니다.
+
+비록 크롬의 Performance 탭에서 수치상 성능 향상이 명확히 잡히지는 않았지만, 이를 적용하니 위에서 언급했던 **'드래그 스킵' 현상이 CPU slowdown 20x에서도 재현되지 않았습니다!** 아무리 성능이 좋지 않은 환경에서도 드래그가 고장나지 않는 것이죠.
+
+### requestAnimationFrame와 코얼레싱
+
+현재 상황에서는 마우스를 1px 움직일 때마다 `onPointerMove` 이벤트가 발생하고 O(336) 연산을 수행하는 것은 동일합니다. 이는 근본적으로 해결하지 못하는 문제죠. 다만 이를 제한할 수는 있습니다. 바로 **쓰로틀링**입니다. 그리고 이는 `requestAnimationFrame`(이하 rAF)을 사용하면 간단히 해결할 수 있습니다.
+
+```tsx
+useEffect(() => {
+  let rAFId = null;
+
+  rAFId = requestAnimationFrame(() => {
+    //rafID가 있으면, 콜백을 실행하지 않는다.
+    if (!rafId) return;
+
+    updateCells();
+    //업데이트가 완료되면 rafID를 비운다.
+    rafId = null;
+  });
+
+  return () => {
+    //멱등성을 위한 클린업
+    if (rAFId) {
+      cancelAnimationFrame(rAFId);
+    }
+  };
+}, []);
+```
+
+rAF는 간단히 쓰로틀링의 니즈를 만족시킬 수 있습니다. 하나의 `rAFId`를 두고, 해당 콜백이 끝나기 전까지 `rAFId`를 그 rAF가 점유합니다. 예약된 콜백이 끝나면 `rAFId`를 null로 만들어 다음 콜백을 실행시키면 됩니다.
+
+rAF의 강점은 이 콜백들을 **모니터의 주사율에 맞게 처리**한다는 것입니다. 콜백은 모니터의 주사율에 맞춰 실행되고, 자연스럽게 모니터의 주사율에 맞게 쓰로틀링이 작용합니다. 자연스럽게 수직동기화가 적용되어 화면에 부드럽게 업데이트됩니다.
+
+`pointerMove`를 이렇게 rAF를 통해 우아하게 쓰로틀링을 처리할 수 있습니다.
+
+그런데 이게 사실 쓸모 없을수도 있습니다.
+
+`Starting in Chrome 60, the input pipeline will delay dispatching continuous events ([**wheel**](https://developer.mozilla.org/docs/Web/Events/wheel), [**mousewheel**](https://developer.mozilla.org/docs/Web/Events/mousewheel), [**touchmove**](https://developer.mozilla.org/docs/Web/Events/touchmove), [**pointermove**](https://developer.mozilla.org/docs/Web/Events/pointermove), [**mousemove**](https://developer.mozilla.org/docs/Web/Events/mousemove)) and dispatch them right before the [**requestAnimationFrame()** callback](https://developer.mozilla.org/docs/Web/API/window/requestAnimationFrame) occurs.`
+
+Chrome 60이 도입되면서, 모든 move 이벤트는 rAF를 쓰지 않아도 자동으로 입력을 묶어줍니다. rAF 콜백 이전에 있는 모든 입력을 지연시켜주는데, 이를 **'코얼레싱(Coalescing)'** 이라고 합니다. 따라서 엄밀히 따지면 `pointerMove`는 rAF가 필요 없습니다. 아무 처리를 하지 않아도 자동으로 쓰로틀링이 이루어지죠.
+
+`getCoalescedEvents()`라는 API를 사용하면 묶인 이벤트들을 꺼내서 사용할 수도 있습니다. 이것은 공식 스펙에 포함된 Web API입니다.
+
+다만 코얼레싱을 어떻게 수행하는지는 정확히 스펙에 명시되어 있지 않습니다. 브라우저마다 구현이 다른데요. Chrome의 경우 rAF 콜백에 맞춰 코얼레싱을 한다고 명문화했지만, 이것은 브라우저 공식 스펙이 아닙니다. 따라서 rAF를 명시적으로 사용하여 Chrome과 같은 방식의 쓰로틀링을 코드상에 명문화하는 것이 중요하다고 판단했습니다. 그렇게 rAF를 도입했습니다.
+
+한편 rAF는 다른 맥락에서 빛을 발했는데요. 그것은 다음 챕터에서 다루겠습니다.
+
+## 간단하지만 확실한 방법 : React에게서 제어권을 가져오기
+
+지금까지 우리는 다음과 같은 최적화를 진행했습니다.
+
+- 상태 끌어내리기와 메모이제이션을 통한 렌더 최적화
+- 히트박스를 통한 충돌 감지 개선으로 Layout Thrashing 개선
+- 코얼레싱과 rAF를 통한 쓰로틀링
+
+이 정도로도 충분히 만족스러운 결과였습니다. 하지만 우리가 전혀 생각하지 못했던 것이 하나 있었습니다.
+
+### **React의 제어권을 다시 가져오기**
+
+```tsx
+import createRoot from "react-dom";
+
+const root = createRoot();
+
+root.render(<App />);
+```
+
+React 앱에서는 이 진입점부터 **제어의 역전**이 발생합니다. 진입점을 기점으로 UI의 관심사를 React에게 맡긴다는 의미죠. `useState`와 `useEffect`를 통해 UI 관심사를 React가 제어하게 되고, 개발자가 직접 제어하지 않아야 합니다.
+
+다만 '드래그'와 같은 특수한 상황에서는 어떨까요? React의 사용 패턴과 전반적인 렌더 사이클이 성능에 심각한 영향을 줍니다. 우리는 '탈출구'인 Context API를 활용했고, 이것이 핵심 UI 로직으로 자리 잡게 되었습니다.
+
+그렇다면 방법은 무엇일까요? React에게서 다시 UI 관심사 제어권을 가져오면 됩니다.
+
+메모이제이션은 '동작'합니다. 하지만 매우 잘 동작하지는 않습니다. 위에서 언급했듯이, `memo` 비교 함수는 오버헤드가 심합니다. 메모이제이션을 완전히 없애버릴 수 있을까요? 매우 간단하고 직관적인 방법이 있습니다. **그냥 CSS 클래스를 쓰면 됩니다.**
+
+```css
+.time-table-cell.selected {
+  background-color: var(--primary);
+}
+```
+
+그리고 코드에서는 이를 끄고 키는 것을 해주면 됩니다.
+
+```tsx
+const updateCellClasses = () => {
+  container.querySelectorAll<HTMLElement>(".heat-map-cell").forEach((cell) => {
+    const dateTime = cell.getAttribute("data-time");
+    const isSelected = currentWorkingSetRef.current.has(dateTime);
+
+    // isSelected가 true면 'selected' 클래스 추가
+    // isSelected가 false면 'selected' 클래스 제거
+    cell.classList.toggle("selected", isSelected);
+  });
+};
+```
+
+수치상으로는 성능에 영향은 크게 가지 않았습니다. 그런데 가장 중요한 점이 있었는데요.
+
+### 애니메이션을 해금하다
+
+```css
+.time-table-cell.selected {
+  background-color: var(--primary);
+  transition: background-color 0.15s cubic-bezier(0.2, 0, 0, 1);
+}
+```
+
+렌더링 비용을 없앤 덕분에, 기존에 비싼 기능이라고 치부되었던 **애니메이션을 사용할 수 있게 되었습니다!**
+
+![CleanShot 2025-10-11 at 17.41.06@2x.png](attachment:f77e14cd-b9be-416c-87e1-95b3cd264c31:CleanShot_2025-10-11_at_17.41.062x.png)
+
+![CleanShot 2025-10-11 at 17.42.24@2x.png](attachment:e7851e56-f70d-4fbc-8f16-6e0b9ad79445:CleanShot_2025-10-11_at_17.42.242x.png)
+
+이 애니메이션을 딱 하나를 추가하니 25.2 프레임이었던 드래그를 **240 프레임까지** 올릴 수 있었습니다!
+
+어떻게 된 일까요?
+
+![CleanShot 2025-10-11 at 17.55.26@2x.png](attachment:56661cec-7dfb-4f42-bc3a-78f137d2c4fc:CleanShot_2025-10-11_at_17.55.262x.png)
+
+이유는 단순합니다! **애니메이션이 중간값을 보간해서 프레임을 만들어냈기 때문**입니다.
+
+예전에는 값이 `0 → 1`로 "툭" 바뀌었지만, 이제는 브라우저가 `0 → 0.1 → 0.2 → ... → 0.8 → 1.0`처럼 중간 단계들을 자동으로 생성합니다. 이 과정이 디스플레이 주사율에 맞춰 꾸준히 그려지면서, **프레임레이트가 240 프레임까지 올라가게 됩니다!**
+
+왜 하필 240 프레임인지 눈치채셨나요? 제가 사용하는 모니터의 주사율이 240Hz이기 때문입니다. rAF가 여기서 빛을 발하기 시작합니다. 이론대로라면, 주사율만큼 이 애니메이션은 부드러워집니다.
+
+이렇게 60프레임에서 240 프레임까지 스케일업하는 드래그 로직을 만들어냈습니다!
+
+# 고주사율 모니터에서의 깜박임 문제 해결
+
+애니메이션을 추가하고 나니 Chrome에서 고주사율 모니터(120Hz 이상)를 사용할 때 셀 선택 시 깜박임 현상이 나타났습니다. 여러 방법을 시도해본 결과, 완전한 해결책은 아니지만 실용적인 우회 방법을 찾았습니다.
+
+## 문제의 원인
+
+세 가지 요인이 복합적으로 작용하고 있었는데요.
+
+**1. CSS-in-JS의 런타임 주입 오버헤드**
+
+Emotion이 런타임에 스타일 문자열을 생성하고 `<style>` 태그에 주입하면서 CSSOM 재계산이 발생합니다. 보통은 무시할 만하지만, 고주사율 환경에서 연속적인 입력이 일어나면 프레임 예산을 잠식하면서 깜빡임이 드러납니다.
+
+**2. `background-color` 애니메이션은 페인트가 필요**
+
+will-change가 background-color를 composite 레이어로 승격시켜줄것이라 생각했지만, 이는 단순한 힌트입니다. `opacity`나 `transform`과는 다르게, `background-color`는 본질적으로 페인트가 필요한 속성이라 매 프레임마다 페인트가 발생합니다.
+
+**3. 3D 컨텍스트와 레이어 구성 간섭**
+
+`backface-visibility: visible`과 같은 3D 관련 속성들이 스태킹 컨텍스트와 레이어 구성을 바꿉니다. 특정 조합에서 레이어 경계와 합성 순서가 불안정하게 변하는것으로 추정됬습니다. Safari와 Firefox에서는 해당 문제가 발생하지 않았는데 Chrome에서만 불안정하게 동작했습니다.
+
+## 해결 방법
+
+**1. CSS-in-JS 제거**
+
+CSS-in-JS를 제거하고 직접 CSS 파일을 통해 `.selected` 선택자를 선언하여 애니메이션을 조절하는 것으로 수정했습니다.
+
+```css
+.time-table-cell.selected {
+  background-color: var(--primary);
+  transition: background-color 0.15s cubic-bezier(0.2, 0, 0, 1);
+}
+```
+
+이렇게 하면 런타임 주입 및 CSSOM 재계산 비용을 줄일 수 있습니다.
+
+**2. `background-color`에서 `opacity`로 전환**
+
+아예 `background-color`로 애니메이션을 주지 않고, `::after`를 통해 opacity를 합성하는 방향으로 수정했습니다.
+
+```css
+.time-table-cell {
+  position: relative;
+  background-color: var(--background);
+}
+
+.time-table-cell::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-color: var(--primary);
+  opacity: 0;
+  transition: opacity 0.15s cubic-bezier(0.2, 0, 0, 1);
+  pointer-events: none;
+}
+
+.time-table-cell.selected::after {
+  opacity: 1;
+}
+```
+
+이렇게 수정하면 다음과 같은 효과를 얻을 수 있습니다. 배경은 한 번만 페인트되고 고정됩니다. 선택 효과는 `opacity` 합성만 수행하게 되어 페인트 충돌이 제거됩니다. 그리고 선택 이펙트를 독립 레이어로 분리하면서 3D 컨텍스트의 간섭을 최소화할 수 있었습니다.
+
+이 두 가지 방법을 함께 적용하니 깜박임 문제를 해결할 수 있었습니다.
+
+## 왜 '완전히 문제를 고치지 않나요'?
+
+원래 이 문제는 간단히 이 한 줄로 해결될 것 같았습니다.
+
+```css
+will-change: background-color;
+```
+
+이 코드가 원래는 `background-color` 변환을 composite layer로 승격시켜 re-paint를 덜 일으키게 할 것 같은데요. 그런데 실제로는 그렇지 않습니다.
+
+`will-change`는 힌트일 뿐이고, `background-color`는 본질적으로 페인트가 필요한 속성입니다. `opacity`나 `transform`처럼 컴포지트 전용으로 처리되지 않습니다. 그래서 `will-change`를 적용해도 매 프레임마다 페인트가 발생하는 근본 문제는 해결되지 않습니다.
+
+![image.png](attachment:0858a0a4-e756-4a6f-9cc4-59f0891a8b9c:image.png)
+
+이 부분에서 상당히 혼란스러웠던 건 브라우저마다 동작이 달랐다는 점입니다. Safari와 Firefox는 잘 작동했는데 Chrome에서만 깜박임이 발생했습니다. 또한 저렇게 에러로그가 찍힌것은 chrome만이였습니다.
+
+## 트레이드오프
+
+결론적으로는 렌더링 경로 자체를 변경해서, 페인트가 필요 없는 방식으로 우회한것입니다. 실제 컴포지트 단계를 로우레벨로 건드리는것은 불가능하기 때문입니다. 그리고 몇가지 트레이드오프가 존재했는데요.
+
+**1. 레이어 수 증가**
+
+의사 요소(`::after`)가 별도 컴포지터 레이어로 승격될 가능성이 큽니다. 요소가 한 개면 괜찮겠지만, 336개의 요소를 동시에 인터랙션하고 있기 때문에 레이어 관리 메모리와 GPU 스케줄링 비용이 늘어납니다. 저사양 기기에 약간의 영향이 갑니다.
+
+**2. 근본 원인 미해결**
+
+3D 컨텍스트로 인한 레이어 구성 문제는 여전히 남아있습니다. 다른 CSS 속성들(필터, 혼합 모드 등)과 조합되면 예상치 못한 동작이 발생할 수 있습니다. 아직 발견을 못한 것 일지도요. 우리는 composite 우선순위 문제를 해결하려고 하지 않고 우회책으로 합성 layer를 추가로 둔 겁니다.
+
+다만, 이 우회책이 현재로서는 버그를 확실하게 우회할 수 있기 때문에 적용했습니다.
+
+## 회고
+
+엄청나게 길고 험한 여정이였습니다. 다만 두드러지게 생각해 볼점이 있었어요.
+
+### 생각해 볼점 하나 : 성능 목표치를 확실히 설계 했는가?
+
+저는 초입에 '41년의 역사를 따라잡을 수 있을까?'라고 화두를 던졌습니다. 이건 사실 불가능한 전제였습니다.
+
+깜빡임 문제와 같은 현상은 생각을 거의 로우레벨까지 끌고 내려가야 합니다. OS 단에서 로우레벨로 관리하는 드래그 성능과, 웹에서 한정된 API만을 통해 성능을 이끌어내는 방법은 그 접근 방식부터가 불리하게 시작합니다.
+
+다만 굉장히 근소하게 만들긴 했죠. 그런데 애초에 **문제 정의를 잘못하지 않았나** 싶습니다.
+
+만약 처음부터 명확한 성능 기준을 세웠다면 어땠을까요?
+
+예를 들어:
+
+- "2017년에 출시된 GTX 1050Ti + i7-6700K 노트북에서도 기능이 동작해야 한다"
+
+이런 확실한 정의를 세웠다면 이렇게까지 로우레벨로 문제를 다룰 필요가 없었을 것 같기도 합니다.
+
+지금 드래그 로직은 10년 전 출시된 아이폰 6s에서도 굉장히 부드럽게 동작하는데요. 엄연히 말하면, 이 드래그가 만약 안 먹힌다면 그것은 유저의 디바이스 책임으로 돌리고 그냥 제외하는 것이 나을 수도 있었습니다.
+
+뒤늦게 성능 타겟을 정해보면 다음과 같습니다:
+
+1. Geekbench 6 기준 최소 1000점을 만족하는 CPU를 사용하는 저사양 유저들
+2. 120 프레임 이상의 고주사율을 사용하는 고사양 유저들
+
+일반적인 게임이었으면 이것이 의미가 있었을 텐데요. 웹이라서 크게 의미는 없을 것이라 생각이 됩니다. 클라이언트의 성능에 따라 기능이 스케일업하는 것이 크게 체감되지도 않을뿐더러, 가장 중요한것은 요구사항 변동에 취약할 수도 있습니다.
+
+다만 이렇게 세세히 문제 상황과 그 개선 방법이 정의되어 있으면, 천천히 덜어내가도 좋다는 것이 지금의 결론입니다.
+
+과도한 최적화였을 수도 있지만, 각 문제의 원인과 해결 방법을 명확히 기록해두었기 때문에 나중에 요구사항이 바뀌거나 더 간단한 구현이 필요할 때 어느 부분을 제거해도 되는지 판단할 수 있습니다.
+
+결국 **네이티브의 41년을 따라잡을 수는 없었지만**, 웹에서 할 수 있는 최선을 다해 근접하게 만들었다고 생각합니다.
+
+### 둘 : 그래서 메모이제이션은 해결했어? ; React 컴파일러 적용기
+
+저 드래그 로직만 React 라이프사이클과 따로 적용해도 여전히 앱 내에 메모이제이션의 끔찍한 문제가 남아 있었는데요. 프로젝트의 30%정도의 코드가 메모이제이션을 위해 존재하고 실제로 팀의 많은 시간과 멘탈을 메모이제이션 잡는데 소비하고 있었습니다. 팀의 정신 건강에 좋지 않았죠. 그렇기 때문에 React 컴파일러를 적용했습니다.
+React 컴파일러는 수동으로 했던 메모이제이션을 자동으로 컴파일 단에서 적용하는 겁니다. 적용도 굉장히 간단한데요.
+
+```bash
+npm install --save-dev --save-exact babel-plugin-react-compiler@latest
+```
+
+이것을 설치하고 각각의 번들러 세팅에서 세팅하면 끝납니다. 다만 플러그인이 있다면 이것을 가장 높은 순서로 로드해야합니다.
+
+```bash
+plugins: ['babel-plugin-react-compiler', '@emotion'],
+```
+
+다만 얼마나 어떻게 도입할지는 조금 고민이 많았는데요. 우리 팀은 React 컴파일러를 prod단에만 도입하기로 결정했습니다. 도입의 배경은 다음과 같습니다.
+
+1. React compiler가주는 자동 메모이제이션 기능이 강력해 렌더 이슈를 해결해준다.
+2. 기존에 useCallback등으로 해주었던 memoization 디버깅이 어려울것 같아서 dev에는 도입하지 않는다.
+3. 이상적이라면 dev,prod 둘다 도입해 메모가 깨지는 곳을 전부 찾아내고 모두 메모를 해보는게 있겠으나 이는 지금 너무 어렵다. 오히려 자동메모를 하고 잊어 버리는게 낫다.
+4. React 컴파일러는 몇몇 엣지케이스에서 불안정적이라는 이야기가 들려오나 그 엣지케이스 대부분은 React 컴파일러 외부에 있는 의존에서 메모가 깨지는 이슈였고 프로젝트 자체는 emotion빼고 라이브러리를 쓰는 곳이 없다. 심지어 React 쿼리도 쓰지 않는다. 1.0.0이 나온 지금 '불안정해서 도입을 머뭇거린다'는 비 합리적이다.
+
+가장 핵심적인것은 4번에서 1.0.0 정식버전 출시, 라이브러리-라이트한 프로젝트의 특성이였습니다.
+
+그렇게 자동 메모이제이션의 이점을 누리고, React memo를 잊을수 있었습니다.
+
+## 닫음말
+
+이번 여정을 통해 배운 것은 **'당연함'이란 수십 년의 최적화가 켜켜이 쌓여 만들어진 결과물**이라는 점입니다. 사용자에게는 1초도 안 되는 드래그 동작이지만, 그 뒤에는 수많은 엔지니어링 결정들이 숨어있었죠.
+
+우리는 React의 선언적 패러다임을 거스르고, 브라우저의 렌더링 파이프라인을 해킹하고, 심지어 CSS 애니메이션을 창의적으로 활용해 프레임레이트를 끌어올렸습니다. 완벽하지는 않지만, 10년 전 아이폰 6s에서도 부드럽게 동작하는 드래그를 만들어냈습니다.
+
+이 글이 비슷한 여정을 가려는 사람들에게 도움이 되기를 바랍니다. 모든 그림을 세세히 이해할 필요는 없습니다. 제가 한 일이 과도한 최적화였을 수도 있지만, 각 개선 포인트를 명확히 문서화했기에 언제든 필요에 따라 조정할 수 있는 유연성을 확보했습니다. 하나하나가 독립적으로 모듈이 되어 여려분들께 도움이 될것이라 생각합니다.
+
+무엇을 만들든 저보다 덜 고생하셨으면 하네요. 읽느라 고생 많이 하셨습니다.
