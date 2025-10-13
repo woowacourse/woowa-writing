@@ -11,7 +11,7 @@ Activity는 서비스를 “활동 여부”에 따른 여러 요소로 쪼개�
 - 모달 열기를 누르면 모달 창이 표시된다.
 - 모달 내부에 있는 모달 닫기를 누르면 모달 창이 사라진다.
 
-![ModalExample.gif](images\ModalExample.gif)
+![ModalExample.gif](https://github.com/MinSungJe/woowa-writing/blob/level4/images/ModalExample.gif)
 
 지금까지 리액트로 이런 모달을 구현하기 위해 보통 && 연산자를 사용했습니다.
 
@@ -74,11 +74,11 @@ export default App;
 
 Activity의 가장 큰 특징은 요소의 DOM 처리에 있습니다. && 연산자의 경우 DOM에서 요소를 삭제합니다. 따라서 특정 조건일 때 해당 요소가 보이지 않습니다.
 
-![&&.gif](images\andand.gif)
+![andand.gif](https://github.com/MinSungJe/woowa-writing/blob/level4/images/andand.gif)
 
 반면 Activity의 경우 DOM에는 있지만 style 속성을 이용해 요소를 숨깁니다. 개발자 도구를 살펴보면 DOM에는 해당 요소가 있지만 `display: none;`을 주어 숨기고 있음을 알 수 있습니다.
 
-![activity.gif](images\activity.gif)
+![activity.gif](https://github.com/MinSungJe/woowa-writing/blob/level4/images/activity.gif)
 
 정리하자면 &&를 이용한 모달은 DOM 요소에서 아예 없어졌다가 다시 생깁니다. 반면 Activity를 이용한 모달은 DOM 요소에는 있지만 스타일을 통해 숨기거나 보입니다. 이 차이점으로 어떤 이점을 가져올 수 있을까요?
 
@@ -86,11 +86,11 @@ Activity의 가장 큰 특징은 요소의 DOM 처리에 있습니다. && 연산
 
 가장 큰 장점은 모달 내부의 상태를 유지할 수 있다는 점입니다. 모달 자체를 언마운트하지 않고 숨기기만 하기 때문이죠. useState 등으로 선언한 상태뿐만 아니라 input 내부에 일시적으로 입력한 값도 유지할 수 있습니다.
 
-![20251012-1818-08.4442615.gif](images\inputSustained.gif)
+![inputSustain](https://github.com/MinSungJe/woowa-writing/blob/level4/images/inputSustained.gif)
 
 기존 &&로 구현한 모달의 경우 값이 유지되지 않습니다.
 
-![20251012-1816-10.9309078.gif](images\noInputSustain.gif)
+![noInputSustain](https://github.com/MinSungJe/woowa-writing/blob/level4/images/noInputSustain.gif)
 
 ### 미리 요소를 렌더링할 수 있다.
 
@@ -106,7 +106,7 @@ Activity의 가장 큰 특징은 요소의 DOM 처리에 있습니다. && 연산
 
 포게더 서비스에선 사용자의 입력을 여러 페이지를 통해 받습니다. 한 곳에 너무 많은 입력이 있을 경우 사용자는 부담을 가질 수 있습니다. 따라서 여러 단계로 이루어진 페이지로 입력을 분산했습니다.
 
-![funnel.png](images\funnel.png)
+![funnel.png](https://github.com/MinSungJe/woowa-writing/blob/level4/images/funnel.png)
 
 페이지를 분산할 때 라우터를 따로 둘 수도 있지만 저는 하나의 라우터로 모든 페이지를 관리하고 싶었습니다. 웹의 특성상 사용자는 url을 마음대로 입력할 수 있습니다. 만약 페이지별로 라우터를 따로 둔다면 사용자가 url을 입력해서 중간 단계에 접속할 수 있습니다. 이는 예상하지 못한 동작을 유발할 수 있겠죠.
 
@@ -136,7 +136,7 @@ const [step, setStep] = useState('name');
 
 하지만 이 요소는 문제가 발생했는데요. 각 페이지를 왔다갔다 할때 입력값이 초기화되는 현상이 있었습니다.
 
-![resetInput.gif](images\resetInput.gif)
+![resetInput.gif](https://github.com/MinSungJe/woowa-writing/blob/level4/images/resetInput.gif)
 
 이유는 앞서 언급한 && 연산자로 구현한 요소의 문제점과 같습니다. &&로 요소를 숨길 경우 요소 자체가 DOM에서 언마운트되기에 상태를 유지하지 않습니다. 따라서 입력값이 초기화 되는것이죠.
 
@@ -204,13 +204,13 @@ const [form, setForm] = useState({
 
 이제 별다른 추가 로직 없이 사용자가 입력했던 값을 유지합니다.
 
-![unresetInput.gif](images\unresetInput.gif)
+![unresetInput.gif](https://github.com/MinSungJe/woowa-writing/blob/level4/images/unresetInput.gif)
 
 Activity는 요소를 아예 언마운트시켰다가 다시 만드는 것이 아닙니다. CSS 속성을 이용해 잠시 숨기는 것입니다. 따라서 상태값이 없어지지 않기에 초기값을 위한 추가 로직을 구현할 필요가 없습니다.
 
 DOM 구조를 확인해보면 CSS 속성을 이용해 잠시 숨기는 동작을 더욱 명확하게 확인할 수 있는데요. 표시되는 단계가 바뀌면 DOM엔 요소가 그대로 있지만 style만 변하는 것을 알 수 있습니다.
 
-![steps.gif](images\steps.gif)
+![steps.gif](https://github.com/MinSungJe/woowa-writing/blob/level4/images/steps.gif)
 
 ## 마치며
 
