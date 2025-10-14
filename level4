@@ -1,3 +1,5 @@
+# R8으로 앱 최적화하기
+
 ## 소개
 
 안드로이드 앱을 빌드할 때 R8를 사용해 앱을 최적화할 수 있습니다. **앱 최적화**(app optimization)는 앱의 코드에서 기능적으로 필요하지 않은 부분을 제거하고 단순화해 앱을 더 작고 빠르게 만드는 과정입니다.
@@ -180,15 +182,23 @@ buildTypes {
 
 리플렉션을 사용하는 라이브러리를 부득이하게 사용해야 한다면, 특정 인터페이스의 구현체 등 특정할 수 있는 범위에서만 리플렉션을 사용하는 라이브러리가 권장됩니다. 이런 경우 라이브러리의 대부분 또는 전체를 최적화에서 제외시킬 필요 없이, 필요한 작은 부분만 keep rule에 추가해서 제외시키면 나머지는 안전하게 최적화할 수 있기 때문입니다..
 
-### 트러블슈팅
+## 트러블슈팅
 
 앱 최적화로 인해 오류가 발생할 경우, 적절한 keep rule을 추가해줘야 합니다. 프로젝트를 하면서 원인을 파악할 때 도움이 됐던 방법 몇 가지를 공유하고자 합니다.
 
-### 로그 확인
+### `NoSuchSomething` 오류 확인
 
-앱 최적화 후 리플렉션으로 인한 문제가 생길 경우, `NoSuchElementError`, `NoSuchFieldError` 등 특정 요소를 찾지 못 하는 오류가 발생하고 있을 확률이 높습니다. 로그에서 `NoSuch...` 오류를 찾아서 
+앱 최적화 후 리플렉션으로 인한 문제가 생길 경우, `NoSuchElementError`, `NoSuchFieldError` 등 특정 요소를 찾지 못 하는 오류가 발생하고 있을 확률이 높습니다. 해당 오류가 발생하는 위치를 찾아서 keep rule을 적용해야 할 대상을 좁힐 수 있습니다.
 
-가 발생할 수 있습니다. 어디에서 해당 오류가 발생하는지 확인해 keep rule을 적용해야 할 대상을 좁힐 수 있습니다.
+예를 들어 카카오맵 SDK를 사용하는 앱에서 적절한 keep rule을 추가하지 않고 앱 최적화를 활성화했을 때 다음과 같은 오류가 발생한다면, keep rule을 추가해야 할 범위를 특정하기 위해 `com.kakao.vectormap`부터 시작해볼 수 있습니다.
+
+```kotlin
+java.lang.NoSuchFieldError: no "I" field "x" in class "Lcom/kakao/vectormap/internal/RenderViewOptions;"
+
+java.lang.NoSuchFieldError: no "I" field "x" in class "Lcom/kakao/vectormap/internal/RenderViewOptions;"
+
+java.lang.NoSuchMethodError: no static method "Lcom/kakao/vectormap/camera/CameraPosition;.from(DDIDDD)Lcom/kakao/vectormap/camera/CameraPosition;"
+```
 
 ### 일부 최적화 과정 비활성화
 
@@ -209,5 +219,4 @@ buildTypes {
 -printmapping        # 난독화 전/후 이름에 대한 매핑을 출력
 -printusage          # 코드 축소 과정에서 제거된 클래스 및 멤버를 출력
 -printseeds          # 코드 축소 과정에서 제거되지 않은 클래스 및 멤버를 출력
-
 ```
