@@ -20,7 +20,7 @@
 - 런타임 성능을 개선하고 ANR이 발생할 확률을 줄여 더 좋은 사용자 경험을 만들어줍니다.
 - 우리의 앱이 삭제당할 확률이 줄여줍니다. 기기에 용량이 부족해지면 용량이 큰 앱부터 삭제하고 싶어지기 마련이니까요.
 
-다음은 [런세권](github.com/woowacourse-teams/2025-course-pick) 프로젝트를 진행하면서 R8 최적화를 적용하기 전과 후의 APK 파일을 비교한 것입니다. APK 파일의 크기가 60.1 MB에서 45.2 MB로 줄었음을 확인할 수 있습니다.
+다음은 [런세권](http://github.com/woowacourse-teams/2025-course-pick) 프로젝트를 진행하면서 R8 최적화를 적용하기 전과 후의 APK 파일을 비교한 것입니다. APK 파일의 크기가 60.1 MB에서 45.2 MB로 줄었음을 확인할 수 있습니다.
 
 |적용 전|적용 후|
 |-|-|
@@ -142,10 +142,10 @@ class CoursesActivity : AppCompatActivity() {
 여기서 "코드 난독화"라는 표현 때문에 오해가 생길 수 있는데, ProGuard와 R8은 보안 툴이 아닙니다. [ProGuard 공식 메뉴얼](https://www.guardsquare.com/manual/configuration/usage)에서는 다음과 같이 설명하고 있습니다.
 
 > Both ProGuard and R8 were designed for app optimization, and although they employ minimal obfuscation techniques, they are not security tools and do not harden applications effectively against reverse engineering and tampering.
->
+> 
 
 > ProGuard와 R8는 앱 최적화를 위해 설계됐으며, 간단한 난독화 기법을 사용하지만 보안 툴이 아니고, 리버스 엔지니어링이나 변조로부터 어플리케이션을 효과적으로 견고하게 만들어주지 않습니다.
->
+> 
 
 앱 최적화 과정에서 코드가 난독화되는 건 부수 효과일 뿐이지, 코드의 보안을 높이는 것이 목적은 아닙니다. 때문에 앱 최적화의 맥락에서는 code obfuscation보단 **identifier renaming**(식별자 이름 변경)이라는 표현이 사용되기도 합니다.
 
@@ -173,7 +173,7 @@ buildTypes {
 
 **Keep rule**은 ProGuard와 R8이 "어떤 코드를 건드리지 말아야 하는가"를 정의하는 규칙입니다. 아래에서 설명될 원인들로 인해 일부 코드에는 최적화를 적용하면 오류가 발생할 수 있기 때문입니다.
 
-안드로이드 앱이 빌드될 때, AAPT2가 안드로이드의 4대 컴포넌트에 한 keep rule을 자동으로 추가해주기 때문에 안드로이드 컴포넌트에 대한 keep rule은 별도로 추가해주지 않아도 됩니다. 또한 R8의 keep rule은 ProGuard의 keep rule과 호환되도록 설계되었습니다.
+안드로이드 앱이 빌드될 때, AAPT2가 안드로이드의 4대 컴포넌트에 필요한 keep rule을 자동으로 추가해주기 때문에 안드로이드 컴포넌트에 대한 keep rule은 별도로 추가해주지 않아도 됩니다. 또한 R8의 keep rule은 ProGuard의 keep rule과 호환되도록 설계되었습니다.
 
 ### 주의할 점
 
@@ -184,7 +184,7 @@ buildTypes {
 ### 외부 라이브러리를 사용할 경우
 
 > 내 코드에서는 리플렉션 안 썼는데요?
->
+> 
 
 우리가 직접 작성한 코드가 리플렉션을 쓰지 않더라도 안심할 수는 없습니다. 사용하는 외부 라이브러리 중 리플렉션을 쓰는 것이 있을 수 있으니까요. 외부 라이브러리도 앱 코드의 일부가 되기 때문에, 적절한 keep rule을 추가해주지 않으면 앱 축소로 인한 문제가 발생할 수 있습니다.
 
