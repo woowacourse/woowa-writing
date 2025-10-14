@@ -4,8 +4,20 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="49c06123-4e3a-4983-b813-286e6cce0865" name="Changes" comment="">
+    <list default="true" id="5cb74763-5922-464a-b88e-6782b7d30649" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/image/dnapt.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/image/napt1.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/image/napt2.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/image/nat1.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/image/nat2.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/image/nat3.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/image/private_ip_check.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/image/private_ip_check2.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/image/product_structure.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/image/public_ip_check.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/image/snapt.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/technical-writing.md" beforeDir="false" afterPath="$PROJECT_DIR$/technical-writing.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -15,54 +27,48 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="MarkdownSettingsMigration">
-    <option name="stateVersion" value="1" />
-  </component>
   <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 7
+  "associatedIndex": 0
 }]]></component>
-  <component name="ProjectId" id="2vCo2vPgterJyWqhiDs6C7mzEim" />
+  <component name="ProjectId" id="342CgA6qRm6Xr79nZYestg9vGbF" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "kjungw",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "D:/dev/homework2",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "editor.preferences.import",
-    "vue.rearranger.settings.migration": "true"
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "technical-writing",
+    "last_opened_file_path": "C:/Users/kjw1/Desktop/level4/technical_writing/woowa-writing/image"
   }
 }]]></component>
-  <component name="SharedIndexes">
-    <attachedChunks>
-      <set>
-        <option value="jdk-21.0.2-corretto-21.0.2-4caba194b151-51586f01" />
-        <option value="jdk-21.0.2-openjdk-21.0.2-4caba194b151-4f524021" />
-      </set>
-    </attachedChunks>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\kjw1\Desktop\level4\technical_writing\woowa-writing\image" />
+    </key>
   </component>
-  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="RunManager">
+    <configuration default="true" type="JetRunConfigurationType">
+      <module name="woowa-writing" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
+      <module name="woowa-writing" />
+      <option name="filePath" />
+      <method v="2" />
+    </configuration>
+  </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="49c06123-4e3a-4983-b813-286e6cce0865" name="Changes" comment="" />
-      <created>1743658214041</created>
+      <changelist id="5cb74763-5922-464a-b88e-6782b7d30649" name="Changes" comment="" />
+      <created>1760402389766</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1743658214041</updated>
-      <workItem from="1743658216038" duration="4383000" />
+      <updated>1760402389766</updated>
     </task>
     <servers />
-  </component>
-  <component name="TypeScriptGeneratedFilesManager">
-    <option name="version" value="3" />
   </component>
 </project>
