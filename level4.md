@@ -1,4 +1,4 @@
-# 💭 들어가며
+# 🔒 SQL 표준 락(Lock)과 MySQL(InnoDB) 락(Lock)
 동시성 문제를 계기로 Lock을 공부하면서 공식 문서, 책, 블로그 등 다양한 자료를 찾아보았다. 그러나 자료마다 설명이 조금씩 달랐고, *Real MySQL 8.0*의 설명조차 MySQL 공식 문서와 일치하지 않는 부분이 존재했다. 이는 DBMS마다 지원하는 Lock의 세부 종류와 동작 방식이 다르기 때문에, 통일된 기준 문서를 찾기 어렵기 때문이다.
 
 따라서 이번 글은 이러한 혼란을 겪는 사람들을 위해 작성되었다. 글의 전반부에서는 **SQL 표준 문서를 기준으로 Lock의 개념과 범위를 정리**하고, 후반부에서는 **MySQL(InnoDB)를 중심으로 실제 Lock 동작을 쿼리로 검증하며 정리한 내용**을 다룬다.
@@ -6,7 +6,7 @@
 <br>
 
 
-# 🔖 목차
+# 📎 목차
 - [✅ Lock 지원 단위](https://github.com/soeun2537/woowa-writing/blob/level4/level4.md#-lock-%EC%A7%80%EC%9B%90-%EB%8B%A8%EC%9C%84)
 - [✅ Lock 종류](https://github.com/soeun2537/woowa-writing/blob/level4/level4.md#-lock-%EC%A2%85%EB%A5%98)
 - [✅ MySQL 엔진의 Lock](https://github.com/soeun2537/woowa-writing/blob/level4/level4.md#-mysql-%EC%97%94%EC%A7%84%EC%9D%98-lock)
