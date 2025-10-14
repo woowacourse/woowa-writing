@@ -4,7 +4,7 @@
 
 커피빵 서비스는 웹소켓을 사용한 실시간 게임 서비스입니다. 레벨4에 들어가서 사용자가 많아지면 어떻게 처리할 것인가에 대해 고민을 하였고, 수평 확장이라는 선택 아래에서 다음과 같은 구조로 설계되었습니다.
 
-![제목 없는 다이어그램.png](%EC%A0%9C%EB%AA%A9_%EC%97%86%EB%8A%94_%EB%8B%A4%EC%9D%B4%EC%96%B4%EA%B7%B8%EB%9E%A8.png)
+![커피빵_AWS_구조.png](images/커피빵_AWS_구조.png)
 
 현재 커피빵 서비스는 여러 대의 인스턴스를 활용해서 수평 확장을 하였습니다. ALB를 활용해서 사용자들을 적절하게 분배하게 됩니다. 
 
@@ -12,9 +12,7 @@
 
 서로 다른 인스턴스에 연결되었기에 서로의 상태를 알 수 없습니다.  이러한 상태 불일치를 해소하기 위해 Redis Pub/Sub을 활용했습니다.
 
-![[https://tech.buysell-technologies.com/entry/adventcalendar2021-12-11](https://tech.buysell-technologies.com/entry/adventcalendar2021-12-11)](image.png)
-
-[https://tech.buysell-technologies.com/entry/adventcalendar2021-12-11](https://tech.buysell-technologies.com/entry/adventcalendar2021-12-11)
+![[https://tech.buysell-technologies.com/entry/adventcalendar2021-12-11](https://tech.buysell-technologies.com/entry/adventcalendar2021-12-11)](images/image.png)
 
 각 인스턴스들이 Redis를 구독(Subscribe)하고 있고, 상태 변경이 필요하다면 이벤트를 발행(Publish)해서 구독된 인스턴스들이 모두 상태 변경을 해서 데이터 일관성 문제를 해소하였습니다.
 
@@ -43,7 +41,7 @@ Redis Pub/Sub 은 기본적으로 fire-and-forget 방식입니다. Redis는 메�
 
 문제 상황은 아래 그림과 같습니다.
 
-![제목 없는 다이어그램 (6).png](%EC%A0%9C%EB%AA%A9_%EC%97%86%EB%8A%94_%EB%8B%A4%EC%9D%B4%EC%96%B4%EA%B7%B8%EB%9E%A8_(6).png)
+![동시 요청 플로우](images/동시_요청_플로우.png)
 
 만약에 게임 방 자리가 하나 밖에 없는데, 서로 다른 인스턴스에서 방 입장 요청을 동시에 한다면 어떻게 될까요?
 
@@ -144,9 +142,8 @@ batchSize는 여러 요청을 한 번에 가져와 처리할 수 있습니다. 1
 
 ## Producer-Consumer
 
-![[https://devopedia.org/images/article/229/1804.1571239690.png](https://devopedia.org/images/article/229/1804.1571239690.png)](image%201.png)
-
-[https://devopedia.org/images/article/229/1804.1571239690.png](https://devopedia.org/images/article/229/1804.1571239690.png)
+![Producer와 Consumer 구조 설명](images/Producer_Consumer.png)
+*출처: [Devopedia, "Redis Streams"](https://devopedia.org/redis-streams)*
 
 설정이 완료되었다면, 이제 Redis Stream을 사용하기 위해 두 개의 역할을 지정해야 합니다.
 
@@ -171,15 +168,17 @@ Stream 도 결국엔 메모리에 보관되기 때문에 지속적으로 데이�
 
 `maxLen`  통해 스트림의 최대 길이를 설정해 메모리를 관리하고, `approximateTrimming` 을 true로 설정해서 대략적인 크기로 지정해서 cpu 연산을 최소화하도록 하였습니다. 이 외에도 `MINID`, `NOMKSTREAM` , `LIMIT` 등 다양한 명령어가 있으니 공식 문서를 확인해보시면 도움이 될 거 같습니다.
 
-[XADD](https://redis.io/docs/latest/commands/xadd/)
+[Redis 공식 문서 XADD](https://redis.io/docs/latest/commands/xadd/)
 
-![image.png](12d5708f-fe94-439f-af3b-ffc11467f27c.png)
+![xRead와 xReadGroup](images/xread_xreadgroup.png)
+*출처: [redis 공식 문서, "Manage streams and consumer groups in Redis Insight"](https://redis.io/docs/latest/develop/tools/insight/tutorials/insight-stream-consumer/)*
 
 Consumer는 XREADGROUP나 XREAD 명령어를 통해서 처리합니다. 커피빵은 XREAD를 활용하였지만 간단하게 XREADGROUP에 대해서 설명해드리겠습니다.
 
 ### XREADGROUP
 
-![image.png](image%202.png)
+![stream key에서 xGroupRead 동작 과정 ](images/stream_key_xgroup_read.png)
+*출처: [jayeon Baek, 「[Redis] Stream 사용 방법」](https://jybaek.tistory.com/935)*
 
 XREADGROUP는 Consumer Group을 활용합니다. 해당 그룹이 메세지를 받아와서 Consumer Group 안에 있는 Consumer들끼리 라운드 로빈 방식으로 메세지를 분배하여 처리합니다. 처리 후에는 ACK 요청을 전달해 처리 완료를 표시합니다. 
 
