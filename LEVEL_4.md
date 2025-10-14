@@ -215,22 +215,121 @@ Retrofit은 네트워크 세부 구현을 OkHttp로 숨기고,
 안전하고 직관적인 방법으로 다룰 수 있게 되었다.
 
 
-8. 추가 retrofit 활용 사례
-팀 코스픽에서 코스 조회 API 응답 압축을 진행하기로 결정 되어, 그에 맞는 응답 압축 대응을 했어야 했다.
+8. Retrofit 활용 사례 — Gzip 응답 압축 대응
+팀 코스픽에서 코스 조회 API 응답을 압축하기로 결정되었다.
+ 이에 따라 클라이언트에서도 압축된 응답을 처리할 수 있도록 대응해야 했다.
+백엔드가 선택한 응답 압축 방식은 gzip이었다.
+gzip은 파일 압축에 사용되는 응용 소프트웨어로, 유닉스 시스템에서 쓰이던 기존 압축 프로그램을 대체하기 위해 만들어진 자유 소프트웨어다.
+ 우리에게 익숙한 zip처럼 DEFLATE 알고리즘을 사용하지만, 여러 파일을 하나의 압축 파일로 묶는 기능은 없다.
+OkHttp는 이러한 gzip 응답을 자동으로 처리할 수 있도록 Transparent GZIP 기능을 지원한다.
+ 이 기능은 서버가 Content-Encoding: gzip 헤더를 보낼 경우, 내부적으로 압축을 해제해주는 역할을 한다.
+ 즉, 개발자가 별도로 설정하지 않아도 네트워크 트래픽을 줄이고 빠른 응답을 받을 수 있다.
+당시 우리는 이 기능을 직접 활성화해서 사용자 경험을 개선하려고 했다.
+ 그러나 적용 후 앱이 크래시가 발생했다.
+ 이유는 Retrofit이 이미 내부적으로 gzip 헤더가 포함된 응답을 자동으로 해제하고 있었기 때문이다.
+ 즉, OkHttp와 Retrofit이 동시에 압축 해제를 시도하면서 충돌이 일어났다.
+그래서 우리는 기능 자체를 비활성화하고, 압축이 적용되었을 때의 성능 차이를 확인하는 방향으로 검증을 진행했다.
+ 측정은 Android Studio의 App Inspector를 이용해, 애뮬레이터 환경에서 로컬 서버를 대상으로 수행했다.
+ 비교 기준은 “API 응답 압축 대응 커밋 전후”였다.
+결과는 다음과 같았다.
+응답 크기: 209KB → 9.3KB (약 95% 감소)
 
-백엔드가 응답 압축하는 방법으로 택한 것은 gzip이라는 친구였다. 
 
-gzip이란 무엇일까? 파일 압축에 쓰이는 응용 소프트웨어로, 유닉스 시스템에 쓰이던 압축 프로그램을 대체하기 위한 자유 소프트웨어이다.
+응답 시간: 476ms → 261ms (약 45% 개선)
 
-우리에게 익숙한 zip과 같이 DEFLATE 라는 알고리즘을 따르지만, 여러 파일을 하나의 파일로 압축하는 옵션이 없다는 점에서 차이가 난다.
 
-okhttp에는 transparent GZIP이라는 응답 데이터를 압축하여 네트워크 트래픽을 줄여주는 기능이 있다.
+압축 덕분에 데이터 전송량과 응답 속도 모두 크게 줄어드는 효과를 확인할 수 있었다.
+ 비록 Retrofit 내부 gzip 처리로 인해 직접적인 설정은 제거했지만,
+ 응답 압축이 네트워크 성능 개선에 얼마나 큰 영향을 주는지 실감할 수 있는 경험이었다.
 
-해당 기능을 활성화해준다면 gzip으로 응답을 받아 더욱 개선된 사용자 경험을 제공해줄 수 있다는 기대를 가지고 적용했으나, 설정을 적용하니 오히려 앱이 크러시가 났다.
+9. Retrofit의 비동기 처리와 코루틴 (suspend 함수 내부 동작)
 
-그 이유는 Retrofit에는 서버로부터 헤더에 gzip이라는 정보가 있으면 내부적으로 압축을 해제하는 처리를 하고 있었기 때문이었다.
+Retrofit 2.6.0 이후부터는 Call<T> 대신 suspend fun을 바로 사용할 수 있다.
+이 말은 곧, enqueue() 같은 콜백 코드를 직접 작성하지 않아도 비동기 처리가 자동으로 이루어진다는 뜻이다.
 
-아쉬운대로 적용 전과 적용 후의 성능을 안드로이드 스튜디오에서 app inspector를 사용하여 애뮬레이터 환경에서 로컬 서버를 사용하여 API 응답 압축 대응 커밋 전 후를 기준으로 실행시키며 네트워크를 요청하며 관찰하였다.
+그렇다면 왜 suspend 키워드를 붙이기만 해도 자동으로 비동기가 될까?
 
-결과는 적용 전에는 209KB 사이즈였던 응답은 gzip 적용 후 9.3KB로 줄어드는 약 95% 감소하였으며, 476ms이 걸리던 시간 요청에 대해서는 261ms으로 감소하여 약 45%의 속도 개선을 확인할 수 있었다.
+Retrofit은 내부적으로 CallAdapter라는 구조를 사용한다.
+CallAdapter.Factory는 함수의 반환 타입을 감지하고, 그에 맞는 어댑터를 선택한다.
+예를 들어, 함수가 Call<T>를 반환하면 일반 Call 어댑터를, suspend fun이면 코루틴 어댑터를 선택한다.
+따라서 Retrofit이 직접 코루틴을 인식하고, 비동기로 동작하는 코드를 자동으로 만들어준다.
+
+Retrofit이 이때 네트워크 요청은 Dispatchers.IO에서 실행하고, 응답은 withContext(Dispatchers.Main)으로 반환한다.
+즉, 개발자가 스레드 전환(IO → Main)을 직접 신경 쓸 필요가 없다.
+Retrofit이 코루틴 컨텍스트와 OkHttp 호출을 연결해주는 중간 계층 역할을 하기 때문이다.
+
+결과적으로 우리는 단순히 아래처럼 선언하기만 해도,
+
+```
+@GET("posts/{id}")
+suspend fun getPost(@Path("id") id: Int): Post
+
+```
+
+Retrofit이 알아서 백그라운드 스레드에서 네트워크를 처리하고, UI 스레드로 결과를 돌려준다.
+ 이런 구조 덕분에 코드가 훨씬 깔끔하고, 가독성이 높아진다.
+공식 문서에서는 “Retrofit은 suspend 함수를 CallAdapter로 변환하며, 코루틴 컨텍스트 내에서 OkHttp의 Call을 실행한다”고 설명한다.
+
+11. Retrofit과 에러 처리 (HttpException, IOException, Result Wrapping)
+
+Retrofit은 단순히 네트워크 요청만 하는 도구가 아니다.
+에러를 어떻게 분류하고, 어떻게 처리할 수 있게 해주는지도 명확하게 정의되어 있다.
+
+먼저, 서버로부터 받은 응답의 상태 코드가 200~299가 아닐 경우, Retrofit은 HttpException을 던진다.
+즉, HTTP 요청은 성공적으로 완료됐지만 서버가 오류를 반환한 경우(404, 500 등)가 여기에 해당한다.
+
+반면, 네트워크 자체가 단절되었거나 타임아웃이 발생한 경우는 IOException으로 구분된다.
+이 차이 덕분에 우리는 서버 문제와 네트워크 환경 문제를 구분해서 처리할 수 있다.
+
+실무에서는 이 예외를 그대로 쓰지 않고, Result나 sealed class로 감싸는 패턴이 흔하다.
+이 방식은 모든 결과를 성공(Success)과 실패(Error)로 명확하게 표현할 수 있어서,
+UI 단에서는 단순히 상태를 구독하고 렌더링만 하면 된다.
+
+예를 들어 다음과 같이 표현할 수 있다:
+
+```
+sealed class NetworkResult<out T> {
+    data class Success<T>(val data: T) : NetworkResult<T>()
+    data class Error(val exception: Throwable) : NetworkResult<Nothing>()
+}
+
+```
+
+이렇게 하면 ViewModel에서는 try-catch 대신 when으로 분기 처리할 수 있다:
+
+```
+when (val result = repository.getPost()) {
+    is NetworkResult.Success -> showPost(result.data)
+    is NetworkResult.Error -> showError(result.exception)
+}
+
+```
+
+공식 Retrofit 문서에서는 “HttpException은 HTTP 오류 상태 코드를 나타내며, IOException은 연결 또는 타임아웃 오류를 나타낸다”고 명시되어 있다.
+
+13. 테스트 및 모킹(Mock) 서버 활용
+
+Retrofit은 테스트하기 쉬운 구조를 가지고 있다.
+그 이유는 인터페이스 기반 설계 때문이다.
+
+Retrofit의 핵심은 “인터페이스만 정의하면, 나머지는 런타임에 자동으로 구현체를 만들어준다”는 점이다.
+덕분에 실제 API 요청 없이도, 테스트 환경에서 가짜 응답을 돌려주는 코드(모킹, Mock)를 만들기 쉽다.
+
+예를 들어, Retrofit이 아닌 단순한 Fake Repository를 만들어 사용할 수도 있다:
+
+```
+class FakePostRepository : PostRepository {
+    override suspend fun getPost(id: Int): Post {
+        return Post(id, "테스트 제목", "테스트 내용")
+    }
+}
+
+```
+
+또는, OkHttp의 MockWebServer를 이용해서 실제 HTTP 통신처럼 테스트할 수도 있다.
+ 이 서버는 로컬 환경에서 요청을 받고, 미리 정의한 응답을 돌려준다.
+ 이를 통해 “API가 제대로 호출되는지”, “응답이 올바르게 파싱되는지”를 검증할 수 있다.
+공식 GitHub 문서에서도 MockWebServer를 Retrofit 테스트용으로 함께 사용하는 예시를 제공한다.
+ MockWebServer는 OkHttp 팀에서 만든 도구로, Retrofit과 완벽하게 호환된다.
+
 
