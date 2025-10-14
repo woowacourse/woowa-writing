@@ -458,7 +458,7 @@ public class MemberTest {
 
 ## 참고자료
 
-[TDD 배워야 할까?](https://groups.google.com/g/ksug/c/W_4w_cNQj7Q?pli=1)\
-[실전에서 TDD하기](https://tech.kakaopay.com/post/implementing-tdd-in-practical-applications)\
-[TDD Isn’t Design](https://tidyfirst.substack.com/p/tdd-isnt-design)\
-[Test-Driven Development: By Example](https://product.kyobobook.co.kr/detail/S000001032985)
+- [TDD 배워야 할까?](https://groups.google.com/g/ksug/c/W_4w_cNQj7Q?pli=1)
+- [실전에서 TDD하기](https://tech.kakaopay.com/post/implementing-tdd-in-practical-applications)
+- [TDD Isn’t Design](https://tidyfirst.substack.com/p/tdd-isnt-design)
+- [Test-Driven Development: By Example](https://product.kyobobook.co.kr/detail/S000001032985)
