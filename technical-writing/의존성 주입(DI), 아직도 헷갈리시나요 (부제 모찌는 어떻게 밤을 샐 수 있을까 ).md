@@ -35,7 +35,7 @@ class HotSix {
 
 즉, `Mochi`는 `HotSix`라는 구체적인 클래스에 **직접 의존**하고 있어요. 핫식스가 없으면, 모찌는 더 이상 힘을 내서 밤을 셀 수 없습니다. 
 
-![image.png](%EC%9D%98%EC%A1%B4%EC%84%B1%20%EC%A3%BC%EC%9E%85(DI),%20%EC%95%84%EC%A7%81%EB%8F%84%20%ED%97%B7%EA%B0%88%EB%A6%AC%EC%8B%9C%EB%82%98%EC%9A%94%20(%EB%B6%80%EC%A0%9C%20%EB%AA%A8%EC%B0%8C%EB%8A%94%20%EC%96%B4%EB%96%BB%EA%B2%8C%20%EB%B0%A4%EC%9D%84%20%EC%83%90%20%EC%88%98%20%EC%9E%88%EC%9D%84%EA%B9%8C%20)%2028c1e632507d80ca9c84fae71942183a/image.png)
+<img width="520" height="283" alt="image" src="https://github.com/user-attachments/assets/7f468904-6030-48e4-9943-fa91d5537dbe" />
 
 **그런데 말입니다.**
 
@@ -56,7 +56,8 @@ class HotSix {
 
 앞서 우리는 `Mochi`가 `HotSix`를 직접 만들어 사용하는, 아주 단단하게 묶인 관계를 보았습니다.
 
-![image.png](%EC%9D%98%EC%A1%B4%EC%84%B1%20%EC%A3%BC%EC%9E%85(DI),%20%EC%95%84%EC%A7%81%EB%8F%84%20%ED%97%B7%EA%B0%88%EB%A6%AC%EC%8B%9C%EB%82%98%EC%9A%94%20(%EB%B6%80%EC%A0%9C%20%EB%AA%A8%EC%B0%8C%EB%8A%94%20%EC%96%B4%EB%96%BB%EA%B2%8C%20%EB%B0%A4%EC%9D%84%20%EC%83%90%20%EC%88%98%20%EC%9E%88%EC%9D%84%EA%B9%8C%20)%2028c1e632507d80ca9c84fae71942183a/image%201.png)
+<img width="540" height="535" alt="image 1" src="https://github.com/user-attachments/assets/e1eb02fe-bb24-4c7a-8bd8-b7093d67b0ec" />
+
 
 ```kotlin
 // 기존 코드: Mochi가 직접 HotSix를 생성하고 제어한다.
@@ -206,7 +207,8 @@ class Mochi {
 
 이 문제를 해결하기 위해, 우리는 마지막 열쇠인 **의존관계 역전 원칙(DIP)** 을 살펴봐야 합니다.
 
-![image.png](%EC%9D%98%EC%A1%B4%EC%84%B1%20%EC%A3%BC%EC%9E%85(DI),%20%EC%95%84%EC%A7%81%EB%8F%84%20%ED%97%B7%EA%B0%88%EB%A6%AC%EC%8B%9C%EB%82%98%EC%9A%94%20(%EB%B6%80%EC%A0%9C%20%EB%AA%A8%EC%B0%8C%EB%8A%94%20%EC%96%B4%EB%96%BB%EA%B2%8C%20%EB%B0%A4%EC%9D%84%20%EC%83%90%20%EC%88%98%20%EC%9E%88%EC%9D%84%EA%B9%8C%20)%2028c1e632507d80ca9c84fae71942183a/image%202.png)
+<img width="640" height="436" alt="image 2" src="https://github.com/user-attachments/assets/83a082b7-5eb4-48b7-b59c-836ba05cab6b" />
+
 
 (모찌가 좋아하는 얼박사 자랑 타임)
 
