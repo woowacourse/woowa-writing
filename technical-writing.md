@@ -108,8 +108,9 @@ Thread에 여유가 있으면 Queue에 들어온 요청은 바로 전달되지�
 # 2. Connection Pool 이란?
 
 ## 2.1 Connection Pool 이해하기
-DB 커넥션을 미리 만들어 두고 재사용하는 방법 입니다. 1 트랜잭션 = 1 커넥션 입니다.
-즉, 애플리케이션이 
+DB 커넥션을 미리 만들어 두고 재사용하는 방법 입니다. 1 트랜잭션 = 1 커넥션 이며, application.yml 파일에
+애플리케이션에서 DB로 연결할 수 있는 최대 갯수를 설정할 수 있습니다.
+
 ```java
 @Transactional  // 트랜잭션 시작
 public void transferMoney(Long fromId, Long toId, int amount) {
