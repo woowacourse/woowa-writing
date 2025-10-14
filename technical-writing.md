@@ -1,5 +1,3 @@
-
-https://github.com/user-attachments/assets/d2469381-4614-44d8-94c2-29366e83a624
 # 스크롤 파헤치기: 브라우저는 스크롤을 어떻게 계산할까
 
 [봄봄](https://www.bombom.news/)에는 스크롤을 활용한 다양한 기능이 존재합니다. 사용자는 뉴스레터를 읽을 때 스크롤 위치에 기반하여 읽기 진행률을 확인할 수 있습니다. 또한, 읽다가 멈춘 뉴스레터에 다시 접속했을 때 마지막으로 읽은 위치를 바로 찾아갈 수 있습니다. 이 외에도 뉴스레터 읽음 여부 판별, 모달창 오픈 시 body 스크롤 비활성화 등 스크롤은 여러 기능에서 핵심 역할을 수행합니다. 저는 봄봄을 개발하며 스크롤 계산을 제대로 이해했을 때, 그 활용 가능성이 무궁무진하다는 것을 깨달았습니다.
@@ -27,7 +25,7 @@ https://github.com/user-attachments/assets/d2469381-4614-44d8-94c2-29366e83a624
 
 
 <video width="50%" autoplay loop muted playsinline>
-  <source src="https://github.com/user-attachments/assets/4f88278d-e9fd-44f7-924f-cdccfe12cc91" type="video/mp4">
+  <source src="https://github.com/user-attachments/assets/d2469381-4614-44d8-94c2-29366e83a624" type="video/mp4">
 </video>
 
 <br>
