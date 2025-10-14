@@ -19,7 +19,8 @@
 
 ## 1.1. 상황
 
-![img_1.png](img_1.png)
+<img src="img_1.png" width="500">
+
 
 > 물 섭취 리마인드 알림 발송 서비스
 >
@@ -40,7 +41,7 @@
 
 ## 1.2. 요구 사항 변경
 
-![img_2.png](img_2.png)
+<img src="img_2.png" width="500">
 
 회원 가입 시 기본 알림 시간(14시, 19시)이 자동으로 설정되지만, 사용자는 설정 화면에서 리마인드 알림을 켜고 끌 수 있으며, 원하는 시간대를 분 단위까지 자유롭게 조정할 수 있다.
 
@@ -59,7 +60,7 @@
 
 ## 2.1. ERD 구조
 
-![img_3.png](img_3.png)
+<img src="img_3.png" width="500">
 
 알림 관련 엔티티는 `Notification(N) : Member(1) : RemindSchedule(N)` 의 연관 관계로 설계되어 있다.
 
@@ -406,7 +407,7 @@ public void sendMulticast(SendMessageByFcmTokensRequest sendMessageByFcmTokensRe
 
 `FirebaseMessagingException`에서도 명확한 오류 메시지가 반환되지 않아 원인 파악이 어려웠는데, 알고 보니 **해당 메서드가 지원 종료**된 것이 원인이었다.
 
-![img_4.png](img_4.png)
+<img src="img_4.png" width="500">
 
 > 최신 버전의 `firebase-admin`에서는 `sendMulitcast`가 제거되었음
 >
