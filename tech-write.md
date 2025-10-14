@@ -90,7 +90,7 @@ EXPLAIN 접두가 붙은 쿼리는 실제로 동작하지 않습니다.
 
 EXPLAIN 명령어는 사용된 테이블을 행(Row)으로, 정해진 열(Column) 데이터에 쿼리가 실행될 방법이 채워져 결과를 반환합니다.
 
-![image.png](attachment:358d8676-f05f-4e18-acc6-e0b79f812bbc:image.png)
+![image.png](img/2.png)
 
 성능과 밀접하게 연관된 열은 type과 Extra입니다.
 
@@ -265,7 +265,7 @@ SET profiling = 0;
 SHOW PROFILES;
 ```
 
-![image.png](attachment:90e3a6bf-27fd-4530-bcde-6dce2857f1b8:image.png)
+![image.png](img/2.png)
 
 Duration값이 초(Second) 단위의 값입니다.
 
