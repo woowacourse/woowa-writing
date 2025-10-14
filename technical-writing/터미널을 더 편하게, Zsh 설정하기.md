@@ -1,11 +1,3 @@
-# 터미널을 더 편하게, Zsh 설정하기
-
-작성일: 2025년 11월 22일
-태그: Zsh, 생산성
-설명: Zsh과 Oh My Zsh를 활용해 생산성을 높인 경험을 이야기합니다.
-메모: kill port 0.1초만에 하기 (https://www.notion.so/kill-port-0-1-25189de02fde802ab0bde1af471197a2?pvs=21) 
-카테고리: 개발 이야기
-
 ## 들어가며
 
 개발을 할 때면 IDE를 주로 사용해 개발을 하지만 터미널을 써야하는 경우가 꼭 있다. Git 명령어를 실행하거나 패키지를 설치하거나, 서버를 실행할 때처럼 말이다. 그런데 기본 터미널은 솔직히 좀 불편하다. 자동완성도 별로고, 보기에도 심심하다.
@@ -42,39 +34,38 @@
 .zshrc 파일을 수정하려면 먼저 파일을 열어야 한다. 여러 가지 방법이 있는데, 자신이 편한 에디터를 사용하면 된다.
 
 1. nano 에디터로 열기
-    
-    ```bash
-    nano ~/.zshrc
-    ```
-    
-    nano는 가벼운 터미널 기반 텍스트 에디터다. 간단한 수정에는 이게 가장 편하다. 저장은 `Control + O`, 종료는 `Control + X`이다.
-    
+
+   ```bash
+   nano ~/.zshrc
+   ```
+
+   nano는 가벼운 터미널 기반 텍스트 에디터다. 간단한 수정에는 이게 가장 편하다. 저장은 `Control + O`, 종료는 `Control + X`이다.
+
 2. vim 에디터로 열기
-    
-    ```bash
-    vim ~/.zshrc
-    ```
-    
-    vim에 익숙하다면 이 방법도 좋다. 다만 vim은 학습 곡선이 있어 처음 사용하는 사람들에게는 조금 어려울 수 있다.
-    
+
+   ```bash
+   vim ~/.zshrc
+   ```
+
+   vim에 익숙하다면 이 방법도 좋다. 다만 vim은 학습 곡선이 있어 처음 사용하는 사람들에게는 조금 어려울 수 있다.
+
 3. VSCode 에디터로 열기
-    
-    ```bash
-    code ~/.zshrc
-    ```
-    
-    개인적으로는 이 방법을 제일 선호한다. 익숙한 에디터에서 편하게 수정할 수 있고, 문법 강조도 되고, 자동완성도 된다.
-    
-    만약 `code` 명령어로 파일이 열리지 않는다면? VSCode에서 `Command + Shift + P`를 누른 후 “Shell Command: install ‘code’ command in PATH’를 검색해서 실행재주자. 그럼 터미널에서 code 명령어를 사용할 수 있게 된다.
-    
-    ![image.png](%ED%84%B0%EB%AF%B8%EB%84%90%EC%9D%84%20%EB%8D%94%20%ED%8E%B8%ED%95%98%EA%B2%8C,%20Zsh%20%EC%84%A4%EC%A0%95%ED%95%98%EA%B8%B0%2025189de02fde80df9adec2dc0d6a6c10/image.png)
-    
-    VSCode 기반의 Cursor로도 물론 실행이 가능하다. Cursor를 터미널에서 실행하기 위해서는 [`Cursor CLI`](https://cursor.com/cli)를 설치해주어야한다.
-    
-    ```tsx
-    curl https://cursor.com/install -fsS | bash
-    ```
-    
+
+   ```bash
+   code ~/.zshrc
+   ```
+
+   개인적으로는 이 방법을 제일 선호한다. 익숙한 에디터에서 편하게 수정할 수 있고, 문법 강조도 되고, 자동완성도 된다.
+
+   만약 `code` 명령어로 파일이 열리지 않는다면? VSCode에서 `Command + Shift + P`를 누른 후 “Shell Command: install ‘code’ command in PATH’를 검색해서 실행재주자. 그럼 터미널에서 code 명령어를 사용할 수 있게 된다.
+
+   ![image.png](%ED%84%B0%EB%AF%B8%EB%84%90%EC%9D%84%20%EB%8D%94%20%ED%8E%B8%ED%95%98%EA%B2%8C,%20Zsh%20%EC%84%A4%EC%A0%95%ED%95%98%EA%B8%B0%2025189de02fde80df9adec2dc0d6a6c10/image.png)
+
+   VSCode 기반의 Cursor로도 물론 실행이 가능하다. Cursor를 터미널에서 실행하기 위해서는 [`Cursor CLI`](https://cursor.com/cli)를 설치해주어야한다.
+
+   ```tsx
+   curl https://cursor.com/install -fsS | bash
+   ```
 
 ### 설정 파일 적용하기
 
@@ -189,14 +180,14 @@ plugins=(
 
 ```
 
-1. [**zsh-autosuggestions**](https://github.com/zsh-users/zsh-autosuggestions)는 정말 강력하다. 이전에 입력했던 명령어를 회색 글씨로 자동 제안해준다. 방향키 오른쪽을 누르면 바로 채워지니까 반복적인 명령어 입력이 훨씬 빨라진다. 
-    
-    ![image.png](%ED%84%B0%EB%AF%B8%EB%84%90%EC%9D%84%20%EB%8D%94%20%ED%8E%B8%ED%95%98%EA%B2%8C,%20Zsh%20%EC%84%A4%EC%A0%95%ED%95%98%EA%B8%B0%2025189de02fde80df9adec2dc0d6a6c10/image%203.png)
-    
+1. [**zsh-autosuggestions**](https://github.com/zsh-users/zsh-autosuggestions)는 정말 강력하다. 이전에 입력했던 명령어를 회색 글씨로 자동 제안해준다. 방향키 오른쪽을 누르면 바로 채워지니까 반복적인 명령어 입력이 훨씬 빨라진다.
+
+   ![image.png](%ED%84%B0%EB%AF%B8%EB%84%90%EC%9D%84%20%EB%8D%94%20%ED%8E%B8%ED%95%98%EA%B2%8C,%20Zsh%20%EC%84%A4%EC%A0%95%ED%95%98%EA%B8%B0%2025189de02fde80df9adec2dc0d6a6c10/image%203.png)
+
 2. [**zsh-syntax-highlighting**](https://github.com/zsh-users/zsh-syntax-highlighting)은 명령어 문법을 실시간으로 강조 표시해준다. 올바른 명령어는 초록색, 잘못된 명령어는 빨간색으로 표시되니까 엔터 누르기 전에 오타를 발견할 수 있다.
-    
-    ![image.png](%ED%84%B0%EB%AF%B8%EB%84%90%EC%9D%84%20%EB%8D%94%20%ED%8E%B8%ED%95%98%EA%B2%8C,%20Zsh%20%EC%84%A4%EC%A0%95%ED%95%98%EA%B8%B0%2025189de02fde80df9adec2dc0d6a6c10/image%204.png)
-    
+
+   ![image.png](%ED%84%B0%EB%AF%B8%EB%84%90%EC%9D%84%20%EB%8D%94%20%ED%8E%B8%ED%95%98%EA%B2%8C,%20Zsh%20%EC%84%A4%EC%A0%95%ED%95%98%EA%B8%B0%2025189de02fde80df9adec2dc0d6a6c10/image%204.png)
+
 3. [git](https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/git), [docker](https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/docker), [npm](https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/npm)은 모두 별칭과 여러가지 함수들을 제공해주는 플러그인이다.
 
 ### 테마 적용하기
