@@ -65,7 +65,7 @@
 
 <br/>
 
-#### 2-1. 기존 방식의 한계
+### 2-1. 기존 방식의 한계
 
 React Query를 도입하기 전, 아래와 같이 `useEffect`와 `useState`로 데이터를 관리했다.
 
@@ -120,7 +120,7 @@ React Query를 통해 우리는 **선언적 데이터 패칭**과 **자동 동�
 
 `useQuery` 하나로 로딩, 에러, 성공 상태를 모두 관리할 수 있었고, 코드의 가독성 역시 높아졌다.
 
-#### 4-1. 핵심 기능 ① — 데이터 동기화: (Invalidate Query)
+### 4-1. 핵심 기능 ① — 데이터 동기화: (Invalidate Query)
 
 React Query는 invalidateQueries 기능을 통해 <br/>
 특정 `queryKey`를 사용하는 모든 컴포넌트를 **자동으로 최신 상태로 갱신**할 수 있다.
@@ -130,15 +130,15 @@ React Query는 invalidateQueries 기능을 통해 <br/>
 
 > **💡 Note:** 자세한 설명 보기
 >
-> ---
+> 이를 구현할 때는 `useMutation`과 `queryClient.invalidateQueries`를 함께 사용한다.<br/> `useMutation`은 데이터 수정(쓰기) 작업을 담당하고,<br/> 그 작업이 성공하면 `invalidateQueries`를 호출하여 관련된 쿼리들을 **무효화(invalidate)한다.**
 >
-> 이를 구현할 때는 `useMutation`과 `queryClient.invalidateQueries`를 함께 사용한다.<br/> > `useMutation`은 데이터 수정(쓰기) 작업을 담당하고,
-> 그 작업이 성공하면 `invalidateQueries`를 호출하여 관련된 쿼리들을 **무효화(invalidate)한다.**
->
-> 여기서 “무효화”란, >React Query가 해당 쿼리의 캐시 데이터를 **“더 이상 신뢰할 수 없다”**고 표시하는 것을 의미한다.
+> 여기서 “무효화”란, <br/>
+> React Query가 해당 쿼리의 캐시 데이터를 **“더 이상 신뢰할 수 없다”**고 표시하는 것을 의미한다. <br/>
 > 즉, 캐시는 남아 있지만 “이 데이터는 오래되었으니 새로 가져와야 한다"고 판단하고 데이터를 다시 refetch 하게 되는 것이다.
 >
 > 그 결과, React Query는 무효화된 쿼리를 **자동으로 다시 요청(refetch)** 하여 최신 데이터를 가져오고, 이를 사용하는 모든 컴포넌트를 즉시 업데이트한다.
+
+<br/>
 
 ```jsx
 const queryClient = useQueryClient();
@@ -162,7 +162,7 @@ const confirmMutation = useMutation({
 
 <br/>
 
-#### 4-2. 핵심 기능 ② — 캐싱(Caching)과 staleness 관리
+### 4-2. 핵심 기능 ② — 캐싱(Caching)과 staleness 관리
 
 React Query의 진정한 힘은 “**언제 데이터를 다시 가져올 것인가**”를 정밀하게 제어할 수 있다는 점이다. <br/>
 React Query는 내부적으로 API 응답을 메모리에 **캐싱**하지만, 캐시가 있다고 해서 항상 네트워크 요청을 생략하는 것은 아니다.<br/>
@@ -213,7 +213,7 @@ const query = useInfiniteQuery({
 
 이 문제를 해결하기 위해 우리는 페이지의 특성과 사용 패턴에 맞춘 캐싱 전략을 수립했다.
 
-#### 5-1. 페이지별 캐싱 전략 수립
+### 5-1. 페이지별 캐싱 전략 수립
 
 | 페이지             | staleTime | cacheTime | 이유                               |
 | ------------------ | --------- | --------- | ---------------------------------- |
@@ -232,7 +232,7 @@ const query = useInfiniteQuery({
 
 ---
 
-#### ✅ (1) 낙관적 업데이트(Optimistic Update)
+### ✅ (1) 낙관적 업데이트(Optimistic Update)
 
 > React Query의 또 다른 강점은 낙관적 업데이트다. <br/>
 > 서버 응답을 기다리지 않고 UI를 먼저 변경한 뒤, 실패 시 롤백한다.
@@ -244,7 +244,7 @@ const query = useInfiniteQuery({
 
 <br/>
 
-#### ✅ (2) 실시간 데이터 신뢰성 확보
+### ✅ (2) 실시간 데이터 신뢰성 확보
 
 - admin dashboard: staleTime=0 → 항상 최신 데이터 패칭
   ![dashborad-not-cache](/.github/assets/TechnicalWriting/dashborad-not-cache.png)<br>
@@ -256,7 +256,7 @@ const query = useInfiniteQuery({
 
 <br/>
 
-#### 6-1. React Query 도입 전후 비교
+### 6-1. React Query 도입 전후 비교
 
 | 항목          | 도입 전 (apiClient)             | 도입 후 (React Query)            |
 | ------------- | ------------------------------- | -------------------------------- |
@@ -274,7 +274,7 @@ React Query는 코드 품질뿐 아니라 팀 생산성에도 직접적인 영�
 
 ---
 
-#### 7-1. React Query 설계 철학
+### 7-1. React Query 설계 철학
 
 React Query는 “데이터의 최신성과 사용자 경험 간의 균형을 자동으로 관리”하는 것을 목표로 한다.
 `staleTime`, `cacheTime`, `refetchOnWindowFocus`, `refetchOnReconnect` 등의 옵션을 통해 정확한 시점 제어가 가능하다.
@@ -284,7 +284,7 @@ React Query는 “데이터의 최신성과 사용자 경험 간의 균형을 �
 
 <br/>
 
-#### 7-2. React Query를 통한 선언적 상태 관리
+### 7-2. React Query를 통한 선언적 상태 관리
 
 React Query를 도입하면서 얻은 가장 큰 이점은 선언적 프로그래밍 패러다임이었다.
 `useQuery`, `useMutation`, `useInfiniteQuery`를 이용하면 다음과 같은 구조로 사고할 수 있다.
@@ -298,12 +298,12 @@ React Query를 도입하면서 얻은 가장 큰 이점은 선언적 프로그�
 
 <br/>
 
-#### 7-3. 도입 과정에서의 학습 포인트
+### 7-3. 도입 과정에서의 학습 포인트
 
 React Query를 도입하면서 우리는 “단순히 사용한다고 해서 캐싱이 완벽히 해결되는 것은 아니다”라는 교훈을 얻었다.
 캐싱의 효율은 `queryKey` 설계, `staleTime·cacheTime` 설정, `invalidateQueries`의 활용 방식에 달려 있다.
 
-#### 7-4. 결론 및 회고
+### 7-4. 결론 및 회고
 
 이전에는 React-Query를 단순히 데이터 패칭을 더 편리하게 할 수 있도록 도와주는 도구로서만 봤다면, 이번 경험을 통해 ‘데이터의 상태를 일관성 있게 관리하는걸 도와주는 도구라는 것을 알게 된 것 같다.
 
