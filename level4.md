@@ -46,7 +46,7 @@
 
 ## **2. hEARit 북마크 기능에 낙관적 UI 적용하기**
 
-이론을 넘어, 직접 개발한 ‘hEARit’ 앱의 북마크 기능에 낙관적 UI를 적용한 실제 사례를 코드를 통해 살펴보자.
+이론을 넘어, 직접 개발한 [‘hEARit’](https://github.com/woowacourse-teams/2025-hEARit) 앱의 북마크 기능에 낙관적 UI를 적용한 실제 사례를 코드를 통해 살펴보자.
 
 ### **2.1. 기존 흐름: 서버 응답 후 UI 업데이트**
 
@@ -207,6 +207,7 @@ Perf[49] MARK ui_emitted at=30456352 (+3ms) // 로딩 UI 표시까지 3ms
 Perf[49] MARK network_done at=30461616 (+5267ms) // 네트워크 응답까지 5,267ms 
 Perf[49] END name=BookmarkToggle outcome=success total=5267ms
 ```
+
 
 로그를 보면,  `ui_emitted`(로딩 UI 표시) 시점과 `network_done`(서버 응답 완료) 시점 사이에 각각 10,022ms와 5,267ms의 지연이 발생했다. 이 시간 동안 사용자는 비활성화된 버튼과 로딩 스피너를 보며 아무것도 하지 못하고 기다려야 한다. 이는 사용자에게 답답함을 안겨주고 심각하게는 앱 이탈로 이어질 수 있다.
 
