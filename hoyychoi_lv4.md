@@ -48,7 +48,9 @@ React를 사용하다 보면 누구나 한 번쯤 훅을 만들어 보게 됩니
 물론, 처음부터 이런 방향성을 가지고 있었던 것은 아닙니다. 여러 훅을 직접 만들고 사용해보는 과정에서 수많은 시행착오를 겪었습니다.
 어떤 훅은 동작은 했지만 쓰기 불편했고, 어떤 훅은 인터페이스가 복잡해 오히려 팀의 진입 장벽이 되기도 했습니다.
 
-<img width=400 src="./image/hook_study.png" alt="hook_study"/>
+<div align="center">
+  <img src="./image/hook_study.png" alt="hook_study"width="600" style="margin: 0 auto; display: block;" />
+</div>
 
 <div style="margin:50px"></div>
 
