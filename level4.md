@@ -8,6 +8,10 @@
 
 이 글은 네트워크 지연 문제로 고민하는 프론트엔드/모바일 개발자, 그리고 단순히 기능 구현을 넘어 뛰어난 사용자 경험을 제공하고 싶은 신입 개발자를 대상으로 한다. 낙관적 UI의 기본 개념부터 실제 앱('hEARit')에 적용한 코드와 데이터, 그리고 그 과정에서 마주한 고민과 배운 점까지 상세히 공유하고자 한다.
 
+<p align="center">
+    <img width="420" alt="ChatGPT Image 2025년 10월 14일 오후 04_49_00" src="https://github.com/user-attachments/assets/b727b66c-0b22-4e6f-91ea-acb46b937c62" />
+</p>
+
 ## **1. 낙관적 UI란 무엇인가?**
 
 ### **1.1. 왜 필요한가: 기다림의 심리학**
@@ -207,6 +211,7 @@ Perf[49] MARK ui_emitted at=30456352 (+3ms) // 로딩 UI 표시까지 3ms
 Perf[49] MARK network_done at=30461616 (+5267ms) // 네트워크 응답까지 5,267ms 
 Perf[49] END name=BookmarkToggle outcome=success total=5267ms
 ```
+<img width="874" height="175" alt="스크린샷 2025-10-14 오후 2 52 34" src="https://github.com/user-attachments/assets/bd171280-d12b-48e5-bb4e-8aa87dca18de" />
 
 
 로그를 보면,  `ui_emitted`(로딩 UI 표시) 시점과 `network_done`(서버 응답 완료) 시점 사이에 각각 10,022ms와 5,267ms의 지연이 발생했다. 이 시간 동안 사용자는 비활성화된 버튼과 로딩 스피너를 보며 아무것도 하지 못하고 기다려야 한다. 이는 사용자에게 답답함을 안겨주고 심각하게는 앱 이탈로 이어질 수 있다.
@@ -227,6 +232,11 @@ Perf[49] END name=BookmarkToggle outcome=success total=5267ms
 
 - **명확한 알림**: 무엇이 왜 실패했는지, 다음에 무엇을 할 수 있는지 명확히 알려주어야 한다 (예: “메시지를 보낼 수 없습니다. 탭하여 다시 시도하세요.”)
 - **사용자 입력 보존**: 긴 댓글처럼 사용자의 노력이 많이 들어간 작업이 실패했을 때, 입력 내용이 사라지지 않도록 보존해야 한다.
+
+<p align="center">
+    <img width="260" alt="Screenshot_20251014_145510" src="https://github.com/user-attachments/assets/0f27c3a3-fb59-4b11-883a-c63a0c1f5704" />
+</p>
+
 
 ## **4. 낙관적 UI의 효과와 배운 점**
 
