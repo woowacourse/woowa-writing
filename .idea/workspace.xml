@@ -4,7 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="cee4f894-fd69-4446-8e8b-107490cb3416" name="Changes" comment="docs: 회고 피드백 반영 추가">
+    <list default="true" id="cee4f894-fd69-4446-8e8b-107490cb3416" name="Changes" comment="feat: add interview essay for 픽잇 팀 프로젝트">
+      <change afterPath="$PROJECT_DIR$/technical_writing.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -39,6 +40,8 @@
 }</component>
   <component name="ProjectId" id="2vCfKiMWX7DrVtXvo4zt1wEaKcc" />
   <component name="ProjectViewState">
+    <option name="flattenModules" value="true" />
+    <option name="flattenPackages" value="true" />
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
@@ -46,7 +49,7 @@
   &quot;keyToString&quot;: {
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;lv2&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
     &quot;last_opened_file_path&quot;: &quot;/Users/minki/woowa-writing&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
@@ -105,6 +108,9 @@
       <workItem from="1749620311942" duration="4888000" />
       <workItem from="1749692122770" duration="1537000" />
       <workItem from="1749706380422" duration="1265000" />
+      <workItem from="1755522799746" duration="737000" />
+      <workItem from="1755567038488" duration="4000" />
+      <workItem from="1760414599973" duration="431000" />
     </task>
     <task id="LOCAL-00001" summary="docs: 회고 작성">
       <option name="closed" value="true" />
@@ -138,7 +144,23 @@
       <option name="project" value="LOCAL" />
       <updated>1743669580816</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="refactor: update workspace configuration and add run configurations">
+      <option name="closed" value="true" />
+      <created>1755522939739</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1755522939739</updated>
+    </task>
+    <task id="LOCAL-00006" summary="feat: add interview essay for 픽잇 팀 프로젝트">
+      <option name="closed" value="true" />
+      <created>1755523081480</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1755523081480</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -149,6 +171,8 @@
     <MESSAGE value="docs: 회고 수정" />
     <MESSAGE value="docs: 회고 피드백 반영" />
     <MESSAGE value="docs: 회고 피드백 반영 추가" />
-    <option name="LAST_COMMIT_MESSAGE" value="docs: 회고 피드백 반영 추가" />
+    <MESSAGE value="refactor: update workspace configuration and add run configurations" />
+    <MESSAGE value="feat: add interview essay for 픽잇 팀 프로젝트" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: add interview essay for 픽잇 팀 프로젝트" />
   </component>
 </project>
