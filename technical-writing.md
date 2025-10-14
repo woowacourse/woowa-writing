@@ -276,7 +276,7 @@ const handleScroll = () => {
 
 <br>
 
-[8-scroll-direction]
+https://github.com/user-attachments/assets/107f77d5-9f31-4f16-bfaf-386e970be8b5
 
 <br>
 
@@ -319,7 +319,7 @@ const handleScroll = () => {
 
 <br>
 
-[9-scroll-speed]
+https://github.com/user-attachments/assets/b1d6cc7f-7d62-423a-8fb8-d4d57c737461
 
 <br>
 
@@ -481,7 +481,7 @@ const updateItemList = async (
 
 <br>
 
-[10-InterSectionObserver-example1]
+https://github.com/user-attachments/assets/cdc78f85-d95b-4d8b-8dee-e690b64dd4f0
 
 <br>
 
@@ -541,7 +541,7 @@ useEffect(() => {
 
 <br>
 
-[11-bombom-infinite-scroll]
+https://github.com/user-attachments/assets/44025b90-1ae5-47d1-bba3-779cd6029533
 
 <br>
 
