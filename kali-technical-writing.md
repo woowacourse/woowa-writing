@@ -446,8 +446,12 @@ FCM 발송과 DB 저장을 **별도의 트랜잭션**으로 분리하여, FCM �
 // [ FcmEventListener.java ]
 
 @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-public void onMulticast(SendMessageByFcmTokensRequest request) {
-    fcmClient.sendMulticast(request);
+@EventListener
+public void onTokens(SendMessageByFcmTokensRequest sendMessageByFcmTokensRequest) {
+    Lists.partition(sendMessageByFcmTokensRequest.allTokens(), FCM_BATCH_SIZE)
+            .forEach(tokens -> {
+                fcmClient.sendMulticast(sendMessageByFcmTokensRequest.withTokens(tokens));
+            });
 }
 ```
 
@@ -460,8 +464,12 @@ FCM은 외부 API로 응답 시간을 제어할 수 없고, 시간이 오래 걸
 
 @Async
 @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-public void onMulticast(SendMessageByFcmTokensRequest request) {
-    fcmClient.sendMulticast(request);
+@EventListener
+public void onTokens(SendMessageByFcmTokensRequest sendMessageByFcmTokensRequest) {
+    Lists.partition(sendMessageByFcmTokensRequest.allTokens(), FCM_BATCH_SIZE)
+            .forEach(tokens -> {
+                fcmClient.sendMulticast(sendMessageByFcmTokensRequest.withTokens(tokens));
+            });
 }
 ```
 
