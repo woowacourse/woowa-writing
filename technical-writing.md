@@ -4,6 +4,9 @@
 
 따라서 이번 글에서는 스크롤 계산의 기본 원리와 동작을 이해하고, 어떻게 활용할 수 있는지, 실제 봄봄 서비스에서는 어떻게 사용되었는지 정리해보려고 합니다.
 
+<br>
+<br>
+
 ## 스크롤 좌표계의 이해: 세 가지 핵심 속성
 
 ### 스크롤 위치를 표현하는 세 가지 속성
@@ -18,15 +21,21 @@
 
 위 설명은 MDN 문서의 정의를 인용한 것입니다. 이를 좀 더 직관적으로 확인하기 위해 봄봄의 아티클 페이지에 각 속성값을 표시해보았습니다.
 
-<video width="700" autoplay loop muted playsinline>
+<br>
+
+<video width="700px" autoplay loop muted playsinline>
   <source src="./assets/1-스크롤을%20계산하는%20세%20가지%20속성.mov" type="video/mp4">
 </video>
+
+<br>
 
 아티클 페이지에서는 문서의 루트(html)에 스크롤이 생성되고 있습니다.
 
 따라서 scrollHeight는 루트 요소 내부의 모든 컨텐츠 높이, 즉 페이지를 펼쳤을 때의 전체 높이가 됩니다. scrollTop은 이 아티클 페이지의 최상단에서 현재 스크롤 위치까지의 거리가 되며, clientHeight는 현재 화면에 보이는 페이지 영역의 높이가 됩니다.
 
 위 영상처럼 스크롤을 내릴 때, scrollHeight와 clientHeight 값은 일정하지만 scrollTop의 값이 커지는 모습을 확인할 수 있었습니다.
+
+<br>
 
 ### 스크롤 위치의 계산
 
@@ -50,7 +59,7 @@ const scrollProgress = (scrollTop / (scrollHeight - clientHeight)) * 100;
 
 <br>
 
-<img src="./assets/2-scrollTop0.png" alt="scrollTop이 0일 때의 화면" width="700" />
+<img src="./assets/2-scrollTop0.png" alt="scrollTop이 0일 때의 화면" width="700px" />
 
 <br>
 
@@ -88,7 +97,7 @@ scrollTop이 0일 때도 이미 clientHeight만큼의 영역이 노출되는 것
 
 스크롤 위치의 개념을 토대로 아티클 페이지의 뉴스레터 읽기 진행도를 구현했습니다.
 
-<img src="./assets/3-뉴스레터%20아티클%20초기%20화면.png" alt="뉴스레터 아티클 초기 화면" width="700" />
+<img src="./assets/3-뉴스레터%20아티클%20초기%20화면.png" alt="뉴스레터 아티클 초기 화면" width="700px" />
 
 아티클 페이지는 루트 스크롤을 통해 읽을 수 있습니다. 즉, 루트 스크롤이 뉴스레터 아티클의 스크롤과 같은 기능을 수행합니다. 따라서 document 객체에 접근하여 필요한 속성값을 바로 참조했습니다. 그리고 이 값을 이용해 진행률(progress)을 계산했습니다.
 
@@ -106,11 +115,15 @@ const calculateProgress = () => {
 };
 ```
 
+<br>
+
 이 값을 미리 구현해둔 ProgressBar 컴포넌트에 전달하면, 스크롤 위치에 기반한 읽기 진행률 UI를 구현할 수 있습니다.
 
 저희 서비스는 emotion 라이브러리를 사용하고 있으므로 진행률 바(bar) 스타일 컴포넌트에 이 값을 인자로 넘겨, 동적으로 스타일링해주었습니다.
 
 진행률(%)을 `width(%)`의 속성 값으로 전달하면 전체 너비에서 일정 비율만큼을 채워, 진행률을 표현할 수 있습니다.
+
+<br>
 
 ```javascript
 const ProgressGauge =styled.div<{ rate: number } >`
@@ -130,7 +143,7 @@ const ProgressGauge =styled.div<{ rate: number } >`
 
 위와 같은 과정을 거치면, 간단한 계산만으로 사용자의 편의성을 높이는 진행률 바를 만들 수 있습니다.
 
-<video width="700" autoplay loop muted playsinline>
+<video width="700px" autoplay loop muted playsinline>
   <source src="./assets/4-progress-bar.mov" type="video/mp4">
 </video>
 
@@ -182,7 +195,7 @@ window 객체의 메서드인 `requestAnimationFrame`은 이 리페인트 수행
 
 <br>
 
-<video width="700" autoplay loop muted playsinline>
+<video width="700px" autoplay loop muted playsinline>
   <source src="./assets/6-scroll-move-but-store.mov" type="video/mp4">
 </video>
 
@@ -194,7 +207,7 @@ window 객체의 메서드인 `requestAnimationFrame`은 이 리페인트 수행
 
 <br>
 
-<img src="./assets/5-frame-drop.png" alt="성능 최적화 전 frame drop" width="700" />
+<img src="./assets/5-frame-drop.png" alt="성능 최적화 전 frame drop" width="700px" />
 
 <br>
 
@@ -220,7 +233,7 @@ const handleScroll = useDebounce(() => {
 
 <br>
 
-<video width="700" autoplay loop muted playsinline>
+<video width="700px" autoplay loop muted playsinline>
   <source src="./assets/7-scroll-move-stop-store.mov" type="video/mp4">
 </video>
 
@@ -230,7 +243,7 @@ const handleScroll = useDebounce(() => {
 
 <br>
 
-<img src="./assets/8-better-frame-drop.png" alt="성능 최적화 후 frame drop" width="700" />
+<img src="./assets/8-better-frame-drop.png" alt="성능 최적화 후 frame drop" width="700px" />
 
 <br>
 <br>
