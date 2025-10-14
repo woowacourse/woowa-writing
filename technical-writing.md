@@ -24,7 +24,7 @@
 <br>
 
 <video width="50%" autoplay loop muted playsinline>
-  <source src="./assets/1-스크롤을%20계산하는%20세%20가지%20속성.mov" type="video/mp4">
+  <source src="https://github.com/user-attachments/assets/91c563bf-0331-4b3e-b095-2cf096c6eef6" type="video/mp4">
 </video>
 
 <br>
@@ -97,7 +97,7 @@ scrollTop이 0일 때도 이미 clientHeight만큼의 영역이 노출되는 것
 
 스크롤 위치의 개념을 토대로 아티클 페이지의 뉴스레터 읽기 진행도를 구현했습니다.
 
-<img src="./assets/3-뉴스레터%20아티클%20초기%20화면.png" alt="뉴스레터 아티클 초기 화면" width="50%" />
+<img src="./assets/3-뉴스레터%20아티클%20초기%20화면.png" alt="뉴스레터 아티클 초기 화면" width="30%" />
 
 아티클 페이지는 루트 스크롤을 통해 읽을 수 있습니다. 즉, 루트 스크롤이 뉴스레터 아티클의 스크롤과 같은 기능을 수행합니다. 따라서 document 객체에 접근하여 필요한 속성값을 바로 참조했습니다. 그리고 이 값을 이용해 진행률(progress)을 계산했습니다.
 
@@ -144,7 +144,7 @@ const ProgressGauge =styled.div<{ rate: number } >`
 위와 같은 과정을 거치면, 간단한 계산만으로 사용자의 편의성을 높이는 진행률 바를 만들 수 있습니다.
 
 <video width="50%" autoplay loop muted playsinline>
-  <source src="./assets/4-progress-bar.mov" type="video/mp4">
+  <source src="https://github.com/user-attachments/assets/5f066314-35e0-4e34-8ace-5f6d61bd7e55" type="video/mp4">
 </video>
 
 <br>
@@ -196,7 +196,7 @@ window 객체의 메서드인 `requestAnimationFrame`은 이 리페인트 수행
 <br>
 
 <video width="50%" autoplay loop muted playsinline>
-  <source src="./assets/6-scroll-move-but-store.mov" type="video/mp4">
+  <source src="https://github.com/user-attachments/assets/46446f78-23b8-4245-9463-2cf8a85cfafd" type="video/mp4">
 </video>
 
 <br>
@@ -207,7 +207,7 @@ window 객체의 메서드인 `requestAnimationFrame`은 이 리페인트 수행
 
 <br>
 
-<img src="./assets/5-frame-drop.png" alt="성능 최적화 전 frame drop" width="50%" />
+<img src="./assets/5-frame-drop.png" alt="성능 최적화 전 frame drop" width="70%" />
 
 <br>
 
@@ -234,7 +234,7 @@ const handleScroll = useDebounce(() => {
 <br>
 
 <video width="50%" autoplay loop muted playsinline>
-  <source src="./assets/7-scroll-move-stop-store.mov" type="video/mp4">
+  <source src="https://github.com/user-attachments/assets/7bf41979-9bc8-43a3-8ba6-2bb6e50ae7b5" type="video/mp4">
 </video>
 
 <br>
@@ -243,7 +243,7 @@ const handleScroll = useDebounce(() => {
 
 <br>
 
-<img src="./assets/8-better-frame-drop.png" alt="성능 최적화 후 frame drop" width="50%" />
+<img src="./assets/8-better-frame-drop.png" alt="성능 최적화 후 frame drop" width="70%" />
 
 <br>
 <br>
