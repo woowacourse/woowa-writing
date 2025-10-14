@@ -23,9 +23,7 @@
 다음은 [런세권](github.com/woowacourse-teams/2025-course-pick) 프로젝트를 진행하면서 R8 최적화를 적용하기 전과 후의 APK 파일을 비교한 것입니다. APK 파일의 크기가 60.1 MB에서 45.2 MB로 줄었음을 확인할 수 있습니다.
 
 |적용 전|적용 후|
-
 |-|-|
-
 |<img width="880" height="506" alt="478680380-7a10fbf9-72db-4ccc-8eca-8b543d9a71b2" src="https://github.com/user-attachments/assets/a7d2c880-9877-4f3a-838d-3f2778117c1b" />|<img width="880" height="506" alt="478680376-0f047251-aeae-4fa4-9650-f5c15ea18904" src="https://github.com/user-attachments/assets/9dc37954-25d2-4441-a37a-e6df200b62fe" />|
 
 ### 안드로이드 빌드 과정
@@ -144,10 +142,10 @@ class CoursesActivity : AppCompatActivity() {
 여기서 "코드 난독화"라는 표현 때문에 오해가 생길 수 있는데, ProGuard와 R8은 보안 툴이 아닙니다. [ProGuard 공식 메뉴얼](https://www.guardsquare.com/manual/configuration/usage)에서는 다음과 같이 설명하고 있습니다.
 
 > Both ProGuard and R8 were designed for app optimization, and although they employ minimal obfuscation techniques, they are not security tools and do not harden applications effectively against reverse engineering and tampering.
-> 
+>
 
 > ProGuard와 R8는 앱 최적화를 위해 설계됐으며, 간단한 난독화 기법을 사용하지만 보안 툴이 아니고, 리버스 엔지니어링이나 변조로부터 어플리케이션을 효과적으로 견고하게 만들어주지 않습니다.
-> 
+>
 
 앱 최적화 과정에서 코드가 난독화되는 건 부수 효과일 뿐이지, 코드의 보안을 높이는 것이 목적은 아닙니다. 때문에 앱 최적화의 맥락에서는 code obfuscation보단 **identifier renaming**(식별자 이름 변경)이라는 표현이 사용되기도 합니다.
 
@@ -186,7 +184,7 @@ buildTypes {
 ### 외부 라이브러리를 사용할 경우
 
 > 내 코드에서는 리플렉션 안 썼는데요?
-> 
+>
 
 우리가 직접 작성한 코드가 리플렉션을 쓰지 않더라도 안심할 수는 없습니다. 사용하는 외부 라이브러리 중 리플렉션을 쓰는 것이 있을 수 있으니까요. 외부 라이브러리도 앱 코드의 일부가 되기 때문에, 적절한 keep rule을 추가해주지 않으면 앱 축소로 인한 문제가 발생할 수 있습니다.
 
