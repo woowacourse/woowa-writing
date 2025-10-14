@@ -68,7 +68,7 @@ Swagger는 속도가 중요할 때 훌륭한 선택지이지만 문서의 정확
 
 ### 테스트 주도 접근법: Spring REST Docs
 
-![Pasted image 20251014083014.png](image/Pasted%20image%2020251014083014.png)![[Pasted image 20251014083014.png]]
+![Pasted image 20251014083014.png](image/Pasted%20image%2020251014083014.png)
 
 #### 핵심 원리: 테스트 결과물로 문서를 만듭니다
 
@@ -79,7 +79,7 @@ Spring REST Docs는 API 문서화에 대한 철학 자체가 다릅니다. 문�
 
 Spring REST Docs는 개발자가 직접 작성한 설명(Asciidoc)과 테스트 실행 중에 자동으로 추출된 **스니펫(snippet)** 을 조합하여 최종 문서를 완성합니다.
 
-![Pasted image 20251014083455.png](image/Pasted%20image%2020251014083455.png)![[Pasted image 20251014083455.png]]
+![Pasted image 20251014083455.png](image/Pasted%20image%2020251014083455.png)
 
 #### 구현: 테스트 코드로 문서를 서술합니다
 
@@ -151,12 +151,12 @@ Spring REST Docs의 정확성은 필수적이지만, 상호작용이 불가능�
 
 두 마리 토끼를 동시에 잡을 수는 없을까요? 꼭 한 방법을 선택해야만 할까요?
 
-![restdocs-api-spec.png](image/restdocs-api-spec.png)![[Pasted image 20251014083315.png]]
+![restdocs-api-spec.png](image/restdocs-api-spec.png)
 
 **`restdocs-api-spec`** 라이브러리는 바로 이 간극을 메워줍니다. 이 라이브러리의 목표는 Spring REST Docs의 테스트 주도 방식을 그대로 사용하면서, 최종 결과물로 AsciiDoc 스니펫
 대신 업계 표준인 **OpenAPI 3.0 명세** 파일을 생성하는 것입니다.
 
-![Pasted image 20251014083327.png](image/Pasted%20image%2020251014083327.png)![[Pasted image 20251014083327.png]]
+![Pasted image 20251014083327.png](image/Pasted%20image%2020251014083327.png)
 
 **[TMI] `restdocs-api-spec`은 누가 만들었을까?** 이 라이브러리는 독일의 대표적인 이커머스(e-commerce) 솔루션 기업인 **ePages**에서 개발하고 관리하는 오픈소스 프로젝트입니다.
 실제 프로덕션 환경에서 API 문서화의 신뢰성 문제를 해결하기 위해 직접 개발되어 지속적으로 업데이트되고 있는 라이브러리입니다.
@@ -265,7 +265,7 @@ void apiSpecTest() throws Exception {
 
 중요한 점은 `responseFields`와 같은 핵심적인 API 계약 테스트의 원리는 그대로라는 것입니다. 우리는 단지 테스트로 검증된 결과물을 OpenAPI 명세서로 만들기 위해 포장 방식을 바꾼 것뿐입니다.
 
-![Pasted image 20251014083425.png](image/Pasted%20image%2020251014083425.png)![[Pasted image 20251014083425.png]]
+![Pasted image 20251014083425.png](image/Pasted%20image%2020251014083425.png)
 
 ---
 
@@ -282,12 +282,10 @@ void apiSpecTest() throws Exception {
 1. **Swagger UI 다운로드**: Swagger UI의 [공식 GitHub 릴리즈](https://github.com/swagger-api/swagger-ui/releases)에서 최신 버전의 `dist`
    폴더 내용을 `src/main/resources/static/swagger-ui`와 같은 정적 리소스 경로에 복사합니다.
 
-![Pasted image 20251014083526.png](image/Pasted%20image%2020251014083526.png)![[Pasted image 20251014083526.png]]
+![Pasted image 20251014083526.png](image/Pasted%20image%2020251014083526.png)
 
 1. **명세 파일 복사 설정 (`build.gradle`)**: 빌드 시 `openapi3` 태스크로 생성된 `openapi3.yaml` 파일을 `bootJar`에 포함될 정적 리소스 폴더(
    `static/docs`)로 복사하는 Gradle 작업을 추가합니다.
-
-   Groovy
 
     ```groovy
     // build.gradle
@@ -320,7 +318,7 @@ void apiSpecTest() throws Exception {
 이제 `./gradlew bootJar`로 빌드하고 애플리케이션을 실행한 뒤 `http://localhost:8080/swagger-ui/index.html`로 접속하면, 직접 호스팅한 최신 버전의 Swagger
 UI를 확인할 수 있습니다.
 
-![Pasted image 20251014083557.png](image/Pasted%20image%2020251014083557.png)![[Pasted image 20251014083557.png]]
+![Pasted image 20251014083557.png](image/Pasted%20image%2020251014083557.png)
 
 ---
 
