@@ -23,10 +23,7 @@
 
 <br>
 
-
-<video width="50%" autoplay loop muted playsinline>
-  <source src="https://github.com/user-attachments/assets/d2469381-4614-44d8-94c2-29366e83a624" type="video/mp4">
-</video>
+https://github.com/user-attachments/assets/6a2a1eb5-b3cf-42ba-82ea-6acec65307ba
 
 <br>
 
@@ -144,9 +141,11 @@ const ProgressGauge =styled.div<{ rate: number } >`
 
 위와 같은 과정을 거치면, 간단한 계산만으로 사용자의 편의성을 높이는 진행률 바를 만들 수 있습니다.
 
-<video width="50%" autoplay loop muted playsinline>
-  <source src="https://github.com/user-attachments/assets/5f066314-35e0-4e34-8ace-5f6d61bd7e55" type="video/mp4">
-</video>
+<br>
+
+
+https://github.com/user-attachments/assets/f91f8a5e-31b3-4523-9088-d46866ca43a9
+
 
 <br>
 <br>
@@ -196,9 +195,9 @@ window 객체의 메서드인 `requestAnimationFrame`은 이 리페인트 수행
 
 <br>
 
-<video width="50%" autoplay loop muted playsinline>
-  <source src="https://github.com/user-attachments/assets/46446f78-23b8-4245-9463-2cf8a85cfafd" type="video/mp4">
-</video>
+
+https://github.com/user-attachments/assets/6a1e3d83-7f6c-46a8-8e7a-4c2ccc322e5a
+
 
 <br>
 
@@ -234,9 +233,7 @@ const handleScroll = useDebounce(() => {
 
 <br>
 
-<video width="50%" autoplay loop muted playsinline>
-  <source src="https://github.com/user-attachments/assets/7bf41979-9bc8-43a3-8ba6-2bb6e50ae7b5" type="video/mp4">
-</video>
+https://github.com/user-attachments/assets/a4d113f1-1a82-4176-87f6-ac3e6de0abcc
 
 <br>
 
