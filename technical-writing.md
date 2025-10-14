@@ -379,3 +379,9 @@ docker compose up을 실행하면 즉시 롤백됩니다.
 
 결국 도커는 개발자가 인프라의 복잡함에 얽매이지 않고, 더 중요한 문제에 집중할 수 있도록 도와주는 강력한 도구라고 생각합니다. 
 이 글이 여러분의 프로젝트에 도커를 적용하는 데 작은 도움이 되었으면 좋겠습니다.
+
+---
+
+## 출처
+- https://docs.docker.com/get-started/
+- https://docs.github.com/en/actions/tutorials/publish-packages/publish-docker-images
