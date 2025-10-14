@@ -1,7 +1,9 @@
 # 검색 품질 향상시키기
+
 > **더 나은 검색 경험을 구축한 기록**
----
+
 ## 대상 독자
+
 검색 결과의 품질을 향상시키고 싶은 사람
 검색 시 원하는 결과가 상위에 노출되지 않아 고민인 서버 개발자
 
@@ -122,7 +124,284 @@ Full-Text Search는 검색어의 빈도만으로 점수를 매깁니다.
 
 ## 적용해보기
 
-실제 구현은 ElasticSearch를 이용했습니다.
+구현은 ElasticSearch를 이용했습니다.
+
+```json
+{
+  "analysis": {
+    "analyzer": {
+      "article_common_analyzer": {
+        "filter": [
+          "nori_pos_with_stoptags",
+          "nori_readingform",
+          "lowercase",
+          "article_common_synonym"
+        ],
+        "tokenizer": "nori_tokenizer_with_dict",
+        "type": "custom"
+      }
+    },
+    "filter": {
+      "article_common_synonym": {
+        "synonyms_path": "synonyms.txt",
+        "type": "synonym_graph"
+      },
+      "nori_pos_with_stoptags": {
+        "stoptags": [
+          "EC",
+          "EF",
+          "EP",
+          "ETM",
+          "ETN",
+          "IC",
+          "JC",
+          "JKB",
+          "JKC",
+          "JKG",
+          "JKO",
+          "JKQ",
+          "JKS",
+          "JKV",
+          "JX",
+          "MAG",
+          "MAJ",
+          "MM",
+          "SP",
+          "SSC",
+          "SSO",
+          "SC",
+          "SE",
+          "XPN",
+          "XSA",
+          "XSN",
+          "XSV",
+          "UNA",
+          "NA",
+          "VSV",
+          "VX"
+        ],
+        "type": "nori_part_of_speech"
+      }
+    },
+    "tokenizer": {
+      "nori_tokenizer_with_dict": {
+        "decompound_mode": "mixed",
+        "discard_punctuation": "false",
+        "type": "nori_tokenizer",
+        "user_dictionary": "dictionary.txt"
+      }
+    }
+  }
+}
+
+```
 
 ### 형태소 분석
 
+[nori 형태소 분석기](https://esbook.kimjmin.net/06-text-analysis/6.7-stemming/6.7.2-nori)를 커스텀하여 사용했습니다.
+어미, 조사, 감탄사 등 핵심과 무관한 단어를 색인하지 않도록 했습니다.
+
+예를들어 "Flyway는 오픈소스 마이그레이션 툴이다" 라는 문장은 다음과 같이 분석됩니다.
+```json
+{
+  "tokens": [
+    {
+      "token": "flyway",
+      "start_offset": 0,
+      "end_offset": 6,
+      "type": "word",
+      "position": 0
+    },
+    {
+      "token": "오픈",
+      "start_offset": 8,
+      "end_offset": 10,
+      "type": "word",
+      "position": 3
+    },
+    {
+      "token": "소스",
+      "start_offset": 10,
+      "end_offset": 12,
+      "type": "word",
+      "position": 4
+    },
+    {
+      "token": "마이",
+      "start_offset": 13,
+      "end_offset": 15,
+      "type": "word",
+      "position": 6
+    },
+    {
+      "token": "그레이",
+      "start_offset": 15,
+      "end_offset": 18,
+      "type": "word",
+      "position": 7
+    },
+    {
+      "token": "션",
+      "start_offset": 18,
+      "end_offset": 19,
+      "type": "word",
+      "position": 8
+    },
+    {
+      "token": "툴",
+      "start_offset": 20,
+      "end_offset": 21,
+      "type": "word",
+      "position": 10
+    }
+  ]
+}
+```
+
+### 사용자 사전
+
+위 예시에서는 "오픈소스"를 "오픈", "소스"로, "마이그레이션"을 "마이", "그레이", "션"으로 쪼개고 있습니다.
+
+"마이그레이션"은 그 자체로 의미를 가지는 하나의 토큰이 되어야합니다. "마이", "그레이", "션"은 아무 의미를 갖지 않기 때문입니다.
+
+이렇게 형태소 분석 시 단어를 쪼개지 않고 유지할 수 있도록 미리 사전을 통해 정의할 수 있습니다.
+
+```text
+// dictionary
+오픈소스
+마이그레이션
+...
+```
+
+사전 정의 이후 "Flyway는 오픈소스 마이그레이션 툴이다" 라는 문장은 다음과 같이 분석됩니다.
+```json
+{
+  "tokens": [
+    {
+      "token": "flyway",
+      "start_offset": 0,
+      "end_offset": 6,
+      "type": "word",
+      "position": 0
+    },
+    {
+      "token": "오픈소스",
+      "start_offset": 8,
+      "end_offset": 12,
+      "type": "word",
+      "position": 3
+    },
+    {
+      "token": "마이그레이션",
+      "start_offset": 13,
+      "end_offset": 19,
+      "type": "word",
+      "position": 4
+    },
+    {
+      "token": "툴",
+      "start_offset": 20,
+      "end_offset": 21,
+      "type": "word",
+      "position": 6
+    }
+  ]
+}
+
+```
+
+### 동의어 사전
+
+언어에는 수많은 동의어들이 존재할 수 있습니다. 모아온의 경우 **개발**이라는 도메인 용어에서는 다음과 같은 예시가 있습니다.
+- 데이터베이스, DB
+- 로드밸런서, 로드밸런싱, 로드밸런스
+
+또한 같은 단어를 한글로 검색할 수도 있고 영어로 검색할 수도 있습니다. 
+"마이그레이션" 대신 "migration"으로 검색해도 "마이그레이션" 글이 포함되어야 합니다.
+
+```text
+// synonyms
+마이그레이션, migration
+로드밸런서, 로드밸런싱, 로드밸런스
+...
+```
+
+동의어 사전 정의 이후 "Flyway는 오픈소스 마이그레이션 툴이다" 라는 문장은 다음과 같이 분석됩니다.
+
+```json
+{
+  "tokens": [
+    {
+      "token": "flyway",
+      "start_offset": 0,
+      "end_offset": 6,
+      "type": "word",
+      "position": 0
+    },
+    {
+      "token": "오픈소스",
+      "start_offset": 8,
+      "end_offset": 12,
+      "type": "word",
+      "position": 3
+    },
+    {
+      "token": "migration",
+      "start_offset": 13,
+      "end_offset": 19,
+      "type": "SYNONYM",
+      "position": 4
+    },
+    {
+      "token": "마이그레이션",
+      "start_offset": 13,
+      "end_offset": 19,
+      "type": "word",
+      "position": 4
+    },
+    {
+      "token": "툴",
+      "start_offset": 20,
+      "end_offset": 21,
+      "type": "word",
+      "position": 6
+    }
+  ]
+}
+
+```
+
+### 스코어링
+
+검색 의도에 맞는 문서가 상위에 있을 수록 검색 엔진의 성능이 좋다고 할 수 있습니다.
+그래서 단어의 빈도가 아닌 문서의 가치를 점수로 매겨보려 시도했습니다.
+
+문서의 가치를 점수화하는 것은 상당히 어려웠습니다. "가치"라는 것이 너무 추상적이기 때문입니다.
+혼자 또는 팀 단위로 문서의 관련도를 매긴다 해도, 집단의 크기가 너무 적었습니다. 즉 직감에 의존하는 점수화가 되어버렸습니다.
+
+따라서 당장은 알고리즘을 수정하지 않았습니다.
+다만 검색어가 제목에 있으면 더 높은 점수를 부여하고 있습니다. 제목은 글이 다루는 핵심 내용에 대한 소개이기 때문에 핵심을 포함할 확률이 높다고 생각했습니다.
+
+## 마무리 : 앞으로의 과제
+
+처음에는 검색을 단순한 “기능”으로 생각했습니다.   
+그러나 사용자가 기대하는 것은 도구가 아니라 **의도 파악**이었습니다.
+
+> “내가 찾고 싶은 것을, 제대로 찾아줄 수 있는가?”  
+> “이 서비스는 나를 이해하는가?”
+
+- 좋은 검색은 **사용자의 만족**으로 완성된다.
+- 검색은 문자열 비교가 아니라 **의미 해석**이다.
+
+이 글에서는 검색 품질이라는 추상적인 목표를 위해 기본적인 기반을 마련했습니다.
+
+객관적인 품질 개선을 위해 앞으로는 이러한 작업을 해나가려 합니다.
+
+- 클릭률, 체류 시간, 스크롤 횟수 등 사용자 행동 데이터 수집
+- 통계를 바탕으로 품질 지표 측정 및 개선
+- 검색어 자동 완성 및 오탈자 교정 등으로 UX 개선
+
+## 참고
+
+- [MySQL Full-Text Search](https://dev.mysql.com/doc/refman/8.4/en/fulltext-search.html)
+- [Elasticsearch](https://www.elastic.co/kr/elasticsearch)
