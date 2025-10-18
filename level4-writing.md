@@ -214,19 +214,29 @@ try {
 > 
 > — Spring Framework Reference, §10.2 Consistent Exception Hierarchy
 
-즉, 스프링은 데이터 접근 기술마다 달랐던 예외(`SQLException`, `HibernateException`, `JDOException`)를 모두 `DataAccessException` 계층으로 번역한다. 이때 예외는 단순히 감싸지는 것이 아니라 **‘실패의 의미’를 공통된 언어로 표현**한다.
+즉, 스프링은 데이터 접근 기술마다 달랐던 예외(`SQLException`, `HibernateException`, `PersistenceException`, `JDOException`)를 모두 `DataAccessException` 계층으로 번역한다. 이때 예외는 단순히 감싸지는 것이 아니라 **‘실패의 의미’를 공통된 언어로 표현**한다.
 
 | 원래 예외 | 변환된 예외 | 의미 |
-| --- | --- | --- |
+|------------|--------------|------|
 | `SQLException` | `DuplicateKeyException` | 중복 키 위반 |
 | `SQLException` | `DataIntegrityViolationException` | 무결성 제약 위반 |
-| `SQLException` | `DataAccessResourceFailureException` | 연결 실패 |
+| `HibernateException` | `HibernateJdbcException` | Hibernate 내부 JDBC 오류 |
+| `PersistenceException` | `JpaObjectRetrievalFailureException` | 엔티티 조회 실패 |
 
 이 계층은 특정 기술에 종속되지 않고, 애플리케이션이 이해할 수 있는 **일관된 실패 모델**을 제공한다.
 
 ## 6.2 예외를 해석하고 번역한다
 
-예외 전환은 `SQLErrorCodeSQLExceptionTranslator` 같은 클래스를 통해 수행된다. 스프링 JDBC는 다음과 같은 방식으로 기술 예외를 번역한다.
+스프링의 예외 전환은 내부적으로 **Translator** 또는 **AOP 프록시**를 통해 수행된다. 각 기술 스택마다 예외를 전환하는 방식이 다르다.
+
+| 기술 스택 | 전용 Translator |
+|------------|-----------------------------|
+| **JDBC** | `SQLErrorCodeSQLExceptionTranslator` |
+| **Hibernate** | `HibernateExceptionTranslator`, `HibernateJpaDialect` |
+| **JPA (표준)** | `PersistenceExceptionTranslationPostProcessor` |
+| **JDO** | `JdoExceptionTranslator` |
+
+예를 들어, Spring JDBC는 다음과 같이 작동한다.
 
 ```java
 try {
@@ -234,14 +244,15 @@ try {
 } catch (SQLException e) {
     throw getExceptionTranslator().translate("update", sql, e);
 }
-
 ```
 
-이 과정에서 데이터베이스별 오류 코드가 해석되어 적절한 `DataAccessException` 하위 클래스로 변환된다. 예외 정보는 `getRootCause()`로 그대로 추적할 수 있어 **의미를 잃지 않으면서도 기술 독립적인 구조**를 유지한다.
+`SQLExceptionTranslator`는 데이터베이스의 SQL 상태 코드나 벤더별 에러 코드를 해석해 적절한 `DataAccessException` 하위 클래스로 변환한다. 반면 JPA나 Hibernate의 경우 `@Repository`가 붙은 클래스에 AOP 프록시를 적용하여 `PersistenceException`이나 `HibernateException`을 감지하고 `DataAccessException`으로 변환한다. 이 역할을 수행하는 것이 `PersistenceExceptionTranslationPostProcessor`이다.
+
+이러한 구조 덕분에 개발자는 각 기술의 세부적인 예외를 몰라도, 언제나 같은 방식으로 예외를 해석할 수 있다. **실패의 형태는 다르더라도, 의미는 통일된다.**
 
 ## 6.3 예외의 언어를 일원화하다
 
-스프링의 예외 전환은 단순한 편의 기능이 아니다. 자바의 Checked Exception이 “실패를 반드시 처리하라”고 강제했다면, 스프링의 Exception Translation은 “실패를 일관된 언어로 이해하라”고 제안한다. 이는 Checked Exception이 추구한 *명시적 실패 표현*을 언어가 아닌 **프레임워크 수준에서 실현**한 것이다.
+스프링의 예외 전환은 단순한 편의 기능이 아니다. 자바의 Checked Exception이 “실패를 반드시 처리하라”고 강제했다면, 스프링의 Exception Translation은 “실패를 일관된 언어로 이해하라”고 제안한다.
 
 > “This allows you to handle most persistence exceptions, which are non-recoverable, only in the appropriate layers, without annoying boilerplate catches/throws.” 
 > 
