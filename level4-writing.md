@@ -358,7 +358,7 @@ public class EventNotFoundException extends RuntimeException {
   "type": "https://example.com/errors/event-not-found",
   "title": "Event not found",
   "status": 404,
-  "detail": "이벤트 ID 1을 찾을 수 없습니다.",
+  "detail": "이벤트를 찾을 수 없습니다: 1",
   "instance": "/api/events/1"
 }
 ```
