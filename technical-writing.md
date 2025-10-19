@@ -153,6 +153,60 @@ default 값이 `phase = TransactionPhase.AFTER_COMMIT`인데, 명시한 이유�
 
 - **성과**: 비동기 처리 도입 후, 동일한 API의 응답 시간은 **평균 144ms**로 단축되었습니다. 이는 기존 대비 약 10배 향상된 속도이며, 사용자가 체감하는 대기 시간을 **90%** 이상 감소시킨 결과입니다.
 
+**스레드 풀 구성으로 안정성 확보**
+
+`@Async`도입 후, "기본 `Async`는 매번 새로운 스레드를  생성하여 리소스 낭비가 발생할 수 있지 않을까?"라는  추가적인 고민이 들었습니다.
+이 문제를 해결하고 스레드를 효율적으로 재사용하며, 시스템 안정성까지 확보하기 위해 별도의 스레드 풀을 직접 설정했습니다.
+```
+@Configuration
+@EnableAsync
+public class AsyncConfig {
+
+    @Bean(name = "badgeAsyncExecutor")
+    public Executor badgeAsyncExecutor() {
+        ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
+        taskExecutor.setCorePoolSize(2);
+        taskExecutor.setMaxPoolSize(4);
+        taskExecutor.setQueueCapacity(100);
+        taskExecutor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+        taskExecutor.setThreadNamePrefix("Badge-Thread-");
+        taskExecutor.initialize();
+        return taskExecutor;
+    }
+}
+```
+- **설정 의도**
+  - `CorePoolSize`/`MaxPoolSize`: 운영 서버의 CPU 코어 수에 맞춰 평상시와 요청 급증 시에 스레드를 유연하게 사용하도록 설정했습니다.
+  - `QueueCapacity`: 핵심 스레드가 모두 바쁠 때, 최대 100개의 작업을 대기시킬 수 있는 버퍼를 만들었습니다.
+
+**🤔 고민: 스레드 풀이 가득 찼을 때**
+
+"모든 스레드가 일하고 있고, 대기 큐까지 꽉 찼을 때 새로 들어온 이벤트는 어떻게 되지?"
+기본 정책대로라면 이 이벤트는 거부되어 **데이터가 손실될 위험**이 있었습니다. 처음에는 "손실되는 이벤트는 로그로 남겨서 개발자가 수동으로 처리하자"
+라고 생각했지만, `EventListener`가 이 이벤트를 받기도 전에 스레드 풀에서 거부되어서 로그조차 남길 수 없다는 것을 깨달았습니다.
+
+그래서, "거부하지 말고, 그 요청만큼은 동기로 처리하면 어떨까?"라는 아이디어를 떠올렸습니다.
+
+**해결책**: `CallerRunsPolicy`와 데이터 무결성 보장
+`setRejectedExecutionHandler`에 `CallerRunsPolicy`정책을 적용했습니다. 이 정책은 스레드 풀이 포화 상태일 때, 새로운 작업을 버리는 대신
+**이벤트를 발행하는 원래 스레드(Caller)가 직접 그 작업을 처리**하도록 만듭니다.
+
+이 방식은 어떤 상황에서도 이벤트가 버려지지 않고 반드시 처리되도록 보장하여 데이터 무결성을 지켜줍니다. 흥미로운 점은, 대기 큐에서 100번째로 기다리던
+작업보다, 큐가 꽉 찬 직후에 들어온 101번째 작업이 '새치기'처럼 먼저 처리될 수 있다는 점입니다. 대기 중인 100개의 작업은 스레드의 순서를 기다리지만,
+101번째 작업은 메인 스레드가 즉시 동기 방식으로 처리하기 때문입니다.
+
+**결론: 두 마리 토끼를 잡는 유연한 비동기 전략**
+
+이러한 스레드 풀 설정을 통해 두 마리 토끼를 모두 잡을 수 있었습니다. 🐇🐇
+평상시에는 비동기 처리의 이점을 최대한 활용하여 **사용자에게 즉각적인 응답**을 제공합니다. 동시에, 트래픽이 폭주하여 스레드 풀이 포화가 되는 예외적인 상황에서는
+`CallerRunsPolicy`를 통해 **동기 방식으로 유연하게 전환**됩니다.
+
+이를 통해 이벤트 유실 없이 데이터 무결성을 보장할 수 있었습니다. 흥미롭게도 이 방식은 단순히 데이터를 지키는 것을 넘어, 대기 큐에서
+자신의 차례를 기다리는 작업보다 오히려 더 빠르게 처리될 가능성까지 열어두었습니다.
+
+결론적으로, 비동기로 처리할 수 있는 부분은 사용자에게 빠른 응답을 줌과 동시에, 스레드가 포화 상태일 때는 적절하게 동기 방식을 택해
+데이터 무결성을 지키고 처리 지연을 초소화하는 시스템을 구축할 수 있었습니다.
+
 ### 3.4. 트랜잭션 분리: `@Transactional(propagation = Propagation.REQUIRES_NEW)`
 - **문제 상황**: `TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)`으로 리스너를 실행하면, 리스너는 이벤트를 발생시킨 기존 트랜잭션의 영속성 컨텍스트는 물려받지만,
 해당 트랜잭션은 이미 커밋되어 **'읽기 전용 상태'**가 됩니다. 이 상태에서 뱃지 정보를 DB에 쓰기 작업하려고 시도하자 쓰기 작업 실패가 발생했습니다.
@@ -327,4 +381,3 @@ public abstract class AbstractBadgePolicy implements BadgePolicy {
 
 결과적으로, 뱃지 시스템은 더 이상 특정 도메인에 묶이지 않고 독립적으로 확장 가능한 형태로 발전했습니다.  
 이번 설계는 "변경에 유연한 구조"가 얼마나 중요한지를 다시 한번 확인할 수 있었던 좋은 경험이었습니다.  
-
