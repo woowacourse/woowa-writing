@@ -263,7 +263,32 @@ export default useProjectList;
 
 ## 10. 마무리 및 추가 자료
 
-TanStack Query v5를 활용한 무한 스크롤 구현 방법에 대해 알아보았습니다. 이 기술을 통해 사용자 경험을 향상시키고, 더 나은 웹 애플리케이션을 개발할 수 있습니다. 추가적으로, 다음 링크들을 참고하시면 더 많은 정보를 얻을 수 있습니다.
+### 핵심 요약
+
+- TanStack Query v5의 `infiniteQueryOptions`와 `useInfiniteQuery`를 활용해 커서 기반 무한 스크롤 구현 과정을 간단하게 만들었습니다.
+- 브라우저의 `IntersectionObserver`와 `useInfiniteScroll` 훅을 적용해, 스크롤 트리거 역할을 분리했습니다.
+- `isLoading`과 `isFetchingNextPage`를 따로 관리해, 초기 로딩과 추가 데이터 로딩 UX를 좀 더 세밀하게 조정할 수 있습니다.
+- 스켈레톤을 지연 표시해 화면이 갑자기 바뀌는 현상을 줄이고, 사용자가 느끼는 속도를 높였습니다.
+- 상황별 가이드: 추가 데이터가 필요할 땐 `fetchNextPage`, 전체 리셋이나 필터 변경 시엔 `resetQueries`가 적합합니다.
+
+### 바로 적용 체크리스트
+
+- `QueryClientProvider`로 앱 전체를 감쌉니다.
+- `infiniteQueryOptions`에서 `getNextPageParam`과 `initialPageParam`을 꼭 설정합니다.
+- `useInfiniteQuery`로 받은 데이터를 `pages.flatMap`으로 한 번에 펼칩니다.
+- 센티널 역할을 하는 DOM 요소와 `useInfiniteScroll` 훅을 연결합니다.
+- 로딩, 에러, 빈 상태, 스켈레톤 지연 표시를 모두 고려해 UI를 구성합니다.
+- `hasNext`와 `scrollEnabled` 같은 조건으로 중복 호출을 막습니다.
+
+### 다음 단계
+
+- 나중엔 가상 스크롤(예: `react-virtual`)까지 적용해 렌더링 비용을 더 줄일 수 있습니다.
+- 접근성도 중요하니, `aria-live` 속성 추가, 포커스 이동, 키보드 탐색 방식도 함께 고민해 보세요.
+- 에러 로그 수집과 재시도(backoff) 전략도 도입할 만합니다.
+- SSR/ISR 환경에서 사용한다면, 초기 데이터와 캐시 정책부터 꼼꼼히 설계해야 합니다.
+- 실제 사용자 경험은 성능 모니터링(예: Web Vitals, Tracing) 도구를 써서 지속적으로 측정해 주세요.
+
+### 참고 자료
 
 - [React-Query(tanstack query v5)로 만들어보는 무한스크롤](https://velog.io/@fromjjong/React-Querytanstack-query-v5%EB%A1%9C-%EB%A7%8C%EB%93%A4%EC%96%B4%EB%B3%B4%EB%8A%94-%EB%AC%B4%ED%95%9C%EC%8A%A4%ED%81%AC%EB%A1%A4)
 - [Next.js TanStack Query V5 무한 스크롤 구현](https://velog.io/@white0_0/Next.js-TanStack-Query-V5-%EB%AC%B4%ED%95%9C-%EC%8A%A4%ED%81%AC%EB%A1%A4-%EA%B5%AC%ED%98%84)
