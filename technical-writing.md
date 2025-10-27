@@ -29,12 +29,14 @@ React 18 이상과 TypeScript를 이미 쓰고 있고, TanStack Query v5도 기�
 
 TanStack Query는 React 애플리케이션에서 서버 상태를 관리하는 데 유용한 라이브러리입니다. `데이터 패칭, 캐싱, 동기화 및 업데이트를 간편하게 처리`할 수 있도록 도와줍니다. 특히 v5에서는 성능과 사용성을 더욱 개선하여 개발자들이 더욱 쉽게 사용할 수 있도록 설계되었습니다.
 
+아래 이미지는 TanStack Query가 클라이언트에서 어떤 역할을 담당하는지 개략적으로 보여줍니다.
 ![image0](/assets/react-query.png)
 
 ## 2. 무한 스크롤의 필요성
 
 무한 스크롤은 사용자가 스크롤을 내릴 때 자동으로 추가 콘텐츠를 로드하는 기능입니다. 이는 페이지네이션보다 더 매끄러운 사용자 경험을 제공하며, 특히 모바일 환경에서 유용합니다. 사용자는 버튼을 클릭할 필요 없이 콘텐츠를 계속해서 탐색할 수 있습니다.
 
+아래 GIF는 페이지네이션 대비 자연스러운 스크롤 경험을 시각적으로 보여줍니다.
 ![image1](/assets/infinite-scroll.gif)
 
 ## 3. TanStack Query v5 설치하기
@@ -95,6 +97,7 @@ export default CardSkeletonList;
 
 `IntersectionObserver`를 활용하여, 스크롤이 되었음을 감지하는 커스텀 훅을 작성하였습니다. 무한스크롤 기능이 여러 곳에서 재사용될 수 있기 때문에, `useInfiniteScroll` 커스텀 훅에서는 스크롤이 감지되면, 외부에서 주입받은 refetch 함수를 호출하는 역할만 담당하고 있습니다.
 
+다음 다이어그램은 관찰 대상 영역과 트리거 지점의 관계를 간단히 나타냅니다.
 ![image2](/assets/area.png)
 
 ```ts
@@ -152,7 +155,7 @@ const useInfiniteScroll = ({
 export default useInfiniteScroll;
 ```
 
-## 6. `infiniteQueryOptions`로의 쿼리 옵션 수정
+## 6. `infiniteQueryOptions`로 마이그레이션
 
 기존의 `queryOptions` 방식에서 커서(`getNextPageParam`)를 포함한 `infiniteQueryOptions`로 마이그레이션 하였습니다.
 
@@ -246,9 +249,10 @@ export default useProjectList;
 
 이제 모든 준비가 완료되었습니다. 위의 코드를 바탕으로 무한 스크롤을 구현할 수 있습니다. 사용자가 스크롤을 내릴 때마다 새로운 데이터를 자동으로 로드하게 됩니다. 이로 인해 사용자 경험이 크게 향상됩니다.
 
+아래 GIF는 실제 구현 결과로, 스크롤 하단 진입 시 다음 페이지가 자연스럽게 이어지는 모습을 보여줍니다.
 ![image3](/assets/result.gif)
 
-## 8. 성능 최적화 및 팁
+## 9. 성능 최적화 및 팁
 
 무한 스크롤을 구현할 때 성능을 최적화하는 것이 중요합니다. 다음은 몇 가지 팁입니다.
 
@@ -257,7 +261,7 @@ export default useProjectList;
 - **로딩 상태 관리** : 로딩 상태를 적절히 관리하여 사용자에게 피드백을 제공하는 것이 중요합니다.
 - **에러 처리** : API 호출 중 에러가 발생할 경우, 사용자에게 적절한 메시지를 제공해야 합니다.
 
-## 9. 마무리 및 추가 자료
+## 10. 마무리 및 추가 자료
 
 TanStack Query v5를 활용한 무한 스크롤 구현 방법에 대해 알아보았습니다. 이 기술을 통해 사용자 경험을 향상시키고, 더 나은 웹 애플리케이션을 개발할 수 있습니다. 추가적으로, 다음 링크들을 참고하시면 더 많은 정보를 얻을 수 있습니다.
 
