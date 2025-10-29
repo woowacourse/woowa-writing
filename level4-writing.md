@@ -374,13 +374,13 @@ public class EventNotFoundException extends RuntimeException {
 
 복구 가능한 실패는 예외를 정의해야 하는 이유가 된다. 사용자의 입력이 잘못되었거나, 요청한 리소스가 없거나, 동일한 데이터를 중복으로 요청하는 경우처럼 클라이언트가 행동을 수정함으로써 회복할 수 있는 상황은 명시적으로 예외를 만들어야 한다.
 
-java
+```java
 public class DuplicateMemberException extends BusinessException {
     public DuplicateMemberException() {
         super("이미 등록된 구성원입니다.");
     }
 }
-
+```
 
 이런 예외는 단순한 오류가 아니라 “어떻게 복구할 수 있는가”를 드러내는 신호다.
 
