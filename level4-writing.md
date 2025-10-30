@@ -10,13 +10,13 @@
 
 # 2. 자바의 예외 체계
 
-자바는 예외를 Error와 Exception 두 축으로 나누고, 그중 Exception을 다시 Checked와 Unchecked로 구분한다. 이 구분은 단순히 문법상의 분류가 아니라, 복구 가능성(recoverability) 이라는 기준에 따라 설계된 구조다.
+자바는 예외를 Error와 Exception 두 축으로 나누고, 그중 Exception을 다시 Checked와 Unchecked로 구분한다. 이 구분은 단순한 문법적 차이가 아니라, 예상 가능한 실패(predictable failure) 를 코드 수준에서 드러내기 위한 설계적 구분이다.
 
-| 구분 | 상위 클래스 | 처리 강제 여부 | 대표 예시 | 의도 |
-| --- | --- | --- | --- | --- |
-| Error | java.lang.Error | 불가능 | OutOfMemoryError, StackOverflowError | JVM 수준 오류 |
-| Checked Exception | Exception (단, RuntimeException 제외) | 필수 | IOException, SQLException | 복구 가능한 예외 |
-| Unchecked Exception | RuntimeException | 선택 | NullPointerException, IllegalArgumentException | 프로그래밍 오류 |
+| 구분                  | 상위 클래스                             | 처리 강제 여부 | 대표 예시                                          | 의도        |
+| ------------------- | ---------------------------------- | -------- | ---------------------------------------------- | --------- |
+| Error               | java.lang.Error                    | 불가능      | OutOfMemoryError, StackOverflowError           | JVM 수준 오류 |
+| Checked Exception   | Exception (단, RuntimeException 제외) | 필수       | IOException, SQLException                      | 예상 가능한 실패 |
+| Unchecked Exception | RuntimeException                   | 선택       | NullPointerException, IllegalArgumentException | 프로그래밍 오류  |
 
 이 구조의 의도는 명확했다. Error는 애플리케이션이 다룰 수 없는 영역이다. 메모리가 부족하거나 스택이 넘치는 상황은 프로그램이 제어할 수 없다. 따라서 그냥 종료하는 것이 맞다. 반면 Exception은 애플리케이션 내부나 외부 자원에서 발생하는 예상 가능한 실패를 표현한다. 그중에서도 Checked Exception은 반드시 처리(catch)하거나 던져야(throws) 한다.
 
@@ -28,7 +28,7 @@ public void readFile(String path) {
 }
 ```
 
-FileReader는 FileNotFoundException을 던질 수 있기 때문이다. 자바는 이 예외를 “복구 가능한 실패”로 보고, 개발자에게 “반드시 다루라”고 요구한다. 즉, 언어 차원에서 안전성을 강제한 실험이었다.
+FileReader는 FileNotFoundException을 던질 수 있기 때문이다. 자바는 이 예외를 “예상 가능한 실패”로 보고, 개발자에게 “반드시 다루라”고 요구한다. 즉, 언어 차원에서 예상 가능한 위험을 명시적으로 표현하고 처리하도록 강제한 실험이었다.
 
 ## 2.1 안전성을 위한 설계 의도
 
@@ -42,7 +42,7 @@ public void copyFile(String src, String dest) throws IOException {
 }
 ```
 
-이제 IDE는 호출자에게 경고한다. “이 메서드는 IOException을 던질 수 있습니다. 처리하지 않으면 컴파일되지 않습니다.” 이 덕분에 작은 프로그램에서는 오류를 놓치기 어려웠다. 자바는 언어 차원에서 ‘안전한 프로그래밍’을 강제하는 언어로 자리 잡았다.
+이제 IDE는 호출자에게 경고한다. “이 메서드는 IOException을 던질 수 있습니다. 처리하지 않으면 컴파일되지 않습니다.” 이 덕분에 작은 프로그램에서는 오류를 놓치기 어려웠다. 자바는 언어 차원에서 ‘예상 가능한 실패를 명시적으로 다루는 언어’로 자리 잡았다.
 
 ## 2.2 Checked Exception 확산 문제
 
@@ -66,13 +66,9 @@ try {
 }
 ```
 
-이 코드는 컴파일러의 요구를 충족할 뿐, 실패를 의미 있게 다루지는 않는다. 결국 Checked Exception은 “안전성 보장”이 아닌 “형식적 의무”로 전락했다.
+이 코드는 컴파일러의 요구를 충족할 뿐, 실패를 의미 있게 다루지는 않는다. 결국 Checked Exception은 “예상 가능한 실패를 명시한다”는 본래 의도와 달리 “형식적 선언”으로 전락했다.
 
 # 3. Checked Exception의 의도와 한계
-
-Checked Exception은 단순한 문법 요소가 아니라, 언어가 개발자에게 던진 질문이었다. “이 실패를 알고 있는가?” “그렇다면 어떻게 처리할 것인가?” 자바는 이 질문을 코드 수준에서 강제함으로써, 실패를 숨기지 않고 드러내는 방식을 택했다.
-
-## 3.1 지키려 했던 가치
 
 자바가 Checked Exception을 설계할 때 중심에 둔 원칙은 다음 세 가지다.
 
@@ -80,19 +76,23 @@ Checked Exception은 단순한 문법 요소가 아니라, 언어가 개발자�
 2. 복구 가능한 실패는 직접 처리하라. - 강제된 try-catch로 시스템 안정성을 높인다.  
 3. 비정상 상황을 제어 흐름 안에서 관리하라. - 오류를 숨기지 않고 프로그램 구조 안에서 다룬다.  
 
-자바는 “실패를 명시적으로 다루는 언어”를 목표로 삼았고, Checked Exception은 그 철학의 구현이었다. 이는 “예측 가능한 실패는 코드로 처리하라”는 선언에 가깝다. 
+예외를 메서드 시그니처에 선언하도록 강제한 것도 같은 이유다. 호출자는 메서드가 어떤 위험을 가질 수 있는지 명확히 인식해야 했고, 이에 대한 처리를 명시적으로 작성해야 했다. 즉, 예상 가능한 실패를 코드에 드러내어 호출자가 그 가능성을 인식하고 대응하도록 한 것이다. 이러한 구조를 통해 자바는 실패를 숨기지 않는 언어적 특성을 확보했다.
 
-이 철학을 명확히 정리한 사람이 조슈아 블로크다. 그는 *이펙티브 자바*에서 다음과 같이 설명한다.
+자바는 여기서 한 단계 더 나아가, 예상 가능한 실패를 단순히 알리는 데 그치지 않고 복구할 수 있는 기회를 제공하려 했다. Checked Exception은 “이 실패를 알고 있다면, 처리하라”는 강제와 함께 “필요하다면 복구하라”는 의도를 포함한다. 이를 통해 예외를 단순한 오류 신호가 아닌 제어 가능한 흐름의 일부로 다루게 되었다.
+
+조슈아 블로크는 이펙티브 자바에서 이러한 철학을 다음과 같이 정리했다.
 
 > “복구 가능한 상황에는 Checked Exception을, 프로그래밍 오류에는 RuntimeException을 사용하라.”
 
-즉, Checked Exception은 복구 가능한 실패를 표현하기 위한 장치로 설계되었다.
+이 문장은 Checked Exception이 단순한 오류 통지가 아니라, 복구 가능한 실패를 표현하기 위한 언어적 장치임을 보여준다. 예외는 예상 가능한 실패를 명시적으로 드러내고, 복구 가능한 경우에만 처리하도록 설계되었다. 그러나 실제 개발 환경에서는 이 ‘복구 가능성’의 의미가 명확하지 않았다. 어떤 실패가 복구 가능한지 판단하기 어렵고, 복구가 실제로 무엇을 의미하는지도 불분명했다.
 
-## 3.2 복구 가능성의 모호함
+## 3.1 복구 가능성의 모호함
 
-하지만 문제는 바로 그 핵심 개념, ‘복구 가능성(recoverability)’에 있었다. 예를 들어 SQLException은 Checked Exception이지만, 데이터베이스 연결이 끊겼을 때 애플리케이션이 이를 스스로 복구할 수 있을까? DB 서버가 다운된 상황에서 애플리케이션이 직접 연결을 복원하는 것은 현실적으로 어렵다. 그럼에도 자바는 이런 예외를 Checked Exception으로 분류했다. “복구할 수도 있으니 직접 처리하라”는 강제였다. 결국 대부분의 개발자는 다음과 같은 코드를 작성하게 된다.
+이 지점에서 Checked Exception의 한계가 드러난다. SQLException은 Checked Exception이지만, 데이터베이스 연결이 끊겼을 때 애플리케이션이 이를 스스로 복구할 수 있을까? DB 서버가 다운된 상황에서 애플리케이션이 직접 연결을 복원하는 것은 현실적으로 어렵다. 그럼에도 자바는 이런 예외를 Checked Exception으로 분류했다. “복구할 수도 있으니 직접 처리하라”는 강제였다.
 
-결국 많은 코드는 다음과 같은 형태로 귀결되었다.
+예측 가능한 결과인 우발적인 상황에서 복구를 시도하려는 의도는 분명했지만, 복구가 실제로 무엇을 수반하는지에 대한 기준은 불명확했다. 연결을 재시도하는 것이 복구인지, 단순히 로그를 남기고 종료하는 것도 복구로 볼 수 있는지 명확하지 않았다. 
+
+결국 대부분의 개발자는 다음과 같은 코드를 작성하게 되었다.
 
 ```java
 try {
@@ -102,17 +102,21 @@ try {
 }
 ```
 
-복구 로직은 없고, 컴파일러의 요구를 만족시키기 위한 재포장만 남는다. 이 시점에서 Checked Exception은 강제된 형식이 되고, 본래의 의미는 흐려진다.
+복구 로직은 없고, 컴파일러의 요구를 만족시키기 위한 재포장만 남았다. Checked Exception의 “복구 가능성”이라는 전제는 현실에서 거의 성립하지 않았다.
 
-## 3.3 강제의 역설
+Checked Exception을 반대하는 의견의 핵심도 여기에 있다. 대부분의 예외는 복원할 수 없으며, 개발자는 오류가 발생한 코드나 서브시스템을 직접 소유하지도, 그 내부 구현을 수정할 책임도 없다. 따라서 “복구 가능한 실패”라는 전제 자체가 애플리케이션의 통제 범위를 넘어서는 경우가 많다.
 
-Checked Exception은 초기에 “실패를 다루는 습관”을 만들어줬지만, 시간이 지나면서 생산성을 떨어뜨리는 형식적 의무로 변했다. 하위 계층에서 발생한 예외가 상위 계층 전체로 확산되며, 모든 메서드가 예외를 선언하거나 포장해야 하는 상황이 반복되었다. 작은 변경에도 코드가 크게 흔들렸고, 예외는 불필요한 보일러플레이트로 변했다.
+## 3.2 강제의 역설
+
+이러한 한계는 Checked Exception이 본래 의도와 다르게 작동하게 만들었다. 초기에는 “실패를 다루는 습관”을 형성하는 데 기여했지만, 시간이 지나면서 생산성을 떨어뜨리는 형식적 의무로 변했다. 하위 계층에서 발생한 예외가 상위 계층 전체로 확산되며, 모든 메서드가 예외를 선언하거나 포장해야 하는 상황이 반복되었다. 작은 변경에도 시그니처 수정이 연쇄적으로 발생했고, 예외는 불필요한 보일러플레이트로 전락했다.
 
 이 상황을 로버트 C. 마틴은 다음과 같이 표현했다.
 
 > “논쟁은 끝났다. Checked Exception은 실수였다. 복구할 수 없는 예외를 강제하는 순간, 시스템은 유연성을 잃는다.”
 
-이 말은 단순한 비판이 아니라, 복구 불가능한 실패를 강제하는 설계 자체가 불필요하다는 지적이었다.
+이 말은 단순한 비판이 아니라, 복구 불가능한 실패까지 강제로 처리하게 만드는 설계 자체가 불필요하다는 지적이다. 예외의 존재가 개발자의 선택을 넓히지 못하고 오히려 제약으로 작용했다는 의미다.
+
+자바의 방향성도 점차 이를 인정하는 쪽으로 변했다. 자바 8의 함수형 인터페이스는 Checked Exception을 선언하지 않는다. 스트림, 람다, CompletableFuture 등 현대 자바의 API는 Checked Exception을 언어적 강제에서 제외했다. 이는 “모든 예외를 복구 대상으로 강제하지 않는다”는 새로운 철학을 보여준다.
 
 # 4. 스프링이 마주한 현실
 
@@ -263,63 +267,17 @@ public class DuplicateUserException extends RuntimeException {
 
 ```
 HTTP/1.1 409 Conflict
-Content-Type: application/json
+Content-Type: application/problem+json
 {
-  "error": "이미 등록된 사용자입니다."
+  "type": "about:blank",
+  "title": "Conflict",
+  "status": 409,
+  "detail": "이미 등록된 사용자입니다.",
+  "instance": "/api/users"
 }
 ```
 
 이 흐름은 예외가 각 계층의 책임에 따라 적절한 의미로 번역되는 과정을 보여준다. 데이터 계층, 서비스 계층, 웹 계층은 각각의 맥락에서 예외를 자신이 이해할 수 있는 형태로 변환한다.
-
-## 7.3 스프링 MVC의 예외 전환
-
-스프링 MVC는 DispatcherServlet을 중심으로 예외 전환을 수행한다. 컨트롤러에서 예외가 발생하면 다음 순서로 처리된다.
-
-1. DispatcherServlet이 예외를 감지한다.
-2. 등록된 HandlerExceptionResolver 목록을 순서대로 탐색한다.
-3. 해당 예외를 처리할 수 있는 Resolver가 적절한 응답 객체를 생성한다.
-4. 이 응답이 ResponseEntity 혹은 JSON 형태로 직렬화되어 클라이언트에게 전달된다.
-
-스프링은 기본 Resolver를 제공한다.
-
-| 클래스 | 역할 |
-| --- | --- |
-| ExceptionHandlerExceptionResolver | @ExceptionHandler 기반 처리 |
-| ResponseStatusExceptionResolver | 예외 클래스의 @ResponseStatus 처리 |
-| DefaultHandlerExceptionResolver | 스프링 내부 표준 예외 처리 (HttpRequestMethodNotSupportedException 등) |
-
-이 체계를 통해 개발자는 예외를 직접 응답으로 변환할 필요 없이, 예외의 의미만 정의하면 된다.
-
-## 7.4 HTTP로 드러나는 의미
-
-스프링은 자바의 throws 선언이 컴파일러에 예외 존재를 알렸던 것처럼, 웹 계층에서는 @ResponseStatus를 통해 클라이언트에 예외의 의미를 전달한다.
-
-```java
-@ResponseStatus(HttpStatus.NOT_FOUND)
-public class EventNotFoundException extends RuntimeException {
-    public EventNotFoundException(Long eventId) {
-        super("이벤트를 찾을 수 없습니다: " + eventId);
-    }
-}
-```
-
-이 코드는 예외를 명시적으로 던지는 대신, HTTP 404 응답으로 의미를 표현한다. 언어 수준의 예외 선언이 프레임워크 수준의 의미 전달로 확장된 형태다.
-
-## 7.5 ProblemDetail 도입
-
-스프링 6부터는 IETF RFC 9457 표준에 따라 ProblemDetail 응답 구조를 지원한다. 이는 예외 전환이 최종적으로 표현되는 구조적 형태다.
-
-```json
-{
-  "type": "https://example.com/errors/event-not-found",
-  "title": "Event not found",
-  "status": 404,
-  "detail": "이벤트를 찾을 수 없습니다: 1",
-  "instance": "/api/events/1"
-}
-```
-
-데이터 계층에서 기술별 예외를 공통 구조로 번역하듯, 웹 계층에서도 실패가 구조화된 언어로 표현된다. ProblemDetail은 예외의 의미를 유지한 채, 클라이언트가 이해할 수 있는 표준화된 응답을 제공한다.
 
 # 8. 예외 정의 기준
 
