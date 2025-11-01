@@ -217,7 +217,7 @@ DataAccessException은 RuntimeException을 상속하는 루트 클래스이며,
 
 # 6. 웹 환경으로의 확장
 
-스프링의 예외 설계는 데이터 접근 계층에 머물지 않는다. 데이터베이스의 SQLException이 DataAccessException으로 전환되어 기술적 실패를 의미로 번역하듯, 웹 계층에서는 내부 예외를 클라이언트가 이해할 수 있는 응답으로 전환한다. 이는 단순히 에러를 HTTP 응답으로 내보내는 과정이 아니다. 프레임워크는 예외의 의미를 계층별로 해석하고, 서버 내부의 실패를 외부와 소통 가능한 형태로 변환한다. 
+스프링의 예외 설계는 데이터 접근 계층에 머물지 않는다. 데이터베이스의 SQLException이 DataAccessException으로 전환되어 기술적 실패를 의미로 전환하듯, 웹 계층에서는 내부 예외를 클라이언트가 이해할 수 있는 응답으로 전환한다.
 
 ## 6.1 웹 응답으로의 전환
 
@@ -269,7 +269,7 @@ Content-Type: application/problem+json
 | 계층     | 예외 전환 대상                                | 변환 결과       |
 | ------ | --------------------------------------- | ----------- |
 | 데이터 계층 | SQLException → DataAccessException      | 런타임 예외      |
-| 서비스 계층 | DataAccessException → BusinessException | 도메인 예외      |
+| 서비스 계층 | DataAccessException → BusinessException | 비지니스 예외      |
 | 웹 계층   | Exception → HTTP Response               | 상태 코드 + 메시지 |
 
 
@@ -285,7 +285,7 @@ try {
 }
 ```
 
-데이터베이스 제약 조건 위반(DataIntegrityViolationException)은 도메인 의미를 지닌 DuplicateUserException으로 전환되어 상위 계층으로 전달된다.
+데이터베이스 제약 조건 위반(DataIntegrityViolationException)은 비지니스 의미를 지닌 DuplicateUserException으로 전환되어 상위 계층으로 전달된다.
 
 그리고 컨트롤러에서는 이 예외가 다음과 같이 HTTP 응답으로 변환된다.
 
@@ -312,7 +312,7 @@ Content-Type: application/problem+json
 }
 ```
 
-이 예시는 하나의 실패가 데이터 계층에서는 기술적 오류, 서비스 계층에서는 도메인 규칙 위반, 웹 계층에서는 HTTP 응답으로 자연스럽게 이어지는 구조를 보여준다.
+이 예시는 하나의 실패가 데이터 계층에서는 기술적 오류, 서비스 계층에서는 비지니스 규칙 위반, 웹 계층에서는 HTTP 응답으로 자연스럽게 이어지는 구조를 보여준다.
 
 이처럼 스프링은 계층 간 의미를 일관되게 전환하는 체계를 제공한다. 스프링의 예외 전환 체계를 이해했다면, 프레임워크의 철학을 바탕으로 예외를 어떻게 바라보고 다뤄야 하는지를 살펴보자.
 
@@ -340,10 +340,10 @@ public class DuplicateMemberException extends BusinessException {
 
 복구 가능한 실패의 예외 전환은 두 단계로 이루어진다.
 
-- 도메인 계층: BusinessException, InvalidStateException 등으로 실패의 의미를 명확히 표현
+- 비지니스 계층: BusinessException, InvalidStateException 등으로 실패의 의미를 명확히 표현
 - 표현 계층: @ResponseStatus, ProblemDetail 등을 사용해 클라이언트가 이해할 수 있는 언어로 변환
 
-즉, 복구 가능한 실패는 기술적 예외에서 의미적 예외로의 전환이 필요하다. 이는 단순한 오류 전달이 아니라, “사용자에게 의미 있는 실패로 번역하는 과정”이다.
+즉, 복구 가능한 실패는 기술적 예외에서 의미적 예외로의 전환이 필요하다. 이는 단순한 오류 전달이 아니라, “사용자에게 의미 있는 실패로 전환하는 과정”이다.
 
 ## 7.2 복구 불가능한 실패
 
