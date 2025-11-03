@@ -1,49 +1,55 @@
 # 💬 들어가며
 
-안녕하세요 헤일러입니다.
+안녕하세요, 헤일러입니다.
 
-저는 서비스를 기획하고, 그 기획을 실제 서비스로 구현하는 데 관심이 많습니다.
+아마 많은 백엔드 개발자분들이 이런 고민을 해보시지 않았을까 싶어요.
 
-백엔드 개발자의 관점에서, 기획 프로세스를 구체화하는 것보다는 프로토타입 → 서비스 런칭으로 이어지는 빠른 사이클을 만들어보는 연습을 하고 있는데요.
+> 이거 서비스로 만들면 사람들이 쓸 것 같은데...
 
-![](https://velog.velcdn.com/images/heiler/post/8a5e8a87-41d7-4edc-b1bc-6c342068aa99/image.png)
+머릿속을 스쳐간 아이디어는 있지만, 화면 설계, 디자인, UI 구현 등 프론트엔드 구현이 장벽이 되어 상상에만 그치고 구현으로는 이어지지 못하는 경험이 한 번 쯤은 있으실 거에요.
+저 또한 그런 개발자 중 한 명이었습니다.
 
-요즘은 Lovable과 같은 노코드 AI를 이용하면 프로토타입을 쉽게 만들어 볼 수 있습니다. 기획한 내용으로 여러 개의 프로토타입을 만들어 보다 보면 실제 서비스로 만들고 싶은 마음에 드는 결과물이 나올 때가 종종 있어요.
+사람의 언어(자연어)로 AI에게 프롬프팅해서 코드를 생성하는 방식을 바이브 코딩이라고 하죠. 요즘은 Lovable, Bolt, v0와 같은 no-code AI를 이용하면, 바이브 코딩으로 쉽고 빠르게 프로토타입을 만들어볼 수 있습니다.
 
-> 최근 Lovable + Cursor로 만들어본 프로토타입 앱들
-> 1.  데이트 코스 공유 & 지도 네비게이터(웹 앱) - [[GitHub](https://github.com/threepebbles/courseitda-date-route)] [[배포 링크](https://threepebbles.github.io/courseitda-date-route/)]
-> 2. 동선 플래너(PC) -  [[GitHub](https://github.com/threepebbles/route-wander-visualizer)] [[배포 링크](https://route-wander-visualizer.lovable.app/)]
-> 3. 코스잇다(웹 앱) - [[GitHub](https://github.com/threepebbles/day-trip-pro)] [[배포 링크](https://day-trip-pro.lovable.app/)]
+만든 프로토타입을 주변에 보여주고 사용성을 어느 정도 검증했다고 가정하겠습니다.
 
-프로토타입 단계에서 이거다! 라는 판단이 들었다면, 이제 운영 가능한 서비스로 옮기기 위해 자체 인프라를 준비해야 합니다.
+프로토타입을 MVP로 발전시키고 싶다면 어떻게 해야 할까요?
 
-이 때 IGW, Route table, VPC, Subnet, EIP, EC2, RDS, S3 등 이미 익숙한 인프라 구조를 재현하는 일이 굉장히 귀찮고 번거로웠습니다.
+Lovable에서 동작하는 프로토타입은 새로운 기능 추가, 유지 보수, 보안, 모니터링 등 제약이 많기 때문에 결국 **자체 인프라 환경으로 마이그레이션**해야 합니다.
 
-이후에 개발(dev), 운영(prod), 스테이징(staging) 환경처럼 구조는 비슷하고, 하드웨어 스펙만 조금씩 다른 환경을 여러 개 만든다면 더 그럴 것 같았습니다.
+![](https://velog.velcdn.com/images/heiler/post/c7f898f5-e8b2-40cb-ac05-108e0d96203e/image.png)
 
-이 문제를 해결하기 위해, 이미 설계된 인프라를 일관되게 재현하고 쉽게 관리할 수 있는 방법을 찾아보다 Terraform을 처음 접하게 됐습니다.
+`기획 → 프로토타이핑 → 서비스 런칭` 사이클 과정에서 새로운 프로토타입을 만들 때마다 "인프라를 매번 수동으로 만들어야 할까..?" 의문이 들었습니다.
 
-올해 추석 연휴에 시작한 코스잇다라는 프로젝트에 Terraform을 처음 적용해보게 되었는데요.
+운영/모니터링이 가능한 최소 비용의 인프라 설계는 어떤 프로토타입이든 비슷할 것이라 생각했어요.
 
-프로젝트에서 사용했던 코드를 예제로 들어 Terraform 입문자가 알아두면 좋을만한 핵심 개념을 정리해 보았습니다. 그리고 사용 중에 겪었던 어려움도 몇 가지 공유하고자 합니다.
+그래서 이미 설계해 놓은 인프라를 템플릿으로 만들어 쉽게 재현할 수 있는 방법을 찾던 중에 Terraform을 접하게 됐습니다.
 
-Terraform을 처음 접하는 분들께 도움이 되길 바랍니다. 😄
+이 목적으로 올해 추석 연휴에 시작한 "코스잇다"라는 프로젝트에서 Terraform을 처음 사용해 보게 됐는데요.
 
----
+제가 Terraform을 프로젝트에 도입하면서 "이 정도만 이해하고 있어도 인프라를 코드로 관리할 수 있겠다"고 느꼈던 내용들을 정리해 보았습니다.
 
+그리고 마지막에 Terraform을 사용하며 겪었던 어려움도 적어 보았는데요.
+
+Terraform을 처음 접하거나, 제 상황과 같이 작은 규모의 프로젝트에 도입하려는 분들께 도움이 되길 바랍니다. 😄
+
+---    
 # ✅ Terraform 핵심 개념
 
 ## Terraform이 무엇인가요?
+
 > HashiCorp Terraform is an **infrastructure as code tool** that lets you define both cloud and on-prem resources in **human-readable configuration files** that you can version, reuse, and share.
 >
 
-간단히 말해, Terraform은 **사람이 읽기 쉬운 설정 파일**로 인프라를 정의하고 관리하는 **IaC 도구**입니다.
+공식 문서의 Terraform 첫 소개 문장입니다.
 
-IaC는 단어 뜻 그대로 인프라를 코드로 관리하는 방법론입니다.
+요약하면 Terraform은 **사람이 읽기 쉬운 설정 파일**로 인프라를 정의하고 관리하는 **IaC(Infrastructure As Code) 도구**입니다.
+
+IaC는 영어 뜻 그대로 인프라를 코드로 정의하고 관리하는 방법론이에요.
 
 코드를 실행하면 작성한 코드대로 인프라가 짠하고 만들어지는 거죠.
 
-대표적인 IaC 도구인 Terraform의 특징 3가지와 핵심 키워드 7가지를 소개하겠습니다.
+아래에서 대표적인 IaC 도구인 Terraform의 특징 3가지와 핵심 키워드 7가지를 본격적으로 소개하겠습니다.
 
 ## Terraform의 특징
 
@@ -55,9 +61,11 @@ HCL에서는 block, argument 구조로 코드를 작성하는데요.
 
 ![](https://velog.velcdn.com/images/heiler/post/c49c7bf9-d6a7-4d98-adb8-c9b94b0a088d/image.png)
 
-HCL을 학습하면서 느낀 점은 HCL에 대한 러닝 커브보다는 사용하는 클라우드(예: AWS)에 대한 이해도가 더 큰 러닝 커브라 느꼈습니다.
+HCL을 학습하면서 느낀 점은 사용하는 클라우드(예: AWS)에 대한 이해만 있다면, 해당 클라우드에서 사용할 리소스를 HCL로 작성하는 것은 크게 어렵지 않을 것이라 생각했습니다.
 
-AWS를 이미 잘 알고 있는 분이라면, AWS 관련 HCL 코드를 작성하는 것은 크게 어렵지 않을 거라 생각합니다.
+다만, HCL도 코드다 보니 추상화, 모듈화 구조 설계가 필요합니다.
+
+HCL 문법에 대한 장벽보다 어떻게 모듈화 구조를 설계할지 고민하는 것이 더 어렵고 큰 진입 장벽이라고 생각해요.
 
 ### 2) 선언적(Declarative)
 
@@ -92,7 +100,9 @@ Terraform은 리소스 간 참조 관계를 기반으로 참조 그래프를 만
 
 ### 3) 멱등성(Idempotency)
 
-같은 Terraform 코드로 여러 번 실행한다고 해서 인프라를 계속 생성하지 않습니다. 현재 인프라 상태를 추적해서, 코드 변경에 의해 발생한 차이만 실행에 반영하기 때문에 멱등성이 보장됩니다.
+같은 Terraform 코드를 여러 번 실행한다고 해서 인프라가 계속 새롭게 만들어지지 않습니다.
+
+현재 인프라 상태를 추적해서, 코드 변경에 의해 발생한 차이만 실행에 반영합니다.
 
 ## Terraform 핵심 키워드
 
@@ -100,7 +110,7 @@ Terraform은 리소스 간 참조 관계를 기반으로 참조 그래프를 만
 
 ![](https://velog.velcdn.com/images/heiler/post/50ee0b15-000c-4819-b5c7-898859d6a488/image.png)
 
-provider는 Terraform과 외부 인프라 서비스(Target API) 사이를 연결해주는 플러그인 역할을 합니다.
+provider는 Terraform과 Target API(예: AWS) 사이를 연결해주는 플러그인 역할을 합니다.
 
 코드로 AWS 인프라를 정의해두면, 내부적으로 Terraform Core가 AWS API를 호출해서 AWS 인프라를 생성합니다.
 
@@ -123,6 +133,8 @@ provider "aws" {
 }
 ```
 
+
+
 ### 2) resource
 
 resource 블록은 VPC, Subnet, EC2, RDS와 같은 하나의 **리소스를 정의**하는 블록입니다.
@@ -141,7 +153,7 @@ resource "aws_instance" "app_instance" {
 }
 ```
 
-익숙하지 않은 data, var와 같은 키워드들이 등장해 혼란스러울 수 있으실 텐데요. 자세한 내용은 아래에서 살펴보겠습니다. 😄
+익숙하지 않은 data, var와 같은 키워드들이 등장해 혼란스러울 수 있으실 텐데요. 자세한 내용은 아래에서 살펴보겠습니다.
 
 ### 3) variable
 
@@ -186,11 +198,11 @@ resource "aws_eip" "app_eip" {
 
 위 코드와 같이 main.tf에서 variables.tf에 정의한 변수를 사용할 수 있습니다.
 
-별다른 조치 없이 variable에 default 값을 입력하지 않으면, Terraform 코드를 실행하는 시점에 콘솔로 사용자 입력을 받게 됩니다. 
+별다른 조치 없이 variable에 default 값을 입력하지 않으면, Terraform 코드를 실행하는 시점에 콘솔로 사용자 입력을 받게 됩니다.
 
-default 값을 variable 선언부에 두지 않고, 실행 시점에 외부에서 값을 주입해서 사용할 수 있는 방법이 여러가지가 있는데요.
+default 값을 variable 선언부에 두지 않고, 실행 시점에 외부에서 값을 주입해서 사용할 수 있는 방법이 여러 가지가 있는데요.
 
-그 중에 자주 사용되는 방법 중 하나가 module을 사용하는 방법입니다.
+그중에 자주 사용되는 방법 중 하나가 module을 사용하는 방법입니다.
 
 ### 4) module
 
@@ -372,7 +384,7 @@ resource "aws_instance" "app_instance" {
 
 ### 7) backend
 
-Terraform에서 말하는 backend는 백엔드/프론트엔드의 백엔드와는 전혀 다른 의미입니다. 
+Terraform에서 말하는 backend는 백엔드/프론트엔드의 백엔드와는 전혀 다른 의미입니다.
 
 backend는 Terraform **상태 파일(이하 상태 파일)을 저장하고 관리하는 위치**를 의미합니다.
 
@@ -401,15 +413,13 @@ Terraform을 프로젝트에 도입하면서 온전하게 해결하지 못한 �
 
 ## 1) 부트스트랩 상태 파일 관리 문제
 
-부트스트랩 상태 파일은 제가 임의로 붙인 이름이고, 명확히는 "백엔드 인프라 상태 파일을 저장하는 backend(S3 버킷)를 생성하는 Terraform 코드에 대한 상태 파일"을 말합니다.
+부트스트랩 상태 파일은 제가 임의로 붙인 이름이고, 명확히는 "백엔드 인프라 상태 파일을 저장하는 S3 버킷을 생성하는 Terraform 코드에 대한 상태 파일"을 말합니다.
 
-설명이 너무 길기 때문에 "부트스트랩 상태 파일"이라 줄여 부르겠습니다.
+예를 들어 백엔드 인프라의 상태 파일을 `courseitda-backend-dev-terraform-state` 라는 이름의 S3 버킷에 저장한다고 해보겠습니다.
 
-예를 들면 백엔드 인프라의 상태 파일을 `courseitda-backend-dev-terraform-state` 라는 이름의 S3 버킷에 저장한다고 해보겠습니다.
+이 `courseitda-backend-dev-terraform-state` S3 버킷을 만드는 Terraform 코드가 따로 존재하고, 그 코드에 대한 상태 파일을 앞으로 "부트스트랩 상태 파일"이라 부르겠습니다.
 
-이 `courseitda-backend-dev-terraform-state` S3 버킷을 만드는 Terraform 코드가 따로 존재하고, 그 코드에 대한 상태 파일은 수동으로 관리해야 합니다.
-
-`courseitda-backend-dev-terraform-state` S3 버킷을 만드는 Terraform 코드는 bootstrap 경로에 두었습니다.
+backend로 S3를 사용하려면 이 부트스트랩 상태 파일을 수동으로 관리해야 했습니다.
 
 ```
 # 폴더 구조
@@ -424,9 +434,14 @@ Terraform을 프로젝트에 도입하면서 온전하게 해결하지 못한 �
 └── modules
 ```
 
-bootstrap/terraform.tfstate이 부트스트랩 상태 파일인데요. 이 상태 파일을 잃어버리게 되면 더이상 `courseitda-backend-dev-terraform-state` S3 버킷을 Terraform으로 관리할 수 없게 됩니다.
+`courseitda-backend-dev-terraform-state` S3 버킷을 만드는 Terraform 코드는 bootstrap 경로에 두었습니다.
 
-상태 파일을 로컬에서 관리하다 실수로 잃어버렸다면, 복원할 수 있는 살짝의 요령이 있습니다.
+`bootstrap/terraform.tfstate`가 바로 부트스트랩 상태 파일입니다.
+이 파일을 잃어버리면 더 이상 `courseitda-backend-dev-terraform-state` S3 버킷을 Terraform으로 관리할 수 없습니다.
+
+상태 파일을 로컬에서 관리하다 보면 실수로 잃어버릴 수도 있는데요.
+
+복원할 수 있는 살짝의 요령이 있습니다.
 
 ```bash
 $ terraform import 'aws_s3_bucket.bucket["dev"]' courseitda-backend-dev-terraform-state
@@ -441,17 +456,18 @@ The resources that were imported are shown above. These resources are now in
 your Terraform state and will henceforth be managed by Terraform.
 ```
 
-네... 제가 잃어버렸었는데요.
+네, 제가 실수로 백업하지 않아 잃어버린 적이 있었는데요.
 
-Terraform 코드의 리소스 이름을 하나하나 분석해가며 `terraform import` 명령어를 통해 tfstate 파일을 복원할 수 있었습니다.
+조금 번거롭지만 `terraform import <리소스명>` 명령어로 리소스를 하나씩 tfstate 파일에 다시 가져와 복원할 수 있습니다.
 
-Terraform Cloud를 사용하면, 이런 부트스트랩 상태 파일 관리 문제가 발생하다고 해서 Terraform Cloud로 옮기려고 생각 중입니다.
+Terraform Cloud를 사용하면 이런 부트스트랩 상태 파일 관리 문제를 줄일 수 있다고 해서,
+현재는 S3 backend에서 Terraform Cloud로 이전하는 것을 고민하고 있습니다.
 
 ## 2) CloudFront와 커스텀 도메인 연결
 
 다음은 CloudFront와 Gabia에서 구매한 도메인을 연결하면서 겪었던 문제입니다.
 
-도메인 구매/유지 비용을 조금이라도 줄이고자, AWS Route 53이 아닌 Gabia를 이용했는데요. 하필 Terraform이 지원 중인 5,000개가 넘는 provider 중에 Gabia는 없었습니다. 😭
+도메인 구매/유지 비용을 조금이라도 줄이고자, AWS Route 53이 아닌 Gabia를 이용했는데요. 하필 Terraform이 수천 개의 provider를 지원하고 있음에도, 그 안에 Gabia는 없었습니다. 😭
 
 그래서 Terraform으로 완전한 자동화는 하지 못했고, Terraform 코드 실행과 수동 작업 🔨을 번갈아가며 진행해야 했습니다.
 
@@ -533,33 +549,35 @@ Terraform으로 대부분의 인프라를 자동화할 수 있지만, Gabia처�
 
 # 🎬 마무리하며
 
-Terraform을 사용하며 몇 가지 어려움이 있었지만 실제 프로젝트에 도입해본 소감은 다음과 같습니다.
+새로운 사이드 프로젝트를 시작할 때마다, 아이디어만 바뀌고 인프라는 템플릿으로 꺼내 쓰는 흐름을 만드는 것이 목표였는데요.
 
-> 한 번도 Terraform을 사용해보지 않은 사람은 있어도, 한 번만 사용해본 사람은 없~~을 것 같~~다.
->
+현재는 프론트엔드 + 백엔드 실행 배포 환경 자동화까지 진행된 상황이고, 다음 단계로 모니터링 시스템을 템플릿화하려 하고 있습니다.
 
-Terraform을 사용하면, 이미 한 번 구축해본 인프라를 전과 똑같이 만들어야 할 때, 웹 콘솔에서 복붙을 반복하는 작업에서 오는 스트레스를 줄일 수 있다는 것이 가장 큰 장점 같습니다.
+인프라의 템플릿화를 위해 Terraform을 프로젝트에서 사용해 본 소감은 다음과 같습니다.
 
-또 사용해본 적 없는 새로운 리소스를 사용하게 된다 해도, 수동으로 한 번 구축해보고 Terraform으로 자동화할 수 있다면 바로 자동화할 것 같습니다 ㅎㅎ
+> 한 번도 Terraform을 사용해 보지 않은 사람은 있어도, 한 번만 사용해 본 사람은 없을 것이다.
 
-다만, 제가 진행한 프로젝트는 백엔드 2명만으로 진행 중인 소규모 프로젝트고, 
+Terraform을 사용하면 이미 한 번 구축해 본 인프라를 전과 똑같이 만들어야 할 때 웹 콘솔에서 복붙을 반복하는 작업에서 오는 스트레스를 줄일 수 있다는 것이 가장 큰 장점 같습니다.
 
-레거시 인프라가 없는 깔끔한 상태(?)에서 인프라 구축을 시작했고, 
+단순한 예로는 리소스에 붙인 태그명을 일괄적으로 바꾸는 작업을 수동으로 한다면 리소스 개수만큼 웹 콘솔에서 수정해 주어야 하는데, Terraform을 사용한다면 코드 한 줄 수정으로 해결할 수 있습니다.
 
-인프라를 담당한 인원이 저 혼자였기에 도입이 비교적 수월했다고 생각합니다.
+아마 앞으로 사용해 본 적 없는 새로운 클라우드 리소스를 사용하게 된다 해도,
+수동으로 한 번 구축해 보고 Terraform으로 자동화할 수 있는지 바로 확인해 볼 것 같아요. 😋
 
-아마 규모가 있는 팀 차원에서의 도입은 레거시 인프라의 상황과 러닝 커브 등의 진입장벽을 고려해 신중하게 결정해야 할 것 같습니다.
+다만, 제가 진행한 프로젝트는 백엔드 2명만으로 진행 중인 소규모 프로젝트고, 레거시 인프라가 없는 깔끔한 상태(?)에서 인프라 구축을 시작했고, 인프라 자동화를 담당한 인원이 저 혼자였기에 복잡한 권한 분리 작업이 따로 필요 없어 비교적 도입이 수월했다고 생각합니다.
 
-동작하는 온전한 Terraform 코드가 궁금하신 분들은 [코스잇다 레포지토리](https://github.com/courseitda/courseitda-backend/tree/develop/terraform)를 참고해주시면 감사하겠습니다.
+규모가 있는 팀 차원에서의 Terraform 도입은 레거시 인프라의 상황과 러닝 커브 등의 진입장벽을 고려해 신중하게 결정해야 할 것 같아요.
+
+혹시 동작하는 전체 Terraform 코드가 궁금하신 분들은 [코스잇다 레포지토리](https://github.com/courseitda/courseitda-backend/tree/develop/terraform)를 참고해 주세요.
 
 감사합니다. 🙌🏻
 
-# 레퍼런스
-- [Terraform 공식 문서](https://developer.hashicorp.com/terraform)
-- [HCL](https://developer.hashicorp.com/terraform/language)
-- [Terraform - 모듈 구조](https://developer.hashicorp.com/terraform/language/modules/develop/structure)
-- [Terraform - 상태 관리](https://developer.hashicorp.com/terraform/language/state)
-- [Terraform AWS Provider](https://registry.terraform.io/providers/hashicorp/aws/latest)
+---
 
-+@
-Infracost 이야기 추가
+# Reference
+- [Terraform 공식 문서 -
+  Intro to Terraform](https://developer.hashicorp.com/terraform/intro)
+- [Terraform 공식 문서 - HCL](https://developer.hashicorp.com/terraform/language)
+- [Terraform 공식 문서 - Standard Module Structure](https://developer.hashicorp.com/terraform/language/modules/develop/structure)
+- [Terraform 공식 문서 - State](https://developer.hashicorp.com/terraform/language/state)
+- [Terraform AWS Provider](https://registry.terraform.io/providers/hashicorp/aws/latest)
