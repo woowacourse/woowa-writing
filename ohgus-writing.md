@@ -451,7 +451,7 @@ const invalid = pick(user, ['id', 'wrong']);
 
 실제 프로젝트의 API Client를 제네릭으로 개선한 사례를 살펴보자.
 
-### Before: 타입이 불명확한 코드
+#### Before: 타입이 불명확한 코드
 
 ```tsx
 // 개선 전 코드 (문제: Response만 반환 → json()이 any)
@@ -482,7 +482,7 @@ const data = await response.json(); // any 타입
 - 자동완성이 작동하지 않음
 - 타입 에러를 런타임에 발견
 
-### After: 제네릭으로 타입 안전하게
+#### After: 제네릭으로 타입 안전하게
 
 ```tsx
 // 개선 후 코드
@@ -581,8 +581,6 @@ async function fetchApi<T extends BaseResponse>(url: string): Promise<T>;
 function pick<T, K extends keyof T>(obj: T, keys: K[]): Pick<T, K>;
 ```
 
-##
-
 ## 전체 정리
 
 ### 핵심 요약
@@ -603,7 +601,7 @@ function pick<T, K extends keyof T>(obj: T, keys: K[]): Pick<T, K>;
 
 ### 자주 하는 실수
 
-### 1. 제네릭 남발
+#### 1. 제네릭 남발
 
 ```tsx
 // ❌ 불필요한 제네릭
@@ -622,7 +620,7 @@ function add(a: number, b: number): number {
 - 여러 타입에서 재사용할 때
 - 입력과 출력의 타입 관계를 유지해야 할 때
 
-### 2. 타입 매개변수 이름 혼란
+#### 2. 타입 매개변수 이름 혼란
 
 ```tsx
 // ❌ 의미 없는 이름
@@ -639,7 +637,7 @@ function fetch<TData, TError, TVariables>(...)
 - `TError`: 에러 타입
 - `TVariables`: 변수 타입
 
-### 3. extends 제약 조건 누락
+#### 3. extends 제약 조건 누락
 
 ```tsx
 // ❌ 런타임 에러 가능
@@ -653,7 +651,7 @@ function getLength<T extends { length: number }>(value: T) {
 }
 ```
 
-### 4. any 타입으로 회귀
+#### 4. any 타입으로 회귀
 
 ```tsx
 // ❌ 제네릭의 의미 없음
@@ -667,7 +665,7 @@ function process<T>(data: T): T {
 }
 ```
 
-### 5. 타입 추론 무시
+#### 5. 타입 추론 무시
 
 ```tsx
 // ❌ 불필요한 타입 명시
