@@ -139,7 +139,7 @@ const Route = () => {
         </PlaceListProvider>
       </RoutieProvider>
       <Toast />
-    <ToastProvider>
+    </ToastProvider>
   );
 };
 ```
