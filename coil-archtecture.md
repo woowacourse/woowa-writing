@@ -2,32 +2,18 @@
 
 ![](https://coil-kt.github.io/coil/logo.svg)
 
-최근 Coil 라이브러리를 사용하던 중, 이미지 요청에 Timeout(시간 제한)을 설정하는 기능의 필요성을 느꼈습니다.   
-'어떻게 하면 이 기능을 구현할 수 있을까?'에서 시작된 이 생각은 곧 Coil 내부 구조 분석으로 이어졌습니다.   
-정신을 차려보니, 저는 이미 이 기능을 담은 코드를 작성하고 Coil 오픈 소스 프로젝트에 PR을 제출하고 있었습니다.   
-비록 제출한 PR은 이런 저런 이유로 반려되었지만, 그 과정에서 얻었던 Coil의 동작을 분석한 경험을 공유하며, Coil의 내부 동작 원리를 알아보자 합니다.   
-
 ### 들어가며
-Coil은 Kotlin과 Coroutine을 기반으로 구축된 경량(Lightweight) 고성능 이미지 로딩 라이브러리입니다.   
-현재 안드로이드 개발 생태계에서 Glide와 더불어 가장 강력하고 널리 사용되는 솔루션으로 인정받고 있습니다.    
- 
-Coil은 다음과 같은 최신 기술 환경과의 시너지를 통해 그 입지를 확고히 하고 있습니다.    
-
-Jetpack Compose 친화적: Compose 환경에 최적화된 API를 제공하며 매끄러운 통합을 지원합니다.    
-KMP(Kotlin Multi Platform) 지원: 크로스 플랫폼 환경에서도 이미지 로딩의 일관성을 유지할 수 있도록 설계되었습니다 .   
-솔직히 고백하자면, 많은 개발자가 이미지 로딩 라이브러리를 "단순히 URL을 요청하고,   
+많은 개발자가 이미지 로딩 라이브러리를 "단순히 URL을 요청하고,   
 비트맵으로 변환하여 View에 전달하는" 간단한 작업으로 치부하곤 합니다. 저 역시 그랬습니다.   
 
-하지만 막상 Coil의 내부를 깊이 들여다보니, 그 생각이 얼마나 안일했는지 깨닫게 되었습니다. 
+하지만 막상 Coil의 내부를 깊이 들여다보니, 그 생각이 얼마나 안일했는지 깨닫게 되었습니다.   
 Coil은 겉으로 보이는 단순함 뒤에 캐싱 전략, 메모리 관리, 생명주기 제어,   
 비동기 처리 최적화 등 수많은 복잡성과 섬세한 고려 사항을 담고 있었습니다.  
 
-Coil은 개발자 Colin White 님, 단 한 분의 깊이 있는 고민과 노력으로 탄생했습니다.  
-이 자리를 빌려 이 놀라운 라이브러리를 개발해주신 Colin White 님께 경의를 표합니다.  
+Coil의 내부 동작을 분석한 경험을 공유하며,  
+Android 환경에서 Coil이 이미지 로딩을 위해 무엇을 고려하는지 실피며 자세한 내부 동작 원리를 알아보자 합니다. 
 
-Coil의 아키텍처 내부를 탐험하며, 고성능 이미지 로딩 라이브러리가 갖춰야 할 진정한 동작 원리와 내부 구조를 파헤쳐 봅시다.   
-
-###ImageRequest, ImageLoader
+### ImageRequest
 
 ```kotlin
 inline fun ImageView.load(
@@ -43,33 +29,33 @@ inline fun ImageView.load(
    return imageLoader.enqueue(request)
 }
 ```
-
-
-이 부분은 우리가 흔히 사용하는 load() 함수의 내부 구현입니다.     
+흔히 사용하는 ```ImageView.load()```의 최상단 내부 구조입니다.   
 이 중 눈여겨 봐야 할 부분은 ImageRequest와 ImageLoader 입니다.    
 
-ImageRequest는 이미지를 로딩할 때 다양한 설정 정보들을 담는 클래스입니다.   
-빌더 패턴으로 구현되어 있고, data() 함수의 인자는 Any? 입니다.    
+ImageRequest는 이미지를 로딩할 때 다양한 설정 정보들을 담는 클래스입니다.    
+data() 함수의 인자는 Any? 입니다.    
 여기에는 url 링크, Android Drawable 등이 들어갈 수 있습니다.    
 target() 함수는 이미지가 로딩된 후 어떤 객체에 반영할 것인지 지정하는 확장 함수입니다.    
-이외에도  diskCachePolicy, networkCachePolicy, scale 등 캐시와 이미지 사이즈, 
-등을 설정할 수 있는 다양한 옵션을 제공합니다. cache에 대해서는 뒤에서 자세히 다루겠습니다   
+이외에도  diskCachePolicy, networkCachePolicy, scale 등 캐시와 이미지 사이즈,   
+등을 설정할 수 있는 다양한 옵션을 제공합니다. cache에 대해서는 뒤에서 자세히 다루겠습니다.    
+ 
+### ImageLoader
+>A service class that loads images by executing ImageRequests. Image loaders handle caching, data fetching, image decoding, request management, memory management, and more. Image loaders are designed to be shareable and work best when you create a single instance and share it throughout your app.
 
-**A service class that loads images by executing ImageRequests. 
-Image loaders handle caching, data fetching, image decoding, request management, memory management, and more.
-Image loaders are designed to be shareable and work best when you create a single instance and share it throughout your app. **  
+ImageLoader는 Android 환경에서 싱글톤으로 제공되며. ```context.imageLoader``로 접근할 수 있습니다. 
 
 ImageLoader의 설명입니다 ImageRequest에서 설정했던 요청 옵션들을 ImageLoader에서 실행합니다.   
 요청은 enqueue, execute 두 가지로 나뉘며 enqueue는 메시지 큐 방식의 비동기를 실행하고 execute는 코루틴 기반으로 실행합니다.   
-하지만 하위 코드를 보시면 사실 enqueue 메서드도 코루틴 기반의 execute() 메서드를 사용하는 것을 알 수 있습니다.  
+하지만 사실 enqueue도 execute와 동일한 내부 메서드를 사용합니다
 
-참고로 ImageLoader는 인터페이스며, RealImageLoader라는 실제 구현체에서 이미지 요청을 처리합니다.  
+ImageLoader는 인터페이스며, RealImageLoader라는 실제 구현체에서 이미지 요청을 처리합니다.  
 
 ```kotlin
 // RealImageLoader (ImageLoader 인터페이스의 구현체)
 override fun enqueue(request: ImageRequest): Disposable {
    // Start executing the request on the main thread.
    val job = scope.async(options.mainCoroutineContextLazy.value) {
+       //execute()에서도 플래그만만 다를 뿐, 동일한 메서드를 실행합니다.
        execute(request, REQUEST_TYPE_ENQUEUE)
    }
 
@@ -78,28 +64,9 @@ override fun enqueue(request: ImageRequest): Disposable {
 }
 ```
 
-Coroutine의 async 메서드를 이용하여 job을 리턴합니다 Disposable은 ImageLoader로 로드한 후 반환하는 객체입니다.  
-시그니쳐는 다음과 같습니다. 내부에 job 프로퍼티가 존재하여 enqueue로 실행한 결과값을 가져올 수 있습니다.  
-
-```kotlin
-interface Disposable {
-   /**
-    * The most recent image request job.
-    * This field is **not immutable** and can change if the request is replayed.
-    */
-   val job: Deferred<ImageResult>
-
-   /**
-    * Returns 'true' if this disposable's work is complete or cancelling.
-    */
-   val isDisposed: Boolean
-
-   /**
-    * Cancels this disposable's work and releases any held resources.
-    */
-   fun dispose()
-}
-```
+Disposable은 ImageLoader로 로드한 후 반환하는 객체입니다.   
+Disposable 객체는 Kotlin의 job을 래핑하여 View에 이미지가 붙었을 때,  
+coil에서 이미지 리소스를 해제하는 클래스라고 보시면 되겠습니다. 
 
 ### Execute
 
@@ -114,14 +81,14 @@ val requestDelegate = requestService.requestDelegate(
 ).apply { assertActive() }
 ```
 
-요청을 할 객체인 Service를 만드는 부분입니다.   
+이미지 요청을 할 객체인 Service를 만드는 부분입니다.   
 RequestDelegate라는 객체로 Service를 감싸고 있습니다.   
 
 **Wrap request to automatically dispose and/or restart the ImageRequest based on its lifecycle.**
 
 requestDelegate 메서드에 작성된 설명입니다.   
 requestService를 바로 사용할 수도 있지만 Delegate를 사용하게 된다면 자동으로 job을 닫고,   
-액티비티의 생명주기에 따라 재요청을 보낼 수 있습니다.  
+액티비티의 생명주기에 따라 재요청을 보낼 수 있습니다. (하위 구현체인 ViewTargetRequestDelegate에서 수행합니다)
 
 ```kotlin
 internal interface RequestDelegate {
@@ -143,8 +110,8 @@ internal interface RequestDelegate {
 ```
 
 RequestDelegate의 인터페이스는 다음과 같으며,   
-ImageLoader의 구현체인 RealImageLoader의 execute() 메서드에서   
-start() 메서드를 호출하여 해당 RequestDelegate 객체를 안드로이드 생명주기와 동기화합니다.  
+ImageLoader의 구현체인 RealImageLoader의 execute() 메서드에서 start() 메서드를 호출합니다.   
+하단 코드는 ImageView.load()를 실행했을 때 제공되는 ViewTargetRequestDelegate의 구현체입니다.   
 
 ```kotlin
 override fun start() {
@@ -156,10 +123,9 @@ override fun start() {
 }
 ```
 
-이후에는 PlaceHolder를 설정하고, ImageRequest에서 등록한 listener  
-를 실행한 후, 사이즈를 계산한 후 이미지 요청을 보냅니다.   
-
-
+이후, 실제 이미지 요청 전(네트워크, 로컬 둘 다) PlaceHolder를 설정하고,  
+sizeResolver에서 View에 들어갈 이미지 사이즈를 계산을 마칩니다.   
+ 
 ```kotlin
 // Set the placeholder on the target.
 val cachedPlaceholder = request.placeholderMemoryCacheKey?.let { memoryCache?.get(it)?.image }
@@ -174,11 +140,8 @@ val size = sizeResolver.size()
 eventListener.resolveSizeEnd(request, size)
 ```
 
-
-눈여겨볼 점은 request.sizeResolver로 등록한 사이즈를 이미지 요청 전에 처리한다는 점입니다.  
-
 ### EngineInterceptor  
-그 다음으로는 실제 이미지를 Interceptor를 통해 요청합니다
+그 다음으로는 Interceptor를 통해 이미지를 요청합니다.  
 
 ```kotlin
 // Execute the interceptor chain.
@@ -196,13 +159,7 @@ val result = withContext(request.interceptorCoroutineContext) {
 ```
 
 눈여겨볼 점은 interceptor는 여러개가 등록될 수 있다는 점입니다.   
-커스텀 Interceptor를 통해 로깅, 재시도 요청, timeout 기능 등을 구현할 수 있습니다.   
-
-하지만 ImageLoader를 커스텀하지 않으면,   
-Coil에서 기본적으로 제공하는 EngineInteceptor 하나만 등록하게 됩니다.   
-이 Interceptor는 Coil의 핵심 클래스인 만큼 사용자가   
-ImageLoader를 커스텀하더라도 EngineInteceptor는 등록됩니다.    
-
+커스텀 Interceptor를 등록하여 로깅, 재시도 요청, timeout 기능 등을 구현할 수 있습니다.   
 
 ```kotlin
 override suspend fun proceed(): ImageResult {
@@ -214,13 +171,20 @@ override suspend fun proceed(): ImageResult {
 }
 ```
 
+ImageLoader를 커스텀하지 않으면,   
+Coil에서 기본적으로 제공하는 EngineInteceptor 하나만 등록하게 됩니다.   
+이 Interceptor는 Coil의 핵심 클래스이며, 실제 ImageRequest를 받아 이미지를 요청하는 클래스입니다. 
 
-다음으로 Engineinterceptor.intercept()의 메서드를 살펴봅시다.   
+### Engineinterceptor.intercept()  
+다음으로  Engineinterceptor.intercept()의 메서드를 살펴봅시다.   
 함수 시그니처는 다음과 같습니다.   
 
 ```kotlin
-override suspend fun intercept(chain: Interceptor.Chain): ImageResult {
+override suspend fun intercept(chain: Interceptor.Chain): ImageResult 
 ```
+
+Engineinterceptor.intercept()의 하는 일을 다음과 같습니다.   
+**1. data의 타입을 분석하여 실제 Coil이 처리 가능한 타입으로 변환**
 
 intercept 메서드가 반환하는 ImageResult 타입은 이미지 요청 결과로 받은 실제 이미지 비트맵 정보가 담겨 있습니다.   
 첫 번째로 EngineInterceptor가 하는 일은 data의 타입을 분석하여   
@@ -230,15 +194,15 @@ intercept 메서드가 반환하는 ImageResult 타입은 이미지 요청 결�
 val mappedData = imageLoader.components.map(data, options)
 ```
 
-Coil에서 처리가 가능한 타입은 다음과 같습니다  
+Coil에서 처리가 가능한 타입은 다음과 같습니다. 
+- android.net.Uri  
+- Integer  
+- File  
+- String  
+- okio.Path
+일반적인 이미지 url은 android.net.Uri로 변환됩니다.   
 
-android.net.Uri  
-Integer  
-File  
-String  
-okio.Path   
-
-두 번째는 cacheKey를 생성하여 메모리에 캐시에 이미지가 있는지 확인한 후, 이미지가 있다면 바로 결과를 반환합니다.  
+**2. cacheKey를 생성하여 메모리에 캐시에 이미지가 있는지 확인한 후, 이미지가 있다면 바로 결과를 반환**  
 
 ```kotlin
 val cacheKey = memoryCacheService.newCacheKey(request, mappedData, options, eventListener)
@@ -250,10 +214,35 @@ if (cacheValue != null) {
 }
 ```
 
-그 다음 mapper로 치환한 타입에 맞는 Fetcher에 따라 이미지를 요청합니다  
-Fetcher의 종류에는 여러가지가 있지만 이미지 url을 로드할 때는 NetworkFetcher를 사용합니다  
-NetworkFetcher는 내부적으로 네트워크 요청 전, 디스크 캐시에 접속하여 이미지 캐시가 있는지 확인합니다. 
-그 후 캐시가 없다면 실제 요청을 처리합니다  
+Coil은 메모리 캐시를 MemoryCacheService에서 관리하며,    
+StrongMemoryCache와 WeakMemoryCache 두 가지의 캐시로 관리됩니다.    
+
+StrongMemoryCache는 내부적으로 LinkedHashMap을 사용하여 Lru 알고리즘을 구현하여,   
+StrongMemoryCache는 MaxSize를 넘지 않도록 가장 오랫동안 사용되지 않은 캐시부터 제거합니다.  
+
+WeakMemoryCache는 StrongMemoryCache에서 요소가 제거되었을 때, 값이 이동하며,   
+WeakMemoryCache는 Map의 값으로 WeakReference를 사용하여 GC에 의해 언제든지 제거되도록 유도하여 캐시를 관리합니다.    
+
+
+**3. mapper로 치환한 타입에 따라 Fetcher를 선택하고 이미지를 요청** 
+요청은 EngineInterceptor의 private 메서드인 fetch()에서 진행합니다.  
+Fetcher의 종류에는 여러가지가 있지만 이미지 url을 로드할 때는 NetworkFetcher를 사용합니다.  
+
+NetworkFetcher는 내부적으로 네트워크 요청 전, 추가적으로 디스크 캐시에서 이미지가 캐싱되었는지 확인합니다. 
+
+```kotlin
+//NetworkFetcher의 메서드
+private fun readFromDiskCache(): DiskCache.Snapshot? {
+        if (options.diskCachePolicy.readEnabled) {
+            return diskCache.value?.openSnapshot(diskCacheKey)
+        } else {
+            return null
+        }
+    }
+``` 
+디스크 캐시를 관리하는 DiskCache 또한 LinkedHashMap으로 구현되어 Lru 알고리즘을 사용하며,    
+내부적으로 Okio 라이브러리를 사용하여 디스크 캐시를 관리하고 있습니다.     
+디스크에 캐시가 없다면 그제서 네트워크 요청을 보냅니다.   
 
 ```kotlin
 @JvmInline
@@ -270,7 +259,7 @@ internal value class CallFactoryNetworkClient(
 ```
 
 그 후 OkHttp를 사용하여 네트워크 요청을 처리한 후,   
-요청 결과값을 BitMapFactoryDecodor를 사용하여 결과값을 디코딩합니다  
+내부적으로 요청 결과값을 Android에서 제공하는 BitmapFactory를 사용하여 결과값을 디코딩합니다.  
 
 ```kotlin
 fun interface Decoder {
@@ -309,15 +298,17 @@ fun interface Decoder {
 }
 ```
 
-### NetworkCache
+### 만약 여러 스레드에서 동시에 요청을 보낸다면?
 
 Coil은 네트워크에 요청 전 메모리 캐시와 디스크 캐시를 조회합니다.  
+모든 캐시는 전부 synchronized를 사용하며, 
+이미지 로딩 라이브러리 특성 상 메인 스레드에서 주로 이미지 요청을 시도합니다.  
 때문에 대부분의 경우에는 한 번 요청을 보냈을 때 캐시에 저장된 값을 사용하지만,  
 만약 여러 스레드에서 같은 URL을 동시에 요청했을 때, 요청을 여러번 보내게 됩니다.  
 
 관련 이슈 : https://github.com/coil-kt/coil/issues/1461
 
-이 부분은 추후 개선이 될 여지가 높아 기다려봐도 좋을 것 같습니다.  
+이 부분은 추후 개선이 될 여지가 높아 기다려봐도 좋을 것 같습니다.   
 
 ### LruCache 
 이미지 비트맵은 상당히 큰 용량을 차지합니다.   
