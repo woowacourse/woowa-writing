@@ -2,39 +2,39 @@
 
 ## TL;DR
 
-야구보구 앱 프로필 사진 업로드 기능 개발 과정에서 발생한 **AWS S3 Presigned URL과 Retrofit Bearer 토큰 인터셉터 충돌 문제를 해결**하고, uCrop, Coil을 사용해 업로드할 이미지 형식을 최적화하고 UX를 개선한 기록입니다. 
+야구보구 앱 프로필 사진 업로드 기능 개발 과정에서 발생한 **AWS S3 Presigned URL과 Retrofit Bearer 토큰 인터셉터 충돌 문제를 해결**하고, uCrop을 통한 이미지 최적화와 UX를 개선한 기록입니다.
 
 ## 대상 독자
 
-- **Kotlin, Retrofit, OkHttp, Coil**등 안드로이드 네트워킹에 대한 기본적인 이해가 있는 **주니어 안드로이드 개발자**
-- **관심사**: **Pre-signed URL을 받아** AWS S3 **파일 업로드** 기능 구현에 도전하고 싶은 개발자
-- **HTTP 인터셉터와 외부 서비스 연동** 시 발생하는 인증 헤더 충돌 문제의 실무 해결 사례가 궁금한 개발자
+- **Kotlin, Retrofit, OkHttp, Coil** 등 안드로이드 네트워킹에 대한 기본적인 이해가 있는 **주니어 안드로이드 개발자**
+- **관심사**: **Pre-signed URL을 받아** AWS S3 **파일 업로드** 기능 구현에 도전하고 싶은 개발자
+- **HTTP 인터셉터와 외부 서비스 연동** 시 발생하는 인증 헤더 충돌 문제의 실무 해결 사례가 궁금한 개발자
 
 ## 문서 활용 계획
 
-- **야구보구** 프로필 사진 업로드 기능 구현 과정에서 겪은 **403 Forbidden 에러와 해결 과정**을 상세히 기록하고 공유한다.
-- 단순히 기능 구현을 넘어, **안정적인 서비스를 만들기 위한 팀의 고민과 성장**을 보여준다.
-- **우아한테크코스 기술 블로그, 팀 기술 블로그, 개인 블로그** 및 외부 개발자 커뮤니티에 공유하며 유사한 고민을 하는 개발자들에게 **실질적인 도움**을 제공한다.
+- **야구보구** 프로필 사진 업로드 기능 구현 과정에서 겪은 **403 Forbidden 에러와 해결 과정**을 상세히 기록하고 공유한다.
+- 단순히 기능 구현을 넘어, **안정적인 서비스를 만들기 위한 팀의 고민과 성장**을 보여준다.
+- **우아한테크코스 기술 블로그, 팀 기술 블로그, 개인 블로그** 및 외부 개발자 커뮤니티에 공유하며 유사한 고민을 하는 개발자들에게 **실질적인 도움**을 제공한다.
 
----
+***
 
 # 프로필 사진 S3 Pre-signed URL 업로드 삽질기
 
 <img width="409" height="123" alt="Image" src="https://github.com/user-attachments/assets/b7d44291-526e-4337-b08d-25b8bae00ade" />
 
-[**야구보구**](https://play.google.com/store/apps/details?id=com.yagubogu&hl=ko)는 우아한테크코스에서 개발 중인 야구 팬 커뮤니티 앱입니다. 프로야구 경기장에서 버튼 한 번으로 직관 인증과 기록이 가능하고, 팬들끼리 소통할 수 있는 플랫폼을 제공합니다.
+**야구보구**는 우아한테크코스 내에서 개발 중인 프로야구 직관 기반 통계 기록 및 팬 커뮤니티 앱입니다. 경기장에서 버튼 한 번으로 직관 인증과 기록이 가능하고, 팬들끼리 소통할 수 있는 플랫폼을 제공합니다.
 
 개발 당시 구글 SSO 로그인으로 간편 가입을 도입함과 더불어 구글 프로필 이미지를 그대로 사용하여 프로필을 표시했으나, "**프로필 사진을 바꾸고 싶어요!**"라는 사용자 피드백이 들어오면서 프로필 사진 업로드 기능을 추가하게 되었습니다.
 
-사진을 업로드하는 단순해 보이는 이 기능이 어떤 기술적 도전을 가져다주었고 어떤 방식으로 해결했을지 궁금하다면 계속 읽어주세요.
-
+사진을 업로드하는 단순해 보이는 이 기능이 어떤 기술적 도전을 가져다주었고 어떤 방식으로 해결했는지 궁금하다면 계속 읽어주세요.
 
 ## 그래서 AWS S3 Pre-signed URL이 뭔데?
 
-![일회용 마그네틱 승차권](https://github.com/user-attachments/assets/54c1ae87-6095-4807-a362-00c036b3118c)
+<img width="411" height="397" alt="image" src="https://github.com/user-attachments/assets/0cb5543a-70ed-46ef-9343-c93565128c06" />
 
-티켓 가격, 목적지가 정해져 있는 옛날 지하철 마그네틱 승차권과 비슷하다. 
-발급받은 URL로 특정 용량의 파일을 단 한번만 전송이 가능하다.
+**제한된 접근 권한을 가진 일회용 티켓**과 비슷합니다. 특정 파일, 특정 작업(업로드/다운로드), 특정 시간 동안만 유효한 임시 접근 권한을 제공합니다.
+
+발급받은 URL로 지정된 용량의 파일을 단 한 번만 전송이 가능합니다.
 
 **Pre-signed URL의 특성**:
 
@@ -42,7 +42,7 @@
 - Content-Type, Content-Length도 서명에 영향을 미칠 수 있음
 
 ```
-<https://s3.amazonaws.com/bucket/key>?
+https://s3.amazonaws.com/bucket/key?
 X-Amz-Algorithm=AWS4-HMAC-SHA256&
 X-Amz-Credential=AKIAIOSFODNN7EXAMPLE%2F20231013%2Fus-east-1%2Fs3%2Faws4_request&
 X-Amz-Date=20231013T000000Z&
@@ -50,11 +50,10 @@ X-Amz-Expires=3600&
 X-Amz-Signature=abc123...
 ```
 
+## 그래서 왜 Pre-signed URL을 쓰는 건데?
 
-## 그래서 왜 Pre-signed URL을 쓰는건데?
-
-S3 버킷은 Amazon S3 스토리지 서비스에서 파일을 저장하는 하나의컨테이너입니다. 
-야구보구에서는 운영 서버 부하 를 줄이기 위해 . 클라이언트에서 S3에 직접 업로드 할 필요성이 생겼습니다.
+S3 버킷은 Amazon S3 스토리지 서비스에서 파일을 저장하는 하나의 컨테이너입니다. 
+야구보구에서는 운영 서버 부하를 줄이기 위해 클라이언트에서 S3에 직접 업로드할 필요성이 생겼습니다.
 
 일반적인 파일 업로드 방식이라면:
 1. 클라이언트 → 서버로 이미지 전송
@@ -64,74 +63,79 @@ S3 버킷은 Amazon S3 스토리지 서비스에서 파일을 저장하는 하�
 하지만 Pre-signed URL을 사용하면:
 1. 서버에서 임시 업로드 URL만 생성
 2. **클라이언트가 S3에 직접 업로드** (서버 경유 없음)
-3. 완료 후 서버에 결과만 통지
+3. 완료 후 서버에 결과만 통보
 
-즉 퍼블릭 액세스가 불가능한 S3 버킷에 직접 접근하기 위한 일회성 URL인 Pre-signed URL인 것입니다.
+즉, 퍼블릭 액세스가 불가능한 S3 버킷에 직접 접근하기 위한 일회성 URL이 Pre-signed URL인 것입니다.
 따라서 야구보구의 운영 서버는 단순히 URL 생성과 완료 확인 역할만 하게 되어 리소스 절약과 업로드 속도 향상의 효과를 얻을 수 있습니다.
 
+## 잘 모르겠고 업로드부터 해보자
 
-## 잘 모르겠고 업로드부터 해 보자
-
-우선 아구보구의 ~~전설은 아니고 레전드인~~ 백엔드 개발자 포라가 `Pre-signed url 조회`와 `Pre-signed url 업로드 확인` 이라는 두개의 API를 만들어 주셨고 아래와 같은 과정을 통해 업로드 기능을 구현하기 시작했습니다.
+우선 야구보구의 백엔드를 담당하는 두리와 포라가 `Pre-signed url 조회`와 `Pre-signed url 업로드 확인`이라는 두 개의 API를 만들어 주셨고 아래와 같은 과정을 통해 업로드 기능을 구현하기 시작했습니다.
 
 ### API를 통해 사진을 업로드하는 과정
 
-1. 야구보구 서버에서 AWS의 Pre-signed url을 받아오기
+1. **야구보구 서버에서 AWS의 Pre-signed URL 받아오기**
     
-    업로드할 파일의 MIME 타입, 업로드할 파일 크기(바이트)를  `Request Body`로 알려주면 다음과 같은 응답이 도착한다 key는 S3의 객체의 고유한 식별자 키이며, url은 Pre-Signed URL 입니다.
+    업로드할 파일의 MIME 타입, 업로드할 파일 크기(바이트)를 `Request Body`로 알려주면 다음과 같은 응답이 도착하며 key는 S3 객체의 고유한 식별자 키이며, url은 Pre-Signed URL입니다.
     
-    ```kotlin
+    ```json
     {
       "key": "yagubogu/images/profile/sample.jpg",
       "url": "https://yagubogu-2025.s3.ap-northeast-2.amazonaws.com/yagubogu/images/profile/sample.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=...&X-Amz-Expires=600&X-Amz-SignedHeaders=host&X-Amz-Signature=..."
     }
     ```
     
-2. AWS S3 서버로 이미지 전송
+2. **AWS S3 서버로 이미지 전송**
     
-    1번에서 받은 Pre-Signed URL로 HTTP PUT 메서드룰 사용해 백엔드 서버를 거치지 않고 AWS로 이미지를 직접 전송해주어야 합니다.
+    1번에서 받은 Pre-Signed URL로 HTTP PUT 메서드를 사용해 백엔드 서버를 거치지 않고 AWS로 이미지를 직접 전송해야 합니다.
     
     URL로 보낼 이미지 데이터는 `RequestBody`에 담아 보내는데, `contentType(MIME 타입 문자열)`, `contentLength(파일 크기)`, `writeTo(파일 데이터)`를 같이 담아 보냅니다.
     
-    - MIME 타입이란?
+    > **MIME 타입이란?**
+    > 
+    > 문서나 파일의 종류와 형식을 나타내는 식별자로서 `image/jpeg`, `text/html`, `video/mp4` 등 서버가 데이터를 어떻게 처리해야 할지 알려주기 위한 꼬리표 같은 역할입니다.
         
-        문서나 파일의 종류와 형식을 나타내는 식별자로서 `image/jpeg` , `text/html` , `video/mp4` 등 서버가 데이터를 어떻게 처리해야 할지 알려주기 위한 꼬리표 같은 녀석입니다.
-        
-3. 야구보구 서버에 성공했다고 알려주기
+3. **야구보구 서버에 성공했다고 알려주기**
     
-    AWS S3 버킷에 파일 전송이 성공(200) 했다면 성공했다는 사실을 우리 앱의 백엔드 서버에 알려줘야 업로드가 최종적으로 완료됩니다.
+    AWS S3 버킷에 파일 전송이 성공(200)했다면 성공했다는 사실을 우리 앱의 백엔드 서버에 알려줘야 업로드가 최종적으로 완료됩니다.
     
-   1번에서 얻어온 S3 객체의 키가 식별자이므로 이 키를 야구보구 백엔드로 넘겨주면 객체 키를 통해 백엔드에서 실제 프로필 사진 업데이트 등을 처리합니다. 
-    
+    1번에서 얻어온 S3 객체의 키가 식별자이므로 이 키를 야구보구 백엔드로 넘겨주면 객체 키를 통해 백엔드에서 실제 프로필 사진 업데이트 등을 처리합니다. 
 
 ## 그리고 문제 발생
 
-야구보구의 백엔드로부터 Pre-signed URL을 받아, 아래의 Retrofit 메서드를 사용해 전송을 시도했지만, 403 에러가 돌아왔습니다.
+야구보구의 백엔드로부터 Pre-signed URL을 받아, 아래의 Retrofit 메서드를 사용해 전송을 시도했지만, 400 에러가 돌아왔습니다.
 
 ```kotlin
-    @PUT
-    suspend fun putProfileImageToS3(
-        @Url url: String, // 야구보구 백엔드로부터 받은 Pre-signed URL
-        @Body imageRequestBody: RequestBody // contentType(MIME 타입 문자열), contentLength(파일 크기), writeTo(파일 데이터) 가 담김
-    ): Response<Unit>
+@PUT
+suspend fun putProfileImageToS3(
+    @Url url: String, // 야구보구 백엔드로부터 받은 Pre-signed URL
+    @Body imageRequestBody: RequestBody // contentType(MIME 타입 문자열), contentLength(파일 크기), writeTo(파일 데이터) 가 담김
+): Response<Unit>
 ```
-
-<img width="408" height="274" alt="Image" src="https://github.com/user-attachments/assets/7bfe2963-3bae-4ee6-a1e7-ffdc81c6ef29" />
 
 ## 에러 분석 과정
 
-백엔드에서 보내주는 URL이 잘못됐는지, API 스펙이 틀렸는지 처음엔 의하했지만, 진짜 범인은 따로 존재했습니다.
+백엔드에서 보내주는 URL이 잘못됐는지, API 스펙이 틀렸는지 처음엔 의심했지만, 진짜 범인은 따로 존재했습니다.
 
-> 이곳엔 진짜 403에러 로그나 캡쳐 이미지를 넣을 예정입니다
+### 실제 발생한 에러 로그
 
-> ```
-> S3 Upload failed: 403
-> ```
+```bash
+2025-11-04 17:35:24.119  okhttp.OkHttpClient  <-- 400 Bad Request 
+[https://techcourse-project-2025.s3.ap-northeast-2.amazonaws.com/...] (376ms)
 
-403, 즉 Forbidden에러는 서버의 권한이 존재하지 않는다는 소리이며 인증이 잘못 되었다는 것을 알 수 있는데
-Presigned Url 특성상 URL자체로 1회 인증이 가증했어야 합니다. 그렇다면 무엇이 인증을 방해했던 걸까요?
+2025-11-04 17:35:24.121  okhttp.OkHttpClient  
+<?xml version="1.0" encoding="UTF-8"?>
+<Error>
+  <Code>InvalidArgument</Code>
+  <Message>Only one auth mechanism allowed; only the X-Amz-Algorithm query parameter, 
+           Signature query string parameter or the Authorization header should be specified</Message>
+  <ArgumentName>Authorization</ArgumentName>
+  <ArgumentValue>Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...</ArgumentValue>
+  <RequestId>1DZTTGMM54A549K3</RequestId>
+</Error>
+```
 
-야구보구에서는 백엔드의 API 호출시 편의를 위해 모든 Retrofit 인스턴스에 아래와 같은 OkHttpClient를 낚아채서 헤더를 추가해주는 tokenInterceptor를 추가하였고 따라서 모든 API 요청에는 야구보구 백엔드 서버 인증용 Bearer 토큰이 부착되어 있습니다.
+야구보구에서는 백엔드 API 호출 시 편의를 위해 모든 Retrofit 인스턴스에 아래와 같은 OkHttpClient를 **가로채서** 헤더를 추가해주는 tokenInterceptor를 추가하였고, 따라서 모든 API 요청에는 야구보구 백엔드 서버 인증용 Bearer 토큰이 부착되어 있습니다.
 
 ```kotlin
 // RetrofitInstance.kt
@@ -144,35 +148,21 @@ private val tokenClient: OkHttpClient by lazy {
 }
 ```
 
-AWS에게 아래와 같이 토큰을 함께 헤더에 넣어 요청하게 되었고, 잘못된 인증 헤더를 읽은 AWS에서 업로드를 거부한 것입니다.
-
-```kotlin
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9... // 문제의 헤더!
-Content-Type: image/jpeg
-Content-Length: 245678
-```
-
+AWS로 요청을 보낼 때 Pre-signed URL 자체의 AWS 서명 정보와 더불어 불필요한 Authorization 헤더에 Bearer 토큰이 붙었던 것이 문제였습니다.
 
 ## 해결 과정
 
-이 문제를 해결하기 위해 아래의 3가지 방법을 고민했고 여러 장단점을 고려해 순수 OkHttpClient를 사용하기로 하였습니다.
+이 문제를 해결하기 위해 코드 리뷰를 거치며 여러 방법을 고민했고, 최종적으로 **별도 Retrofit 인스턴스** 방식을 채택했습니다.
 
-| 방법 | 장점 | 단점 | 채택 여부 |
+| 방법 | 장점 | 단점 | 채택 |
 | --- | --- | --- | --- |
 | **URL별 인터셉터 제외** | 기존 구조 유지 | 복잡한 조건문, 유지보수성 저하 | ❌ |
-| **별도 Retrofit 인스턴스** | 명확한 분리 | 리소스 중복, 과도한 오버헤드 | ❌ |
-| **순수 OkHttpClient 분리** | 간단명확, 리소스 효율적 | 일부 코드 중복 | ✅ |
+| **순수 OkHttpClient 사용** | 직접 제어, 직관적 | 타입 안전성 손실, 코드 일관성 저하 | ❌ |
+| **별도 Retrofit 인스턴스** | Retrofit 장점 유지, 명확한 분리 | 약간의 리소스 증가 | ✅ |
 
-- **명확한 책임 분리**: 내부/외부 서버 API 용도별 클라이언트 구분
-- **유지보수성**: 단순하고 이해하기 쉬운 구조
-- **확장성**: 향후 다른 외부 서비스 연동 시에도 순수한 Client 적용 가능
+### 1단계 - 클라이언트 인스턴스 분리
 
-순수 OkHttpClient를 사용한 자세한 해결 방법을 알아보도록 하겠습니다.
-
-## 1단계  클라이언트 인스턴스 분리
-이미 만들어둔 RetrofitInstance에 로깅만 하고 있던 순수한 loggingClient가 이미 존재하고 있었고 이를 재활용했습니다.
-
-처음에는 재활요하지 않고 요청시마다 매번 OkHttpClient 클라이언트를 생성했었는데 클라이언트는 자체적인 연결 풀과 스레드 풀을 가지고 있기 떄문에 반드시 재사용 해야 한다는 리뷰을 받았고, 직접 인스턴스를 만들지 않고 의존성을 주입받아 사용하도록 했습니다.
+코드 리뷰 과정에서 **OkHttpClient는 반드시 재사용해야 한다**는 피드백과 **Retrofit의 일관성을 유지하는 것이 좋겠다**는 의견을 받아 최종적으로 별도 Retrofit 인스턴스를 구성했습니다.
 
 ```kotlin
 // RetrofitInstance.kt
@@ -180,8 +170,8 @@ class RetrofitInstance(
     baseUrl: String,
     tokenManager: TokenManager,
 ) {
-    // Bearer 토큰이 없지만 디버그시 로깅은 작동하는 순수 클라이언트
-    val loggingClient: OkHttpClient by lazy {
+    // Bearer 토큰이 없는 순수 클라이언트 (로깅만)
+    val baseClient: OkHttpClient by lazy {
         OkHttpClient()
             .newBuilder()
             .addInterceptor(httpLoggingInterceptor) // 로깅만 유지
@@ -189,129 +179,180 @@ class RetrofitInstance(
     }
 
     // 야구보구 서버 API 요청용 Bearer 토큰 포함 클라이언트
-    private val tokenClient: OkHttpClient by lazy {
-        OkHttpClient()
+    private val baseTokenClient: OkHttpClient by lazy {
+        baseClient
             .newBuilder()
             .addInterceptor(tokenInterceptor) // 인증 토큰 자동 추가
-            .addInterceptor(httpLoggingInterceptor)
+            .authenticator(tokenAuthenticator)
+            .readTimeout(30, TimeUnit.SECONDS)
             .build()
     }
-}
 
+    // ThirdParty 전용 Retrofit (토큰 없음)
+    private val baseRetrofit: Retrofit by lazy {
+        Retrofit.Builder()
+            .baseUrl(baseUrl) // 더미 URL (실제로는 @Url이 오버라이드)
+            .client(baseClient) // Bearer 토큰 없는 순수 클라이언트
+            .addConverterFactory(json.asConverterFactory(MEDIA_TYPE.toMediaType()))
+            .build()
+    }
+
+    // 야구보구 서버 API용 Retrofit (토큰 포함)
+    private val baseTokenRetrofit: Retrofit by lazy {
+        Retrofit.Builder()
+            .baseUrl(baseUrl)
+            .client(baseTokenClient) // Bearer 토큰 포함 클라이언트
+            .addConverterFactory(json.asConverterFactory(MEDIA_TYPE.toMediaType()))
+            .build()
+    }
+
+    // 서드파티 API 서비스 (S3, Google Drive 등)
+    val thirdPartyApiService: ThirdPartyApiService by lazy {
+        baseRetrofit.create(ThirdPartyApiService::class.java)
+    }
+
+    // 야구보구 내부 API 서비스들
+    val memberApiService: MemberApiService by lazy {
+        baseTokenRetrofit.create(MemberApiService::class.java)
+    }
+}
 ```
 
-- `loggingClient`: 로깅 인터셉터만 포함하는 순수 OkHttpClient로 S3 업로드시 사용
-- `tokenClient`: 기존대로 Bearer 토큰 포함, 백엔드와 통신하는 일반 API 요청용으로서 Retrofit 적용
-- 단일 `OkHttpClient` 인스턴스 재사용으로 연결 풀 최적화
+**핵심 설계 원칙**:
+- `baseClient`: 로깅만 포함하는 순수 클라이언트 → **ThirdParty API용**
+- `baseTokenClient`: Bearer 토큰 포함 클라이언트 → **야구보구 내부 API용**
 
----
-
-## 2단계 - S3 업로드 로직 구현
-
-### MemberRemoteDataSource 수정
+### 2단계 - ThirdPartyDataSource 구현
 
 ```kotlin
-// MemberRemoteDataSource.kt
-class MemberRemoteDataSource(
-    private val context: Context,
-    private val memberApiService: MemberApiService,
-    private val pureClient: OkHttpClient, // S3 전용 클라이언트
-) : MemberDataSource {
-
-    override suspend fun uploadProfileImage(
+// ThirdPartyDataSource.kt
+class ThirdPartyDataSource(
+    private val thirdPartyApiService: ThirdPartyApiService,
+    private val contentResolver: ContentResolver,
+) {
+    suspend fun uploadImageToS3(
         url: String, // S3 Pre-signed URL
         imageFileUri: Uri,
         contentType: String,
         contentLength: Long,
-    ): Result<Unit> = withContext(Dispatchers.IO) {
+    ): Result<Unit> = safeApiCall {
+        val requestBody = createRequestBody(imageFileUri, contentType, contentLength)
+        
+        // 핵심: Bearer 토큰이 없는 Retrofit 인스턴스 사용
+        thirdPartyApiService.putImageToS3(url, requestBody)
+    }
+
+    private fun createRequestBody(
+        uri: Uri,
+        contentType: String,
+        contentLength: Long,
+    ): RequestBody = object : RequestBody() {
+        
+        override fun contentType(): MediaType? = contentType.toMediaTypeOrNull()
+        override fun contentLength(): Long = contentLength
+
+        override fun writeTo(sink: BufferedSink) {
+            contentResolver.openInputStream(uri)?.use { inputStream ->
+                sink.writeAll(inputStream.source())
+            }
+        }
+    }
+}
+```
+
+### 3단계 - ThirdPartyApiService 정의
+
+```kotlin
+// ThirdPartyApiService.kt
+interface ThirdPartyApiService {
+    @PUT
+    suspend fun putImageToS3(
+        @Url url: String, // 전체 URL이 제공되면 baseUrl 무시됨
+        @Body requestBody: RequestBody,
+    ): Response<Unit>
+}
+```
+
+- `@Url` 어노테이션은 **Retrofit 공식 지원 기능**으로, 완전한 URL이 제공되면 baseUrl을 자동으로 오버라이드합니다.
+
+## 그래서 왜 이 방식을 최종 선택했을까?
+
+### 처음엔 순수 OkHttpClient를 고려했지만...
+
+코드 리뷰 과정에서 순수 OkHttpClient 사용의 단점들이 드러났습니다:
+
+```kotlin
+// 순수 OkHttpClient 사용 시의 문제점
+override suspend fun uploadProfileImage(...): Result<Unit> = 
+    withContext(Dispatchers.IO) {
         runCatching {
-            val requestBody = createRequestBody(imageFileUri, contentType, contentLength)
-
             val request = Request.Builder()
-                .url(url) // Pre-signed URL 사용
-                .put(requestBody) // http PUT 메서드로 이미지 데이터 전송
+                .url(url)
+                .put(requestBody)
                 .build()
-
-            // 핵심: Bearer 토큰 없는 순수 클라이언트 사용
-            pureClient.newCall(request).execute().use { response ->
+                
+            // 매번 새 클라이언트 생성 (성능 문제)
+            OkHttpClient().newCall(request).execute().use { response ->
+                // 수동 에러 처리
                 if (!response.isSuccessful) {
-                    val errorBody = response.body?.string()
-                    Timber.e("S3 Upload failed: ${response.code}")
-                    Timber.e("S3 Error body: $errorBody")
                     throw Exception("Upload failed: ${response.code}")
                 }
             }
-        }.onFailure { e ->
-            Timber.e(e, "S3 Upload exception")
         }
     }
-}
-
 ```
 
-- `pureClient.newCall()`: Bearer 토큰 인터셉터를 거치지 않음
-- `runCatching`: 간결한 예외 처리 (코드 리뷰 반영)
-- `use` 블록: 리소스 자동 해제로 메모리 누수 방지
+**문제점들**:
+1. **타입 안전성 손실**: `Response<Unit>` 대신 수동 파싱
+2. **코드 일관성 저하**: 90% API는 Retrofit, 10%는 순수 OkHttp
+3. **복잡한 예외 처리**: `safeApiCall` 등 공통 유틸 활용 불가
+4. **Coroutine 통합 어려움**: `suspend` 함수의 자연스러운 흐름 방해
 
-## RequestBody 생성 로직
+### 별도 Retrofit 인스턴스의 장점
 
-URI란 업로드할 파일에 접근 가능한 내부 주소로서, Context를 사용해 실제 파일의 정보를 가져옵니다.
+최종 선택한 방식의 장점들:
 
 ```kotlin
-// URI를 RequestBody로 변환
-private fun createRequestBody(
-    uri: Uri,
-    contentType: String,
-    contentLength: Long,
-): RequestBody = object : RequestBody() {
-
-    override fun contentType(): MediaType? =
-        contentType.toMediaTypeOrNull()
-
-    override fun contentLength(): Long = contentLength
-
-    override fun writeTo(sink: BufferedSink) {
-        context.contentResolver.openInputStream(uri)?.use { inputStream ->
-            sink.writeAll(inputStream.source())
-        }
-    }
+// ThirdPartyApiService - Retrofit의 모든 장점 유지
+interface ThirdPartyApiService {
+    @PUT
+    suspend fun putImageToS3(
+        @Url url: String, // baseUrl 자동 오버라이드
+        @Body requestBody: RequestBody,
+    ): Response<Unit> // 타입 안전성 유지
 }
 ```
 
+- **타입 안전성**: `Response<Unit>` 반환으로 명확한 타입 체크
+- **Coroutine 지원**: `suspend` 키워드로 자연스러운 비동기 처리
+- **일관된 아키텍처**: 모든 네트워크 호출을 Retrofit으로 통일
+- **공통 유틸 활용**: `safeApiCall` 등 기존 에러 처리 패턴 재사용
+- **확장성**: 향후 다른 외부 서비스 연동 시에도 동일한 패턴 적용
 
-### contentLength(파일 크기) 측정 로직
+### baseUrl을 지정하지 않기 위해 OkHttpClient만 사용했더라면?
 
-```kotlin
-// URI에서 정확한 파일 크기 추출
-fun Uri.fileSize(context: Context): Result<Long?> = runCatching {
-    context.contentResolver // ContentResolver의 query()로 SIZE 컬럼 조회
-        .query(this, arrayOf(OpenableColumns.SIZE), null, null, null)
-        ?.use { cursor ->
-            if (cursor.moveToFirst()) {
-                val idx = cursor.getColumnIndexOrThrow(OpenableColumns.SIZE)
-                cursor.getLongOrNull(idx)  // SIZE 컬럼 값 반환
-            } else null
-        } ?: context.contentResolver // 실패시 FileDescriptor의 statSize 사용 (fallback)
-            .openFileDescriptor(this, "r")
-            ?.use { pfd -> pfd.statSize.takeIf { it >= 0 } } // 유효한 크기만 반환
-}
-```
+다음과 같은 문제를 가지고 있었을 것입니다:
 
----
+1. **타입 안전성 손실**: Retrofit의 어노테이션 기반 타입 체크 장점을 잃게 됨
+2. **코드 일관성 저하**: 프로젝트 내 다른 API 호출과 일관성 있는 패턴을 잃음
+3. **예외 처리 복잡화**: Retrofit의 통합된 에러 핸들링 패턴 활용 불가
+4. **유지보수성 저하**: 개발자가 HTTP 요청/응답을 수동으로 처리해야 함
 
-이로서 이미지 업로드 자체의 문제는 해결하였습니다!!
+따라서 **Pre-signed URL 등으로 서드파티 Base URL이 필요한 경우**, 현재 구성처럼 URL 자체를 `@Url` 어노테이션을 사용한 API 서비스를 활용하면서, baseUrl은 우리의 도메인을 그대로 Retrofit에 할당해주는 방식이 채택되었습니다.
 
+***
 
 ## 서버비는 조상님이 내주시냐?
 
-단순히 프로필 사진을 표시할 용도의 이미지가 용량이 큰 원본 이미지를 사용할 필요가 없기 때문에 압축할 필요성이 있었고 최대 5MB까지의 이미지만 업로드 가능하다는 S3에 제약이 걸려 있었기 때문에 용량을 줄일 필요성이 생겼습니다.
+단순히 프로필 사진을 표시할 용도의 이미지가 용량이 큰 원본 이미지를 사용할 필요가 없기 때문에 압축할 필요성이 있었고, 최대 5MB까지의 이미지만 업로드 가능하다는 백엔드 구현의 제약이 걸려 있었기 때문에 용량을 줄일 필요성이 생겼습니다.
+
 더불어 사용자에게 이미지에서 실제 프로필 사진의 영역을 미리 보여주게끔 하여, UX적으로도 완성도를 높이고 싶었습니다!
 
-### uCrop을 활용한 이미지 크롭
+### uCrop을 활용한 이미지 크롭 및 압축
 
-[uCrop](https://github.com/Yalantis/uCrop)은 안드로이드 앱 개발을 위한 이미지 자르기 라이브러리로서 프로필 사진에 사용할 이미지의 미리보기를 표시하면서 크롭하기 위해 선택한 라이브러리 입니다.
+[uCrop](https://github.com/Yalantis/uCrop)은 안드로이드 앱 개발을 위한 이미지 자르기 라이브러리로서 프로필 사진에 사용할 이미지의 미리보기를 표시하면서 크롭하기 위해 선택한 라이브러리입니다.
 
-아래와 같은 uCrop액티비티 생성 코드에 파일 URI를 넘겨 액티비티를 실행하도록 하고 이미지를 크롭하는 역할을 위임합니다.
+아래와 같은 uCrop 액티비티 생성 코드에 파일 URI를 넘겨 액티비티를 실행하도록 하고 이미지를 크롭하는 역할을 위임합니다.
 
 ```kotlin
 // SettingMainFragment.kt - uCrop 설정
@@ -324,6 +365,9 @@ private fun launchUCropActivity(sourceUri: Uri) {
         setCircleDimmedLayer(true) // 원형 크롭 가이드
         setFreeStyleCropEnabled(false) // 정사각형 고정
         setToolbarColor(requireContext().getColor(R.color.primary500))
+        // uCrop 내장 압축 설정
+        setCompressionFormat(Bitmap.CompressFormat.JPEG)
+        setCompressionQuality(85) // 85% 품질
     }
 
     val uCropIntent = UCrop
@@ -335,86 +379,64 @@ private fun launchUCropActivity(sourceUri: Uri) {
 
     uCropLauncher.launch(uCropIntent)
 }
-
 ```
+
 코드를 통해 아래와 같은 크롭 UI 가이드를 만들 수 있습니다.
 
 <img width="972" height="727" alt="Image" src="https://github.com/user-attachments/assets/b2d0ba3b-b0ee-47c0-8b69-46a9df1d3a74" />
 
-### Coil을 활용한 이미지 압축
+### 이미지 처리 라이브러리 선택 과정
 
-uCrop 단독으로는 크롭한 이미지를 바로 사용하지 않고, [Coil](https://coil-kt.github.io/coil/README-ko/) 이미지 라이브러리를 사용해 압축을 진행하였습니다. 
-프로젝트 내에서 이미지 표시 이미 Coil을 도입해서 사용되고 있었고, uCrop에 비해 효율적인 압축 알고리즘으로 용량을 절약할 수 있었기에 uCrop 단독으르 크롭한 이미지의 후처리를 진행 하였습니다.
+처음에는 [uCrop](https://github.com/Yalantis/uCrop)과 더불어 [Coil](https://coil-kt.github.io/coil/README-ko/) 이미지 라이브러리를 사용해 추가 압축을 진행하려 했습니다. 프로젝트 내에서 이미지 표시를 위해 이미 Coil을 도입해서 사용하고 있었고, uCrop에 비해 다양한 압축 옵션을 제공하기 때문이었습니다.
 
-```kotlin
-// ImageUtils.kt - Coil 압축 유틸리티
-object ImageUtils {
-    suspend fun compressImageWithCoil(
-        context: Context,
-        uri: Uri,
-        maxSize: Int = 500, // 500x500 픽셀로 리사이즈
-        quality: Int = 85   // JPEG 품질 85%
-    ): Uri? = withContext(Dispatchers.IO) {
-        try {
-            val imageLoader = ImageLoader(context)
-            val request = ImageRequest.Builder(context)
-                .data(uri)
-                .size(maxSize, maxSize) // 균등 리사이즈
-                .allowHardware(false)   // 소프트웨어 비트맵 강제
-                .build()
+또한 uCrop은 2가지 버전을 제공하고 있어 실험을 통해 적합한 방법을 알아보기로 했습니다.
 
-            val bitmap = imageLoader.execute(request)
-                .image?.toBitmap() ?: return@withContext null
-
-            val outputFile = File(
-                context.cacheDir,
-                "compressed_${System.currentTimeMillis()}.jpeg"
-            )
-
-            outputFile.outputStream().use { out ->
-                bitmap.compress(Bitmap.CompressFormat.JPEG, quality, out)
-            }
-
-            Uri.fromFile(outputFile)
-        } catch (e: Exception) {
-            Timber.e(e, "이미지 압축 실패")
-            null
-        }
-    }
-}
-
+```gradle
+implementation 'com.github.yalantis:ucrop:2.2.11' // 경량 일반 솔루션
+implementation 'com.github.yalantis:ucrop:2.2.11-native' // 이미지 품질을 유지하기 위해 네이티브 코드 사용 (+ APK 크기에 약 1.5MB)
 ```
 
-# 구현을 통한 개선점 및 마무리
+### 실험
 
-**이미지 처리 성능**:
+실험을 위해 19.2MB의 용량을 가지는 허블 울트라 딥필드 이미지를 사용했습니다. [원본 이미지 열람](https://upload.wikimedia.org/wikipedia/commons/archive/2/2f/20081125003002%21Hubble_ultra_deep_field.jpg)
 
-- **원본 이미지**: 평균 2-5MB (유저가 선택하는 용량에 따라 천차 만별)
-- **압축 후 이미지**: 평균 200-500KB (약 80% 크기 감소, 정사각형 보장)
-- **처리 시간**: 1~2초 (크롭 + 압축 + 업로드 전체 과정)
+실험 방법은 아래의 3개 방식으로 이미지를 직접 크롭해서 비교해 보는 방법으로 진행했습니다:
 
-**기술적 성과**:
+- **uCrop + Coil**: uCrop을 사용해서 1000x1000 100% 품질로 크롭 뒤 Coil에서 500x500 85% 품질로 리샘플링
+- **uCrop-native**: uCrop-native를 사용해서 500x500 85% 품질로 크롭
+- **uCrop 단독**: uCrop을 사용해서 500x500 85% 품질로 크롭
 
-- Pre-signed URL을 사용하여 백엔드를 거치치 않고 Amazon S3로 직접 업로드
-- **80% 이미지 크기 감소** 효과 (평균 2-5MB → 200-500KB)
-- **일관된 UX** 제공 (1:1 원형 크롭 가이드)
+실험을 진행한 결과를 요약하면 다음 이미지와 같습니다:
 
+<img width="1520" height="500" alt="ucrop 비교" src="https://github.com/user-attachments/assets/aa55bc92-0cfc-4c40-92f5-a59dce53ed9b" />
 
-사용자 피드백을 바탕으로 프로필 이미지 변경 기능을 추가하면서, 단순히 백엔드로 원본 이미지를 전송하는 방식도 고려했습니다. 하지만 클라이언트에서 원형 크롭 가이드를 제공함으로써 사용자에게 최종 결과를 미리 보여줄 수 있었고, 동시에 이미지 처리 부담을 클라이언트로 분산하여 백엔드 리소스를 절약하는 효과를 얻었습니다.
+**실험 결과**:
 
-이번 구현에서 가장 큰 교훈은 **"모든 HTTP 요청이 동일한 인터셉터를 필요로 하지 않는다"**는 점이었습니다. 처음에는 Bearer 토큰이 모든 상황에서 자동으로 포함되어야 한다고 생각했지만, 외부 서비스(AWS S3)와 통신할 때는 오히려 방해 요소로 작용하였습니다. 외부 API 연동 시에는 해당 서비스의 인증 방식을 정확히 파악하고, 상황에 맞는 HTTP 클라이언트를 선택하는 것이 핵심임을 배웠습니다.
+- **Coil3을 함께 사용**: 가장 이미지 크기가 작았지만 디테일이 뭉개지는 이미지
+- **uCrop 단독 사용**: 표준적인 이미지와 적당한 크기
+- **uCrop-native 사용**: 가장 큰 크기의 이미지를 얻었고 디테일을 살리기 위해서라고 추측되는 약간의 **흐려짐** 현상을 확인
 
----
+최종적으로 **uCrop 단독**을 선택했으며 이유는 다음과 같습니다:
 
-## 부록
+1. **성능**: uCrop 단독 사용이 2번의 파이프라인을 거치지 않아 속도가 빠름
+2. **코드 가독성**: 단일 라이브러리 사용으로 의존성과 복잡도 최소화
+3. **앱 크기**: uCrop-native을 사용했을 때 앱 크기가 1.5MB 늘어나는 것 대비 얻는 이점이 없음
 
-### 용어 정리
+최종적으로 사용자 피드백을 바탕으로 프로필 이미지 변경 기능을 추가하면서, 단순히 백엔드로 원본 이미지를 전송하는 방식도 고려했습니다. 하지만 클라이언트에서 원형 크롭 가이드를 제공함으로써 사용자에게 최종 결과를 미리 보여줄 수 있었고, 동시에 이미지 처리 부담을 클라이언트로 분산하여 백엔드 리소스를 절약하는 효과를 얻었습니다.
 
-- **Pre-signed URL**: AWS S3에서 제공하는 임시 업로드/다운로드 URL로, URL 자체에 인증 정보가 포함됨
-- **Bearer Token**: API 인증에 사용되는 토큰으로, HTTP Authorization 헤더에 `Bearer {token}` 형태로 포함
-- **Interceptor**: HTTP 요청/응답을 가로채어 공통 작업(로깅, 인증 등)을 수행하는 OkHttp 컴포넌트
-- **uCrop**: Android용 이미지 크롭 라이브러리, 다양한 크롭 옵션과 UI 커스터마이징 제공
-- **Coil**: Kotlin 기반 Android 이미지 로딩 라이브러리, 비동기 처리와 메모리 효율성에 특화
+## 마치며
+
+이번 구현에서 가장 큰 교훈은 두 가지였습니다:
+
+1. **"모든 HTTP 요청이 동일한 인터셉터를 필요로 하지 않는다"**: Bearer 토큰이 모든 상황에서 자동으로 포함되어야 한다고 생각했지만, 외부 서비스(AWS S3)와 통신할 때는 오히려 방해 요소로 작용했습니다.
+
+2. **"아키텍처 일관성과 성능 최적화의 균형점 찾기"**: 처음에는 순수 OkHttpClient로 해결하려 했지만, 코드 리뷰를 통해 **Retrofit의 장점을 포기하지 않으면서도 Bearer 토큰 충돌을 해결**하는 더 나은 방법을 찾았습니다.
+
+외부 API 연동 시에는 해당 서비스의 인증 방식을 정확히 파악하고, **프로젝트의 아키텍처 일관성을 유지하면서도** 상황에 맞는 HTTP 클라이언트를 선택하는 것이 핵심임을 배웠습니다.
+
+또한 이미지 처리 라이브러리 선택에서도 **"성능만이 전부가 아니다"**라는 것을 깨달았습니다. uCrop-native의 우수한 성능보다도 앱 크기와 구현 복잡도를 고려한 균형 잡힌 선택이 더 중요했고, 실제 테스트 결과 uCrop 단독 사용이 가장 효율적이었습니다.
+
+***
 
 ### 참고 문헌 및 출처
 
@@ -428,10 +450,8 @@ object ImageUtils {
 
 - [`33d3904`](https://github.com/woowacourse-teams/2025-yagu-bogu/commit/33d3904): uCrop 라이브러리 의존성 추가
 - [`26e99a9`](https://github.com/woowacourse-teams/2025-yagu-bogu/commit/26e99a99024ca84a02de39ee5fb031458ce16cf9): 프로필 사진 변경 API 추가
-- [`b1531ce`](https://github.com/woowacourse-teams/2025-yagu-bogu/commit/b1531ce3942c88261700905381973bff32891b5f): 설정 화면에 프로필 사진 crop 및 압축 기능 추가
-- [`34bbd57`](https://github.com/woowacourse-teams/2025-yagu-bogu/commit/34bbd579ce4164d5a346feed851f6d52c76a2995): 프로필 사진 업로드 로직 구현 (초기 버전)
-- [`b8fec65`](https://github.com/woowacourse-teams/2025-yagu-bogu/commit/b8fec65676c25d0bdfb19123cc128de90a782787): **프로필 사진 변경을 위한 OkHttpClient 의존성 분리** (핵심 해결)
-- [`24966d3`](https://github.com/woowacourse-teams/2025-yagu-bogu/commit/24966d333fc1cb7672b0350ffeab58430a51b5cf): S3 이미지 업로드 로직 개선 (runCatching 적용)
-- [`482f7f6`](https://github.com/woowacourse-teams/2025-yagu-bogu/commit/482f7f65ec5a2b83e13d157a89c65f7641f3a427): PureInstance 클래스 삭제 및 RetrofitInstance로 통합 (최종 최적화)
-
----
+- [`34bbd57`](https://github.com/woowacourse-teams/2025-yagu-bogu/commit/34bbd579ce4164d5a346feed851f6d52c76a2995): 프로필 사진 업로드 로직 구현 (초기 버전 - Bearer 토큰 충돌 발생)
+- [`cb9a613`](https://github.com/woowacourse-teams/2025-yagu-bogu/commit/cb9a61350f77b686586e25018d81928550223fcd): uCrop 이미지 압축 로직 적용
+- [`b28759d`](https://github.com/woowacourse-teams/2025-yagu-bogu/commit/b28759d2280fde765dc8956983a9762046ae0c08): **S3 이미지 업로드 로직 ThirdPartyRepository로 분리** (핵심 아키텍처 개선)
+- [`fbd7cea`](https://github.com/woowacourse-teams/2025-yagu-bogu/commit/fbd7cea2416fb782350d3a628beebae041002945): **ThirdParty 요청에 토큰 헤더 제거** (Bearer 토큰 충돌 해결)
+- [`09f2252`](https://github.com/woowacourse-teams/2025-yagu-bogu/commit/09f22528e8303f4c23b7719894372785e9d0d419): Presigned URL 관련 메서드명 변경 (최종 정리)
