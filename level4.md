@@ -6,7 +6,7 @@
 
 <img width="1400" height="480" alt="Image" src="https://github.com/user-attachments/assets/0d7ef6df-a573-47b4-934a-e3645d57f9ff" />
 
-*(그림 0-1: WorkManager는 OS 버전에 따라 JobScheduler나 알람 기반 방식 등을 알아서 선택하여 백그라운드 작업을 일정에 맞게 수행한다. 모든 작업은 내부 DB에 저장되어 앱 재시작이나 기기 재부팅 후에도 지속된다.)*
+*(그림 0-1: WorkManager는 OS 버전에 맞는 스케줄러를 자동 선택해 백그라운드 작업을 실행한다. 모든 작업은 내부 DB에 저장되어 앱 재시작이나 기기 재부팅 후에도 지속된다.)*
 
 ---
 
