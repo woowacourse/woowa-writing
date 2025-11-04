@@ -123,9 +123,10 @@ TanStack Query는 활발한 커뮤니티와 풍부한 자료 덕분에 문제 �
 
 ### 1. 초기 세팅
 
-먼저 프로젝트 루트에 QueryClientProvider를 추가해 전역에서 QueryClient 인스턴스를 사용할 수 있도록 설정했습니다.
+도메인별로 분리된 여러 Provider를 모두 제거하고, **QueryClientProvider 하나로 서버 상태를 통합**했습니다.  
+이제 전역 상태는 QueryClient가 관리하고, 각 컴포넌트는 필요한 데이터만 구독하게 되었습니다.
 
-기존 코드
+기존에는 RoutieProvider, PlaceListProvider 등 여러 Context Provider가 중첩되어 있었습니다.
 
 ```tsx
 const Route = () => {
@@ -143,7 +144,7 @@ const Route = () => {
 };
 ```
 
-세팅 후
+이 구조를 QueryClientProvider 기반으로 단순화했습니다.
 
 ```tsx
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -164,8 +165,7 @@ const Route = () => {
 export default Route;
 ```
 
-기존에는 도메인별 Provider가 여러 개 있었지만,
-이제는 QueryClientProvider 하나로 서버 상태를 관리할 수 있게 되었습니다.
+이 변경으로 Provider 계층이 단일화되어 트리가 가벼워지고, QueryClientProvider 하나로 서버 상태를 관리할 수 있게 되었습니다.
 
 ### 2. 쿼리 키 세팅
 
@@ -198,9 +198,11 @@ TanStack Query는 `queryKey`를 기준으로 데이터를 캐싱하고, 무효�
 
 ### 3. Query 훅으로 전환
 
-다음으로는 기존의 fetch + useState 조합을 제거하고, 데이터를 useQuery 훅으로 불러오도록 변경했습니다.
+데이터 fetch 로직을 모두 `useQuery`로 통합하면서, **데이터 요청, 로딩, 에러 상태를 자동으로 관리하는 구조**로 개선했습니다.  
+이제 컴포넌트는 단순히 `queryKey`만 선언하면, 데이터 흐름을 신경 쓰지 않고 UI에 집중할 수 있습니다.
 
-기존 코드:
+기존에는 `fetch`와 `useState`를 조합해 데이터를 직접 불러오고,  
+요청 실패나 로딩 처리 로직을 매번 반복해야 했습니다.
 
 ```ts
 const refetchPlaceList = useCallback(async () => {
@@ -214,7 +216,7 @@ const refetchPlaceList = useCallback(async () => {
 }, []);
 ```
 
-적용 후
+이 로직을 useQuery 기반으로 단순화했습니다.
 
 ```ts
 const usePlaceListQuery = () => {
@@ -228,14 +230,13 @@ const usePlaceListQuery = () => {
 const { data, isLoading, isError, error } = usePlaceListQuery();
 ```
 
-보시다시피 쿼리 훅으로 전환 이후에는 데이터를 가져오는 로직이 간결해졌고, 로딩, 에러 상태도 자동으로 관리할 수 있게 되었습니다.
+반복되던 에러, 리패칭 처리가 사라지고, 데이터 로직과 UI 로직이 명확히 분리된 구조로 바뀌었습니다.
 
 ### 4. Mutation 적용
 
-데이터 추가, 수정, 삭제와 같은 서버 액션은 useMutation으로 전환했습니다.
-액션 이후 수동으로 refetch를 호출하지 않고, invalidateQueries로 필요한 데이터만 갱신할 수 있게 되었습니다.
+서버에 데이터를 추가·수정·삭제하는 액션을 모두 `useMutation`으로 전환해, **액션 이후 수동 refetch를 없애고 자동으로 관련 데이터만 갱신**하도록 개선했습니다.
 
-기존 코드
+이전에는 성공 후마다 `refetch`를 직접 호출해야 했고, API가 늘어날수록 중복 코드와 불필요한 요청이 급격히 늘어났습니다.
 
 ```ts
 // 장소 선택 후 동선 무효화
@@ -253,7 +254,7 @@ const handleAddRoutie = useCallback(
 );
 ```
 
-적용 후
+useMutation을 적용해 다음처럼 단순화했습니다.
 
 ```ts
 // 장소 선택 후 동선 무효화
@@ -271,6 +272,8 @@ const useAddRoutieMutation = () => {
   });
 };
 ```
+
+이제 액션 성공 시 관련 캐시만 invalidate되어 필요한 부분만 새로 패칭되고, 전역 refetch 호출과 중복 네트워크 요청이 모두 사라졌습니다.
 
 ## 도입 효과
 
