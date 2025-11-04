@@ -1,7 +1,7 @@
 # 문제 상황
 
 백엔드 개발자라면 한 번쯤 ALTER TABLE 구문을 실행하다가 WAS가 먹통이 되는 경험을 해봤을 것이다. 테이블이 잠기면서 쿼리들이 대기 상태에 빠지고, 타임아웃이 연쇄적으로 발생하는 상황 말이다.
-물론 잠시 점검시간을 갖고 서비스를 중단한 뒤 DDL을 실행하면 간단하다. 하지만 대규모 서비스를 운영 중인데, 상대적으로 작은 스키마 변경을 위해 전체 서비스를 중단해야 한다면? 그 시간동안 발생하는 감히 손실은 상상하기 어렵다.
+물론 잠시 점검시간을 갖고 서비스를 중단한 뒤 DDL을 실행하면 간단하다. 하지만 대규모 서비스를 운영 중인데, 상대적으로 작은 스키마 변경을 위해 전체 서비스를 중단해야 한다면? 그 시간 동안 발생하는 손실은 상상하기 어렵다.
 **그렇다면 서비스 중단 없이 안전하게 스키마를 변경할 방법은 없을까?**
 
 
@@ -10,7 +10,7 @@
 ALTER TABLE이 서비스에 영향을 주는 이유는 크게 두 가지다.
 
 **1. 데이터베이스 계층의 문제: 테이블 락**
-- DDL 실행 중 테이블에 Shared Lock이 걸려 DML이 차단된다
+- DDL 실행 중 테이블에 락이 걸려 DML이 차단된다
 - 대용량 테이블일수록 락 시간이 길어진다
 - ex) 1억 row 테이블의 컬럼 수정 시 수십 분간 락 발생
 
@@ -110,7 +110,7 @@ ALTER TABLE users ADD COLUMN email VARCHAR(255);
 
 **Offline DDL**
 
-DDL 실행 중 테이블이 잠겨 DML이 차단된다. 테이블을 통째로 복사하는 방식이라 시간이 오래 걸리며, 운영 환경에서 실행 시 서비스 장애로 이어질 수 있다.
+DDL 실행 중 테이블에 락이 걸려 DML이 차단된다. 테이블을 통째로 복사하는 방식이라 시간이 오래 걸리며, 운영 환경에서 실행 시 서비스 장애로 이어질 수 있다.
 ```sql
 -- Offline DDL: 컬럼 타입 변경
 ALTER TABLE users MODIFY COLUMN age VARCHAR(10) NOT NULL;
@@ -138,8 +138,8 @@ ALTER TABLE users
 ADD COLUMN email VARCHAR(255),
 ALGORITHM=INPLACE, LOCK=NONE;
 
--- 성공 -> Online DDL. 실행됨.
--- 에러 -> Offline DDL. 실행되지 않음.
+-- 성공 -> Online DDL 가능, 그대로 실행됨.
+-- 에러 -> Offline DDL만 가능. 명시한 조건으로는 실행 안 됨.
 
 -- 에러 예시
 -- ERROR 1846 (0A000): ALGORITHM=INPLACE is not supported. 
@@ -159,11 +159,11 @@ COPY 알고리즘을 사용하는 Offline DDL은 내부적으로 스키마 변�
 그렇다면 데이터 복사 간 일어나는 변경사항을 신규 테이블에도 반영할 수 있다면 어떨까? 우리는 이 아이디어를 통해 Offline DDL의 Online Migration을 실현할 수 있다.
 
 
-### Offline DDL online migration 도구
+### Offline DDL Online migration 도구
 
 시중에는 Offline DDL online migration 도구가 여럿 있다. 여기서는 pt-online-schema-change와 gh-ost를 간단하게 알아보자.
 
-**pt-online-scheme-change**
+**pt-online-schema-change**
 2011년 Perocona Toolkit에서 출시한 도구로, 복제 테이블에서 작업하며 변경사항은 트리거에 의해 반영된다. 즉 원본 테이블에 락이 걸리지 않아 Offline DDL 실행 간 DML을 허용한다.
 
 동작 과정
@@ -175,7 +175,7 @@ COPY 알고리즘을 사용하는 Offline DDL은 내부적으로 스키마 변�
 
 
 **gh-ost**
-2016년 Github에서 출시한 도구로, pt-online-scheme-change와 같이 복제 테이블에서 작업하며 원본 테이블의 락을 회피한다. 하지만 이를 구현한 방법이 다른데, 다른 도구는 트리거 기반으로 변경사항을 반영하는 반면 gh-ost는 Binary Log Stream을 기반으로 변경사항을 반영한다. 덕분에 트리거로 인해 생기는 여러 제약과 위험을 회피했다.
+2016년 Github에서 출시한 도구로, pt-online-schema-change와 같이 임시 테이블(복제본)에서 작업하며 원본 테이블의 락을 회피한다. 하지만 이를 구현한 방법이 다른데, 다른 도구는 트리거 기반으로 변경사항을 반영하는 반면 gh-ost는 Binary Log Stream을 기반으로 변경사항을 반영한다. 덕분에 트리거로 인해 생기는 여러 제약과 위험을 회피했다.
 
 동작 과정
 1. 임시 테이블 생성 후 스키마 변경사항 반영
@@ -185,7 +185,7 @@ COPY 알고리즘을 사용하는 Offline DDL은 내부적으로 스키마 변�
 - 복사 간 대상 테이블 변경사항은 Binary Log Streaming에 의해 수신 및 반영
 4. 대상 테이블 <-> 임시 테이블 교체
 
-**pt-online-scheme-change vs gh-ost**
+**pt-online-schema-change vs gh-ost**
 
 ![](https://i.imgur.com/qsv2UK3.png)
 
@@ -195,23 +195,24 @@ COPY 알고리즘을 사용하는 Offline DDL은 내부적으로 스키마 변�
 
 # 애플리케이션 계층: 스키마 불일치 문제 해결
 
-아래 그림을 보자.
+이번에는 애플리케이션 계층 문제를 살펴보자.
 
-(이미지)
+![](https://i.imgur.com/EGvVGx3.png)
 
-애플리케이션 코드는 기존 테이블 스키마에 맞춰 작성된 것이다. 스키마 변경이 일어나면 애플리케이션 코드도 그에 대응하여 수정 배포가 필요하다. 스키마 변경 이후부터 애플리케이션 코드 재배포 사이의 갭동안 서비스 중단이 발생한다.
+위 그림은 first_name, last_name을 full_name으로 통합하는 상황으로, 애플리케이션 코드는 기존 스키마에 맞춰 작성되어 있다. DDL로 테이블에 full_name이 추가되더라도, 애플리케이션은 여전히 first_name과 last_name만 사용한다. 이처럼 스키마 변경 이후부터 애플리케이션 재배포 사이의 시간 갭 동안 불일치가 발생하며, 이는 서비스 중단으로 이어진다.
 
-DDL을 Online으로 실행하든 Offline으로 실행하든 스키마 불일치 문제를 해결하지 않으면 서비스 중단은 피할 수 없는 것이다.
+DDL을 Online으로 실행하든 Offline으로 실행하든 스키마 불일치 문제를 해결하지 않으면 서비스 중단은 피할 수 없다.
 
 이 문제를 해결하기 위해 우리는 확장 축소 패턴을 사용할 수 있다.
 
+
 ## 확장 축소 패턴
 
-(이미지)
+![](https://i.imgur.com/VbICbDG.png)
 
 확장 축소 패턴(Expand Contract Pattern)은 스키마 변경 시 확장에 대한 부분을 먼저 반영하고, 이후에 기존 스키마를 축소하는 패턴이다. 이렇게 순서를 구분하면 뭐가 달라질까?
 
-(이미지)
+![](https://i.imgur.com/FVbhXtp.png)
 
 이번에는 확장 이후의 스키마에 대응하도록 애플리케이션 코드를 작성했다. 이는 기존 스키마와 신규 스키마에 모두 대응되는 애플리케이션 코드이기도 하다. 이렇게 애플리케이션에서 양 쪽 스키마에 모두 대응하면 스키마 변경 완료 후 애플리케이션 코드를 재배포하지 않아도 이미 대응이 되는 상태라 문제가 없다.
 
@@ -223,16 +224,16 @@ DDL을 Online으로 실행하든 Offline으로 실행하든 스키마 불일치 
 
 즉, 이 단계에서 애플리케이션은 기존/신규 스키마 양 쪽에 동시에 쓰기를 해야 한다. 이를 이중 쓰기(Dual Write) 기법이라 한다.
 
-(이미지)
+![](https://i.imgur.com/WnLxNRz.png)
 
-> **신규 테이블에 데이터 변경사항 반영은 아까 했던 거 아니에요?**
+> **💡 DDL 실행 중 변경사항 반영과 Dual Write의 차이**
 >
-> 앞서 `데이터베이스 계층: 테이블 락 문제`를 다룰 때 신규 테이블에 데이터 변경사항을 반영하기 위해 트리거나 바이너리 로그를 활용한다고 언급한 바가 있다. 하지만 헷갈리지 말자.
+> 앞서 `데이터베이스 계층: 테이블 락 문제`를 다룰 때 신규 테이블에 데이터 변경사항을 반영하기 위해 트리거나 바이너리 로그를 활용한다고 언급한 바 있다. 하지만 헷갈리지 말자.
 > 해당 문제는 DDL 실행 간 발생하는 변경사항을 반영하기 위한 것이고, Dual Write는 DDL 종료 이후 애플리케이션 재배포 시점부터 발생하는 변경사항을 반영하기 위한 것이다. 둘 다 데이터 일관성 보장을 위한 것은 맞지만 그 시점과 계층이 완전히 다르다.
 
 ### 읽기
 
-Dual Write를 적용한 애플리케이션은 기존 스키마에서 데이터를 읽어와야 한다. 바로 뒤에 언급하겠지만 Dual Write 애플리케이션 배포 이후에는 기존 데이터의 마이그레이션이 필요하다. 데이터 마이그레이션이 아직 이루어지지 않은 데이터에 대해서는 NULL 값이 읽히는 것이다. 그래서 현 단계에서는 기존 스키마로부터 데이터를 읽어와야 한다.
+Dual Write를 적용한 애플리케이션은 기존 스키마에서 데이터를 읽어와야 한다. 바로 뒤에 언급하겠지만 Dual Write 애플리케이션 배포 시점에는 아직 기존 데이터가 신규 스키마로 마이그레이션되지 않았다. 따라서 신규 스키마에서 읽으면 NULL 값이 반환된다. 그래서 이 단계에서는 기존 스키마로부터 데이터를 읽어와야 한다.
 
 
 ## 데이터 마이그레이션
@@ -241,9 +242,9 @@ DB 스키마를 확장하고 Dual Write 애플리케이션을 배포했다면 �
 
 기존 데이터를 신규 스키마 구조에 맞게 마이그레이션해야 한다. 앞에서의 예시를 다시 살펴보자.
 
-(이미지)
+![](https://i.imgur.com/VbICbDG.png)
 
-first_name + last_name을 full_name으로 바꾸는 스키마 변경이지만 확장 축소 패턴을 적용하면서 세 컬럼이 동시에 있게 된다. 확장 단계에서는 full_name이라는 비어있는 컬럼이 추가되었고, 축소 단계에서는 first_name과 last_name 기존 컬럼들이 제거된다. 그럼 기존의 first_name과 last_name 데이터들은 언제 full_name으로 마이그레이션될까? 그 시점은 Dual Write 애플리케이션이 배포된 이후이다. 백그라운드에서 데이터를 채운다고 하여 이 단계를 백필(Back Fill)이라 부른다.
+first_name + last_name을 full_name으로 바꾸는 스키마 변경이지만 확장 축소 패턴을 적용하면서 세 컬럼이 동시에 존재하게 된다. 확장 단계에서는 full_name이라는 비어있는 컬럼이 추가되었고, 축소 단계에서는 first_name과 last_name 기존 컬럼들이 제거된다. 그럼 기존의 first_name과 last_name 데이터들은 언제 full_name으로 마이그레이션될까? 그 시점은 Dual Write 애플리케이션이 배포된 이후이다. 백그라운드에서 데이터를 채운다고 하여 이 단계를 백필(Back Fill)이라 부른다.
 
 백필은 데이터 규모에 따라 긴 시간이 걸리는 작업이기 때문에 보통 배치 작업으로 수행한다.
 
@@ -255,13 +256,9 @@ first_name + last_name을 full_name으로 바꾸는 스키마 변경이지만 �
 Feature Flag는 애플리케이션 재배포 없이도 특정 기능을 켜고 끌 수 있는 스위치이다. 점진적 배포를 도와주는 도구로 활용할 수 있는데, 이를 활용하면 신규 스키마로의 읽기 전환을 1% -> 10% -> ... -> 100%와 같이 점진적으로 진행할 수 있다. 또한 재배포 없이 이 수치를 수정할 수 있기 때문에 신규 버전에서 버그를 확인하는 즉시 기존 버전으로 롤백할 수 있다.
 
 
-### 카나리 배포와의 차이
+### Feature Flag와 카나리 배포의 차이
 
-어? 이거 완전 카나리 배포 아니야?
-
-```
-와.. 너 정말, **핵심**을 찔렀어.
-```
+얼핏 보면 비슷해 보이지만, 중요한 차이가 있다.
 
 실제로 Feature Flag와 카나리 배포는 점진적 전환이라는 동일한 목적을 가지고 있지만, 계층의 차이가 존재한다.
 
@@ -275,20 +272,31 @@ Feature Flag는 애플리케이션 재배포 없이도 특정 기능을 켜고 �
 
 # 정리
 
+전체 흐름을 요약하면 다음과 같다.
+
+![](https://i.imgur.com/PgM3icr.png)
+
+각 단계를 구체적으로 살펴보자.
+
+실습 저장소에 단계별 PR이 있으니 직접 확인해보면 이해에 도움이 될 것이다.
+https://github.com/songsunkook/db-migration-test
+
 1. Expand: 스키마 변경 대상 추가(DDL)
 - 스키마 변경에 대해 확장(추가)만 하고 기존 스키마는 유지한다.
 - Offline DDL이라면 Offline DDL Online Migration Tool 사용을 고려할 수 있다.
 - 신규 데이터는 아직 NULL 상태이다.
 - 애플리케이션은 아직 기존 스키마를 사용한다.
+- https://github.com/songsunkook/db-migration-test/pull/1
 
 ```sql
-ALTER TABLE users ADD COLUMN email VARCHAR(255)
+ALTER TABLE users ADD COLUMN email VARCHAR(255);
 ```
 
 2. Dual Write: 기존/신규 스키마 쓰기 대응 애플리케이션 배포(APP)
 - 기존/신규 스키마 양쪽에 모두 쓰기 작업을 하는 애플리케이션을 배포한다.
 - 읽기는 아직 기존 스키마를 사용한다.
 - 신규 데이터는 양쪽에 동시 저장된다.
+- https://github.com/songsunkook/db-migration-test/pull/2
 
 ```java
 public void updateName(String firstName, String lastName) {
@@ -302,8 +310,9 @@ public void updateName(String firstName, String lastName) {
 - 기존 데이터를 신규 스키마로 마이그레이션한다.
 - 보통 Spring Batch 등을 통해 배치 처리한다.
 - NULL인 신규 스키마를 실제 값으로 채운다.
+- https://github.com/songsunkook/db-migration-test/pull/3
 
-```java
+```sql
 UPDATE users 
     SET full_name = CONCAT(first_name, ' ', last_name) 
     WHERE full_name IS NULL;
@@ -312,17 +321,14 @@ UPDATE users
 4. Read Conversion: 읽기 전환 애플리케이션 배포(APP)
 - Feature Flag로 신규 스키마 읽기를 점진적 전환한다.
 - 쓰기는 여전히 Dual Write를 유지한다.
+- https://github.com/songsunkook/db-migration-test/pull/4
 
 ```java
-public String getDisplayName(boolean useNewSchema) {
-    if (useNewSchema && fullName != null) {
-        return fullName;
+public String getDisplayName() {
+    if (featureFlag.isEnabled("use_full_name", id)) {
+        return fullName; // 신규
     }
-    if (fullName == null) {
-        log.warn("Full name is null, falling back to first and last name.");
-        return firstName + " " + lastName;
-    }
-    return fullName;
+    return firstName + " " + lastName; // 기존 (Fallback)
 }
 ```
 
@@ -330,15 +336,11 @@ public String getDisplayName(boolean useNewSchema) {
 - Feature Flag를 제거한다.
 - Dual Write를 제거한다.(신규 스키마만 Write한다)
 - 기존 스키마 관련 코드를 제거한다.
+- https://github.com/songsunkook/db-migration-test/pull/5
 
 ```java
 public String getFullName() {
-    // 제거
-    // if (fullName != null) {
-    //     return fullName;
-    // }
-    // return firstName + " " + lastName;
-    return fullName;
+    return fullName; // Feature Flag와 Fallback 로직 제거
 }
 ```
 
@@ -346,7 +348,8 @@ public String getFullName() {
 - 기존 스키마를 제거한다.
 - Offline DDL이라면 Offline DDL Online Migration Tool 사용을 고려할 수 있다.
 - 애플리케이션이 더이상 기존 스키마를 참조하지 않는다.
-- 데이터베이스와 애플리케이션 모두 스키마 마이그레이션이 완료된다.
+- 데이터베이스와 애플리케이션의 스키마 마이그레이션이 완료된다.
+- https://github.com/songsunkook/db-migration-test/pull/6
 
 ```sql
 ALTER TABLE users 
@@ -362,5 +365,4 @@ ALTER TABLE users
 [[MySQL Docs]17.12.1 Online DDL Operations](https://dev.mysql.com/doc/refman/8.4/en/innodb-online-ddl-operations.html)  
 [[Percona Toolkit Docs]pt-online-schema-change](https://docs.percona.com/percona-toolkit/pt-online-schema-change.html)  
 [[Github]gh-ost Repository](https://github.com/github/gh-ost?tab=readme-ov-file)  
-[gh-ost vs pt-online-schema-change in 2025](https://www.bytebase.com/blog/gh-ost-vs-pt-online-schema-change/)  
-
+[[Bytebase]gh-ost vs pt-online-schema-change in 2025](https://www.bytebase.com/blog/gh-ost-vs-pt-online-schema-change/)  
