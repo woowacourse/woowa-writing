@@ -1,4 +1,4 @@
-# Android Widget
+# Android 위젯, 홈 화면에서 확장되는 사용자 경험
 
 ## 안드로이드 위젯 개요
 
