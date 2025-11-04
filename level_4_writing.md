@@ -118,7 +118,7 @@ public Response recover(ExternalApiException e) {
 - 요청 성공/실패를 기록하고 실패율을 계산합니다
 - 실패율이 임계치 이상이면 Open 상태로 전환합니다
 
-<img src="img/circuitbreaker_status_1.png" width="650px" title="CircuitBreaker_status_1"/>
+<img src="img/circuitbreaker_status_1.jpeg" width="650px" title="CircuitBreaker_status_1"/>
 
 ### 2. Open (차단 상태)
 
