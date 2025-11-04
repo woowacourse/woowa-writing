@@ -1,89 +1,104 @@
-Retrofit이란 무엇인가?
+# 왜 Retrofit을 사용할까? - HttpURLConnection부터 Retrofit까지의 여정
 
-Retrofit은 Square에서 개발한 type-safe HTTP 클라이언트로, 자바 및 안드로이드에서 REST API 통신을 더 쉽고 안전하게 해주는 라이브러리입니다.
+## 글을 시작하며
 
-개발자가 직접 HTTP 요청을 구성하지 않아도, 마치 인터페이스 메서드를 호출하듯 안전하게 네트워크 요청을 보낼 수 있게 해주는 도구로 사용할 수 있습니다.
+안드로이드 개발을 하다 보면 네트워크 통신은 피할 수 없는 필수 요소입니다. 하지만 HttpURLConnection, OkHttp, Retrofit 등 다양한 선택지 앞에서 "왜 이 라이브러리를 써야 하는지" 명확히 답하기 어려울 때가 있습니다.
 
-네트워크 개념에 익숙하지 않은 독자도 이해할 수 있도록, 먼저 HTTP 통신의 기초부터 설명한 뒤, Retrofit이 왜 유용한지, 그리고 내부적으로 어떻게 동작하는지를 순차적으로 풀어가겠습니다.
+이 글은 **안드로이드에서 네트워크 통신을 처음 접하거나, 각 라이브러리의 차이점이 궁금한 개발자**를 위해 작성되었습니다. HTTP 통신의 기초부터 시작해 각 방식의 장단점을 실제 코드로 비교하고, Retrofit이 내부적으로 어떻게 동작하는지까지 살펴보겠습니다.
 
-1. HTTP와 클라이언트-서버 통신의 기초
-HTTP란?
+## 이 주제를 선택한 계기
 
-HTTP는 Hypertext Transfer Protocol의 줄임말로, 웹 클라이언트(브라우저, 앱 등)와 웹 서버 간에 데이터를 주고받는 규약입니다.
+우아한테크코스 레벨2에서 HttpClient 미션을 진행할 때였습니다. 리뷰어님께 이런 질문을 받았습니다.
 
-클라이언트가 “요청(request)”을 보내면, 서버가 “응답(response)”을 돌려주는 구조죠.
+> "왜 Retrofit을 쓰나요? OkHttp로도 충분하지 않나요?"  
+> "왜 OkHttp를 쓰나요? HttpURLConnection으로도 할 수 있는데요?"
 
-여기서 말하는 클라이언트란, 요청을 보내는 쪽을 의미한다.
-예를 들어 브라우저나 모바일 앱이 클라이언트가 되고, 요청을 받는 쪽인 서버는 데이터를 보내주는 역할을 한다.
+순간 당황했습니다. 단순히 "많이 쓰니까", "미션 조건이 써야 해서"라는 막연한 답변밖에 떠오르지 않았기 때문입니다. 그날 이후 각 라이브러리가 해결하려는 문제가 무엇인지, 어떤 점을 개선했는지 직접 확인해보고 싶었습니다.
 
-클라이언트와 서버는 어떻게 소통하는가?
+그래서 같은 API 요청을 HttpURLConnection, OkHttp, Retrofit 세 가지 방식으로 구현해보며 차이점을 비교해보기로 했습니다.
 
-엔드포인트(endpoint)
-　클라이언트와 서버가 통신하기 위한 주소(URL)를 엔드포인트라 부릅니다.
-　예: https://api.base.url/blogpost/1
+---
 
-클라이언트(앱)는 HTTP 요청을 보냅니다.
+## HTTP 통신의 기초
 
-서버는 요청을 처리하고, JSON, XML 등 형식으로 응답 본문(body)을 돌려줍니다.
+본격적인 비교에 앞서, HTTP 통신의 기본 개념을 짚고 넘어가겠습니다.
 
-2. 안드로이드의 네트워크 통신: HttpURLConnection
+### HTTP란?
 
-안드로이드에서 기본적으로 제공하는 네트워크 통신 수단 중 하나가 HttpURLConnection입니다.
-다음은 단순한 요청 예시:
+**HTTP(Hypertext Transfer Protocol)**는 클라이언트와 서버가 데이터를 주고받기 위한 규약입니다. 
 
-```
+- **클라이언트**: 요청을 보내는 쪽 (브라우저, 모바일 앱 등)
+- **서버**: 요청을 받아 처리하고 응답을 돌려주는 쪽
+- **엔드포인트**: 통신을 위한 주소(URL), 예: `https://api.example.com/posts/1`
+
+클라이언트가 HTTP 요청을 보내면, 서버는 JSON, XML 등의 형식으로 응답 본문을 반환합니다.
+
+---
+
+## 1단계: HttpURLConnection - 가장 기본적인 방식
+
+안드로이드에서 기본 제공하는 네트워크 통신 수단입니다. 다음은 간단한 GET 요청 예시입니다.
+```kotlin
 fun request() {
     thread {
-        val url = URL("https://api.base.url/blogpost/1")
+        val url = URL("https://api.example.com/posts/1")
         val connection = url.openConnection() as HttpURLConnection
+        
         val title = if (connection.responseCode == HttpURLConnection.HTTP_OK) {
             val content = connection.inputStream.bufferedReader().use { it.readText() }
             JSONObject(content).getString("title")
         } else {
             "HTTP 오류: ${connection.responseCode}"
         }
+        
         runOnUiThread {
             textView.text = title
         }
     }
 }
-
-
 ```
-이 코드는 동작은 하지만, 실제로 사용할 때 다음과 같은 문제점들이 있습니다:
 
-요청 메서드(GET, POST 등)가 문자열로 지정되어 컴파일 시점에 오류를 잡을 수 없고,
-네트워크 요청은 메인(UI) 스레드에서 네트워크 요청을 수행할 수 없어 반드시 별도의 스레드로 감싸야 한다.
+### 동작은 하지만, 문제가 많습니다
 
-네트워크 중단, 응답 실패, 파싱 오류 등의 예외를 모두 직접 처리해야 하며,
-응답을 다 읽은 뒤에는 스트림과 연결을 닫아줘야 메모리 누수가 발생하지 않는다.
+#### 타입 안전성 부족
+- HTTP 메서드가 문자열로 지정되어 컴파일 시점에 오류를 잡을 수 없습니다
+- URL이나 파라미터 오타도 런타임에야 발견됩니다
 
-응답으로 받은 JSON을 직접 파싱해야 하고, 여러 API를 관리할 경우 URL, 파라미터, 헤더 설정 등이 중복되어 코드가 복잡해진다.
+#### 스레드 관리의 어려움
+- 메인 스레드에서 네트워크 요청을 할 수 없어 `thread {}`로 감싸야 합니다
+- UI 업데이트를 위해 다시 `runOnUiThread {}`를 써야 합니다
 
-즉, 코드가 길고 실수하기 쉽고 중복도 많아집니다.
+#### 복잡한 예외 처리
+- 네트워크 중단, 응답 실패, 파싱 오류를 모두 직접 처리해야 합니다
+- 스트림과 연결을 수동으로 닫지 않으면 메모리 누수가 발생합니다
 
-3. 안드로이드 네트워크 통신: OkHttp
-이러한 문제를 해결하기 위해 Square에서 만든 것이 OkHttp입니다.
+#### 중복 코드의 증가
+- JSON 파싱을 매번 직접 작성해야 합니다
+- 여러 API를 관리할 경우 URL, 헤더, 파라미터 설정이 반복됩니다
 
-Retrofit 전 단계로 자주 사용되는 라이브러리가 OkHttp입니다. 이건 HTTP 클라이언트를 좀 더 사용하기 편하도록 추상화해 준 라이브러리예요.
+---
 
-```
+## 2단계: OkHttp - HTTP 클라이언트의 추상화
+
+Square에서 만든 OkHttp는 HttpURLConnection의 불편함을 개선한 라이브러리입니다.
+```kotlin
 val okHttpClient = OkHttpClient()
 val request = Request.Builder()
-    .url("https://api.base.url/blogpost/1")
+    .url("https://api.example.com/posts/1")
     .build()
+    
 okHttpClient.newCall(request).enqueue(object : Callback {
     override fun onFailure(call: Call, e: IOException) {
         runOnUiThread {
             textView.text = "요청 실패: ${e.message}"
         }
     }
+    
     override fun onResponse(call: Call, response: Response) {
         if (response.isSuccessful) {
             val body = response.body?.string() ?: "응답이 null"
             val title = try {
-                val json = JSONObject(body)
-                json.getString("title")
+                JSONObject(body).getString("title")
             } catch (e: Exception) {
                 "파싱 오류: ${e.message}"
             }
@@ -93,49 +108,60 @@ okHttpClient.newCall(request).enqueue(object : Callback {
         }
     }
 })
-
-
 ```
 
-OkHttp를 쓰면 다음과 같은 이점이 있습니다:
+### OkHttp가 개선한 점들
 
-이전과 달리 enqueue() 메서드가 비동기로 동작하므로 스레드를 직접 만들 필요가 없다.
-응답 본문도 response.body?.string()으로 한 줄이면 충분하며, Request.Builder로 URL, 헤더, 메서드를 명시적으로 구성할 수 있다.
+#### 1. 비동기 처리 간소화
+- `enqueue()` 메서드가 자동으로 백그라운드에서 실행됩니다
+- 더 이상 `thread {}`를 직접 만들 필요가 없습니다
 
-Request.Builder를 통해 URL, 헤더, 메서드 등을 직관적으로 설정 가능하다.
+#### 2. 명시적인 요청 구성
+- `Request.Builder`를 통해 URL, 헤더, 메서드를 직관적으로 설정할 수 있습니다
+- 응답 본문도 `response.body?.string()`으로 간단히 읽을 수 있습니다
 
-커넥션 풀(connection pool)을 통한 재사용성, 타임아웃 기본값 관리 등이 내장되어 있어, 필요한 경우에 다시 설정해주면 된다.
+#### 3. 내장된 최적화 기능
+- **커넥션 풀(Connection Pool)**: 연결을 재사용해 성능을 향상시킵니다
+- **타임아웃 기본값**: 별도 설정 없이도 안정적인 타임아웃이 적용됩니다
+- **자동 리소스 관리**: 스트림을 열고 닫는 과정을 자동으로 처리합니다
 
-또한 OkHttp는 커넥션 풀을 자동으로 관리해 불필요한 연결을 재활용하고,
-HTTP 상태 코드(200~299)를 isSuccessful로 간단히 처리할 수 있다.
+#### 4. 간편한 상태 코드 처리
+- `isSuccessful`로 HTTP 200~299 응답을 쉽게 확인할 수 있습니다
 
-스트림을 열고 닫는 과정을 직접 작성할 필요도 없다.
+### 하지만 여전히 남은 과제
 
-하지만 OkHttp도 JSON 파싱, 여러 API 관리, 결합된 예외 처리, 콜백 기반 비동기 처리 등은 여전히 개발자가 직접 관리해야 합니다.
+OkHttp도 다음과 같은 작업은 개발자가 직접 해야 합니다:
 
-4. 안드로이드 네트워크 통신: Retrofit 인터페이스 + 어노테이션 기반으로 추상화
+- JSON 파싱을 매번 수동으로 처리
+- 여러 API 엔드포인트 관리
+- 콜백 기반 비동기 처리로 인한 가독성 저하
+- 공통 헤더나 인증 로직의 중복
 
-이제 본론인 Retrofit을 소개하겠습니다.
+---
 
-다음과 같은 코드만으로 API 요청을 정의할 수 있다.
+## 3단계: Retrofit - 인터페이스 기반의 선언적 HTTP 클라이언트
 
-```
+드디어 Retrofit입니다. Retrofit은 "어노테이션 기반 인터페이스"만으로 API를 정의할 수 있게 해줍니다.
+
+### 인터페이스 정의
+```kotlin
 interface RetrofitService {
     @GET("posts/{id}")
     suspend fun getPost(@Path("id") id: Int): Post
 }
 ```
-Retrofit 객체를 생성하면 된다.
-```
+
+### Retrofit 객체 생성
+```kotlin
 val retrofitService = Retrofit.Builder()
-    .baseUrl("https://api.base.url/")
+    .baseUrl("https://api.example.com/")
     .addConverterFactory(GsonConverterFactory.create())
     .build()
     .create(RetrofitService::class.java)
 ```
-네트워크 요청을 보내려면 단순히 retrofitService.getPost(1)을 호출하면 된다.
-코루틴을 이용해 다음과 같이 처리할 수 있다.
-```
+
+### 실제 사용
+```kotlin
 lifecycleScope.launch {
     runCatching { retrofitService.getPost(1) }
         .onSuccess { post: Post ->
@@ -144,11 +170,9 @@ lifecycleScope.launch {
         .onFailure { e ->
             when (e) {
                 is HttpException -> {
-                    // 서버 응답은 받았지만 2xx가 아님
                     textView.text = "HTTP 오류: ${e.code()}"
                 }
                 is IOException -> {
-                    // 네트워크/타임아웃 오류
                     textView.text = "네트워크 오류: ${e.message}"
                 }
                 else -> {
@@ -157,179 +181,218 @@ lifecycleScope.launch {
             }
         }
 }
-
 ```
 
-Retrofit을 사용하면 비동기 네트워크 요청, 예외 처리, JSON 파싱까지 모두 자동으로 처리된다.
+### Retrofit이 해결한 모든 문제들
 
-5. Retrofit 내부 동작 원리 (어노테이션 → 실행 흐름)
+#### 1. 극적인 코드 간소화
+- 복잡한 네트워크 로직이 인터페이스 선언 몇 줄로 대체됩니다
+- 마치 로컬 함수를 호출하듯 API를 사용할 수 있습니다
 
-Retrofit의 핵심은 **리플렉션(Reflection)**과 **프록시(Proxy)**이다.
-Retrofit은 우리가 작성한 인터페이스를 런타임에 분석해, 실제 네트워크 요청을 수행할 수 있는 “대리자” 객체를 만든다.
+#### 2. 타입 안전성 보장
+- JSON 응답이 자동으로 데이터 클래스로 변환됩니다
+- 컴파일 시점에 타입 오류를 발견할 수 있습니다
+- 키 누락이나 형 변환 오류가 크게 줄어듭니다
 
+#### 3. 자동 JSON 파싱
+- Gson, Moshi, Kotlinx Serialization 등 다양한 Converter를 지원합니다
+- 필요하다면 커스텀 `ConverterFactory`를 만들어 직렬화를 제어할 수도 있습니다
 
-이 프록시는 인터페이스의 메서드 호출을 가로채고, 어노테이션 정보를 읽어 실제 HTTP 요청을 구성합니다.
+#### 4. 코루틴 완벽 지원
+- `suspend` 키워드만으로 비동기 처리가 가능합니다
+- 콜백 지옥에서 벗어나 순차적인 코드 작성이 가능합니다
 
-이 과정에서 InvocationHandler가 사용됩니다. 이 대리자는 InvocationHandler라는 인터페이스를 구현하며,
-인터페이스의 메서드가 호출될 때 대신 실행되는 동적 프록시 객체다.
+#### 5. OkHttp 기반의 확장성
+- `Interceptor`를 통해 공통 헤더, 로깅, 인증 토큰 삽입이 쉽습니다
+- OkHttp의 모든 최적화 기능을 그대로 활용할 수 있습니다
 
-Retrofit은 Java의 리플렉션(reflection)과 동적 프록시 기술을 사용하여, 개발자가 별도의 구현체를 작성하지 않아도 인터페이스를 실행 가능한 형태로 만듭니다.
+#### 6. 뛰어난 유지보수성
+- API가 늘어나도 코드가 복잡해지지 않습니다
+- 각 API가 독립적인 메서드로 표현되어 관리가 쉽습니다
+- 테스트 코드 작성이 훨씬 간편합니다
 
-어노테이션(@GET, @POST, @Path, @Query, @Body 등)을 읽어 RequestFactory 또는 ServiceMethod 객체를 생성합니다.
+---
 
+## Retrofit 내부 동작 원리 - 어떻게 인터페이스만으로 동작할까?
 
-이 ServiceMethod는 파라미터 핸들러(ParameterHandler)를 통해 각 파라미터에 맞는 역할 (예: @Path 삽입, @Query 추가, @Body 직렬화 등)을 수행하는 로직을 내부에 가집니다.
+Retrofit의 마법 같은 동작은 **리플렉션(Reflection)**과 **동적 프록시(Dynamic Proxy)**를 활용합니다.
 
-이렇게 구성된 ServiceMethod 객체는 캐시되고, 같은 메서드가 여러 번 호출되면 재사용됩니다.
+### 1. 프록시 객체 생성
 
-6. 실제 네트워크 요청 실행
+`create()` 메서드가 호출되면 Retrofit은 Java의 `Proxy.newProxyInstance()`를 사용해 인터페이스의 프록시 객체를 생성합니다. 이 프록시는 `InvocationHandler`를 구현하며, 모든 메서드 호출을 가로챕니다.
 
-인터페이스의 메서드를 호출하면, 프록시가 가로채서 ServiceMethod를 통해 OkHttp Request 객체를 만듭니다.
+### 2. 어노테이션 파싱
 
-그 Request는 내부적으로 OkHttp 클라이언트를 통해 실행됩니다.
+메서드가 호출되면 프록시는:
+- `@GET`, `@POST` 등의 HTTP 메서드 정보
+- `@Path`, `@Query`, `@Body` 등의 파라미터 정보
+- 반환 타입 정보
 
-응답이 돌아오면, Retrofit의 Converter(예: GsonConverterFactory)가 응답 본문(JSON 등)을 Kotlin/Java 객체로 변환해 줍니다.
+를 리플렉션으로 읽어 `ServiceMethod` 객체를 생성합니다.
 
-또한, 메서드의 반환 타입이 코루틴, RxJava, Call<T> 등 다양한 형태를 허용하기 위해 CallAdapter 체계를 사용합니다.
+### 3. 요청 객체 구성
 
-7. Retrofit의 장점
+`ServiceMethod`는 내부의 `ParameterHandler`를 통해:
+- `@Path`로 URL 경로 삽입
+- `@Query`로 쿼리 파라미터 추가
+- `@Body`로 요청 본문 직렬화
 
-Retrofit의 가장 큰 장점은 간결함과 안전성, 그리고 확장성이다.
+등의 작업을 수행해 OkHttp의 `Request` 객체를 만듭니다.
 
-개발자는 복잡한 네트워크 로직을 작성하지 않아도, 마치 로컬 함수를 호출하듯 API를 호출할 수 있다.
-타입 안전성이 보장되어 JSON 응답을 정의한 데이터 클래스 타입으로 바로 받을 수 있고,
-형 변환이나 키 누락 오류를 줄일 수 있다.
+### 4. 네트워크 요청 실행
 
-Gson, Moshi, Kotlinx Serialization 등 다양한 Converter를 사용할 수 있으며,
-필요하다면 직접 ConverterFactory를 만들어 커스텀 직렬화를 구현할 수도 있다.
-OkHttp를 기반으로 하기 때문에 Interceptor를 통한 공통 헤더 추가, 로깅, 인증 토큰 삽입도 쉽다.
+구성된 `Request`는 OkHttp 클라이언트를 통해 실제 네트워크 요청으로 실행됩니다.
 
-무엇보다 Retrofit은 API 개수가 늘어나도 코드가 복잡해지지 않는다.
-각 API는 독립적인 인터페이스 메서드로 표현되며,
-이를 한 곳에서 관리할 수 있어 유지보수성이 높고,
-테스트 코드 작성도 훨씬 수월해진다.
+### 5. 응답 변환
 
-Retrofit은 네트워크 세부 구현을 OkHttp로 숨기고,
-개발자에게는 “어노테이션 기반 인터페이스”라는 추상적인 계약만 노출한다.
-덕분에 우리는 네트워크 통신이라는 복잡한 문제를
-안전하고 직관적인 방법으로 다룰 수 있게 되었다.
+응답이 돌아오면:
+- `Converter`(예: Gson)가 JSON을 객체로 변환
+- `CallAdapter`가 반환 타입에 맞게 결과를 래핑 (코루틴, RxJava, Call 등)
 
+### 6. 캐싱 최적화
 
-8. Retrofit 활용 사례 — Gzip 응답 압축 대응
-팀 코스픽에서 코스 조회 API 응답을 압축하기로 결정되었다.
- 이에 따라 클라이언트에서도 압축된 응답을 처리할 수 있도록 대응해야 했다.
-백엔드가 선택한 응답 압축 방식은 gzip이었다.
-gzip은 파일 압축에 사용되는 응용 소프트웨어로, 유닉스 시스템에서 쓰이던 기존 압축 프로그램을 대체하기 위해 만들어진 자유 소프트웨어다.
- 우리에게 익숙한 zip처럼 DEFLATE 알고리즘을 사용하지만, 여러 파일을 하나의 압축 파일로 묶는 기능은 없다.
-OkHttp는 이러한 gzip 응답을 자동으로 처리할 수 있도록 Transparent GZIP 기능을 지원한다.
- 이 기능은 서버가 Content-Encoding: gzip 헤더를 보낼 경우, 내부적으로 압축을 해제해주는 역할을 한다.
- 즉, 개발자가 별도로 설정하지 않아도 네트워크 트래픽을 줄이고 빠른 응답을 받을 수 있다.
-당시 우리는 이 기능을 직접 활성화해서 사용자 경험을 개선하려고 했다.
- 그러나 적용 후 앱이 크래시가 발생했다.
- 이유는 Retrofit이 이미 내부적으로 gzip 헤더가 포함된 응답을 자동으로 해제하고 있었기 때문이다.
- 즉, OkHttp와 Retrofit이 동시에 압축 해제를 시도하면서 충돌이 일어났다.
-그래서 우리는 기능 자체를 비활성화하고, 압축이 적용되었을 때의 성능 차이를 확인하는 방향으로 검증을 진행했다.
- 측정은 Android Studio의 App Inspector를 이용해, 애뮬레이터 환경에서 로컬 서버를 대상으로 수행했다.
- 비교 기준은 “API 응답 압축 대응 커밋 전후”였다.
-결과는 다음과 같았다.
-응답 크기: 209KB → 9.3KB (약 95% 감소)
+생성된 `ServiceMethod`는 캐시되어, 같은 메서드가 재호출될 때 재사용됩니다.
 
+---
 
-응답 시간: 476ms → 261ms (약 45% 개선)
+## Retrofit의 비동기 처리 - suspend 키워드의 비밀
 
+Retrofit 2.6.0 이후부터는 `suspend` 함수를 직접 사용할 수 있습니다. 하지만 어떻게 키워드 하나만으로 비동기가 동작할까요?
 
-압축 덕분에 데이터 전송량과 응답 속도 모두 크게 줄어드는 효과를 확인할 수 있었다.
- 비록 Retrofit 내부 gzip 처리로 인해 직접적인 설정은 제거했지만,
- 응답 압축이 네트워크 성능 개선에 얼마나 큰 영향을 주는지 실감할 수 있는 경험이었다.
+### CallAdapter의 역할
 
-9. Retrofit의 비동기 처리와 코루틴 (suspend 함수 내부 동작)
+Retrofit은 `CallAdapter.Factory`를 통해 함수의 반환 타입을 감지합니다:
 
-Retrofit 2.6.0 이후부터는 Call<T> 대신 suspend fun을 바로 사용할 수 있다.
-이 말은 곧, enqueue() 같은 콜백 코드를 직접 작성하지 않아도 비동기 처리가 자동으로 이루어진다는 뜻이다.
+- `Call<T>` → 일반 Call 어댑터
+- `suspend fun` → 코루틴 어댑터
+- `Observable<T>` → RxJava 어댑터
 
-그렇다면 왜 suspend 키워드를 붙이기만 해도 자동으로 비동기가 될까?
+`suspend` 함수가 감지되면 Retrofit은:
 
-Retrofit은 내부적으로 CallAdapter라는 구조를 사용한다.
-CallAdapter.Factory는 함수의 반환 타입을 감지하고, 그에 맞는 어댑터를 선택한다.
-예를 들어, 함수가 Call<T>를 반환하면 일반 Call 어댑터를, suspend fun이면 코루틴 어댑터를 선택한다.
-따라서 Retrofit이 직접 코루틴을 인식하고, 비동기로 동작하는 코드를 자동으로 만들어준다.
+1. 네트워크 요청을 `Dispatchers.IO`에서 실행
+2. 응답을 호출한 코루틴 컨텍스트로 반환
+3. 스레드 전환(IO → Main)을 자동으로 처리
 
-Retrofit이 이때 네트워크 요청은 Dispatchers.IO에서 실행하고, 응답은 withContext(Dispatchers.Main)으로 반환한다.
-즉, 개발자가 스레드 전환(IO → Main)을 직접 신경 쓸 필요가 없다.
-Retrofit이 코루틴 컨텍스트와 OkHttp 호출을 연결해주는 중간 계층 역할을 하기 때문이다.
-
-결과적으로 우리는 단순히 아래처럼 선언하기만 해도,
-
-```
+따라서 개발자는 단순히 이렇게만 작성하면:
+```kotlin
 @GET("posts/{id}")
 suspend fun getPost(@Path("id") id: Int): Post
-
 ```
 
-Retrofit이 알아서 백그라운드 스레드에서 네트워크를 처리하고, UI 스레드로 결과를 돌려준다.
- 이런 구조 덕분에 코드가 훨씬 깔끔하고, 가독성이 높아진다.
-공식 문서에서는 “Retrofit은 suspend 함수를 CallAdapter로 변환하며, 코루틴 컨텍스트 내에서 OkHttp의 Call을 실행한다”고 설명한다.
+Retrofit이 알아서 백그라운드에서 실행하고 결과를 안전하게 반환합니다.
 
-11. Retrofit과 에러 처리 (HttpException, IOException, Result Wrapping)
+---
 
-Retrofit은 단순히 네트워크 요청만 하는 도구가 아니다.
-에러를 어떻게 분류하고, 어떻게 처리할 수 있게 해주는지도 명확하게 정의되어 있다.
+## 실전 활용: 에러 처리 패턴
 
-먼저, 서버로부터 받은 응답의 상태 코드가 200~299가 아닐 경우, Retrofit은 HttpException을 던진다.
-즉, HTTP 요청은 성공적으로 완료됐지만 서버가 오류를 반환한 경우(404, 500 등)가 여기에 해당한다.
+Retrofit은 명확한 에러 분류를 제공합니다:
 
-반면, 네트워크 자체가 단절되었거나 타임아웃이 발생한 경우는 IOException으로 구분된다.
-이 차이 덕분에 우리는 서버 문제와 네트워크 환경 문제를 구분해서 처리할 수 있다.
+### HttpException vs IOException
 
-실무에서는 이 예외를 그대로 쓰지 않고, Result나 sealed class로 감싸는 패턴이 흔하다.
-이 방식은 모든 결과를 성공(Success)과 실패(Error)로 명확하게 표현할 수 있어서,
-UI 단에서는 단순히 상태를 구독하고 렌더링만 하면 된다.
+- **HttpException**: 서버 응답은 받았지만 상태 코드가 200~299가 아닌 경우 (404, 500 등)
+- **IOException**: 네트워크 단절, 타임아웃 등 통신 자체가 실패한 경우
 
-예를 들어 다음과 같이 표현할 수 있다:
+### Result 래핑 패턴
 
-```
+실무에서는 sealed class로 결과를 래핑하는 패턴이 흔합니다:
+```kotlin
 sealed class NetworkResult<out T> {
     data class Success<T>(val data: T) : NetworkResult<T>()
     data class Error(val exception: Throwable) : NetworkResult<Nothing>()
 }
-
 ```
 
-이렇게 하면 ViewModel에서는 try-catch 대신 when으로 분기 처리할 수 있다:
-
-```
+이렇게 하면 ViewModel에서 명확한 상태 관리가 가능합니다:
+```kotlin
 when (val result = repository.getPost()) {
     is NetworkResult.Success -> showPost(result.data)
     is NetworkResult.Error -> showError(result.exception)
 }
-
 ```
 
-공식 Retrofit 문서에서는 “HttpException은 HTTP 오류 상태 코드를 나타내며, IOException은 연결 또는 타임아웃 오류를 나타낸다”고 명시되어 있다.
+---
 
-13. 테스트 및 모킹(Mock) 서버 활용
+## 실전 사례: Gzip 압축 대응기
 
-Retrofit은 테스트하기 쉬운 구조를 가지고 있다.
-그 이유는 인터페이스 기반 설계 때문이다.
+팀 프로젝트에서 API 응답 압축을 도입하면서 겪은 경험을 공유하겠습니다.
 
-Retrofit의 핵심은 “인터페이스만 정의하면, 나머지는 런타임에 자동으로 구현체를 만들어준다”는 점이다.
-덕분에 실제 API 요청 없이도, 테스트 환경에서 가짜 응답을 돌려주는 코드(모킹, Mock)를 만들기 쉽다.
+### 상황
 
-예를 들어, Retrofit이 아닌 단순한 Fake Repository를 만들어 사용할 수도 있다:
+백엔드에서 응답을 gzip으로 압축하기로 결정했고, 클라이언트에서도 대응이 필요했습니다.
 
-```
+### 시행착오
+
+OkHttp의 Transparent GZIP 기능을 명시적으로 활성화했더니 앱이 크래시했습니다. 원인은 **Retrofit이 이미 내부적으로 gzip 헤더(`Content-Encoding: gzip`)를 자동으로 처리**하고 있었기 때문입니다. OkHttp와 Retrofit이 동시에 압축 해제를 시도하면서 충돌이 발생한 것이죠.
+
+### 해결과 검증
+
+명시적 설정을 제거하고, Android Studio의 App Inspector로 성능을 측정했습니다:
+
+- **응답 크기**: 209KB → 9.3KB (약 95% 감소)
+- **응답 시간**: 476ms → 261ms (약 45% 개선)
+
+Retrofit이 이미 최적화를 처리하고 있었고, 개발자가 별도로 신경 쓸 필요가 없었습니다.
+
+---
+
+## 테스트 가능한 설계
+
+Retrofit의 인터페이스 기반 설계는 테스트를 매우 쉽게 만듭니다.
+
+### Fake Repository 패턴
+```kotlin
 class FakePostRepository : PostRepository {
     override suspend fun getPost(id: Int): Post {
         return Post(id, "테스트 제목", "테스트 내용")
     }
 }
-
 ```
 
-또는, OkHttp의 MockWebServer를 이용해서 실제 HTTP 통신처럼 테스트할 수도 있다.
- 이 서버는 로컬 환경에서 요청을 받고, 미리 정의한 응답을 돌려준다.
- 이를 통해 “API가 제대로 호출되는지”, “응답이 올바르게 파싱되는지”를 검증할 수 있다.
-공식 GitHub 문서에서도 MockWebServer를 Retrofit 테스트용으로 함께 사용하는 예시를 제공한다.
- MockWebServer는 OkHttp 팀에서 만든 도구로, Retrofit과 완벽하게 호환된다.
+### MockWebServer 활용
 
+OkHttp 팀에서 제공하는 `MockWebServer`를 사용하면 실제 HTTP 통신처럼 테스트할 수 있습니다:
+```kotlin
+val mockWebServer = MockWebServer()
+mockWebServer.enqueue(MockResponse().setBody("""{"id":1,"title":"테스트"}"""))
 
+val retrofit = Retrofit.Builder()
+    .baseUrl(mockWebServer.url("/"))
+    .addConverterFactory(GsonConverterFactory.create())
+    .build()
+```
+
+이를 통해 API 호출과 응답 파싱을 독립적으로 검증할 수 있습니다.
+
+---
+
+## 결론: Retrofit을 선택해야 하는 이유
+
+처음 받았던 질문으로 돌아가 보겠습니다.
+
+> "왜 Retrofit을 쓰나요?"
+
+이제는 명확하게 답할 수 있습니다.
+
+### 변경에 강한 코드
+
+API 명세가 바뀌어도 인터페이스만 수정하면 됩니다. URL이 변경되거나, 파라미터가 추가되어도 어노테이션 몇 줄만 고치면 전체 코드가 즉시 반영됩니다.
+
+### 유지보수의 용이함
+
+10개의 API를 관리하든 100개의 API를 관리하든, 코드 복잡도는 선형적으로 증가하지 않습니다. 각 API가 독립적인 메서드로 표현되어 있어, 특정 API만 수정하거나 디버깅하기가 매우 쉽습니다.
+
+### 팀 협업의 효율
+
+네트워크 로직이 추상화되어 있어 백엔드 개발자와의 소통도 간편합니다. "이 엔드포인트에 이런 파라미터를 추가해주세요"라는 요청이 오면, 인터페이스에 `@Query` 하나만 추가하면 끝입니다.
+
+### 안전성과 생산성의 균형
+
+타입 안전성을 보장하면서도 보일러플레이트 코드를 최소화합니다. 컴파일 타임에 오류를 잡으면서도, 실제 작성하는 코드는 몇 줄에 불과합니다.
+
+---
+
+HttpURLConnection부터 시작해 OkHttp를 거쳐 Retrofit까지, 각 단계는 이전 방식의 문제를 해결하기 위한 진화였습니다. 
+
+Retrofit은 단순히 "편한 라이브러리"가 아니라, **변경에 유연하고 유지보수하기 쉬운 코드를 작성할 수 있게 해주는 아키텍처적 도구**입니다.
+
+다음에 누군가 "왜 Retrofit을 쓰나요?"라고 묻는다면, 이제 자신 있게 답할 수 있을 것입니다.
