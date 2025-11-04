@@ -78,7 +78,7 @@ Context 내부에서는 서버에서 받아오는 데이터와 UI 렌더링을 �
   value={{
     routiePlaces, // 서버 상태
     routes, // 서버 상태
-    routes, // 클라이언트 상태
+    routieIdList, // 클라이언트 상태
     refetchRoutieData,
     handleAddRoutie,
     handleDeleteRoutie,
