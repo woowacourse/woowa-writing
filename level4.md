@@ -108,7 +108,7 @@ WorkManager.getInstance(context)
 
 **시나리오:** 사용자 건강 데이터를 2시간마다 서버와 동기화해야 한다고 가정하자. 배터리 소모를 고려해 **Wi-Fi에 연결되고, 배터리가 충분할 때만** 동기화를 실행해야 한다. 앱이 처음 설치된 후에는 바로 동기화하지 말고 15분 정도 있다가 첫 실행되면 좋겠다. 또한 중복 예약을 피하고, 필요 시 작업을 취소할 수 있어야 한다.
 
-**해결:** WorkManager의 **주기적 PeriodicWorkRequest**를 사용한다. 주기적 작업은 이름이 동일할 경우 하나만 존재하도록 하고 (enqueueUniquePeriodicWork), 이미 등록된 작업이 있다면 새로 추가하지 않도록 **ExistingPeriodicWorkPolicy.KEEP** 정책을 선택한다. Constraints를 사용해 **네트워크=Unmetered(무료 Wi-Fi)**, **배터리 충분** 조건을 걸고, setInitialDelay로 **15분 지연 후 첫 실행**되도록 설정한다. 다음은 코틀린 코드 예시다.
+**해결:** WorkManager의 **주기적 PeriodicWorkRequest**를 사용한다. 주기적 작업은 enqueueUniquePeriodicWork() 로 등록한다. 이미 같은 이름의 작업이 있다면, **ExistingPeriodicWorkPolicy.KEEP** 을 적용해 중복을 방지한다. Constraints를 사용해 **네트워크=Unmetered(무료 Wi-Fi)**, **배터리 충분** 조건을 걸고, setInitialDelay로 **15분 지연 후 첫 실행**되도록 설정한다. 다음은 코틀린 코드 예시다.
 
 ```kotlin
 val constraints = Constraints.Builder()
