@@ -1,80 +1,97 @@
-# 🔒 SQL 표준 락(Lock)과 MySQL(InnoDB) 락(Lock)
+# 🔒 SQL 표준 락(Lock)과 비교한 MySQL(InnoDB) 락(Lock)
 동시성 문제를 계기로 Lock을 공부하면서 공식 문서, 책, 블로그 등 다양한 자료를 찾아보았다. 그러나 자료마다 설명이 조금씩 달랐고, *Real MySQL 8.0*의 설명조차 MySQL 공식 문서와 일치하지 않는 부분이 존재했다. 이는 DBMS마다 지원하는 Lock의 세부 종류와 동작 방식이 다르기 때문에, 통일된 기준 문서를 찾기 어렵기 때문이다.
 
-따라서 이번 글은 이러한 혼란을 겪는 사람들을 위해 작성되었다. 글의 전반부에서는 **SQL 표준 문서를 기준으로 Lock의 개념과 범위를 정리**하고, 후반부에서는 **MySQL(InnoDB)를 중심으로 실제 Lock 동작을 쿼리로 검증하며 정리한 내용**을 다룬다.
+따라서 이번 글은 이러한 혼란을 겪는 사람들을 위해 작성되었다. 글의 전반부에서는 **SQL 표준 문서를 기준으로 Lock의 개념을 정리**하고, 후반부에서는 **MySQL(InnoDB)를 중심으로 실제 Lock 동작을 쿼리로 검증하며 정리한 내용**을 다룬다.
 
 <br>
-
+<br>
 
 # 📎 목차
 - [✅ Lock 지원 단위](https://github.com/soeun2537/woowa-writing/blob/level4/level4.md#-lock-%EC%A7%80%EC%9B%90-%EB%8B%A8%EC%9C%84)
 - [✅ Lock 종류](https://github.com/soeun2537/woowa-writing/blob/level4/level4.md#-lock-%EC%A2%85%EB%A5%98)
 - [✅ MySQL 엔진의 Lock](https://github.com/soeun2537/woowa-writing/blob/level4/level4.md#-mysql-%EC%97%94%EC%A7%84%EC%9D%98-lock)
 - [✅ InnoDB 엔진의 Lock](https://github.com/soeun2537/woowa-writing/blob/level4/level4.md#-innodb-%EC%97%94%EC%A7%84%EC%9D%98-lock)
+- [📍 참고 자료](https://github.com/soeun2537/woowa-writing/blob/level4/level4.md#-%EC%B0%B8%EA%B3%A0-%EC%9E%90%EB%A3%8C)
 
 <br>
-
+<br>
 
 # ✅ Lock 지원 단위
 > SQL 표준 문서에서 정의하는 Lock의 지원 단위는 Table과 Row에 한정된다. 그 외 Page/Block, Index, Database 수준의 Lock은 Oracle, SQL Server, MySQL 등 각 DBMS가 자체적으로 확장하여 제공한다.
 > 
 > 예를 들어, SQL Server는 RID, Page, Extent, HoBT, Table 단위 Lock을 지원하고, MySQL(InnoDB)는 Global 단위를 추가로 제공한다. 따라서 실제 사용 가능한 Lock 단위는 DBMS 공식 문서를 반드시 확인해야 한다.
 
+<br>
+
 ## ▶ 데이터베이스(Database)
 **데이터베이스 단위**로 Lock을 설정하는 방식이다.
 - 해당 DB 내 모든 테이블과 레코드에 대한 접근이 차단된다.
 - 주로 유지보수, 백업, 대규모 스키마 변경 같은 특수 상황에서만 사용된다.
 - 동시성이 심각하게 제한되므로 일반적인 환경에서는 거의 사용되지 않는다.
-> MySQL의 Global Lock이 이에 해당된다.
+
+<br>
 
 ## ▶ 파일(File)
 테이블이나 인덱스가 저장된 **물리적 파일 단위**로 Lock을 설정하는 방식이다.
 - 파일 기반 DBMS 또는 구버전에서 주로 사용되었다.
 - 최신 DBMS에서는 더 세밀한 Lock 단위를 선호하기 때문에 잘 쓰이지 않는다.
-> MySQL의 MyISAM 스토리지 엔진이 파일 단위 Lock을 사용했다.
+
+<br>
 
 ## ▶ 테이블(Table)
 **테이블 단위**로 Lock을 설정하는 방식이다.
 - 테이블 내 모든 레코드가 동시에 수정 불가 상태가 된다.
 - 쓰기 작업이 많을 경우 동시성이 크게 저하될 수 있다.
 
+<br>
+
 ## ▶ 페이지(Page) (= Block)
 DB 저장소에서 일정 크기(보통 4KB~16KB)의 데이터 묶음인 **페이지 단위**로 Lock을 설정하는 방식이다.
 - 행보다 크고, 테이블 전체보다는 작은 단위다.
 - 여러 행이 같은 페이지에 속해 있으면, 특정 행이 Lock될 때 페이지 전체가 함께 잠길 수 있다.
-> - SQL Server, Oracle은 Page 단위 Lock을 지원한다.
-> - MySQL(InnoDB)는 직접적인 Page Lock 대신 Row Lock + Gap Lock 조합을 사용한다.
+
+<br>
 
 ## ▶ 행(Row)
 **행 단위**로 Lock을 설정하는 방식이다.
 - 가장 세밀하게 제어할 수 있어 동시성 확보에 유리하다.
 - 하지만 관리해야 할 Lock의 수가 많아져 성능 부담이 커질 수 있다.
 
+<br>
+
 ## ▶ 컬럼(Column)
 **특정 행의 일부 컬럼 단위**로 Lock을 설정하는 방식이다.
 - 이론적으로는 가능하지만, 구현 난이도가 높고 실질적 효용이 낮아 상용 DBMS에서는 거의 사용되지 않는다.
 
 <br>
-
+<br>
 
 # ✅ Lock 종류
 SQL-92에서는 트랜잭션 격리 수준을 구현하기 위해 Lock 모드를 정의한다. SQL-92에는 **공유 락(Shared), 배타 락(Exclusive), 내재 락(Intent)** 등이 정의되어 있으며, **업데이트 락(Update)** 은 SQL Server 확장 기능이다.
+
+<br>
 
 ## ▶ 공유 락(Shared Lock, S)
 **데이터를 조회(SELECT)할 때 사용**하며, **S로 표기**한다.
 - 다른 트랜잭션도 동일한 데이터에 대해 공유 락(S)을 걸 수 있다. 즉, 읽기는 여러 트랜잭션에서 동시에 가능하다.
 - 그러나 다른 트랜잭션이 배타 락(X)을 거는 것은 허용되지 않는다. 즉, 쓰기는 불가능하다.
 
+<br>
+
 ## ▶ 배타 락(Exclusive Lock, X)
 **데이터를 변경(INSERT, UPDATE, DELETE)할 때 사용**하며, **X로 표기**한다.
 - 해당 데이터에 대해 다른 어떤 트랜잭션도 공유 락(S)이나 배타 락(X)을 걸 수 없다.
 - 즉, 읽기와 쓰기 모두 차단된다.
+
+<br>
 
 ## ▶ 업데이트 락(Update Lock, U)
 **데이터를 수정하기 위해 배타 락(X)을 걸기 전에 사용**하며, **U로 표기**한다.
 - 공유 락(S)에서 배타 락(X)으로 승격하는 과정에서 Deadlock이 자주 발생한다.
 - 이를 방지하기 위해 중간 단계로 Update Lock을 사용한다.
 > ANSI SQL 표준에는 Update Lock이라는 용어 자체는 존재하지 않는다. Microsoft SQL Server 등 일부 DBMS에서 Deadlock 회피 목적으로 추가로 제공하는 락 모드다.
+
+<br>
 
 ## ▶ 내재 락(Intent Lock, IS, IX, SIX)
 **상위 객체(테이블)에 직접 Lock을 걸지 않고도, 하위 객체(행, 페이지) 단위 Lock을 명확히 알리기 위해 사용**하며, **IS, IX, SIX로 표기**한다.
@@ -86,13 +103,15 @@ SQL-92에서는 트랜잭션 격리 수준을 구현하기 위해 Lock 모드를
   - **SIX (Shared with Intent Exclusive):** 테이블 전체에는 공유 락(S)을 걸고, 특정 행에는 배타 락(X)을 걸 예정이라는 의도를 표기한다.
 
 <br>
-
+<br>
 
 # ✅ MySQL 엔진의 Lock
-> MySQL은 구조적으로 MySQL 엔진과 스토리지 엔진의 두 계층으로 구성되어 있다. 아래 그림에서 볼 수 있듯이, MySQL 엔진 락은 비교적 레거시에 가까운 개념이며, 현대 MySQL에서는 대부분의 동시성 제어가 InnoDB 스토리지 엔진의 락을 중심으로 이루어진다.
+> MySQL은 구조적으로 MySQL 엔진과 스토리지 엔진의 두 계층으로 구성되어 있다. 아래 그림에서 볼 수 있듯이, MySQL 엔진 락은 비교적 레거시에 가까운 개념이며, 현대 MySQL에서는 대부분의 동시성 제어가 InnoDB 스토리지 엔진의 락을 통해 이루어진다.
 >
 > <img src="images/mysql_engine_1.png" width="400px">
 > <img src="images/mysql_engine_2.png" width="400px">
+
+<br>
 
 ## ▶ 글로벌 락(Global Lock)
 **데이터베이스 단위**로 설정되는 락이다.
@@ -116,6 +135,8 @@ UNLOCK TABLES;
 *세션 B에서 읽기 O*
 ![global_lock_3.png](images/global_lock_3.png)
 *세션 B에서 쓰기 X*
+
+<br>
 
 ## ▶ 테이블 락(Table Lock)
 **테이블 단위**로 설정되는 락이다.
@@ -150,6 +171,8 @@ UNLOCK TABLES;
 ![table_lock_6.png](images/table_lock_6.png)
 *세션 B에서 쓰기 X*
 
+<br>
+
 ## ▶ 네임드 락(Named Lock)
 대상이 특정 테이블이나 레코드가 아닌, **사용자가 지정한 문자열 단위**로 설정되는 락이다.
 - 데이터베이스 객체에 국한되지 않고 애플리케이션 레벨 동기화에 활용할 수 있다.
@@ -170,6 +193,8 @@ SELECT RELEASE_LOCK('task_123');
 *세션 A에서 네임드 락 획득 O*
 ![named_lock_2.png](images/named_lock_2.png)
 *세션 B에서 네임드 락 획득 X*
+
+<br>
 
 ## ▶ 메타데이터 락(Metadata Lock)
 **테이블의 DDL 또는 DML 시 자동으로 획득**되는 락이다.
@@ -192,11 +217,13 @@ ALTER TABLE users ADD COLUMN nickname VARCHAR(50);
 *세션 B에서 DDL 반영 X*
 
 <br>
-
+<br>
 
 # ✅ InnoDB 엔진의 Lock
 InnoDB는 트랜잭션과 MVCC 기반 동시성 제어를 위해 더 세밀한 레벨의 락을 제공한다.
 ![innodb_engine_1.png](images/innodb_engine_1.png)
+
+<br>
 
 ## ▶ 레코드 락(Record Lock)
 **인덱스의 특정 레코드**에 설정되는 락이다.
@@ -219,6 +246,8 @@ UPDATE users SET age = 35 WHERE id = 10;
 ![record_lock_2.png](images/record_lock_2.png)
 *세션 B에서 UPDATE 반영 X*
 
+<br>
+
 ## ▶ 갭 락(Gap Lock)
 **인덱스 레코드 사이의 간격(범위)** 에 설정되는 락이다.
 - 특정 값이 존재하지 않는 인덱스 구간에 락을 걸어, 다른 트랜잭션이 해당 범위에 새로운 레코드를 INSERT하지 못하도록 막는다.
@@ -239,6 +268,8 @@ INSERT INTO users (name, age) VALUES ('Boogie', 35);
 ![gap_lock_2.png](images/gap_lock_2.png)
 *세션 B에서 INSERT 반영 X*
 
+<br>
+
 ## ▶ 넥스트 키 락(Next-Key Lock)
 **레코드 락(Record Lock)과 갭 락(Gap Lock)을 결합**한 형태의 락이다.
 - 이 락의 주 목적은 Phantom Read를 완전히 방지하고, 바이너리 로그(binlog) 기반 복제 환경에서 일관된 결과를 보장하는 것이다.
@@ -258,6 +289,8 @@ INSERT INTO users (name, age) VALUES ('Miso', 23);
 *세션 A에서 범위 SELECT 후 COMMIT X*
 ![next_key_lock_2.png](images/next_key_lock_2.png)
 *세션 B에서 INSERT 반영 X*
+
+<br>
 
 ## ▶ 자동 증가 락(Auto Increment Lock)
 **AUTO_INCREMENT 컬럼에 값을 INSERT할 때 사용되는 테이블 단위** 락이다.
@@ -284,6 +317,7 @@ INSERT INTO users (name, age) VALUES ('Boogie', 20);
 ![auto_increment_lock_2.png](images/auto_increment_lock_2.png)
 *세션 B에서 INSERT 반영 O, innodb_autoinc_lock_mode = 2 (Interleaved 모드)이기 때문*
 
+<br>
 
 ## ▶ 공유 락(Shared Lock)
 **조회(SELECT) 작업 시 사용**되는 락이다.
@@ -314,6 +348,8 @@ UPDATE users SET age = age + 1 WHERE id = 1;
 ![shared_lock_3.png](images/shared_lock_3.png)
 *세션 B에서 쓰기 X*
 
+<br>
+
 ## ▶ 배타 락(Exclusive Lock)
 **변경(INSERT, UPDATE, DELETE) 작업 시 사용**되는 락이다.
 - 한 트랜잭션이 배타 락을 획득하면, 다른 트랜잭션은 해당 레코드에 접근할 수 없다.
@@ -338,6 +374,8 @@ UPDATE users SET age = age + 1 WHERE id = 1;
 *세션 B에서 읽기 X*
 ![exclusive_lock_3.png](images/exclusive_lock_3.png)
 *세션 B에서 쓰기 X*
+
+<br>
 
 ## ▶ 의도 락(Intention Lock)
 **테이블 단위 락과 레코드 단위 락 간 충돌을 방지**하기 위한 락이다.
@@ -370,6 +408,8 @@ UPDATE users SET age = age + 1 WHERE id = 1;  -- 특정 행에 X 락 걸림
 ![intention_lock_3.png](images/intention_lock_3.png)
 *SIX 의도 락 획득 후 상태 직접 확인*
 
+<br>
+
 ## ▶ 삽입 의도 락(Insert Intention Lock)
 **INSERT 시 해당 위치에 새로운 레코드를 삽입할 예정임을 표시**하는 락이다.
 - 단순히 이 자리에 INSERT 가능 여부만 확인하기 위해 존재한다.
@@ -389,6 +429,8 @@ INSERT INTO users (name, age) VALUES ('Miso', 23);
 ![insert_intention_lock_1.png](images/insert_intention_lock_1.png)
 *Insert 의도 락 획득 후 상태 직접 확인*
 
+<br>
+
 ## ▶ 조건 락(Predicate Lock for Spatial Indexes)
 **공간(Spatial) 인덱스 사용 시, 범위 조건**에 따라 설정되는 락이다.
 - 일반적인 레코드 락과 달리 조건 기반(Predicate)으로 락을 설정한다.
@@ -398,7 +440,7 @@ INSERT INTO users (name, age) VALUES ('Miso', 23);
 > 자세한 내용은 [MySQL 공식 문서](https://dev.mysql.com/doc/refman/8.0/en/innodb-locking.html#innodb-predicate-locks)를 참고하면 좋을 것 같다.
 
 <br>
-
+<br>
 
 # 📍 참고 자료
 - [ISO/IEC 9075-2(유료 문서)](https://www.iso.org/obp/ui/en/#iso:std:iso-iec:9075:-2:ed-6:v1:en)
