@@ -38,7 +38,7 @@
 
 <img src="img/circuitbreaker.jpeg" width="450px" title="CircuitBreaker"/>
 
-서킷브레이커는 전기 회로 차단기에서 유래한 소프트웨어 디자인 패턴입니다. 전기 회로 차단기가 과전류 발생 시 전원을 차단해 회로를 보호하듯, 서킷브레이커 패턴은 시스템의 실패율이 임계치를 넘으면 요청을 차단해 시스템을 보호합니다.
+서킷브레이커는 전기 회로 차단기에서 유래한 소프트웨어 디자인 패턴입니다. 전기 회로 차단기가 과전류 발생 시 전원을 차단해 회로를 보호하듯, 서킷브레이커 패턴은 외부 시스템의 실패율이 임계치를 넘으면 요청을 차단해 시스템을 보호합니다.
 
 ### 핵심 개념
 
@@ -48,7 +48,7 @@
 **내결함성(Fault Tolerance)**:
 시스템 일부가 고장나도 전체 시스템은 정상 작동을 유지하는 능력
 
-서킷브레이커는 이 두 가지 속성을 모두 제공하여 장애가 시스템 전체로 퍼지는 것을 방지하고, 자동으로 회복할 수 있는 구조를 만듭니다. 즉, 서킷브레이커는 실패를 완전히 없애는 것이 아니라 실패를 제어 가능한 형태로 관리합니다.
+서킷브레이커는 이 두 가지 속성을 모두 제공하여 장애가 시스템 전체로 퍼지는 것을 방지하고, 회복 여부를 자동으로 확인할 수 있는 구조를 만듭니다. 즉, 서킷브레이커는 실패를 완전히 없애는 것이 아니라 실패를 제어 가능한 형태로 관리합니다.
 
 ---
 
@@ -56,7 +56,7 @@
 
 ### 단일 장애 지점의 위험성
 
-하나의 단일 장애가 전체 시스템을 마비시키는 것은 흔한 일입니다. 온라인 쇼핑몰의 결제 시스템을 예로 들어보겠습니다.
+하나의 장애가 전체 시스템을 마비시키는 것은 흔한 일입니다. 온라인 쇼핑몰의 결제 시스템을 예로 들어보겠습니다.
 
 <img src="img/shoppingmall_example.png" width="650px" title="online_shoppingmall_example"/>
 
@@ -81,11 +81,11 @@
 - 서버 자원 보호
 - 핵심 기능 유지
 
-결론적으로 서킷브레이커가 있었다면 결제 서비스가 외부 장애를 감지하고 요청을 차단해, 빠르게 실패를 반환했을 것입니다. 즉, 부분 장애를 전체 장애로 확산시키지 않는 것, 이것이 서킷브레이커의 존재 이유입니다.
+결론적으로 서킷브레이커가 있다면 결제 서비스가 외부 장애를 감지하고 요청을 차단해, 빠르게 실패를 반환할 수 있습니다. 즉, 부분 장애를 전체 장애로 확산시키지 않는 것, 이것이 서킷브레이커의 존재 이유입니다.
 
-### Retry만으로는 부족합니다
+### 외부 API 응답 실패 시 요청을 다시 보낸다면?
 
-외부 API 장애에 대응하기 위해 초기에는 Spring의 `@Retryable`만 사용했습니다.
+외부 API 응답 실패에 대응하기 위해 초기에 Spring의 `@Retryable`을 사용했습니다.
 
 ```java
 @Retryable(value = ExternalApiException.class, maxAttempts = 3)
@@ -99,7 +99,7 @@ public Response recover(ExternalApiException e) {
 }
 ```
 
-하지만 Retry는 실패를 확인한 후 재시도하기 때문에:
+하지만 `@Retryable`은 실패를 확인한 후 재시도하기 때문에 다음과 같은 문제가 있었습니다.
 - 이미 장애가 발생한 API에 계속 요청을 보냅니다
 - 응답 시간이 지연됩니다 (재시도 횟수 × 타임아웃)
 - 외부 서버에 불필요한 부하를 발생시킵니다
@@ -142,7 +142,7 @@ public Response recover(ExternalApiException e) {
 
 <img src="img/circuitbreaker_status_5.png" width="650px" title="CircuitBreaker_status_5"/>
 
-서킷브레이커는 시간에 따라 Closed → Open → Half-Open → Closed or Open 으로 순환하며 자동으로 회복을 시도합니다. 이 메커니즘 덕분에 서킷브레이커는 실패의 흐름을 끊고, 시스템의 자기 회복성을 유지합니다.
+서킷브레이커는 시간에 따라 Closed → Open → Half-Open → Closed or Open 으로 순환하며 회복 여부를 자동으로 확인합니다. 이 메커니즘 덕분에 서킷브레이커는 실패의 흐름을 끊고, 시스템의 자기 회복성을 유지합니다.
 
 ---
 
@@ -270,7 +270,7 @@ resilience4j.circuitbreaker:
 <img src="img/before_circuitbreaker.png" width="300px" title="before_circuitbreaker"/>
 <img src="img/after_circuitbreaker.png" width="280px" title="after_circuitbreaker"/>
 
-### 실제 로그 분석
+### 서킷브레이커 상태 변화 로그
 
 <img src="img/log_after.png" width="650px" title="after_circuitbreaker_log"/>
 
@@ -314,7 +314,7 @@ resilience4j.circuitbreaker:
 
 **3. 자동 회복 메커니즘을 구축하라**
 
-장애는 항상 새벽에 발생합니다. 자동으로 회복할 수 있는 시스템이 진정한 안정성을 제공합니다.
+장애는 새벽에도 발생할 수 있습니다. 자동으로 회복할 수 있는 시스템이 진정한 안정성을 제공합니다.
 
 ### 적용을 고려해야 할 때
 
