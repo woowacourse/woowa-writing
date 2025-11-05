@@ -559,12 +559,12 @@ private void sendNotifications(
 # 4. 성능 비교
 
 ## 4.1. AS-IS vs TO-BE 성능 측정
-### AS-IS ( - 처리 속도 : 1m 26초 )
+### AS-IS ( - 처리 속도 : 1m 26s )
 ![img_6.png](img_6.png)
 
 <br>
 
-### TO-BE ( - 처리 속도 : 229ms ) 
+### TO-BE ( - 처리 속도 : 0.23s ) 
 ![img_5.png](img_5.png)
 
 <br>
