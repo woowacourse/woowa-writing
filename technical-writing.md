@@ -339,8 +339,11 @@ enum class InAppUpdateType {
             availableVersionInfo: VersionInfo,
         ): InAppUpdateType =
             when {
+				// Major 버전이 증가한 경우 → 강제 업데이트
                 availableVersionInfo.major > currentVersionInfo.major -> IMMEDIATE
+				// Minor 버전이 증가한 경우 → 권장 업데이트
                 availableVersionInfo.minor > currentVersionInfo.minor -> FLEXIBLE
+				// Patch만 증가하거나 동일한 경우 → 업데이트 불필요
                 else -> NONE
             }
     }
