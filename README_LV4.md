@@ -165,7 +165,7 @@ Logback 설정 파일에서 로그 패턴에 MDC 정보를 추가합니다.
         ...
     </configuration>
 
-이제 컨트롤러와 서비스는 요청에 대해 아무것도 모른채ㄴ 로그를 남기면 됩니다.
+이제 컨트롤러와 서비스는 요청에 대해 아무것도 모른 채 로그를 남기면 됩니다.
 
     @RestController
     public class OrderController {
