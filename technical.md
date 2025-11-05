@@ -30,7 +30,7 @@
 
 > Context, Redux, 그리고 무거운 리렌더
 
-처음부터 useSyncExternalStore로 접근을 한 것은 아니였습니다.
+처음부터 useSyncExternalStore로 접근을 한 것은 아니었습니다.
 
 useSyncExternalStore로 접근하기 이전에 2가지를 고민했습니다.
 
@@ -56,11 +56,11 @@ function ToastProvider({ children }) {
 }
 ```
 
-이러한 구조는 단순하지만 토스트 하나가 사라질 때마 `ToastProvider`와 내부 모든 컴포넌트가 리렌더링 되는 점이 context API 설계 도중 망설이게 되는 지점이었습니다.
+이러한 구조는 단순하지만 토스트 하나가 사라질 때마다 `ToastProvider`와 내부 모든 컴포넌트가 리렌더링 되는 점이 context API 설계 도중 망설이게 되는 지점이었습니다.
 
 ### **2.** 전역 상태 라이브러리(`Redux, Zustand`)
 
-전역 상태 라이브러리를 도입하게 된다면 위와 같은 부분을 해결하기 위할 수도 있지만, 작은 기능을 위해 전역 스토어를 세팅하는 건 과하다고 생각을 했습니다.
+전역 상태 라이브러리를 도입하게 된다면 위와 같은 부분을 해결하는데 도움이 될 수도 있지만, 작은 기능에 전역 스토어를 세팅하는 것은 과했습니다.
 이러한 과정 속에서 useSyncExternalStore라는 것을 알게 되었고 도입을 시도하게 되었습니다.
 
 ---
@@ -327,7 +327,8 @@ export function ToastItem({ toast }: { toast: ToastData }) {
   }, [id, duration]);
 
   return (
-    <S.ToastItemtype={type}
+    <S.ToastItem
+      type={type}
       duration={duration / TOAST_MILLISECONDS_IN_SECOND}
       onClick={() => removeToast(id)}
     >
