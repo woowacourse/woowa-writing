@@ -6,7 +6,8 @@
 
 ViewModel은 UI 상태를 **구성 변경** 이후에도 보관하도록 설계된 Jetpack 아키텍처 컴포넌트이다.
 
-ViewModel의 생명 범위는 **소유자(ViewModelStoreOwner)** 에 따라 달라진다.
+ViewModel은 기본적으로 **ViewModelStoreOwner**에 결합되어 있으며,
+ViewModelStore는 프로세스 내에서 소유자 수명과 함께 유지·소멸된다.
 
 | 구분 | ViewModel 소유자 | 수명 |
 | --- | --- | --- |
@@ -30,6 +31,9 @@ ViewModel의 생명 범위는 **소유자(ViewModelStoreOwner)** 에 따라 달�
 ---
 
 ## 3. ViewModel의 수명 범위 종류
+
++ AndroidX 1.8 이후부터는 `navGraphViewModels()`를 통해 Navigation 그래프 단위 스코프도 지원한다.
++ 이는 Fragment/Activity 스코프 중간 수준으로, 다중 Fragment 전환 시에도 일관된 상태 유지가 가능하다.
 
 ### 3.1 Fragment 범위 (기본 스코프)
 
@@ -198,7 +202,9 @@ val discussionId: Long =
 
 ### 6.3 해결 방법: extrasProducer에서 수동 전달
 
-Fragment의 `arguments`를 `DEFAULT_ARGS_KEY`에 직접 넣어 `SavedStateHandle`이 초기 인자를 정상적으로 받을 수 있도록 수정했다.
+Fragment의 `arguments`를 `DEFAULT_ARGS_KEY`에 직접 넣어 `SavedStateHandle`이 초기 인자를 복원할 수 있도록 한다.
+단, `requireActivity()` 스코프 사용 시 ViewModel은 Activity 전역에서 공유되므로,
+`discussionId` 등 식별값이 다른 Fragment에서 중복되지 않도록 주의해야 한다.
 
 ```kotlin
 private val viewModel by viewModels<CommentsViewModel>(
@@ -299,6 +305,9 @@ private val viewModel by viewModels<CommentsViewModel>(
 ---
 
 ## 8. ViewModel 생명주기 흐름
+ViewModel은 Activity의 ViewModelStore에 저장되며,
+동일 Activity 내의 다른 Fragment에서도 동일 인스턴스를 획득한다.
+단, 프로세스가 완전히 종료되면 SavedStateHandle을 통해 일부 상태만 복원된다 (in-memory 상태는 소실).
 
 ```
 Activity onCreate()
@@ -327,10 +336,9 @@ Activity 종료
 
 ## 10. 결론
 
-- **ViewModel 범위 확장**은 단순 편의가 아니라 설계적 결정이다.
-- Fragment 범위는 UI 단위, Activity 범위는 화면 묶음 단위이다.
-- BottomSheet, Dialog 등은 필요에 의해 Activity 범위를 상태를 유지할 수 있다.
-- `CreationExtras`와 `SavedStateHandle`을 함께 사용하면 프로세스 복원까지 자동 지원된다.
+ViewModel 스코프는 **데이터의 공유 단위**이자 **메모리 생명주기 단위**다.
+BottomSheet, Dialog 등은 Activity 범위로 확장 시 UX 개선에 효과적이지만,
+**Activity 재사용이 불필요할 때는 Fragment 스코프 유지가 더 안전**하다.
 
 | 상황 | 권장 스코프 |
 | --- | --- |
