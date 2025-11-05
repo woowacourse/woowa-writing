@@ -122,7 +122,7 @@ const calculateProgress = () => {
 <br>
 
 ```javascript
-const ProgressGauge =styled.div<{ rate: number } >`
+const ProgressGauge = styled.div<{ rate: number } >`
   overflow: hidden;
   width: ${({ rate }) => `${rate}%`};
   height: 100%;
