@@ -37,11 +37,11 @@ MySQL의 `EXPLAIN`과 `EXPLAIN ANALYZE` 방식을 선택했습니다.
 
 # Spring Data JPA 실제 쿼리 확인
 
-Spring Data JPA를 사용하여 개발자가 쿼리를 작성하지 않고 있습니다.
+MySQL 쿼리 성능 측정을 위해서 웹 어플리케이션에서 사용하는 쿼리를 알아야 합니다.
 
-따라서 데이터베이스에 요청하는 쿼리를 보려면 어플리케이션 설정 값을 변경해야 합니다.
+Spring Data JPA가 만드는 쿼리를 확인하려면 Spring 설정을 변경해야 합니다.
 
-```sql
+```yaml
 spring:
   jpa:
     show-sql: true
@@ -51,15 +51,20 @@ spring:
         use_sql_comments: true
 ```
 
-show-sql: true 사용 시 **Hibernate가 생성하는 모든 SQL 쿼리**를 콘솔에 출력합니다.
+- show-sql: true 
+  - **Hibernate가 생성하는 모든 SQL 쿼리**를 콘솔에 출력합니다.
 
-format_sql: true 콘솔에 출력하는 **SQL 문을 보기 좋게 줄바꿈과 들여쓰기를 사용하여 포맷(format)합니다.**
+- format_sql: true 
+  - 콘솔에 출력하는 **SQL 문을 보기 좋게 줄바꿈과 들여쓰기를 사용하여 포맷(format)합니다.**
 
-use_sql_comments: true **Hibernate가 생성하는 SQL에 주석을 추가합니다.**
+- use_sql_comments: true 
+  - **Hibernate가 생성하는 SQL에 주석을 추가합니다.**
 
-위 설정은 웹 어플리케이션 서버 성능을 사용하므로 필요한 경우에만 사용해야 합니다.
+위 설정은 쿼리를 콘솔에 출력하므로 애플리케이션 성능 하락이 발생합니다.
 
-이후 웹 어플리케이션 서버에서 데이터베이스에 쿼리를 순간 다음 처럼 콘솔에 SQL이 표시됩니다.
+따라서 개발 환경이나 디버깅 상황에서 사용하는 것이 좋습니다.
+
+이 설정을 적용하고 API를 호출하면, 콘솔에 다음과 같이 실제 실행된 SQL이 출력됩니다.
 
 ```sql
 select
