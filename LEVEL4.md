@@ -1,8 +1,5 @@
 # Retrofit
 
-강의명: 레벨4
-작성 날짜: 2025년 10월 13일
-
 이 글은 Android에서 네트워크 작업을 간소화해주는 Retrofit 라이브러리에 대해 알아보고, 이를 이해하는데 필요한 개념을 기록한다. 
 
 Retrofit은 내부적으로 OkHttp를 사용한다. OkHttp의 공식 설명(번역)은 다음과 같다.
@@ -61,7 +58,7 @@ val okHttpClient = OkHttpClient()
 
 우선 `OkHttpClient` 를 선언한다. OkHttpClient는 HTTP 요청을 보내고 응답을 읽는 `Call` 객체를 위한 Factory다. 
 
-OkHttp는 OkHttpClient 인스턴스 하나를 생성하고, 이를 재사용하길 권장한다. 
+OkHttp는 **OkHttpClient 인스턴스 하나를 생성하고, 이를 재사용하길 권장한다.** 
 
 모든 HTTP 호출에서 이를 공유할 때 가장 좋은 성능을 낸다. 각 클라이언트는 자체적인 커넥션 풀(connection pool)과 스레드 풀(thread pool)을 가지기 때문이다. 커넥션과 스레드를 재사용하면 지연 시간이 줄고 메모리를 절약할 수 있다. 반대로, 매 요청마다 새로운 클라이언트를 생성하면 유휴 풀(idel pool)이 계속 만들어져 리소스가 낭비된다.
 
@@ -197,3 +194,70 @@ okHttpClient.newCall(request).enqueue(object : Callback {
 단순히 HTTP 요청을 보내고 응답을 받는 것은 OkHttp로도 충분하다. 요청마다 URL을 문자열로 작성하고, 응답을 직접 파싱해야 하며, API가 많아질수록 코드가 복잡해진다.
 
 Retrofit은 이러한 반복적인 작업을 인터페이스 기반으로 추상화해, 선언적이고 유지보수하기 쉬운 방식으로 네트워크 코드를 관리할 수 있도록 돕는다. 쉽게 말해, Retrofit은 OkHttp를 더욱 쉽게 사용하기 위한 추상화 계층이라 볼 수 있다.
+
+[2.6.0 버전](https://github.com/square/retrofit/blob/trunk/CHANGELOG.md#260---2019-06-05)부터는 Kotlin의 `suspend` 키워드를 지원한다. 이것이 `suspend` 키워드를 사용해 정의한 함수에서 `Call` 을 쓰지 않고, `Response<T>`  또는 `T` 타입으로 반환값을 정의할 수 있는 이유이다.
+
+```kotlin
+@GET("users/{id}")
+suspend fun user(@Path("id") id: Long): User
+```
+
+위 코드는 `fun user(...): Call<User>` 처럼 정의되어 있고, `Call.enque` 를 호출한 것처럼 처리된다. 또한, 응답 메타데이터(예: HTTP 상태 코드, 헤더 등)에 접근하고 싶다면 `Response<User>`를 반환하도록 선언할 수도 있다.
+
+```kotlin
+@GET("users/{id}")
+suspend fun user(@Path("id") id: Long): Response<User>
+```
+
+---
+
+Retrofit을 통해 API 요청을 방법을 예제 코드를 통해 알아보자.
+
+```kotlin
+interface GitHubService {
+    @GET("/repos/{owner}/{repo}/contributors")
+    fun listRepos(
+        @Path("owner") owner: String,
+        @Path("repo") repo: String,
+    ): Call<List<Contributor>>
+}
+```
+
+우선적으로 사용할 API를 선언한 인터페이스를 만들어야 한다. `/repos/{owner}/{repo}/contributors`는 GitHub 특정 리포지토리의 컨트리뷰터들을 요청할 수 있는 엔드포인트다. 앞에 BASE_URL이 명시되어 있지 않은데, 이것은 주로 재사용될 것이므로 Retrofit 객체를 만들 때 등록한다. `GET` 요청을 보낼 것이므로 `@GET` 어노테이션 내에 url을 명시한다.
+
+```kotlin
+private const val BASE_URL = "https://api.github.com"
+
+fun main() {
+		// 1. Retrofit 객체 생성
+    val json = Json { ignoreUnknownKeys = true }
+    val retrofit: Retrofit =
+        Retrofit
+            .Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(
+                json.asConverterFactory("application/json; charset=UTF8".toMediaType()),
+            ).build()
+
+		// 2. Retrofit을 통해 API Service 인터페이스 구현체 생성
+    val gitHubService: GitHubService = retrofit.create(GitHubService::class.java)
+    
+    // 3. API 요청 및 응답 처리
+    val requestCall: Call<List<Contributor>> = gitHubService.listRepos("square", "retrofit")
+    val response: Response<List<Contributor>?> = requestCall.execute()
+    
+    val contributors: List<Contributor>? = response.body()
+    contributors?.forEach {
+        println(it.login)
+    }
+}
+
+```
+
+코드는 다음 로직을 순차적으로 실행한다.
+
+1. `Retrofit` 객체 생성한다.
+2. Retrofit을 통해 API Service 인터페이스(`GitHubService`)의 구현체를 생성한다.
+3. `Call` 객체를 `execute()`하고, `Response` 응답을 처리한다.
+
+3번 과정부터는 OkHttp를 통해 응답을 처리하는 방식과 동일하다.
