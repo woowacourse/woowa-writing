@@ -6,13 +6,14 @@ React로 프로젝트를 진행하면서 가장 많이 겪은 문제는 **런타
 
 예를 들자면 다음과 같다.
 
-![alt text](image-2.png)
+![alt text](image.png)
+다음과 같이 **Props 이름에 오타가 있거나 필수 Props를 전달하지 않아도**
+
+JavaScript에서는 **에러 없이 실행**된다.
 
 ![alt text](image-1.png)
 
-다음과 같이 **Props 이름에 오타가 있거나 필수 Props를 전달하지 않아도**
-
-JavaScript에서는 **에러 없이 실행**되지만, TypeScript에서는 **컴파일 단계에서 오류를 잡아준다.**
+하지만 TypeScript에서는 **컴파일 단계에서 오류를 잡아준다.**
 
 이런 경험이 누적되면서, **정적 타입 시스템**의 필요성을 절실히 느꼈다.
 
