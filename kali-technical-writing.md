@@ -559,9 +559,19 @@ private void sendNotifications(
 # 4. 성능 비교
 
 ## 4.1. AS-IS vs TO-BE 성능 측정
+### AS-IS ( - 처리 속도 : 1m 26초 )
 ![img_6.png](img_6.png)
+
+<br>
+
+### TO-BE ( - 처리 속도 : 229ms ) 
 ![img_5.png](img_5.png)
+
+<br>
+
 batch 부분 10만명 기준 처리 속도가 1m 26s 에서 229ms로 **99.734 % 감소**했다.
+
+<br> 
 메모리 사용량은 95% 개선되었다. (100만 기준, 400MB 》 24MB)
 
 # 5. 느낀점
