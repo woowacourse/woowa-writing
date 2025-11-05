@@ -29,7 +29,7 @@ Stacko/
 <br>
 
 각 모듈은 역할에 따라 잘 분리되어 있었지만, `build.gradle.kts`의 코드 중복이 심했다.
-모든 모듈이 동일한 설정(android, plugins, dependencies 등)을 반복 선언하고 있었고, 새로운 모듈을 추가할 때마다 기존 설정을 복사해 붙여넣는 비효율적인 과정이 필요했다.
+모든 모듈이 동일한 설정(android, plugins, dependencies 등)을 반복 선언하고 있었고, 새로운 모듈을 추가할 때마다 기존 설정을 복사해 붙여넣는 비효율적인 과정이 반복됐다.
 
 ### build.gradle.kts (:feature:home)
 ```kotlin
@@ -99,7 +99,7 @@ dependencies {
 
 이런 중복은 단순히 보기 불편한 수준을 넘어 실제 문제를 유발했다.
 - 동일한 의존성을 여러 곳에서 관리하면서 버전 불일치와 충돌 위험 증가
-- 새로운 모듈으르 추가할 때마다 기존 설정을 복사, 붙여넣는 비효율적인 작업 반복
+- 새로운 모듈을 추가할 때마다 기존 설정을 복사, 붙여넣는 비효율적인 작업 반복
 - ...
 
 <br>
@@ -117,7 +117,7 @@ dependencies {
 여기서는 **Custom Plugin(또는 Convention Plugin)을 정의**해 공통 빌드 설정을 한 곳에서 관리한다.
 
 **settings.gradle.kts(프로젝트 루트)**
-```kotiln
+```kotlin
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 pluginManagement {
@@ -125,7 +125,7 @@ pluginManagement {
     ...
 }
 ```
-Gradle이 일반 Kotlin Module과 Build Module 구별할 수 있도록 `includeBuild("build-logic")`을 작성해야 한다. 
+Gradle이 일반 Kotlin 모듈과 Build Logic 모듈을 구분할 수 있도록 `includeBuild("build-logic")`을 작성해야 한다. 
 
 <br>
 
