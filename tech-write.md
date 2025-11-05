@@ -89,9 +89,9 @@ limit
 
 # **EXPLAIN은 무엇인가?**
 
-EXPLAIN 명령어는 MySQL이 쿼리를 실행하는 방법에 대한 정보를 제공합니다.
+`EXPLAIN` 명령어는 MySQL이 쿼리를 실행하는 방법에 대한 정보를 제공합니다.
 
-사용 방법은 쿼리 접두로 EXPLAIN을 붙이면 됩니다.
+`EXPLAIN` 사용 방법은 쿼리 접두에 EXPLAIN을 붙이면 됩니다.
 
 ```sql
 # EXPLAIN 예시
@@ -99,11 +99,11 @@ EXPLAIN
 SELECT * FROM festabook.lineup;
 ```
 
-EXPLAIN 접두가 붙은 쿼리는 실제로 동작하지 않습니다.
+`EXPLAIN` 접두가 붙은 쿼리는 실제로 동작하지 않습니다.
 
-따라서 쓰기 작업인 INSERT, UPDATE, DELETE 쿼리 또한 실제 데이터베이스에 영향 없이 EXPLAIN을 사용할 수 있습니다.
+따라서 INSERT, UPDATE, DELETE 쓰기 작업 쿼리가 데이터베이스에 영향을 미치지 않습니다.
 
-EXPLAIN 명령어는 사용된 테이블을 행(Row)으로, 정해진 열(Column) 데이터에 쿼리가 실행될 방법이 채워져 결과를 반환합니다.
+`EXPLAIN` 명령어는 쿼리가 각 테이블에 접근하는 방식을 행(Row) 단위로 보여주며, 정해진 열(Column)을 통해 실행 계획을 설명합니다
 
 ![image.png](img/2.png)
 
