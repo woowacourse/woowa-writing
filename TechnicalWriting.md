@@ -6,8 +6,10 @@
   - [목차](#목차)
   - [1. 서문: 데이터 패칭의 혼돈 속에서](#1-서문-데이터-패칭의-혼돈-속에서)
   - [2. Situation(상황) : 동기화되지 않는 데이터의 혼란](#2-situation상황--동기화되지-않는-데이터의-혼란)
+    - [발생한 문제](#발생한-문제)
     - [2-1. 기존 방식의 한계](#2-1-기존-방식의-한계)
-  - [3. Task(과제) : 우리의 목표](#3-task과제--우리의-목표)
+  - [3. Task(과제) : 문제 해결 목표 정의](#3-task과제--문제-해결-목표-정의)
+    - [3-1. 대안 검토 및 선택 이유 (참고)](#3-1-대안-검토-및-선택-이유-참고)
   - [4. Action(행동1) : React Query의 도입과 코드 전환](#4-action행동1--react-query의-도입과-코드-전환)
     - [4-1. 핵심 기능 ① — 데이터 동기화: (Invalidate Query)](#4-1-핵심-기능---데이터-동기화-invalidate-query)
     - [4-2. 핵심 기능 ② — 캐싱(Caching)과 staleness 관리](#4-2-핵심-기능---캐싱caching과-staleness-관리)
@@ -33,8 +35,7 @@
 
 우리 팀 역시 초기에 직접 만든 `apiClient`를 사용하며 큰 문제 없이 진행했으나, 프로젝트가 확장되면서 **데이터 동기화 문제, 무한 스크롤의 비효율, 화면 깜빡임(flickering)** 등의 현상을 겪었다.
 
-이러한 문제를 해결하기 위해 우리는 **React Query를 도입**하게 되었다.
-
+이 문제를 해결하기 위해 **React Query**를 도입하게 되었다.
 <br/>
 
 ## 2. Situation(상황) : 동기화되지 않는 데이터의 혼란
@@ -44,24 +45,24 @@
 프로젝트는 관리자 대시보드 서비스를 중심으로 구성되어 있었다.<br/>
 이 대시보드에는 사용자들이 남긴 피드백 목록이 무한 스크롤 형태로 표시되고, 상단에는 피드백 통계(총 개수, 완료 개수 등)가 실시간으로 보여졌다.
 
-문제는 관리자가 피드백 목록에서 특정 항목을 삭제하거나 완료 처리했을 때 발생했다.
+문제는 관리자가 피드백 목록에서 특정 항목을 **삭제**하거나 **완료** 처리했을 때 발생했다.
 
 ![situation](/.github/assets/TechnicalWriting/situation.png)
 
 <br/>
 
+### 발생한 문제
+
 1. **데이터 불일치**
 
-   - 관리자가 피드백을 삭제하거나 완료 처리했지만, 통계 패널의 숫자는 그대로였다.
-   - 데이터를 갱신하려면 페이지를 새로고침해야 했고, 이는 UX 측면에서 명백한 결함이었다.
+   - 목록에서 피드백을 삭제해도 통계 패널의 숫자가 갱신되지 않았다.
+   - 데이터를 갱신하려면 페이지를 새로고침해야 했고, 이는 UX 결함으로 이어졌다.
 
 2. **무한 스크롤 동기화 문제**
 
-   - 피드백 목록은 커서 기반 무한 스크롤로 구성되어 있었다.
-   - 중간의 피드백이 삭제되면, 전체 데이터를 다시 불러와야 했고 이때 깜빡임이 발생했다.
-   - 스크롤 위치 복원, 불필요한 API 호출 등의 부가 문제도 따라왔다.
+   - 중간 피드백이 삭제되면 전체 데이터를 다시 불러와야 했고, 화면 깜빡임과 스크롤 위치 손실이 발생했다.
 
-결국 핵심은 **“데이터 일관성과 자연스러운 UI 경험을 동시에 달성하는 것”**이었다.
+결국 핵심 과제는 **데이터 일관성과 자연스러운 UI 경험의 동시 달성**이었다.
 
 <br/>
 
@@ -70,6 +71,7 @@
 React Query를 도입하기 전, 아래와 같이 `useEffect`와 `useState`로 데이터를 관리했다.
 
 ```jsx
+// 조직 통계 데이터를 직접 패칭해 관리하는 기존 방식
 export default function useUserOrganizationsStatistics() {
   const [statistics, setStatistics] = useState({
     reflectionRate: "0",
@@ -79,8 +81,10 @@ export default function useUserOrganizationsStatistics() {
   });
 
   useEffect(() => {
+    // 컴포넌트 마운트 시 API 호출
     const getData = async () => {
       const response = await getOrganizationStatistics({ organizationId: 1 });
+      // 응답 데이터를 state에 저장
       setStatistics(response.data);
     };
     getData();
@@ -101,14 +105,52 @@ export default function useUserOrganizationsStatistics() {
 
 <br/>
 
-## 3. Task(과제) : 우리의 목표
+## 3. Task(과제) : 문제 해결 목표 정의
 
 ---
 
-문제상황을 정리하고, React-Query를 도입하기 전 우리가 해결해야 하는 문제를 먼저 간단히 정의해봤다.
+문제상황을 정리하고, React Query를 도입하기 전 우리가 해결해야 하는 문제를 먼저 간단히 정의해봤다.
 
 - 피드백 ‘완료’ 또는 ‘삭제’ 시에 **대시보드 패널에도 값이 즉각적으로 반영**되어야 한다.
 - 피드백 ‘삭제’시에 제거된 피드백을 제외한 **상태가 변경되지 않은 피드백들을 다시 호출하지 않아야 한다.**
+
+<br/>
+
+### 3-1. 대안 검토 및 선택 이유 (참고)
+
+React Query를 도입하기 전, 우리는 다양한 데이터 패칭 및 상태 관리 라이브러리를 검토해봤다. <br/>
+우리가 중점적으로 봤던 부분은 **서버 상태**를 안정적으로 관리할 수 있는지, **데이터 동기화 및 캐싱(무한 스크롤)**문제를 해결할 수 있는지를 살펴봤다.
+
+React Query 외에 고민해봤던 대안으로는 대표적으로 `RTK Query`와 `SWR`, `Apollo Client` 등이 있다.
+
+| 라이브러리                                         | 주요 특징                                                                                    | 한계점                                                                                                                             |
+| -------------------------------------------------- | -------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| **Redux Toolkit Query (RTK Query)**                | Redux 공식 툴킷 기반의 서버 상태 관리 라이브러리. Redux Store와 완벽하게 통합됨.             | Redux를 이미 사용 중인 환경에는 적합하지만, **Redux 미사용 프로젝트에서는 초기 설정이 과도하게 복잡함**.                           |
+| **SWR (by Vercel)**                                | React Hooks 기반의 간결한 데이터 패칭 라이브러리. `useSWR` 훅 하나로 캐싱·revalidation 가능. | 기본 기능은 강력하지만, **복잡한 캐싱 정책(staleTime, cacheTime), 무한 스크롤, 낙관적 업데이트 등 고급 기능 구현 시 제약**이 많음. |
+| **Apollo Client (GraphQL)**                        | GraphQL API에 최적화된 클라이언트로, 정교한 캐싱과 쿼리 병합 기능 제공.                      | REST API 기반 프로젝트에서는 **오버엔지니어링**이 되며, GraphQL 서버 구축 비용이 발생함.                                           |
+| **TanStack Query (React Query v5 이후 통합 이름)** | React Query의 최신 통합 버전. 다양한 프레임워크 지원.                                        | 당시 프로젝트 시점(React Query v4)에서는 도입 시 **호환성 테스트가 필요했음**. 안정성을 위해 React Query(v4) 선택.                 |
+
+<br/>
+
+**React Query 선택 근거**
+
+1. REST 기반 프로젝트에 최적화된 서버 상태 관리
+
+우리 프로젝트는 GraphQL이 아닌 RESTful API 기반이었기 때문에, <br/>
+`Redux Toolkit Query`나 `Apollo Client`는 구조적으로 과했거나 설정이 복잡했다.<br/>
+React Query는 별도 아키텍처 변경 없이 **자동 캐싱·refetch·동기화**를 지원해 REST 환경에 바로 적용할 수 있었다.
+
+2. 세밀한 캐싱 제어와 데이터 신선도 관리
+
+React Query는 `staleTime`, `cacheTime`, `refetchOnWindowFocus` 등을 통해
+**데이터의 신선도(freshness)** 를 정밀하게 제어할 수 있었다.
+SWR보다 유연한 이 구조 덕분에, 대시보드는 즉시 갱신하고 설정 페이지는 장기 캐싱하는 등 페이지별 전략을 세밀히 조정할 수 있었다.
+
+3. 무한 스크롤에서의 자연스러운 로딩 경험
+
+`useInfiniteQuery`는 커서 기반 페이징을 손쉽게 구현할 수 있어,
+데이터 추가·삭제 시에도 깜빡임 없이 부드러운 갱신이 가능했다.
+`SWR`이나 `Redux Toolkit Query`에서는 무한 스크롤을 직접 관리해야 해 페이지 캐싱·커서 계산·refetch 제어를 모두 수동으로 구현해야 했다.
 
 <br/>
 
@@ -116,9 +158,8 @@ export default function useUserOrganizationsStatistics() {
 
 ---
 
-React Query를 통해 우리는 **선언적 데이터 패칭**과 **자동 동기화**를 구현할 수 있었다.
-
-`useQuery` 하나로 로딩, 에러, 성공 상태를 모두 관리할 수 있었고, 코드의 가독성 역시 높아졌다.
+React Query는 선언적 데이터 패칭과 자동 동기화를 제공한다. <br/>
+`useQuery` 하나로 로딩, 에러, 성공 상태를 모두 관리할 수 있어 코드가 간결해졌다.
 
 ### 4-1. 핵심 기능 ① — 데이터 동기화: (Invalidate Query)
 
@@ -141,15 +182,20 @@ React Query는 invalidateQueries 기능을 통해 <br/>
 <br/>
 
 ```jsx
+// 피드백 상태 변경 후 관련 쿼리 자동 갱신
 const queryClient = useQueryClient();
 
 const confirmMutation = useMutation({
+  // 피드백 상태 변경 API 요청
   mutationFn: ({ feedbackId, comment }) =>
     patchFeedbackStatus({ feedbackId, comment }),
+  // 요청 성공 시: 관련 데이터 쿼리 무효화 → 자동 refetch
   onSuccess: () => {
+    // 조직 통계 패널 데이터 갱신
     queryClient.invalidateQueries({
       queryKey: QUERY_KEYS.organizationStatistics(organizationId),
     });
+    // 피드백 목록(무한 스크롤) 데이터 갱신
     queryClient.invalidateQueries({ queryKey: QUERY_KEYS.infiniteFeedbacks });
   },
 });
@@ -164,7 +210,7 @@ const confirmMutation = useMutation({
 
 ### 4-2. 핵심 기능 ② — 캐싱(Caching)과 staleness 관리
 
-React Query의 진정한 힘은 “**언제 데이터를 다시 가져올 것인가**”를 정밀하게 제어할 수 있다는 점이다. <br/>
+React Query의 장점은 **데이터를 언제 다시 가져올지 정밀하게 제어**할 수 있다는 것이다. <br/>
 React Query는 내부적으로 API 응답을 메모리에 **캐싱**하지만, 캐시가 있다고 해서 항상 네트워크 요청을 생략하는 것은 아니다.<br/>
 **데이터의 신선도(freshness)** 를 판단해, 필요할 때만 자동으로 다시 가져오도록 설계되어 있다.
 
@@ -199,13 +245,14 @@ cacheTime = 5 * 60 * 1000; // 5분 동안 캐시 유지
 무한 스크롤에서는 useInfiniteQuery 훅을 사용했다.
 
 ```jsx
+// 커서 기반 무한 스크롤 데이터 패칭
 const query = useInfiniteQuery({
-  queryKey: ["infinity", key, url, size],
+  queryKey: ["infinity", key, url, size], // 쿼리 식별 키
   enabled: enabled && Boolean(url),
-  retry: 3,
-  queryFn: ({ pageParam }) => fetchCursorPage({ url, size, pageParam }),
+  retry: 3, // 요청 실패 시 재시도 횟수
+  queryFn: ({ pageParam }) => fetchCursorPage({ url, size, pageParam }), // 커서 기반 페이지 데이터 fetch 함수
   getNextPageParam: (lastPage) =>
-    lastPage?.hasNext ? lastPage.nextCursorId : undefined,
+    lastPage?.hasNext ? lastPage.nextCursorId : undefined, // 다음 페이지 커서 계산
 });
 ```
 
@@ -300,12 +347,12 @@ React Query를 도입하면서 얻은 가장 큰 이점은 선언적 프로그�
 
 ### 7-3. 도입 과정에서의 학습 포인트
 
-React Query를 도입하면서 우리는 “단순히 사용한다고 해서 캐싱이 완벽히 해결되는 것은 아니다”라는 교훈을 얻었다.
+React Query 도입 과정에서 우리는 ‘캐싱은 설정의 문제가 아니라 설계의 문제’라는 교훈을 얻었다.
 캐싱의 효율은 `queryKey` 설계, `staleTime·cacheTime` 설정, `invalidateQueries`의 활용 방식에 달려 있다.
 
 ### 7-4. 결론 및 회고
 
-이전에는 React-Query를 단순히 데이터 패칭을 더 편리하게 할 수 있도록 도와주는 도구로서만 봤다면, 이번 경험을 통해 ‘데이터의 상태를 일관성 있게 관리하는걸 도와주는 도구라는 것을 알게 된 것 같다.
+이전에는 React Query를 단순히 데이터 패칭을 더 편리하게 할 수 있도록 도와주는 도구로서만 봤다면, 이번 경험을 통해 React Query는 데이터의 일관성을 유지하며 관리할 수 있도록 돕는 강력한 도구임을 실감했다.
 
 우리 팀은 이를 통해 다음을 달성할 수 있었다.
 
@@ -324,6 +371,6 @@ React Query를 도입하면서 우리는 “단순히 사용한다고 해서 캐
 
 - React Query는 서버 상태 관리 라이브러리이다.
 - staleTime, cacheTime을 통해 데이터 최신성과 성능 간의 균형을 조정할 수 있다.
-- invalidateQueries는 자동 동기화를 제공해 개발 효율성을 높인다.
-- 각 페이지별 특성을 고려한 캐싱 전략이 성능 최적화의 핵심이다.
+- invalidateQueries()는 변경된 데이터를 자동으로 동기화하여 개발 효율성을 높인다.
+- 페이지 특성에 맞는 캐싱 전략 설계가 성능 최적화의 핵심이다.
 - React Query의 철학은 “데이터 일관성과 사용자 경험의 조화”에 있다.
