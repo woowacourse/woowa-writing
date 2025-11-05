@@ -455,7 +455,7 @@ const updateItemList = async (
       return;
     }
 
-    const itemItems = createItemItems(results);
+    const items = createItems(results);
     itemList.updateList(items);
 
     scrollRenderer.setNewObservingTarget(
@@ -489,7 +489,6 @@ https://github.com/user-attachments/assets/cdc78f85-d95b-4d8b-8dee-e690b64dd4f0
 
 ```javascript
 window.addEventListener('scroll', () => {
-  const handleScroll = () => {
   const scrollTop = document.documentElement.scrollTop;
   const scrollHeight = document.documentElement.scrollHeight;
   const clientHeight = document.documentElement.clientHeight;
@@ -498,7 +497,6 @@ window.addEventListener('scroll', () => {
   if (scrollTop + clientHeight >= scrollHeight - 100) {
     loadMoreItems();
   }
-};
 });
 ```
 
