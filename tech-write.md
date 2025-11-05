@@ -264,17 +264,18 @@ ROLLBACK;
 
 # **SHOW PROFILING**
 
-EXPLAIN ANALYZE는 쿼리들의 실행 시간만 측정합니다.
+`EXPLAIN ANALYZE`는 쿼리 실행 시간을 보여줍니다.
 
-따라서 쿼리 요청부터 응답까지 걸리는 MySQL 내부 시간을 측정하려면 다른 방법을 사용해야 합니다.
+만약 쿼리 파싱, 최적화, 락(Lock)등 쿼리 시작부터 응답까지의 전체 소요 시간을 확인하려면 `SHOW PROFILING`을 사용해야 합니다.
 
-파싱, 실행, 정리 등 모든 오버헤드 포함하는 MySQL의 쿼리 시작부터 응답까지의 시간을 측정하라면 **SHOW PROFILING를 사용해야 합니다.**
+`EXPLAIN ANALYZE`는 쿼리 자체의 효율의 개선을 확인하는 지표로 사용합니다.
 
-EXPLAIN ANALYZE는 **쿼리 자체의 효율의 개선을 확인하는 지표로 사용합니다.**
+`SHOW PROFILING`는 MySQL에서 쿼리 실행 전후의 부가적인 단계에 병목이 없는지 확인하는 지표로 사용합니다.
 
-SHOW PROFILING는 MySQL에서 쿼리 실행 전후의 **부가적인 단계**에 병목이 없는지 확인하는 지표로 사용합니다.
-
-사용 방법은 SET profiling = 1;, SET profiling = 0; SHOW PROFILES; 를 사용합니다.
+`SHOW PROFILING`는 다음 명령어를 사용합니다.
+- `SET profiling = 1;`
+- `SET profiling = 0;`
+- `SHOW PROFILES;` 
 
 ```sql
 # 쿼리 기록 시작 (이전 쿼리 기록이 사라집니다.)
@@ -298,19 +299,24 @@ SHOW PROFILES;
 
 ![image.png](img/2.png)
 
-Duration값이 초(Second) 단위의 값입니다.
+가장 중요한 열(Column) 값은 Duration 입니다.
 
-쿼리 기록을 삭제하려면 쿼리 기록 종료 후 다시 쿼리 기록을 시작하면 됩니다.
+Duration은 해당 쿼리에 소요된 전체 시간 값을 나타내며, 값의 단위는 초(Second)입니다.
+
+`SHOW PROFILING` 기록을 지우고 새로 측정하려면, 
+기록 종료 후 다시 기록을 시작하면 됩니다.
 
 ```sql
 # 쿼리 기록 종료
 SET profiling = 0;
 
-# 새로운 쿼리 기록 시작 (이전 쿼리 기록 사라짐)
+# 새로운 쿼리 기록 시작 (이전 쿼리 기록 삭제)
 SET profiling = 1;
 ```
 
-주의할 점은 SHOW PROFILING에 네트워크 전송 속도와 웹 어플리케이션 서버 처리 시간은 포함하지 않습니다.
+## SHOW PROFILING 정리
+
+`SHOW PROFILING`은 네트워크 소요시간과 웹 어플리케이션 서버 처리 시간을 제외한 순수 쿼리 전체 동작 속도를 측정할 수 있습니다.
 
 # 마무리
 
