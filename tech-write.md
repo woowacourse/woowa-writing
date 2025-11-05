@@ -145,21 +145,24 @@ JOIN이나 WHERE 절에서 인덱스를 잘 사용했다는 의미이다.
 
 ## Extra
 
-extra 값은 쿼리가 효율적으로 실행되는지 판단하는 정보를 알려줍니다.
+`EXPLAIN` 결과 열(Column)의 extra 값은 쿼리가 효율적으로 실행되는지 판단하는 정보를 알려줍니다.
 
-이 값으로 개선 필요성을 파악할 수 있습니다.
+extra 값으로 개선이 필요한지 파악할 수 있습니다.
 
 ### Extra 값
 
-EXPLAIN에서 MySQL이 추가적으로 수행하는 작업에 대한 정보 제공.
+인덱스를 사용했는지, 비용이 큰 작업이 발생했는지 확인할 수 있습니다.
 
-인덱스가 사용 되는지, 비용이 큰 작업인지 확인 가능.
+- Using index: 커버링 인덱스를 사용한 경우.
 
-- Using index: 커버링 인덱스
-- Using index condition: WHERE절에 인덱스 사용
-- Using where: WHERE절에 필터링 작업이 수행됨. 인덱스가 일부 사용 된 경우도 포함. (개선 필요)
+- Using index condition: 인덱스 사용하여 클러스터링 인덱스의 데이터 접근을 줄임.
+
+- Using where: 인덱스만으로 조건을 처리할 수 없어서 클러스터링 인덱스에 접근한 경우. (개선 필요)
+
 - Using filesort: ORDER BY 정렬을 수행함. (개선 필요)
+
 - Using temporary: GROUP BY, ORDER BY, DISTINCT  작업을 위해 임시 테이블 생성 (개선 필요)
+
 - Using join buffer (Block Nested Loop): 조인 데이터가 커서 메모리를 사용함 (개선 필요)
 
 ## 결론
