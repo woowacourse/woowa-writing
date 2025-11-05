@@ -575,8 +575,7 @@ Terraform을 사용하면 이미 한 번 구축해 본 인프라를 전과 똑�
 ---
 
 # Reference
-- [Terraform 공식 문서 -
-  Intro to Terraform](https://developer.hashicorp.com/terraform/intro)
+- [Terraform 공식 문서 - Intro to Terraform](https://developer.hashicorp.com/terraform/intro)
 - [Terraform 공식 문서 - HCL](https://developer.hashicorp.com/terraform/language)
 - [Terraform 공식 문서 - Standard Module Structure](https://developer.hashicorp.com/terraform/language/modules/develop/structure)
 - [Terraform 공식 문서 - State](https://developer.hashicorp.com/terraform/language/state)
