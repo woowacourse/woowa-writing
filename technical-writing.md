@@ -152,7 +152,7 @@ https://github.com/user-attachments/assets/f91f8a5e-31b3-4523-9088-d46866ca43a9
 
 이처럼 스크롤 이벤트는 사용자가 스크롤하는 동안 초당 수십 번에서 수백 번까지 발생하기 때문에, 모든 이벤트마다 계산을 수행하면 **불필요한 연산과 렌더링이 반복되어** 성능 저하를 일으킬 수 있습니다.
 
-이를 해결하기 위해 Throttle, Debounce, RequestAnimationFrame(RAF)과 같은 최적화 기법을 적용할 수 있습니다.
+이를 해결하기 위해 쓰로틀링, 디바운싱, RequestAnimationFrame(RAF)과 같은 최적화 기법을 적용할 수 있습니다.
 
 <br>
 
