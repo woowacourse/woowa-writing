@@ -6,7 +6,7 @@
 
 저희 프로젝트에서도 같은 일이 있었습니다.
 
-GET /contents/keyword API 한 번 호출에 298개의 쿼리가 실행되고 있었습니다. 원인은 JPA의 지연 로딩(Lazy Loading) 으로 인해 발생한 N+1 문제였습니다.
+GET /contents/keyword API 한 번 호출에 298개의 쿼리가 실행되고 있었습니다. 원인은 JPA의 지연 로딩(Lazy Loading)으로 인해 발생한 N+1 문제였습니다.
 
 이 글은 그 문제를 추적하고, Fetch Join → Batch Size → @EntityGraph로 쿼리 개수를 줄이며 성능을 개선해 나간 과정을 기록한 글입니다.
 
@@ -72,7 +72,7 @@ if (QueryCountInspector.getCount() > 10) {
 "message":"하나의 요청에 쿼리가 10번 이상 발생했습니다. QUERY_COUNT: 298","method":"GET","uri":"/contents/keyword"
 ```
 
-쿼리가 이렇게 많이 발생한 이유는 JPA의 기본 동작 방식인 지연 로딩(Lazy Loading) 때문이었습니다.
+쿼리가 이렇게 많이 발생한 이유는 JPA의 기본 동작 방식인 지연 로딩 때문이었습니다.
 
 Content → Place → PlaceCategory 로 이어지는 연관관계가 각 엔티티마다 별도의 쿼리를 발생시키며 N+1 문제를 만들고 있었던 것입니다.
 
@@ -84,9 +84,7 @@ N+1 문제란, 첫 번째 쿼리(1)의 결과로 N개의 데이터를 가져온 
 
 ## 원인 분석
 
-문제의 원인은 JPA의 지연 로딩(Lazy Loading)과 관련된 동작 방식 때문이었습니다. 저희 프로젝트에사는 장소(`Place`)와 장소의 카테고리(`PlaceCategory`)가 아래와 같이 `@OneToMany` 관계로 설정되어 있었습니다.
-
-이는 Lazy Loading이 기본값으로 동작하고 있었습니다.
+저희 프로젝트에서는 장소(`Place`)와 장소의 카테고리(`PlaceCategory`)가 아래와 같이 `@OneToMany` 관계로 설정되어 있고, 지연 로딩이 기본값으로 동작하고 있었습니다.
 
 ```java
 @Entity
@@ -95,7 +93,7 @@ public class Place {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // @OneToMany의 기본 Fetch 전략은 Lazy Loading 이다.
+    // @OneToMany의 기본 Fetch 전략은 지연 로딩이다.
     @OneToMany(mappedBy = "place", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PlaceCategory> placeCategories = new ArrayList<>();
     // ...
@@ -148,7 +146,7 @@ Fetch 전략에는 Lazy, Eager 2가지가 있습니다.
 
 ### 어떤 전략을 선택해야 할까?
 
-즉시 로딩(EAGER)을 사용하면 문제를 피할 수 있을 것 같지만, 실제로는 완벽한 해결책이 아닙니다. 데이터를 조회하면 연관관계가 있는 엔티티는 신경 쓰지 않고, 조회 대상이 되는 엔티티만 즉시 가져옵니다. 조회 대상 엔티티를 가져온 이후 연관된 엔티티가 있다면 그때 연관 엔티티를 즉시 로딩합니다. 지연 로딩과 다르게 프록시 객체를 사용하진 않지만, 결국 N개의 추가 쿼리가 발생하게 됩니다.
+즉시 로딩을 사용하면 문제를 피할 수 있을 것 같지만, 실제로는 완벽한 해결책이 아닙니다. 데이터를 조회하면 연관관계가 있는 엔티티는 신경 쓰지 않고, 조회 대상이 되는 엔티티만 즉시 가져옵니다. 조회 대상 엔티티를 가져온 이후 연관된 엔티티가 있다면 그때 연관 엔티티를 즉시 로딩합니다. 지연 로딩과 다르게 프록시 객체를 사용하진 않지만, 결국 N개의 추가 쿼리가 발생하게 됩니다.
 
 결국 중요한 것은, 언제 어떻게 연관 데이터를 함께 가져올지를 명시적으로 제어하는 것입니다. 스프링 공식 문서에서도 즉시 로딩보다 지연 로딩을 기본으로 사용하고, 필요에 따라 연관 데이터를 함께 조회하는 방식을 권장합니다.
 
@@ -299,10 +297,10 @@ Slice<Content> findByCityName(...);
 ```
 
 - `@EntityGraph(attributePaths = {"creator", "city"})`: `Content`를 조회할 때, `creator`와 `city` 필드를 함께 `JOIN`하여 가져오도록 지정합니다.
-- `type = EntityGraph.EntityGraphType.FETCH`: `attributePaths`에 명시된 속성은 EAGER로, 나머지 속성은 엔티티에 명시된 기본 Fetch 전략(LAZY)을따릅니다.
+- `type = EntityGraph.EntityGraphType.FETCH`: `attributePaths`에 명시된 속성은 EAGER로, 나머지 속성은 엔티티에 명시된 기본 Fetch 전략(LAZY)을 따릅니다.
 - * `type = EntityGraph.EntityGraphType.LOAD`는 명시된 속성만 EAGER, 나머지는 기본 EAGER 전략을 따릅니다.
 
-`@EntityGraph` 적용 후, Hibernate는단 하나의 `JOIN` 쿼리를 생성하여 모든 정보를 한 번에 가져옵니다.
+`@EntityGraph` 적용 후, Hibernate는 단 하나의 `JOIN` 쿼리를 생성하여 모든 정보를 한 번에 가져옵니다.
 
 ```sql
 -- @EntityGraph 적용 후 실행되는 쿼리
@@ -367,4 +365,4 @@ export default function () {
 
 즉시 로딩(EAGER)은 단기적으로 편해 보이지만, 결국 불필요한 데이터 로드로 성능을 악화시킵니다. 반대로 지연 로딩(LAZY)은 효율적이지만, 무의식적인 접근 한 줄이 수백 개의 쿼리를 만들 수 있습니다.
 
-N+1 문제는 단순히 쿼리가 많이 나가는 현상이 아니라, 데이터를 언제, 어떻게 불러올지에 대한 설계의 영역이 될 수있다는 걸 느꼈습니다.
+N+1 문제는 단순히 쿼리가 많이 나가는 현상이 아니라, 데이터를 언제, 어떻게 불러올지에 대한 설계의 영역이 될 수 있다는 걸 느꼈습니다.
