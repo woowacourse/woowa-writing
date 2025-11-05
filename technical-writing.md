@@ -2,19 +2,13 @@
 
 ## TL;DR
 
-야구보구 앱 프로필 사진 업로드 기능 개발 과정에서 발생한 **AWS S3 Presigned URL과 Retrofit Bearer 토큰 인터셉터 충돌 문제를 해결**하고, uCrop을 통한 이미지 최적화와 UX를 개선한 기록입니다.
+야구보구 앱 프로필 사진 업로드 기능 개발 과정에서 발생한 **AWS S3 Pre-signed URL과 Retrofit Bearer 토큰 인터셉터 충돌 문제를 해결**하고, uCrop을 통한 이미지 최적화와 UX를 개선한 기록입니다.
 
 ## 대상 독자
 
 - **Kotlin, Retrofit, OkHttp, Coil** 등 안드로이드 네트워킹에 대한 기본적인 이해가 있는 **주니어 안드로이드 개발자**
 - **관심사**: **Pre-signed URL을 받아** AWS S3 **파일 업로드** 기능 구현에 도전하고 싶은 개발자
 - **HTTP 인터셉터와 외부 서비스 연동** 시 발생하는 인증 헤더 충돌 문제의 실무 해결 사례가 궁금한 개발자
-
-## 문서 활용 계획
-
-- **야구보구** 프로필 사진 업로드 기능 구현 과정에서 겪은 **403 Forbidden 에러와 해결 과정**을 상세히 기록하고 공유한다.
-- 단순히 기능 구현을 넘어, **안정적인 서비스를 만들기 위한 팀의 고민과 성장**을 보여준다.
-- **우아한테크코스 기술 블로그, 팀 기술 블로그, 개인 블로그** 및 외부 개발자 커뮤니티에 공유하며 유사한 고민을 하는 개발자들에게 **실질적인 도움**을 제공한다.
 
 ***
 
@@ -76,7 +70,7 @@ S3 버킷은 Amazon S3 스토리지 서비스에서 파일을 저장하는 하�
 
 1. **야구보구 서버에서 AWS의 Pre-signed URL 받아오기**
     
-    업로드할 파일의 MIME 타입, 업로드할 파일 크기(바이트)를 `Request Body`로 알려주면 다음과 같은 응답이 도착하며 key는 S3 객체의 고유한 식별자 키이며, url은 Pre-Signed URL입니다.
+    업로드할 파일의 MIME 타입, 업로드할 파일 크기(바이트)를 `Request Body`로 알려주면 다음과 같은 응답이 도착합니다. key는 S3 객체의 고유한 식별자 키이며, url은 Pre-Signed URL입니다.
     
     ```json
     {
@@ -99,7 +93,7 @@ S3 버킷은 Amazon S3 스토리지 서비스에서 파일을 저장하는 하�
     
     AWS S3 버킷에 파일 전송이 성공(200)했다면 성공했다는 사실을 우리 앱의 백엔드 서버에 알려줘야 업로드가 최종적으로 완료됩니다.
     
-    1번에서 얻어온 S3 객체의 키가 식별자이므로 이 키를 야구보구 백엔드로 넘겨주면 객체 키를 통해 백엔드에서 실제 프로필 사진 업데이트 등을 처리합니다. 
+    1번에서 얻어온 S3 객체의 키가 식별자이므로 이 키를 야구보구 백엔드로 넘겨주면 객체 키를 통해 백엔드 내부적으로 프로필 사진 업데이트 등의 비즈니스 로직을 처리합니다.
 
 ## 그리고 문제 발생
 
@@ -222,7 +216,27 @@ class RetrofitInstance(
 - `baseClient`: 로깅만 포함하는 순수 클라이언트 → **ThirdParty API용**
 - `baseTokenClient`: Bearer 토큰 포함 클라이언트 → **야구보구 내부 API용**
 
-### 2단계 - ThirdPartyDataSource 구현
+### 2단계 - ThirdPartyApiService 정의
+
+Bearer 토큰을 추가하지 않은 Retrofit인스턴스를 사용해 통신하는 API들을 정의해둔 ThirdPartyApiService를 작성합니다.
+`@Url` 어노테이션을 사용해 완전한 URL이 제공되면 Retrofit 인스턴스의 baseUrl을 오버라이드합니다.
+
+```kotlin
+// ThirdPartyApiService.kt
+interface ThirdPartyApiService {
+    @PUT
+    suspend fun putImageToS3(
+        @Url url: String, // 전체 URL이 제공되면 baseUrl 무시됨
+        @Body requestBody: RequestBody,
+    ): Response<Unit>
+}
+```
+
+- 
+
+### 3단계 - ThirdPartyDataSource 구현
+
+2단계에서 정의한 s3로 이미지를 전송하는 ApiService를 호출해 실제 업로드 동작을 구현합니다.
 
 ```kotlin
 // ThirdPartyDataSource.kt
@@ -260,26 +274,10 @@ class ThirdPartyDataSource(
 }
 ```
 
-### 3단계 - ThirdPartyApiService 정의
-
-```kotlin
-// ThirdPartyApiService.kt
-interface ThirdPartyApiService {
-    @PUT
-    suspend fun putImageToS3(
-        @Url url: String, // 전체 URL이 제공되면 baseUrl 무시됨
-        @Body requestBody: RequestBody,
-    ): Response<Unit>
-}
-```
-
-- `@Url` 어노테이션은 **Retrofit 공식 지원 기능**으로, 완전한 URL이 제공되면 baseUrl을 자동으로 오버라이드합니다.
 
 ## 그래서 왜 이 방식을 최종 선택했을까?
 
-### 처음엔 순수 OkHttpClient를 고려했지만...
-
-코드 리뷰 과정에서 순수 OkHttpClient 사용의 단점들이 드러났습니다:
+처음엔 Retrofit 인스턴스를 만들 경우 BaseUrl 지정을 강제하므로 이것을 우회하기 위해 Retrofit 대신 순수 OkHttpClient를 사용하는 방법을 선택했습니다.
 
 ```kotlin
 // 순수 OkHttpClient 사용 시의 문제점
@@ -291,7 +289,7 @@ override suspend fun uploadProfileImage(...): Result<Unit> =
                 .put(requestBody)
                 .build()
                 
-            // 매번 새 클라이언트 생성 (성능 문제)
+            // 매번 새 클라이언트 생성(성능 문제 발생)
             OkHttpClient().newCall(request).execute().use { response ->
                 // 수동 에러 처리
                 if (!response.isSuccessful) {
@@ -302,15 +300,19 @@ override suspend fun uploadProfileImage(...): Result<Unit> =
     }
 ```
 
-**문제점들**:
-1. **타입 안전성 손실**: `Response<Unit>` 대신 수동 파싱
-2. **코드 일관성 저하**: 90% API는 Retrofit, 10%는 순수 OkHttp
-3. **복잡한 예외 처리**: `safeApiCall` 등 공통 유틸 활용 불가
-4. **Coroutine 통합 어려움**: `suspend` 함수의 자연스러운 흐름 방해
+하지만 코드 리뷰 과정에서 순수 OkHttpClient 사용의 아래와 같은 단점으로 인해 사용하지 않게 되었습니다.
+
+**문제점들**
+
+1. **타입 안전성 손실**: Retrofit의 어노테이션 기반 타입 체크 장점을 잃게 됨
+2. **코드 일관성 저하**: 90% API는 Retrofit, 10%는 순수 OkHttp를 사용해 API 호출시 일관성 없음
+3. **예외 처리 복잡화**: Retrofit의 통합된 에러 핸들링 패턴 활용 불가
+4. **유지보수성 저하**: 개발자가 HTTP 요청/응답을 수동으로 처리해야 함
+5. **Coroutine 통합 어려움**: `suspend` 함수의 자연스러운 흐름 방해
 
 ### 별도 Retrofit 인스턴스의 장점
 
-최종 선택한 방식의 장점들:
+이후 `@Url` 어노테이션의 존재를 알게 되어 최종적으로 Retrofit 인스턴스를 별도로 만들어두고 사용하는 방식을 선택했습니다.
 
 ```kotlin
 // ThirdPartyApiService - Retrofit의 모든 장점 유지
@@ -323,30 +325,24 @@ interface ThirdPartyApiService {
 }
 ```
 
+**장점들**
 - **타입 안전성**: `Response<Unit>` 반환으로 명확한 타입 체크
 - **Coroutine 지원**: `suspend` 키워드로 자연스러운 비동기 처리
 - **일관된 아키텍처**: 모든 네트워크 호출을 Retrofit으로 통일
 - **공통 유틸 활용**: `safeApiCall` 등 기존 에러 처리 패턴 재사용
 - **확장성**: 향후 다른 외부 서비스 연동 시에도 동일한 패턴 적용
 
-### baseUrl을 지정하지 않기 위해 OkHttpClient만 사용했더라면?
-
-다음과 같은 문제를 가지고 있었을 것입니다:
-
-1. **타입 안전성 손실**: Retrofit의 어노테이션 기반 타입 체크 장점을 잃게 됨
-2. **코드 일관성 저하**: 프로젝트 내 다른 API 호출과 일관성 있는 패턴을 잃음
-3. **예외 처리 복잡화**: Retrofit의 통합된 에러 핸들링 패턴 활용 불가
-4. **유지보수성 저하**: 개발자가 HTTP 요청/응답을 수동으로 처리해야 함
-
-따라서 **Pre-signed URL 등으로 서드파티 Base URL이 필요한 경우**, 현재 구성처럼 URL 자체를 `@Url` 어노테이션을 사용한 API 서비스를 활용하면서, baseUrl은 우리의 도메인을 그대로 Retrofit에 할당해주는 방식이 채택되었습니다.
+따라서 **Pre-signed URL 등으로 서드파티 Base URL이 필요한 경우**, 현재 구성처럼 URL 자체를 `@Url` 어노테이션을 사용한 API 서비스를 활용하면서, baseUrl은 우리의 도메인을 그대로 Retrofit에 할당해주는 방식을 채택하였습니다.
 
 ***
 
-## 서버비는 조상님이 내주시냐?
+## 프로필에 적합한 이미지 규격 만들기
 
-단순히 프로필 사진을 표시할 용도의 이미지가 용량이 큰 원본 이미지를 사용할 필요가 없기 때문에 압축할 필요성이 있었고, 최대 5MB까지의 이미지만 업로드 가능하다는 백엔드 구현의 제약이 걸려 있었기 때문에 용량을 줄일 필요성이 생겼습니다.
+Pre-signed URL을 통해 이미지를 업로드를 이용해 사용자가 보유한 원본 이미지를 바로 업로드 할 경우 정사각형 이미지가 아닌 경우가 있어 1:1 비율로 크롭하고 압축할 필요가 생겼습니다.
 
-더불어 사용자에게 이미지에서 실제 프로필 사진의 영역을 미리 보여주게끔 하여, UX적으로도 완성도를 높이고 싶었습니다!
+일부 초고화질 이미지의 경우 프로필 사진에 적합하지 않은 너무 큰 파일 크기를 가지기 때문에 백엔드에서 요구한 최대 5MB까지의 업로드 제약을 만족시키기 위해서 리사이징 및 압축이 필요했습니다.
+
+더불어 사용자에게 실제 프로필 사진으로 사용될 영역을 미리 보여주게끔 하여, UX적으로도 완성도를 높이고 싶었습니다.
 
 ### uCrop을 활용한 이미지 크롭 및 압축
 
@@ -381,7 +377,7 @@ private fun launchUCropActivity(sourceUri: Uri) {
 }
 ```
 
-코드를 통해 아래와 같은 크롭 UI 가이드를 만들 수 있습니다.
+코드를 통해 다음과 같은 크롭 UI 가이드를 만들 수 있습니다.
 
 <img width="972" height="727" alt="Image" src="https://github.com/user-attachments/assets/b2d0ba3b-b0ee-47c0-8b69-46a9df1d3a74" />
 
@@ -398,7 +394,7 @@ implementation 'com.github.yalantis:ucrop:2.2.11-native' // 이미지 품질을 
 
 ### 실험
 
-실험을 위해 19.2MB의 용량을 가지는 허블 울트라 딥필드 이미지를 사용했습니다. [원본 이미지 열람](https://upload.wikimedia.org/wikipedia/commons/archive/2/2f/20081125003002%21Hubble_ultra_deep_field.jpg)
+실험을 위해 19.2MB 용량, 6200×6200픽셀 고화질의 허블 울트라 딥필드 이미지를 사용했습니다. [원본 이미지 열람](https://upload.wikimedia.org/wikipedia/commons/archive/2/2f/20081125003002%21Hubble_ultra_deep_field.jpg)
 
 실험 방법은 아래의 3개 방식으로 이미지를 직접 크롭해서 비교해 보는 방법으로 진행했습니다:
 
@@ -412,29 +408,37 @@ implementation 'com.github.yalantis:ucrop:2.2.11-native' // 이미지 품질을 
 
 **실험 결과**:
 
-- **Coil3을 함께 사용**: 가장 이미지 크기가 작았지만 디테일이 뭉개지는 이미지
+- **Coil3을 함께 사용**: 가장 이미지 크기가 작았지만 세부 디테일이 뭉개지는 이미지
 - **uCrop 단독 사용**: 표준적인 이미지와 적당한 크기
 - **uCrop-native 사용**: 가장 큰 크기의 이미지를 얻었고 디테일을 살리기 위해서라고 추측되는 약간의 **흐려짐** 현상을 확인
 
-최종적으로 **uCrop 단독**을 선택했으며 이유는 다음과 같습니다:
+실험 결과, **uCrop 단독**을 선택했으며 이유는 다음과 같습니다:
 
-1. **성능**: uCrop 단독 사용이 2번의 파이프라인을 거치지 않아 속도가 빠름
-2. **코드 가독성**: 단일 라이브러리 사용으로 의존성과 복잡도 최소화
-3. **앱 크기**: uCrop-native을 사용했을 때 앱 크기가 1.5MB 늘어나는 것 대비 얻는 이점이 없음
+**1. 성능 최적화**
+- uCrop 단독 사용 시 처리 파이프라인 1회 (vs Coil 조합 2회)
+- 업로드 속도 향상
 
-최종적으로 사용자 피드백을 바탕으로 프로필 이미지 변경 기능을 추가하면서, 단순히 백엔드로 원본 이미지를 전송하는 방식도 고려했습니다. 하지만 클라이언트에서 원형 크롭 가이드를 제공함으로써 사용자에게 최종 결과를 미리 보여줄 수 있었고, 동시에 이미지 처리 부담을 클라이언트로 분산하여 백엔드 리소스를 절약하는 효과를 얻었습니다.
+**2. 코드 복잡도 감소**
+- 단일 라이브러리로 의존성 최소화
+- 유지보수 용이성 확보
+
+**3. APK 크기 최적화**
+- uCrop-native 대비 1.5MB 절감
+- 이미지 품질 차이 미미
+
+최종적으로 사용자 피드백을 바탕으로 프로필 이미지 변경 기능을 추가하면서, 원형 크롭 가이드를 제공하여 사용자에게 최종 결과를 미리 보여줄 수 있었고, 동시에 이미지 처리 부담을 클라이언트로 분산하여 백엔드 리소스를 절약하는 효과를 얻었습니다.
 
 ## 마치며
 
-이번 구현에서 가장 큰 교훈은 두 가지였습니다:
+이번 구현에서 가장 큰 교훈은 세 가지였습니다:
 
 1. **"모든 HTTP 요청이 동일한 인터셉터를 필요로 하지 않는다"**: Bearer 토큰이 모든 상황에서 자동으로 포함되어야 한다고 생각했지만, 외부 서비스(AWS S3)와 통신할 때는 오히려 방해 요소로 작용했습니다.
 
 2. **"아키텍처 일관성과 성능 최적화의 균형점 찾기"**: 처음에는 순수 OkHttpClient로 해결하려 했지만, 코드 리뷰를 통해 **Retrofit의 장점을 포기하지 않으면서도 Bearer 토큰 충돌을 해결**하는 더 나은 방법을 찾았습니다.
 
-외부 API 연동 시에는 해당 서비스의 인증 방식을 정확히 파악하고, **프로젝트의 아키텍처 일관성을 유지하면서도** 상황에 맞는 HTTP 클라이언트를 선택하는 것이 핵심임을 배웠습니다.
+4. **실험을 통한 트러블 슈팅의 중요성**: uCrop으로 이미지를 자른 뒤 coil로 후처리를 하며 이미지 품질이 단순히 좋을 것이라 생각했지만 실제 실험을 통해 적합한 방식을 선택해 나가는 접근법을 배웠습니다.
 
-또한 이미지 처리 라이브러리 선택에서도 **"성능만이 전부가 아니다"**라는 것을 깨달았습니다. uCrop-native의 우수한 성능보다도 앱 크기와 구현 복잡도를 고려한 균형 잡힌 선택이 더 중요했고, 실제 테스트 결과 uCrop 단독 사용이 가장 효율적이었습니다.
+지금까지 프로필 이미지 업로드 과정의 트러블 슈팅과 성능 및 UX적 고민을 어떻게 풀어나갔는지의 과정에 그리고 여기서 얻은 교훈들에 대해 소개해 드렸습니다. 이 글이 동일한 문제와 고민을 겪고 있는 분들께 도움이 되었길 바랍니다.
 
 ***
 
@@ -454,4 +458,4 @@ implementation 'com.github.yalantis:ucrop:2.2.11-native' // 이미지 품질을 
 - [`cb9a613`](https://github.com/woowacourse-teams/2025-yagu-bogu/commit/cb9a61350f77b686586e25018d81928550223fcd): uCrop 이미지 압축 로직 적용
 - [`b28759d`](https://github.com/woowacourse-teams/2025-yagu-bogu/commit/b28759d2280fde765dc8956983a9762046ae0c08): **S3 이미지 업로드 로직 ThirdPartyRepository로 분리** (핵심 아키텍처 개선)
 - [`fbd7cea`](https://github.com/woowacourse-teams/2025-yagu-bogu/commit/fbd7cea2416fb782350d3a628beebae041002945): **ThirdParty 요청에 토큰 헤더 제거** (Bearer 토큰 충돌 해결)
-- [`09f2252`](https://github.com/woowacourse-teams/2025-yagu-bogu/commit/09f22528e8303f4c23b7719894372785e9d0d419): Presigned URL 관련 메서드명 변경 (최종 정리)
+- [`09f2252`](https://github.com/woowacourse-teams/2025-yagu-bogu/commit/09f22528e8303f4c23b7719894372785e9d0d419): Pre-signed URL 관련 메서드명 변경 (최종 정리)
