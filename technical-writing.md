@@ -89,15 +89,17 @@ export default App;
 
 ### 요소를 없애지 않는다. 요소를 숨길 뿐이다.
 
-Activity의 가장 큰 특징은 요소의 DOM 처리에 있습니다. && 연산자의 경우 DOM에서 요소를 삭제합니다. 따라서 특정 조건일 때 해당 요소가 보이지 않습니다.
+Activity의 가장 큰 특징은 요소의 DOM 처리에 있습니다.
 
-![andand.gif](https://github.com/MinSungJe/woowa-writing/blob/level4/images/andand.gif)
-
-반면 Activity의 경우 DOM에는 있지만 style 속성을 이용해 요소를 숨깁니다. 개발자 도구를 살펴보면 DOM에는 해당 요소가 있지만 `display: none;`을 주어 숨기고 있음을 알 수 있습니다.
+Activity의 경우 DOM에는 있지만 style 속성을 이용해 요소를 숨깁니다. 개발자 도구를 살펴보면 DOM에는 해당 요소가 있지만 `display: none;`을 주어 숨기고 있음을 알 수 있습니다.
 
 ![activity.gif](https://github.com/MinSungJe/woowa-writing/blob/level4/images/activity.gif)
 
-정리하자면 &&를 이용한 모달은 DOM 요소에서 아예 없어졌다가 다시 생깁니다. 반면 Activity를 이용한 모달은 DOM 요소에는 있지만 스타일을 통해 숨기거나 보입니다. 이 차이점으로 어떤 이점을 가져올 수 있을까요?
+반면 && 연산자의 경우 DOM에서 요소를 삭제합니다. 따라서 특정 조건일 때 해당 요소가 보이지 않습니다.
+
+![andand.gif](https://github.com/MinSungJe/woowa-writing/blob/level4/images/andand.gif)
+
+정리하자면 Activity를 이용한 모달은 DOM 요소에는 있지만 스타일을 통해 숨기거나 보입니다. 반면 &&를 이용한 모달은 DOM 요소에서 아예 없어졌다가 다시 생깁니다. 이 차이점으로 어떤 이점을 가져올 수 있을까요?
 
 ### 가지고 있는 상태값을 유지한다.
 
