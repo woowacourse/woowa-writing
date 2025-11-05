@@ -109,7 +109,7 @@ export const useLike = (postId: number) =>
 await queryClient.cancelQueries({ queryKey: key });
 ```
 
-이 코드는 React Query(TanStack Query)에서 같은 키로 진행 중인 서버 fetch(쿼리)를 취소하는 역할을 한다.
+이 코드는 TanStack Query(React Query)에서 같은 키로 진행 중인 서버 fetch(쿼리)를 취소하는 역할을 한다.
 낙관적 업데이트 시 UI에 임시 변경을 먼저 반영하고, 캐시에 값을 직접 넣지만, 만약 서버에서 같은 데이터를 위한 fetch가 동시에 진행 중이면, 그 fetch가 끝날 때 서버로부터 온 값이 낙관적으로 변경한 캐시를 덮어쓸 수 있다.
 이렇게 되면, 사용자가 방금 한 조작이 UI에 제대로 반영되지 않고, 옛날 값으로 돌아가는 버그가 발생한다.
 
@@ -212,7 +212,7 @@ const [{ data: currentEventData }, { data: pastEventData }] =
 
 화면에 보이는 데이터와 서버의 진실이 항상 일치하도록, 특히 쓰기(삭제·수정·등록 등) 작업 이후에는 어떤 쿼리들을 invalidate(무효화)해서 갱신할지를 일관된 규칙으로 관리해야 한다.
 
-React Query(TanStack Query) 환경에서는 각 리소스별로 일관된 접두사(queryKey)를 설정하는 것이 invalidate 전략의 핵심이다.
+TanStack Query(React Query) 환경에서는 각 리소스별로 일관된 접두사(queryKey)를 설정하는 것이 invalidate 전략의 핵심이다.
 
 예를 들어, 모든 조직 관련 데이터는 `['organization', ...]` 형태의 키를 가지므로, `invalidateQueries({ queryKey: ['organization'] })` 한 줄로 조직에 관련된 모든 쿼리(상세, 프로필, 멤버, 참여 목록, 그룹 등)를 일괄 무효화할 수 있다
 이 규칙이 모든 곳에서 동일하게 적용되므로, 어떤 작업 이후 어느 화면을 갱신해야 할지 직관적으로 판단할 수 있다.
