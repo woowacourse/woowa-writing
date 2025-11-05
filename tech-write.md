@@ -262,6 +262,10 @@ ROLLBACK;
 
 오토 커밋이 발생하는 명령어로는 DDL(CREATE, ALTER 등)이나 락(Lock) 관련 구문이 있습니다.
 
+## EXPLAIN ANALYZE 정리
+
+`EXPLAIN ANALYZE` 명령어는 쿼리를 실제로 실행하여, 쿼리의 각 단계별 실제 소요 시간 측정하여 성능 병목 지점을 분석할 수 있습니다.
+
 # **SHOW PROFILING**
 
 `EXPLAIN ANALYZE`는 쿼리 실행 시간을 보여줍니다.
