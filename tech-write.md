@@ -22,24 +22,23 @@ Spring Data JPA와 MySQL을 사용하는 프로젝트에서 SQL 쿼리 성능 �
 
 더미 데이터는 SQL 프로시저나 프로그래밍 언어로 삽입할 수 있습니다.
 
-성능 측정 방법은 MySQL의 EXPLAIN과 EXPLAIN ANALYZE 명령어 사용하여 측정할 계획입니다.
+성능 측정 방법은 MySQL의 `EXPLAIN`과 `EXPLAIN ANALYZE` 명령어를 사용하여 측정할 계획입니다.
 
-다양한 소요 시간 측정 방식 중 MySQL의 EXPLAIN과 EXPLAIN ANALYZE 명령어 사용하는 방식을 선택한 이유는 다음과 같습니다.
+다양한 작업 시간 측정 방식 중 MySQL의 `EXPLAIN`과 `EXPLAIN ANALYZE` 명령어를 사용하는 방식을 선택한 이유는 다음과 같습니다.
 
-정확한 MySQL 쿼리 성능 분석을 위해서는 순수한 쿼리 실행 소요 시간을 알아야 합니다.
+MySQL 쿼리 성능을 분석하려면 쿼리 처리 시간을 알아야 합니다.
 
-웹 어플리케이션 서버 요청 후 응답까지의 시간 측정 방식은 네트워크 소요 시간, 서버 동작 시간, MySQL 쿼리 동작 시간이 포함되어 측정됩니다.
+웹 어플리케이션 서버 요청 후 응답까지의 시간 측정 방식은 네트워크 소요 시간, 서버 작업 시간, MySQL 쿼리 처리 시간이 포함되어 측정됩니다.
 
-MySQL에 접속하여 쿼리 요청 후 응답까지의 시간 측정 방식은 네트워크 소요 시간과 MySQL 쿼리 동작 시간이 포함되어 측정됩니다.
+MySQL에 접속하여 쿼리 요청 후 응답까지의 시간 측정 방식은 네트워크 소요 시간과 MySQL 쿼리 처리 시간이 포함되어 측정됩니다.
 
-네트워크 소요 시간은 변동성이 크기 때문에 시간 측정마다 일정하지 않은 결과를 보일 수 있습니다.
-따라서 MySQL의 순수한 쿼리 실행 소요 시간을 알기 위해서는 네트워크 지연을 제외해야 합니다.
+네트워크 소요 시간은 변동성이 크기 때문에 측정마다 일정하지 않은 결과를 보일 수 있습니다.
 
-MySQL의 `EXPLAIN`은 실행 계획을 알려줍니다.
-`EXPLAIN ANALYZE`는 실제 실행한 동작과 실행 시간을 알려줍니다.
+따라서 MySQL의 쿼리 처리 시간만 측정하려면 네트워크 지연을 제외해야 합니다.
 
-따라서 순수한 쿼리 실행 소요 시간을 알 수 있는 방식인
-MySQL의 `EXPLAIN`과 `EXPLAIN ANALYZE` 방식을 선택했습니다.
+MySQL의 `EXPLAIN`은 실행 계획을, `EXPLAIN ANALYZE`는 실제 실행한 동작과 실행 시간을 알려줍니다.
+
+따라서 순수한 쿼리 실행 소요 시간을 알 수 있는 MySQL의 `EXPLAIN`과 `EXPLAIN ANALYZE` 방식을 선택했습니다.
 
 # Spring Data JPA 실제 쿼리 확인
 
@@ -68,7 +67,7 @@ spring:
 
 위 설정은 쿼리를 콘솔에 출력하므로 애플리케이션 성능 하락이 발생합니다.
 
-따라서 개발 환경이나 디버깅 상황에서 사용하는 것이 좋습니다.
+따라서 개발 환경이나 디버깅 상황에서만 사용하는 것이 좋습니다.
 
 이 설정을 적용하고 API를 호출하면, 콘솔에 다음과 같이 실제 실행된 SQL이 출력됩니다.
 
@@ -91,11 +90,13 @@ limit
     ?
 ```
 
-위 방식으로 데이터베이스에 사용되는 쿼리를 파악할 수 있습니다.
+이로서 Spring Data JPA가 생성하는 쿼리를 확인했습니다.
 
-# **EXPLAIN은 무엇인가?**
+이제 다음 단계에서 확인한 쿼리를 분석해 보겠습니다.
 
-`EXPLAIN` 명령어는 MySQL이 쿼리를 실행하는 방법에 대한 정보를 제공합니다.
+# EXPLAIN은 무엇인가?
+
+`EXPLAIN` 명령어는 MySQL이 쿼리를 실행하는 방법에 대한 정보를 제공합니다. [MySQL 공식문서: EXPLAIN](https://dev.mysql.com/doc/refman/8.0/en/explain-output.html)
 
 `EXPLAIN` 사용 방법은 쿼리 접두에 EXPLAIN을 붙이면 됩니다.
 
@@ -167,15 +168,15 @@ extra 값으로 개선이 필요한지 파악할 수 있습니다.
 
 ## EXPALIN 정리
 
-실제 사용되는 쿼리를 `EXPLAIN` 명령어로 분석하면  MySQL에서 쿼리가 효율적으로 동작하는지 파악할 수 있습니다.
+실제 사용되는 쿼리를 `EXPLAIN` 명령어로 분석하면 MySQL에서 쿼리가 효율적으로 동작하는지 파악할 수 있습니다.
 
 type과 extra에 개선이 필요한 값이 나타나면 쿼리에 적합한 인덱스를 생성하거나 쿼리를 수정하여 성능을 개선해야 합니다.
 
-# **EXPLAIN ANALYZE는 무엇인가?**
+# EXPLAIN ANALYZE는 무엇인가?
 
 `EXPLAIN` 명령어로 개선이 필요한 결과가 나오더라도 테이블에 데이터가 적은 경우 실행 시간이 짧을 수 있습니다.
 
-MySQL 8.0 부터 쿼리의 실행 시간을 확인하는 `EXPLAIN ANALYZE` 명령어가 추가됐습니다. ([https://dev.mysql.com/blog-archive/mysql-explain-analyze](https://dev.mysql.com/blog-archive/mysql-explain-analyze/))
+MySQL 8.0 부터 쿼리의 실행 시간을 확인하는 `EXPLAIN ANALYZE` 명령어가 추가됐습니다. [MySQL 공식 문서: EXPLAIN ANALYZE](https://dev.mysql.com/blog-archive/mysql-explain-analyze)
 
 `EXPLAIN ANALYZE`는 쿼리를 실제로 실행하고 쿼리의 각 영역별 동작 시간을 확인합니다.
 
@@ -266,7 +267,7 @@ ROLLBACK;
 
 `EXPLAIN ANALYZE` 명령어는 쿼리를 실제로 실행하여, 쿼리의 각 단계별 실제 소요 시간 측정하여 성능 병목 지점을 분석할 수 있습니다.
 
-# **SHOW PROFILING**
+# SHOW PROFILING
 
 `EXPLAIN ANALYZE`는 쿼리 실행 시간을 보여줍니다.
 
