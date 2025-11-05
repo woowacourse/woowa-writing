@@ -212,7 +212,7 @@ RGB=>YCbCr로 색공간 변환 시 이미지 압축에 용이해진다. YCbCr란
 
 코드를 더 간결하게 작성하고 싶다면 라이브러리를 활용하자!
 
-<img src="./images/pickeat-opt-2.png" width="300" />
+<img src="./images/pickeat-opt-2.png" width="700" />
 
 이미지 용량을 1,992kb에서 36.7kb로 약 54배 줄였다! 사진 품질의 중요도가 높지 않아 DPR 3까지만 대응해도 충분하다고 생각했다. Canvas API 기반으로 동작하므로 메타데이터까지 자동으로 제거된다. webp 변환을 고려했으나 이미 사이즈가 매우 작아 효과가 미미했다. Lambda + CloudFront + S3 조합으로 DPR 1/2/3 각각 대처 및 webp 미지원 브라우저 대처가 가능하지만 서비스 규모가 작아 오버엔지니어링이라고 판단했다.
 
