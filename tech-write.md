@@ -173,13 +173,14 @@ type과 extra에 개선이 필요한 값이 나타나면 쿼리에 적합한 인
 
 # **EXPLAIN ANALYZE는 무엇인가?**
 
-**EXPLAIN 명령어로 type 값과 extra값이 개선이 필요한 값이 나오더라도, 테이블 데이터가 적다면 실행 시간이 짧을 수 있습니다.**
+`EXPLAIN` 명령어로 개선이 필요한 결과가 나오더라도 테이블에 데이터가 적은 경우 실행 시간이 짧을 수 있습니다.
 
-MySQL 8.0 부터 쿼리의 실행 시간을 확인 할 수 있도록 EXPLAIN ANALYZE가 추가됐습니다. ([https://dev.mysql.com/blog-archive/mysql-explain-analyze](https://dev.mysql.com/blog-archive/mysql-explain-analyze/))
 
-EXPLAIN ANALYZE는 쿼리를 실행하고 쿼리의 각 영역별 동작 시간을 확인할 수 있습니다.
+MySQL 8.0 부터 쿼리의 실행 시간을 확인하는 `EXPLAIN ANALYZE` 명령어가 추가됐습니다. ([https://dev.mysql.com/blog-archive/mysql-explain-analyze](https://dev.mysql.com/blog-archive/mysql-explain-analyze/))
 
-사용 방법은 EXPLAIN과 유사하게 쿼리 접두로 EXPLAIN ANALYZE를 붙이면 됩니다.
+`EXPLAIN ANALYZE`는 쿼리를 실제로 실행하고 쿼리의 각 영역별 동작 시간을 확인합니다.
+
+사용 방법은 EXPLAIN과 유사하게 쿼리 접두로 `EXPLAIN ANALYZE`를 붙이면 됩니다.
 
 ```sql
 # EXPLAIN ANALYZE 예시
@@ -192,6 +193,10 @@ where (l1_0.deleted = 0)
   and l1_0.performance_at = '2026-08-13 06:30:45.000000' limit     1;
 ```
 
+`EXPLAIN ANALYZE`는 계층 구조로 이루어진 데이터를 응답합니다.
+
+계층 구조의 아래쪽 노드가 먼저 수행되며, 최상단 노드가 최종 결과입니다.
+
 ```sql
 -> Limit: 1 row(s)  (cost=7.09 rows=0.45) (actual time=0.0262..0.0262 rows=1 loops=1)
     -> Filter: ((l1_0.performance_at = TIMESTAMP'2026-08-13 06:30:45') and (l1_0.deleted = 0))  (cost=7.09 rows=0.45) (actual time=0.0255..0.0255 rows=1 loops=1)
@@ -199,38 +204,35 @@ where (l1_0.deleted = 0)
 
 ```
 
-EXPLAIN ANALYZE는 계층 구조로 이루어진 데이터를 응답합니다.
+actual 앞에 있는 부분은 예상했던 실행 계획입니다 (cost=7.09 rows=9)
 
-계층 구조의 아래쪽 노드가 먼저 수행됩니다.
-
-따라서 위쪽 노드가 최종 결과입니다.
+예상되는 비용은 7.09, 예상되는 반환 행 수는 9개입니다.
 
 ```sql
 -> Index lookup on l1_0 using FK_LINEUP_ON_FESTIVAL (festival_id=2911)  (cost=7.09 rows=9) (actual time=0.0236..0.0236 rows=1 loops=1)
 
 ```
 
-actual 앞에 있는 부분은 예상했던 실행 계획입니다 (cost=7.09 rows=9)
+actual이 붙은 부분은 실제 결과를 나타냅니다.  
+(actual time=0.0236..0.0236 rows=1 loops=1)
 
-예상되는 비용은 7.09, 예상되는 반환 행 수는 9개입니다.
+actual time은 `0.0236..0.0236` 처럼 `..` 을 구분자로 2개의 시간 값이 나타납니다.
 
-actual이 붙은 부분은 실제 결과를 나타냅니다. (actual time=0.0236..0.0236 rows=1 loops=1)
+앞쪽은 첫 번째 행을 찾는 데 걸린 시간입니다.
 
-actual time은 `0.0236..0.0236` 처럼 .. 을 구분자로 2개의 시간 값이 나타납니다.
+뒤쪽은 모든 행을 찾는 데 걸린 시간입니다.
 
-앞쪽 시간은 첫 번째 행을 찾는 데 걸린 시간입니다.
-
-뒤쪽 시간은 모든 행을 찾는 데 걸린 시간입니다.
-
-실제로 1개의 행을 반환했기 때문에 앞쪽 시간과 뒤쪽 시간이 동일합니다.
+위 예제에서는 1개의 행을 반환했기 때문에 앞쪽과 뒤쪽 의 시간이 동일합니다.
 
 rows는 실제 반환한 행의 수, loop는 모든 행을 찾는데 작업을 수행한 횟수입니다.
 
-actual time은 누적되기 때문에 가장 위쪽 노드의  actual time 뒤쪽 시간이 쿼리에 사용된 실제 시간입니다.
+actual time 값은 누적되어 기록됩니다.
+최상단 노드의 actual time의 `..` 뒤쪽 시간이 쿼리에 사용된 실제 시간입니다.
 
-EXPLAIN ANALYZE 주의사항은 실제 쿼리가 실행되기 때문에 쓰기 작업과 오토 커밋(Auto Commit)명령어는 주의해야 합니다.
+`EXPLAIN ANALYZE` 명령어는 실제 쿼리가 실행됩니다.
+따라서 쓰기 작업과 오토 커밋(Auto Commit)명령어에는 조심히 사용해야합니다.
 
-쓰기 작업의 성능을 측정하기 위해서는 트랜잭션을 사용하여 데이터베이스에 반영 되지 않도록 해야 합니다.
+만약 쓰기 작업의 성능을 측정하려면 트랜잭션을 사용하여 데이터베이스에 반영 되지 않도록 해야 합니다.
 
 ```sql
 START TRANSACTION;
