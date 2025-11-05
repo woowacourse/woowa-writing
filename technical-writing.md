@@ -334,6 +334,8 @@ https://github.com/user-attachments/assets/b1d6cc7f-7d62-423a-8fb8-d4d57c737461
 
 [MDN 문서의 해설](https://developer.mozilla.org/ko/docs/Web/API/Intersection_Observer_API)에 따르면, Intersection Observer는 상위 요소 또는 최상위 문서의 viewport와 대상 요소 사이의 변화를 비동기적으로 관찰할 수 있도록 하는 API입니다.
 
+Intersection Observer는 대부분의 모던 브라우저에서 지원되며, Chrome 51+, Edge 15+, Firefox 55+, Safari 12.1+ 버전부터 사용할 수 있습니다. 다만 IE에서는 지원하지 않으므로, IE 지원이 필요한 경우 [polyfill](https://developer.mozilla.org/ko/docs/Glossary/Polyfill)을 활용할 수 있습니다.
+
 <br>
 
 ### Intersection Observer의 장점
