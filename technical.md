@@ -37,21 +37,24 @@
 
 ## 그렇다면 어떤 부분부터 최적화를 진행하면 되는걸까?
 
-아마 처음 최적화를 접한다면 무엇을 기준으로 최적화를 하면 좋을지 막막할 것 같습니다.
+처음 최적화를 시도한다면 “도대체 어디부터 손대야 하지?”라는 생각이 들 수 있습니다.
+이를 도와주는 도구가 바로 Lighthouse입니다.
 
-이걸 알려주는 지표로 Lighthouse가 있습니다.
+Lighthouse는 구글이 개발한 자동화 성능 측정 도구로,
+웹사이트의 성능을 점수화하고 개선 방향을 구체적으로 제안해줍니다.
+크롬 개발자 도구(DevTools)에서 바로 실행할 수 있습니다.
 
-Lighthouse는 구글에서 만든 크롬 개발자 도구에서 사용할 수 있는 툴로, 웹사이트의 성능을 측정하고 개선 방향을 제시해주는 자동화 툴입니다.
+아래는 Lighthouse가 보여주는 Performance 리포트 예시입니다.
 
-Lighthouse는 아래 사진과 같이 브라우저의 성능을 측정해줍니다.
+여기서 우리가 집중해서 볼 부분은 Performance 탭입니다.
 
-이번 글에서 집중해서 볼 건 Performance 탭인데요.
-
-Lighthosue가 측정한 이 웹 페이지의 종합 성능 점수입니다.
+이는 실제 사용자가 페이지를 사용할 때의 체감 성능을 수치화한 결과입니다.
 
 ![alt text](image-1.png)
 
-구글의 Core Web Vitals 권장 기준에 따르면, 웹 페이지의 성능을 안정적으로 유지하기 위해서는 다음 세 가지 지표를 만족하는 것이 좋습니다.
+#### Core Web Vitals
+
+구글의 Core Web Vitals는 웹 페이지의 “사용자 경험 품질”을 수치로 표현한 세 가지 핵심 지표입니다.
 
 - LCP (Largest Contentful Paint) ≤ 2.5초 — 주요 콘텐츠가 표시되는 속도를 나타내고 로딩 성능을 평가합니다.
 
@@ -59,178 +62,354 @@ Lighthosue가 측정한 이 웹 페이지의 종합 성능 점수입니다.
 
 - CLS (Cumulative Layout Shift) ≤ 0.1 — 예기치 않은 화면 이동 정도를 나타내고 시각적 안정성을 평가합니다.
 
-추가로 Lighthouse는 아래와 같이 어떤 부분을 개선해나가면 좋을지 방향성도 알려줍니다.
+이 세 가지를 기준으로 페이지의 전반적인 사용자 경험 품질을 평가할 수 있습니다.
+즉, 이 지표들이 낮을수록 “사용자가 체감하는 빠름” 이 향상된다는 뜻입니다.
 
-총 2가지 섹션을 보여주는데요.
+#### Lighthouse의 결과 해석하기
 
-Lighthouse의 Insights 영역은
-실제 성능 점수에 직접적인 영향을 미치는 개선 포인트를 제안하는 섹션으로,
-“무엇을 고치면 성능이 향상되는가”를 정량적으로 알려줍니다.
+Lighthouse는 성능 점수 외에도 두 가지 섹션을 제공합니다.
 
-반면 Diagnostics 영역은
-페이지의 렌더링 구조나 메인 스레드 사용량, 서드파티 리소스 비중 등을 분석해
-“왜 느린가”를 데이터 기반으로 설명해줍니다.
+- Insights (개선 포인트)
 
-따라서 성능 최적화를 진행할 때는
-Insights로 우선순위를 정하고 → Diagnostics로 원인을 구체적으로 파악하는 흐름으로 접근해볼 수 있습니다.
+→ “무엇을 고치면 성능이 향상되는가?”를 정량적으로 보여줍니다.
 
-## 그렇다면 최적화 어떻게 해볼 수 있을까? - 저는 이런 방법을 시도해보았습니다
+예: 이미지 크기 최적화, 불필요한 JS 제거 등
 
-앞서 성능을 로딩 성능과 렌더링 성능으로 구분하여 살펴보았습니다.
+- Diagnostics (진단 정보)
 
-이제 두 측면에서, 제가 학습하고 적용한 최적화 방법들을 정리해보려 합니다.
+→ “왜 느린가?”를 데이터 기반으로 분석합니다.
 
-최적화에는 다양한 접근이 존재하지만, 이번 글에서는 제가 실제로 경험한 방법을 중심으로 다루었습니다.
+예: 메인 스레드 차단 시간, Third-party 리소스 비중, DOM 크기 등
 
-(참고 — React, Webpack 기준)
+따라서 최적화를 진행할 때는
+
+1️⃣ Insights로 우선순위를 정하고
+
+2️⃣ Diagnostics로 원인을 파악하는 흐름으로 접근하는 것이 효과적입니다.
+
+## 그렇다면 최적화 어떻게 해볼 수 있을까?
+
+앞서 살펴본 것처럼 웹의 성능은 크게 로딩 성능(Loading Performance) 과 렌더링 성능(Rendering Performance) 으로 나눌 수 있습니다.
+
+로딩 성능은 “얼마나 빨리 화면을 볼 수 있는가”,
+렌더링 성능은 “화면을 본 이후 얼마나 부드럽게 반응하는가”의 문제입니다.
+
+이 두 성능은 서로 독립적이면서도, 사용자 경험 전체를 구성하는 한 몸입니다.
+
+로딩이 빠르더라도 인터랙션이 끊기면 사용자는 불편함을 느끼고,
+렌더링이 아무리 부드러워도 첫 화면이 늦게 나타난다면 “느린 서비스”로 인식합니다.
+
+이번 섹션에서는 이 두 성능을 각각 개념적으로 분석하고,
+실제 프로젝트에서 어떻게 적용할 수 있는지를 함께 살펴보겠습니다.
 
 ### 1) 로딩 성능 최적화
 
-브라우저는 HTML, CSS, JS, 이미지 등 다양한 리소스를 다운로드하고
-이를 해석한 뒤 화면을 그리는 과정을 거칩니다.
+목표: “사용자가 첫 화면을 보기까지 걸리는 시간”을 단축하기
 
-이때 파일의 용량이 크고 불필요한 코드가 많거나,
-렌더링을 차단하는 리소스가 존재하면
-사용자는 페이지를 느리게 인식하게 됩니다.
+로딩 과정에서 브라우저는 다음 단계를 거칩니다.
 
-로딩 성능을 개선하기 위해서는 리소스의 크기와 요청 흐름을 효율적으로 관리하는 것이 핵심입니다.
+1️⃣ HTML 파싱 → 2️⃣ CSS 파싱 및 렌더트리 생성 → 3️⃣ JS 파싱 및 실행 → 4️⃣ 이미지 등 리소스 로드 → 5️⃣ 첫 화면 렌더링.
 
-소개할 방법은 다음과 같습니다.
+이 중 어느 하나라도 지연되면 사용자에게 “빈 화면”이 더 오래 보이게 됩니다.
 
-### 이미지 최적화
+즉, 로딩 성능 최적화는 이 Critical Rendering Path(핵심 렌더링 경로) 를 단축하는 과정입니다.
 
-이미지는 페이지 내에서 가장 큰 리소스 중 하나입니다.
+그 핵심은 리소스의 크기, 수량, 우선순위를 조정하는 데 있습니다.
 
-이미지 크기를 줄이거나 WebP와 같은 포맷을 사용하면 네트워크 전송량이 줄어 초기 로딩 시간을 단축할 수 있습니다.
+**(1) 이미지 최적화**
 
-### 리소스 코드 전송 최적화
+이미지는 대부분의 웹 페이지에서 가장 큰 네트워크 부하를 차지합니다.
 
-번들 크기를 줄이거나 당장 필요한 코드만 먼저 다운로드하여 초기 화면 표시 속도를 높일 수 있습니다.
+실제로 구글의 HTTP Archive에 따르면, 웹 페이지 리소스 중 약 60~70%가 이미지입니다.
 
-gzip, brotli 같은 압축도 요청 효율을 높이는 방법 중 하나입니다.
+따라서 이미지 최적화는 가장 직접적이면서 체감 효과가 큰 최적화 포인트입니다.
 
-### 캐시 활용
+① 이미지 포맷 최적화
 
-캐시는 브라우저가 동일한 리소스를 재요청하지 않도록 하여 재방문 시 로딩 속도를 단축합니다. (추후 사례 업데이트 예정)
+JPEG나 PNG 대신 WebP, AVIF 같은 차세대 포맷을 사용하면
+같은 화질을 유지하면서 파일 크기를 30~70% 줄일 수 있습니다.
 
-이러한 최적화 방법들은 모두 사용자가 첫 화면을 더 빠르게 볼 수 있도록 하는 데 목적이 있습니다.
+프로젝트에서는 Webpack 빌드 단계에서
+image-minimizer-webpack-plugin￼
+을 활용하여 자동 변환 및 압축을 수행할 수 있습니다.
 
-저는 이미지 최적화를 진행하기 위해서 2가지 방법을 사용했는데요.
-
-이미지 압축과 WebP 이미지 변환입니다.
-
-이미지를 압축하는 방법은 외부 사이트에서도 가능하지만 저는 이미지 파일을 들고 왔을 때 코드 내부적으로 알아서 압축을 해주는 것이 더 자연스럽다고 생각해서 코드 내부적으로 자동으로 압축해주는 image-minimizer-webpack-plugin을 사용하였습니다.
-
-제가 적용한 코드는 아래와 같습니다.
-
-```js
+```typescript
 new ImageMinimizerPlugin({
-      generator: [
-        {
-          implementation: ImageMinimizerPlugin.sharpGenerate,
-          type: 'asset',
-          filter: (_, sourcePath) => /\.png$/i.test(sourcePath),
-          filename: 'static/[name].webp',
-          options: {
-            encodeOptions: { webp: { quality: 40 } },
-            resize: { width: 1920 }
-          }
-        }
-      ]
-    })
+  generator: [
+    {
+      implementation: ImageMinimizerPlugin.sharpGenerate,
+      type: 'asset',
+      filter: (_, sourcePath) => /\.png$/i.test(sourcePath),
+      filename: 'static/[name].webp',
+      options: {
+        encodeOptions: { webp: { quality: 40 } },
+        resize: { width: 1920 },
+      },
+    },
   ],
+});
 ```
 
-image-minimizer-webpack-plugin은 Webpack에서 제공하는 플러그인으로 이미지를 압축하거나 새로운 포맷으로 변환하기 위한 도구입니다.
+이 설정은 PNG 파일을 WebP로 변환하고, 동시에 리사이즈 및 품질 압축을 수행합니다.
 
-그중에서도 플러그인에 내장된 sharpGenerator를 사용하면 “압축 + 포맷 변환 + 리사이즈”를 한번에 사용할 수 있는 점이 큰 장점인 것 같아 사용해보았습니다.
+즉, “이미지를 업로드할 때마다 개발자가 수동으로 압축하지 않아도 되는 자동화된 빌드 파이프라인”이 완성됩니다.
 
-다음으로 리소스 코드 전송을 최소화 하기 위해 2가지를 적용해보았습니다.
-소스코드 압축, 코드 스플리팅인데요.
+② 이미지 로딩 우선순위 관리
 
-웹팩에서 제공하는 optimization 속성을 활성화하면 소스 코드의 크기를 줄일 수 있습니다.
+이미지가 많을수록 브라우저는 네트워크 요청을 병렬로 수행하더라도 시간이 걸립니다.
 
-웹펙에서 소스 코드 압축은 기본적으로 프로덕션 모드에서 자동으로 수행되는데요,
-mode: 'production'을 사용하면 optimization.minimize가 활성화되고 Terser가 기본값으로 동작하여 공백/주석 제거, 사용되지 않는 코드 제거, 식별자 축약 등을 수행합니다. 기본 설정만으로도 충분한 압축 효과를 얻을 수 있지만 세밀한 제어(ex) console.log 제거, 주석 완전 제거)가 필요하다면 TerserPlugin을 명시적으로 설정해 세부 옵션을 조정할 수 있습니다.
-또한 프로덕션 모드에서는 트리 셰이킹과 모듈 결합 등의 최적화가 함께 적용되어서 번들의 크기를 추가로 줄여줍니다.
+따라서 “무엇을 먼저 보여줄 것인가” 를 명시하는 것이 중요합니다.
 
-코드 스플리팅의 경우, React.lazy를 활용했습니다.
+- 주요 콘텐츠(LCP 이미지)는 <link rel="preload"> 또는 fetchpriority="high" 속성으로 우선 로드
+- 뷰포트 밖 이미지는 <img loading="lazy"> 속성으로 지연 로드(lazy-loading)
+- 시각적으로 작은 아이콘은 SVG나 CSS Sprite로 대체
 
-```js
+이렇게 하면 사용자가 가장 먼저 봐야 하는 이미지를 신속하게 보여주면서,
+불필요한 리소스 요청을 뒤로 미뤄 네트워크 혼잡을 줄일 수 있습니다.
+
+**(2) 리소스 코드 전송 최적화**
+
+웹 애플리케이션은 HTML·CSS·JS뿐 아니라 다양한 번들 파일로 구성됩니다.
+
+이 중 자바스크립트(JS)는 실행 전 파싱·컴파일·실행 과정이 필요하기 때문에
+전송량이 많을수록 렌더링 차단(blocking)이 발생합니다.
+
+① 번들 크기 줄이기
+
+Webpack이나 Vite 같은 번들러는 mode: 'production' 설정 시
+자동으로 코드 압축(Terser) 과 트리 셰이킹(Tree Shaking) 을 수행합니다.
+
+- Terser → 공백·주석 제거, 식별자 단축, 사용되지 않는 코드 제거
+- Tree Shaking → 실제로 import되지 않은 모듈 자동 제거
+
+여기에 추가로 gzip / brotli 압축을 적용하면
+네트워크 전송량을 최대 70%까지 감소시킬 수 있습니다.
+
+이러한 압축은 대부분의 CDN에서 자동으로 지원하지만,
+Nginx나 CloudFront 등 서버 설정을 직접 다룰 때도 쉽게 적용 가능합니다.
+
+② 코드 스플리팅 (Code Splitting)
+
+코드 스플리팅은 “필요한 시점에 필요한 코드만 불러오기” 전략입니다.
+
+초기 번들에 모든 페이지 코드를 포함하는 대신,
+라우트 단위로 분리하여 사용자가 접근할 때마다 로드하는 방식입니다.
+
+React에서는 React.lazy와 Suspense로 간단히 구현할 수 있습니다.
+
+```typescript
 const Search = lazy(() => import('./pages/Search/Search'));
 
-<Router>
-  <NavBar />
-  <Routes>
-    <Route path="/" element={<Home />} />
-    <Route
-      path="/search"
-      element={
-        <Suspense fallback={<div>Loading...</div>}>
-          <Search />
-        </Suspense>
-      }
-    />
-  </Routes>
-  <Footer />
-</Router>;
+<Routes>
+  <Route path="/" element={<Home />} />
+  <Route
+    path="/search"
+    element={
+      <Suspense fallback={<div>Loading...</div>}>
+        <Search />
+      </Suspense>
+    }
+  />
+</Routes>;
 ```
 
-React.lazy는 컴포넌트 단위로 코드를 지연 로드(lazy loading) 할 수 있게 해주는 React 내장 기능입니다.
+이렇게 분리하면 초기 번들 크기가 줄고,
+LCP(Largest Contentful Paint) 개선 효과를 직접적으로 얻을 수 있습니다.
 
-평소에는 번들 파일 내에 포함되지 않다가 사용자가 해당 컴포넌트를 실제로 렌더링하는 시점에
-네트워크 요청을 통해 별도의 청크(chunk) 로 로드되는 방식입니다.
+**(3) 폰트 전략**
 
-이러한 접근 방식은 초기 로딩 시점에 불필요한 코드 전송을 줄이고 사용자가 실제로 필요로 하는 기능이나 페이지를 요청할 때만
-관련 코드를 불러오도록 함으로써 초기 번들 크기를 줄이는 효과가 있습니다.
+폰트는 종종 간과되지만, 실제로 텍스트 표시 지연(FOIT)과 레이아웃 점프(CLS) 의 주요 원인입니다.
 
-예를 들어, 사용자 진입 후 즉시 보이지 않는 페이지나 모달 혹은 특정 상호작용 이후에만 필요한 컴포넌트는 React.lazy를 통해 분리하면 초기 렌더링 속도를 방해하지 않습니다.
+또한 정적 리소스(JS/CSS/이미지/폰트)의 장기 캐싱은 재방문 속도에 큰 영향을 미칩니다.
 
-또한 React.Suspense와 함께 사용하면 비동기로 로드되는 동안 로딩 상태를 자연스럽게 표시할 수 있습니다.
+아래는 프로젝트에서 바로 적용할 수 있는 구체적인 방법입니다.
 
-Lazy 적용 후에는 번들이 다음과 같이 페이지별로 분리된 여러 개의 청크 파일로 나누어집니다.
+핵심 목표는 두 가지입니다.
 
-Search 페이지와 관련된 코드가 별도의 청크로 분리되어 초기 로딩 시점의 전송량이 감소했습니다.
+1. 첫 텍스트 표시 시점 단축: 폰트 로딩을 기다리지 않고 먼저 읽히게 만들기
+2. 시각적 안정성 확보(CLS 방지): 폴백 폰트와 실제 폰트의 메트릭을 맞춰 레이아웃 점프 최소화
 
-이처럼 React.lazy를 적용하면 초기 번들에는 핵심 UI 코드만 포함되고, 나머지 페이지나 기능은 사용자의 실제 탐색 시점에 로드되는 구조로 개선됩니다.
+구체적으로는 다음 순서를 권장합니다.
 
-(추후 사례 업데이트 예정)
+① WOFF2 서브셋(Subset) + self-host
+
+- 사용 글리프만 포함한 서브셋 폰트 생성(영문/숫자/기호/국문 분리 가능) → 파일 크기 급감
+- CDN/자체 서버에 self-host(Google Fonts URL 의존 줄이고 캐시/정책을 우리가 통제)
+
+예시) PretendardSubsetKR.woff2, PretendardSubsetLatin.woff2 로 분리
+
+② Preconnect & Preload로 폰트 우선순위 올리기
+
+```html
+<!-- 폰트를 같은 도메인에서 서비스한다면 생략 가능 -->
+<link rel="preconnect" href="https://static.example-cdn.com" crossorigin />
+
+<link
+  rel="preload"
+  href="https://static.example-cdn.com/fonts/PretendardSubsetKR.woff2"
+  as="font"
+  type="font/woff2"
+  crossorigin
+/>
+```
+
+- preconnect는 TCP/TLS 핸드셰이크를 앞당겨 첫 바이트까지의 지연을 줄여줍니다.
+
+- preload는 해당 폰트가 반드시 필요함을 명시해 우선 로드하게 합니다.
 
 ### 2) 렌더링 성능 최적화
 
-브라우저는 사용자의 조작이 있을 때마다
-레이아웃 계산, 스타일 적용, 페인트, 그리고 컴포지팅 단계를 거쳐 화면을 갱신합니다.
+목표: “화면이 그려진 이후, 얼마나 부드럽게 반응하는가” 개선하기
 
-이 과정에서 자바스크립트 연산이 길어지거나 DOM 변경이 과도하면
-화면이 ‘버벅이는’ 현상이 발생할 수 있습니다.
+렌더링 성능은 브라우저의 메인 스레드가 얼마나 효율적으로 작동하는가에 달려 있습니다.
 
-렌더링 성능을 높이기 위해서는 메인 스레드의 부하를 줄이고
-불필요한 렌더링을 최소화하는 것이 중요합니다.
+브라우저는 한 프레임을 그릴 때마다 다음 과정을 수행합니다.
 
-렌더링 성능이 좋지 못하다면, 스크롤, 클릭, 애니메이션 등과 같은 상호작용이 뚝 끊기거나 버벅임이 느껴질 수 있습니다.
+1️⃣ 자바스크립트 실행
+2️⃣ 스타일 계산 (Recalculate Style)
+3️⃣ 레이아웃 계산 (Reflow)
+4️⃣ 페인트 (Paint)
+5️⃣ 합성 (Compositing)
 
-이러한 부분들은 로딩이 끝난 뒤의 사용자 경험을 결정하는 중요한 요소이기 때문에 이러한 현상이 발생한다면 최적화를 통해 사용자에게 더 자연스러운 상호작용 경험을 제공해야 합니다.
+이 중 하나라도 지연되면 프레임 드롭이 발생해 화면이 ‘끊기는’ 듯한 느낌을 줍니다.
 
-소개할 방법은 아래와 같습니다.
+(1) 애니메이션 최적화
 
-#### 애니메이션 최적화
+애니메이션은 사용자의 체감 품질에 큰 영향을 줍니다.
 
-애니메이션으로 인해 화면이 끊기거나 버벅이는 현상이 발생할 수 있습니다.
+그러나 잘못 구현된 애니메이션은 오히려 렌더링 병목을 일으킬 수 있습니다.
 
-이를 최적화함으로써 보다 더 부드럽고 자연스러운 애니메이션 효과를 사용자에게 제공할 수 있습니다.
+① Reflow / Repaint 최소화
 
-#### 리렌더링 최소화
+- Reflow는 DOM 구조나 크기, 위치가 변경될 때 전체 레이아웃을 다시 계산하는 과정입니다.
+- Repaint는 색상이나 그림자 등의 시각적 속성만 바뀔 때 발생합니다.
 
-상태 변경 시 불필요하게 많은 컴포넌트가 계속 리렌더링되면 입력 지연이나 스크롤 끊김 등 즉각적으로 반응성이 떨어지는 문제가 생깁니다.
+Reflow는 비용이 훨씬 크므로, 가능하면 DOM 구조 변경을 최소화해야 합니다.
 
-메모이제이션이나 상태 분리를 통해 리렌더링을 줄여볼 수 있습니다.
+```typescript
+// 🔴 반복문 안에서 매번 DOM에 접근하고 스타일 변경
+const items = document.querySelectorAll('.list-item');
 
-(추후, 렌더링 부분은 사례 업데이트 혹은 삭제 예정)
+for (let i = 0; i < items.length; i++) {
+  items[i].style.width = items[i].offsetWidth + 10 + 'px'; // offsetWidth 접근 시 즉시 reflow 발생
+  items[i].style.marginLeft = i * 5 + 'px';
+}
+```
+
+문제점
+
+- offsetWidth를 읽는 시점에 브라우저는 최신 레이아웃 정보를 알아야 합니다.
+  -> 이때 즉시 Reflow(레이아웃 재계산) 이 발생하며, 모든 요소의 배치를 다시 계산하게 됩니다.
+
+- 이어서 스타일이 변경되면, 브라우저는 다시 레이아웃을 검증해야 합니다.
+  -> 이 과정이 layout → style → layout → style 형태로 반복되면서
+  프레임마다 연속적인 Reflow가 발생하고, 결과적으로 CPU 사용량이 증가하며 화면이 끊겨 보이는 현상이 나타납니다.
+
+```typescript
+const items = document.querySelectorAll('.list-item');
+
+// 🟢 DOM 접근은 한 번에 묶기 (읽기 → 계산 → 쓰기 순서로 분리)
+const widths = Array.from(items).map((item) => item.offsetWidth);
+
+for (let i = 0; i < items.length; i++) {
+  const newWidth = widths[i] + 10;
+  // 🟢 스타일 변경은 메모리 상에서만 조작 후 한 번에 반영
+  items[i].style.transform = `translateX(${i * 5}px)`;
+  items[i].style.width = `${newWidth}px`;
+}
+```
+
+개선 포인트
+
+- DOM 읽기(offsetWidth)와 쓰기(style)를 분리하여,
+  “읽기 단계 → 계산 단계 → 쓰기 단계” 순으로 명확히 구분합니다.
+  이렇게 하면 브라우저가 중간에 불필요하게 레이아웃을 다시 계산하지 않아
+  Reflow 발생 빈도를 크게 줄일 수 있습니다.
+
+- 또한, 위치나 크기 변경이 필요한 경우
+  top, left와 같은 레이아웃 관련 속성 대신 transform 속성을 사용하는 것이 좋습니다.
+  transform은 GPU 레벨에서 처리되므로 레이아웃 계산에 영향을 주지 않아
+  부드러운 애니메이션과 안정적인 렌더링 성능을 확보할 수 있습니다.
+
+② GPU 가속 활용
+
+transform과 opacity 속성은 GPU 합성 레이어에서 처리됩니다.
+
+즉, CPU 기반의 레이아웃 계산을 거치지 않아도 되기 때문에 부드러운 애니메이션을 만들 수 있습니다.
+
+```css
+.element {
+  transform: translateY(20px);
+  will-change: transform;
+}
+```
+
+여기서 will-change는 브라우저에게 “이 속성이 곧 바뀔 것”임을 미리 알려
+GPU 레이어를 사전 생성하게 함으로써 첫 프레임 지연을 줄여줍니다.
+
+단, 너무 많은 요소에 적용하면 오히려 메모리 사용량이 증가할 수 있으므로
+정말 필요한 애니메이션 요소에만 사용해야 합니다.
+
+(2) 불필요한 리렌더링 최소화 (React 기준)
+
+React의 렌더링 병목은 대부분 상태 변경이 불필요하게 많은 컴포넌트에서 발생합니다.
+
+즉, 데이터는 변하지 않았는데 상위 컴포넌트가 리렌더링되면서
+자식들도 연쇄적으로 다시 그려지는 경우입니다.
+
+이를 줄이기 위한 전략은 다음과 같습니다.
+
+① 컴포넌트 분리
+
+하나의 큰 컴포넌트가 많은 상태를 관리하면, 작은 변화에도 전체가 리렌더링됩니다.
+
+상태가 달라지는 부분을 작은 단위로 쪼개고, 각 컴포넌트가 자신에게 필요한 상태만 구독하도록 구조를 분리합니다.
+
+② 메모이제이션 (Memoization)
+
+- React.memo → props가 바뀌지 않으면 리렌더링 방지
+- useMemo, useCallback → 계산 비용이 큰 값이나 함수를 캐싱
+
+단, 모든 컴포넌트에 적용하면 오히려 메모리 사용량이 늘고 유지보수가 복잡해질 수 있습니다.
+
+따라서 렌더링 비용이 크거나 자주 리렌더링되는 컴포넌트에만 선택적으로 적용하는 것이 좋습니다.
+
+③ 전역 상태 최소화
+
+전역 Context는 하위 모든 컴포넌트를 리렌더링시킬 수 있습니다.
+
+useSyncExternalStore나 zustand 같은 외부 스토어를 활용하여
+필요한 데이터만 구독하게 하면, 불필요한 렌더링을 획기적으로 줄일 수 있습니다.
+
+(3) 메인 스레드 부하 줄이기
+
+렌더링 성능은 결국 메인 스레드가 얼마나 자주 쉬는가에 달려 있습니다.
+
+JS 연산이 길어지면 렌더링이 차단되어 사용자는 “버벅임”을 느낍니다.
+
+이런 경우 다음과 같은 방식으로 부하를 분산시킬 수 있습니다.
+
+- Web Worker: 무거운 연산(예: 데이터 파싱, 이미지 변환)을 별도 스레드로 이동
+- requestIdleCallback: 사용자의 인터랙션이 없는 틈새 시간에 비필수 작업 수행
+- Debounce / Throttle: 스크롤, 입력 이벤트를 일정 주기로 묶어 처리
+
+## 마무리하며
+
+성능 최적화는 단순히 “점수 올리기”가 아니라,
+사용자가 체감하는 경험의 품질을 높이는 일입니다.
+
+빠른 로딩과 부드러운 상호작용은 결국 사용자의 신뢰와 만족도로 이어집니다.
+
+따라서 성능 최적화는 개발 과정의 마지막 단계가 아니라,
+기획·디자인·개발 전 과정에 걸친 사용자 중심 사고로 접근해야 합니다.
 
 ## 참고 자료
 
 - [프론트엔드 최적화? 토스에서는 이렇게 합니다!](https://toss.tech/article/firesidechat_frontend_9)
 - [Think With Google - Mobile Page Speed](https://www.thinkwithgoogle.com/intl/en-emea/marketing-strategies/app-and-mobile/find-out-how-you-stack-new-industry-benchmarks-mobile-page-speed/)
-- [프론트엔드 성능 최적화 가이드](https://search.shopping.naver.com/book/catalog/35627588630?cat_id=50010881&frm=PBOKPRO&query=%ED%94%84%EB%A1%A0%ED%8A%B8%EC%97%94%EB%93%9C+%EC%84%B1%EB%8A%A5+%EC%B5%9C%EC%A0%81%ED%99%94+%EA%B0%80%EC%9D%B4%EB%93%9C&NaPm=ct%3Dmgm5pwj4%7Cci%3Dfea1e581621accfb7c542385f86bc6990cf9d72a%7Ctr%3Dboknx%7Csn%3D95694%7Chk%3D0bf3e93e889a0e15edf364a66a94525d7037fde1)
+- [Web.dev - Rendering Performance](https://web.dev/articles/rendering-performance?hl=ko)
+- [Web.dev - Optimize Web Fonts](https://web.dev/articles/optimize-webfont-loading?hl=ko)
 - [Web Vitals](https://web.dev/articles/vitals?hl=ko)
-- [Webpack](https://webpack.kr/)
+- [MDN Web Docs - will-change](https://developer.mozilla.org/en-US/docs/Web/CSS/will-change)
+- [Webpack - Image Minimizer Plugin](https://github.com/webpack-contrib/image-minimizer-webpack-plugin)
+- [Google Fonts Knowledge - Font performance](https://fonts.google.com/knowledge)
