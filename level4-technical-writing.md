@@ -31,7 +31,7 @@ Server-Sent Events(SSE) 는 클라이언트가 하나의 HTTP 연결을 열어 �
 
 일반적인 HTTP 통신은 ‘Keep-Alive’ 헤더를 사용하여 TCP 연결을 오랜 시간 유지할 수 있습니다. 그러나 일반적인 HTTP 통신은 한 번의 요청은 한 번의 응답만 가능합니다. 반면 SSE는 한 번의 요청으로 SSE 연결을 맺은 후, 서버에서 클라이언트에게 여러 번 응답을 전송할 수 있습니다.
 
-![alt text](./img/image.png)
+![alt text](./img/image-9.png)
 
 ### SSE의 동작 원리: text/event-stream
 
