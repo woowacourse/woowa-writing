@@ -198,6 +198,15 @@ public void divide(int a, int b) {
 다만 필요하다면 try-catch로 처리할 수 있으며, 코드 설계 시 예외가 발생하지 않도록 **사전에 오류를 방지하는 것이 권장**된다.
 
 
+#### Checked Exception과 Unchecked Exception 비교표
+
+| 구분 | Checked Exception | Unchecked Exception |
+|------|-------------------|---------------------|
+| **상속 관계** | Exception 상속 (RuntimeException 제외) | RuntimeException 상속 |
+| **컴파일러 체크** | 강제 (try-catch 또는 throws 필수) | 선택 (명시하지 않아도 컴파일 가능) |
+| **발생 원인** | 외부 환경 문제 (파일, 네트워크, DB) | 프로그래밍 오류 |
+| **대표 예시** | IOException, SQLException | NullPointerException, IllegalArgumentException |
+| **처리 권장** | 반드시 처리 | 사전 검증으로 예방 |
 
 #### ❓왜 예외를 두가지 상황으로 나누었을까?
 그에 대한 해답은 자바의 아버지라 불리는 James Gosling 과의 대화에서 알 수 있다.
