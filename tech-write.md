@@ -175,7 +175,6 @@ type과 extra에 개선이 필요한 값이 나타나면 쿼리에 적합한 인
 
 `EXPLAIN` 명령어로 개선이 필요한 결과가 나오더라도 테이블에 데이터가 적은 경우 실행 시간이 짧을 수 있습니다.
 
-
 MySQL 8.0 부터 쿼리의 실행 시간을 확인하는 `EXPLAIN ANALYZE` 명령어가 추가됐습니다. ([https://dev.mysql.com/blog-archive/mysql-explain-analyze](https://dev.mysql.com/blog-archive/mysql-explain-analyze/))
 
 `EXPLAIN ANALYZE`는 쿼리를 실제로 실행하고 쿼리의 각 영역별 동작 시간을 확인합니다.
@@ -261,7 +260,7 @@ ROLLBACK;
 
 트랜잭션 롤백을 사용하면 데이터베이스 데이터에 영향 없이 쓰기 DML 작업의 실행 시간을 측정할 수 있습니다.
 
-오토 커밋 명령어는 DDL, 락(Lock) 등의 명령어가 있습니다.
+오토 커밋이 발생하는 명령어로는 DDL(CREATE, ALTER 등)이나 락(Lock) 관련 구문이 있습니다.
 
 # **SHOW PROFILING**
 
