@@ -53,7 +53,7 @@ const scrollProgress = (scrollTop / (scrollHeight - clientHeight)) * 100;
 
 처음에는 scrollHeight에서 clientHeight를 제외하는 것에 의문을 가졌습니다.
 
-단순하게 생각하면 scrollHeight 자체가 스크롤 가능한 요소의 전체 높이이므로, scrollHeight에서 스크롤링한 픽셀 수인 scrollTop을 나눈 값이 진행률이라 이해할 수 있기 때문입니다.
+단순하게 생각하면 scrollHeight 자체가 스크롤 가능한 요소의 전체 높이이므로, scrollTop을 scrollHeight로 나눈 값이 진행률이라 이해할 수 있기 때문입니다.
 
 <br>
 
@@ -61,11 +61,9 @@ const scrollProgress = (scrollTop / (scrollHeight - clientHeight)) * 100;
 
 <br>
 
-그러나 위의 이미지와 같이, 스크롤이 페이지 최상단에 있을 때도(scrollTop = 0) clientHeight가 유효한 값을 가지는 점을 확인하고, 계산식을 이해할 수 있었습니다.
+그러나 위의 이미지와 같이, 스크롤이 페이지 최상단에 있을 때도(scrollTop = 0) clientHeight가 유효한 값을 가지는 점을 확인하고 계산식을 이해할 수 있었습니다.
 
-스크롤 위치와 무관하게 사용자는 항상 컨텐츠의 일부 영역을 화면으로 볼 수 있습니다.
-
-scrollTop이 0일 때도 이미 clientHeight만큼의 영역이 노출되는 것입니다. 따라서 사용자는 실제 컨텐츠의 높이보다 더 짧은 길이만큼 스크롤을 내리게 됩니다.
+스크롤 위치와 무관하게 사용자는 항상 컨텐츠의 일부 영역을 화면으로 볼 수 있습니다. scrollTop이 0일 때도 이미 clientHeight만큼의 영역이 노출되는 것입니다. 따라서 사용자는 실제 컨텐츠의 높이보다 더 짧은 길이만큼 스크롤을 내리게 됩니다.
 
 결과적으로 실제로 스크롤해야 하는 거리는 컨텐츠의 전체 높이가 아닌, 그 높이에서 clientHeight만큼 제외한 값이 됩니다.
 
