@@ -1,606 +1,345 @@
-# TanStack Query는 왜 등장했는가
+# **웹 폰트 로딩 성능 최적화 전략**
 
-## 예상 독자
+## 0) 목표
 
-- React 기반 웹 애플리케이션을 개발하는 프론트엔드 개발자
-- 비동기 데이터 처리와 상태 관리 패턴에 관심 있는 개발자
-- useEffect/Redux의 한계를 경험하고 더 나은 해결책을 찾는 개발자
+웹 폰트(Web Font)의 로딩 성능과 렌더링 안정성을 고려한 최적화 전략을 직접 설계하고 적용할 수 있는 수준에 도달한다.
 
-## 개요
+---
 
-React 애플리케이션에서 외부 API 데이터를 관리하는 것은 생각보다 복잡합니다. 로딩 상태, 에러 처리, 캐싱, 데이터 동기화 등 고려해야 할 사항이 많습니다. 이 글에서는 전통적인 `useEffect` 방식과 Redux 미들웨어의 한계를 분석하고, TanStack Query가 이를 어떻게 해결하는지 살펴봅니다.
+## 1) 실습 환경 준비
 
-## 문제 상황
-
-React 애플리케이션에서 Todo 리스트를 외부 API로부터 가져와 화면에 표시하는 기능을 구현한다고 가정해봅시다. 가장 직관적인 방법은 `useEffect`와 `useState`를 조합하는 것입니다.
-
-```jsx
-import React, { useState, useEffect } from "react";
-import axios from "axios";
-
-const App = () => {
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const response = await axios.get("http://localhost:4000/todos");
-        setData(response.data);
-      } catch (error) {
-        setError(error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
-
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error.message}</div>;
-  // ... (데이터 렌더링)
-};
-```
-
-이 코드는 동작하지만, 다음과 같은 문제가 발생합니다.
-
-### 주요 문제점
-
-**1. 상태 관리의 복잡성**
-
-- 하나의 API 호출을 위해 세 가지 상태(data, loading, error)를 직접 관리해야 합니다
-- 컴포넌트가 늘어날수록 반복적인 보일러플레이트 코드가 증가합니다
-
-**2. 중복 요청 문제**
-
-- 동일한 데이터를 여러 컴포넌트에서 필요로 할 때, 각 컴포넌트가 독립적으로 API를 호출합니다
-- 네트워크 비용이 불필요하게 증가하고 서버 부하가 커집니다
-
-**3. 데이터 동기화 이슈**
-
-- 한 컴포넌트에서 데이터를 수정하면, 다른 컴포넌트의 데이터는 자동으로 갱신되지 않습니다
-- 수동으로 모든 관련 컴포넌트를 찾아 리렌더링을 트리거해야 합니다
-
-**4. 비즈니스 로직의 혼재**
-
-- UI 렌더링 로직과 데이터 패칭 로직이 한 컴포넌트에 섞여 있습니다
-- 코드의 가독성이 떨어지고 테스트가 어려워집니다
-
-## 해결 시도: Redux 미들웨어
-
-위 문제들을 해결하기 위해 많은 개발자들이 Redux와 미들웨어(Redux Thunk, Redux Saga)를 도입했습니다.
-
-### Redux Thunk 방식
-
-Redux Thunk는 액션 크리에이터에서 함수를 반환하여 비동기 로직을 처리합니다.
-
-```jsx
-// Action Creator
-export const fetchTodos = () => async (dispatch) => {
-  dispatch({ type: 'FETCH_TODOS_REQUEST' });
-
-  try {
-    const response = await axios.get('/todos');
-    dispatch({
-      type: 'FETCH_TODOS_SUCCESS',
-      payload: response.data
-    });
-  } catch (error) {
-    dispatch({
-      type: 'FETCH_TODOS_FAILURE',
-      error: error.message
-    });
-  }
-};
-
-// Reducer
-const todosReducer = (state = initialState, action) => {
-  switch (action.type) {
-    case 'FETCH_TODOS_REQUEST':
-      return { ...state, loading: true };
-    case 'FETCH_TODOS_SUCCESS':
-      return { ...state, loading: false, data: action.payload };
-    case 'FETCH_TODOS_FAILURE':
-      return { ...state, loading: false, error: action.error };
-    default:
-      return state;
-  }
-};
-```
-
-### Redux의 장점
-
-**1. 중앙 집중식 상태 관리**
-
-- 모든 데이터가 하나의 스토어에서 관리됩니다
-- 상태 변화를 예측 가능하게 추적할 수 있습니다
-
-**2. 비즈니스 로직 분리**
-
-- 데이터 패칭 로직을 액션 크리에이터로 분리할 수 있습니다
-- 컴포넌트는 UI 렌더링에만 집중합니다
-
-**3. 일관된 에러 처리**
-
-- 로딩 상태와 에러 상태를 중앙에서 관리합니다
-
-### Redux의 한계
-
-하지만 Redux도 완벽한 해결책은 아니었습니다.
-
-**1. 과도한 보일러플레이트**
-
-```jsx
-// 하나의 API 호출을 위해 필요한 코드들
-- Action Types (3개: REQUEST, SUCCESS, FAILURE)
-- Action Creators (3개 이상)
-- Reducer (switch-case 로직)
-- 컴포넌트 연결 코드 (useDispatch, useSelector)
+### 1.1 폴더 구조
 
 ```
-
-**2. 서버 상태 관리의 비효율성**
-
-- Redux는 클라이언트 상태 관리에 최적화되어 있습니다
-- 캐싱, 자동 리페칭, 백그라운드 업데이트 등의 기능이 없습니다
-- 이런 기능들을 직접 구현하면 코드가 더욱 복잡해집니다
-
-**3. 테스트의 복잡도**
-
-- 비동기 액션 크리에이터를 테스트하려면 모킹이 필요합니다
-- 다양한 응답 시나리오를 시뮬레이션하기 어렵습니다
-
-## 해결 방향: TanStack Query의 등장
-
-### 핵심 인사이트
-
-Redux를 사용하면서 개발자들은 중요한 사실을 깨달았습니다.
-
-> 서버에서 가져온 데이터는 클라이언트 상태와 근본적으로 다르다.
-> 
-
-클라이언트 상태(예: UI 토글, 폼 입력값)와 달리, 서버 상태는 다음과 같은 특성이 있습니다:
-
-- **비동기적**: 네트워크를 통해 가져오므로 로딩 시간이 필요합니다
-- **공유됨**: 여러 컴포넌트에서 동일한 데이터를 필요로 합니다
-- **시간에 민감**: 시간이 지나면 오래된(stale) 데이터가 됩니다
-- **소유권이 없음**: 다른 사용자나 프로세스가 언제든 변경할 수 있습니다
-
-TanStack Query는 이러한 서버 상태의 특성에 최적화된 라이브러리입니다.
-
-### TanStack Query의 핵심 기능
-
-| 기능 | 설명 | 전통적 방식과의 차이 |
-| --- | --- | --- |
-| **자동 캐싱** | 동일한 데이터는 한 번만 가져오고 재사용 | useEffect는 매번 새로 요청 |
-| **자동 리페칭** | 데이터가 오래되면 자동으로 갱신 | 수동으로 갱신 트리거 필요 |
-| **백그라운드 업데이트** | 사용자 경험을 해치지 않고 데이터 갱신 | 로딩 화면이 반복 표시됨 |
-| **쿼리 무효화** | 데이터 변경 시 관련 쿼리 자동 갱신 | 수동으로 모든 관련 상태 업데이트 필요 |
-
-## TanStack Query 기본 사용법
-
-### 1. 초기 설정
-
-먼저 애플리케이션 최상단에 QueryClientProvider를 설정합니다.
-
-```jsx
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-
-const queryClient = new QueryClient();
-
-ReactDOM.createRoot(document.getElementById("root")).render(
-  <QueryClientProvider client={queryClient}>
-    <App />
-    <ReactQueryDevtools initialIsOpen={false} />
-  </QueryClientProvider>
-);
-
+font-optimization/
+ ┣ index.html
+ ┣ style.css
+ ┗ fonts/
 ```
 
-### 2. 데이터 조회: useQuery
+### 1.2 폰트 파일 준비
 
-기존의 복잡한 `useEffect` 코드가 간단해집니다.
+#### 예시 1: Pretendard
 
-**Before (useEffect)**
+* **다운로드:** [https://github.com/orioncactus/pretendard/releases](https://github.com/orioncactus/pretendard/releases)
+* “PretendardSubset”의 **WOFF2(Web Open Font Format 2)** 버전 다운로드
+* `Pretendard-Regular.woff2` 파일을 `fonts/` 폴더에 저장
 
-```jsx
-const [data, setData] = useState(null);
-const [loading, setLoading] = useState(true);
-const [error, setError] = useState(null);
+#### 예시 2: Noto Sans KR (Google Fonts)
 
-useEffect(() => {
-  const fetchData = async () => {
-    setLoading(true);
-    try {
-      const response = await axios.get("/todos");
-      setData(response.data);
-    } catch (error) {
-      setError(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-  fetchData();
-}, []);
+* **링크:** [https://fonts.google.com/noto/specimen/Noto+Sans+KR](https://fonts.google.com/noto/specimen/Noto+Sans+KR)
+* 압축을 해제한 후 `NotoSansKR-Regular.woff2` 파일을 `fonts/` 폴더에 저장
+
+최종 구조:
 
 ```
-
-**After (useQuery)**
-
-```jsx
-const { data, isPending, isError } = useQuery({
-  queryKey: ["todos"],
-  queryFn: async () => {
-    const response = await axios.get("/todos");
-    return response.data;
-  },
-});
-
-if (isPending) return <div>Loading...</div>;
-if (isError) return <div>Error occurred</div>;
-
+font-optimization/
+ ┣ index.html
+ ┣ style.css
+ ┗ fonts/
+    ┣ Pretendard-Regular.woff2
+    ┗ NotoSansKR-Regular.woff2
 ```
 
-### 3. 데이터 변경: useMutation
+---
 
-데이터를 생성, 수정, 삭제할 때는 `useMutation`을 사용합니다.
+### 1.3 HTML 기본 구성
 
-```jsx
-const queryClient = useQueryClient();
-
-const { mutate } = useMutation({
-  mutationFn: async (newTodo) => {
-    return await axios.post("/todos", newTodo);
-  },
-  onSuccess: () => {
-    // todos 쿼리를 무효화하여 자동 리페칭 트리거
-    queryClient.invalidateQueries(["todos"]);
-  },
-});
-
-// 사용
-const handleSubmit = (content) => {
-  mutate({ content });
-};
-
+```html
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>폰트 최적화 실습</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <h1>폰트 최적화 실습 🎨</h1>
+    <p>
+      이 문장은 Pretendard 폰트로 렌더링됩니다. 
+      폰트 로딩 과정을 직접 관찰합니다.
+    </p>
+  </body>
+</html>
 ```
 
-### 4. 자동 데이터 동기화
+---
 
-`invalidateQueries`의 강력함은 여러 컴포넌트에서 드러납니다.
+### 1.4 CSS 연결 확인
 
-```jsx
-// 컴포넌트 A: Todo 목록 표시
-function TodoList() {
-  const { data: todos } = useQuery({
-    queryKey: ["todos"],
-    queryFn: fetchTodos,
-  });
-  // ...
-}
-
-// 컴포넌트 B: Todo 추가 폼
-function TodoForm() {
-  const queryClient = useQueryClient();
-
-  const { mutate } = useMutation({
-    mutationFn: addTodo,
-    onSuccess: () => {
-      // 이 한 줄로 모든 컴포넌트의 todos가 자동 갱신됨
-      queryClient.invalidateQueries(["todos"]);
-    },
-  });
-  // ...
-}
-
-```
-
-## 핵심 개념: 쿼리 생명주기
-
-TanStack Query의 효율성은 정교한 생명주기 관리에서 나옵니다.
-
-### 쿼리 상태
-
-| 상태 | 설명 | 발생 시점 |
-| --- | --- | --- |
-| fresh | 데이터가 최신 상태 | staleTime이 지나지 않음 |
-| stale | 데이터가 오래됨, 리페칭 필요 | staleTime이 경과 |
-| fetching | 데이터를 가져오는 중 | API 호출 진행 중 |
-| inactive | 사용되지 않는 쿼리 | 컴포넌트 언마운트 |
-| deleted | 캐시에서 제거됨 | gcTime 경과 후 |
-
-### 데이터 흐름 시나리오
-
-**시나리오 1: 최초 데이터 로드**
-
-1. 컴포넌트 마운트 → `useQuery` 실행
-2. 캐시 확인 → 데이터 없음
-3. `queryFn` 실행 (`isPending = true`)
-4. 데이터 수신 → 캐시 저장 → 리렌더링
-5. UI에 데이터 표시
-
-**시나리오 2: 동일 데이터 재요청 (SWR 전략)**
-
-1. 다른 컴포넌트에서 동일 `queryKey`로 `useQuery` 호출
-2. 캐시 데이터 즉시 반환 (빠른 UI 표시)
-3. 동시에 백그라운드에서 `queryFn` 실행 (데이터 최신화)
-4. 새 데이터 도착 → 캐시 갱신 → 필요시 리렌더링
-
-**시나리오 3: 데이터 변경 후 동기화**
-
-1. `mutate` 함수 호출 (데이터 추가/수정/삭제)
-2. 서버 요청 성공 → `onSuccess` 콜백 실행
-3. `invalidateQueries` 호출
-4. 해당 쿼리를 사용하는 모든 컴포넌트 자동 리페칭
-5. 최신 데이터로 UI 갱신
-
-## 필수 설정 옵션
-
-### 시간 관련 옵션
-
-```jsx
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 60 * 1000, // 1분 동안 fresh 상태 유지
-      gcTime: 5 * 60 * 1000, // 5분 후 캐시 삭제
-    },
-  },
-});
-```
-
-**staleTime vs gcTime**
-
-| 옵션 | 기본값 | 의미 | 용도 |
-| --- | --- | --- | --- |
-| `staleTime` | 0ms | 데이터가 fresh한 시간 | 불필요한 리페칭 방지 |
-| `gcTime` | 5분 | 캐시 보관 시간 | 메모리 관리 |
-
-### 자동 리페칭 제어
-
-```jsx
-useQuery({
-  queryKey: ["todos"],
-  queryFn: fetchTodos,
-  refetchOnMount: true,        // 컴포넌트 마운트 시
-  refetchOnWindowFocus: true,  // 윈도우 포커스 시
-  refetchOnReconnect: true,    // 네트워크 재연결 시
-});
-```
-
-### 에러 처리
-
-```jsx
-useQuery({
-  queryKey: ["todos"],
-  queryFn: fetchTodos,
-  retry: 3, // 실패 시 3번 재시도
-  retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
-});
-```
-
-## 고급 기능
-
-### 1. 조건부 쿼리 실행
-
-```jsx
-function UserProjects({ userId }) {
-  // userId가 있을 때만 쿼리 실행
-  const { data } = useQuery({
-    queryKey: ["projects", userId],
-    queryFn: () => fetchProjects(userId),
-    enabled: !!userId, // userId가 falsy면 쿼리 실행 안 함
-  });
+```css
+body {
+  background: #fafafa;
+  color: #222;
+  font-family: sans-serif;
 }
 ```
 
-### 2. 종속 쿼리
+> Visual Studio Code에서 **“Open with Live Server”** 로 실행 후 페이지를 확인한다.
 
-```jsx
-// 1. 먼저 사용자 정보 가져오기
-const { data: user } = useQuery({
-  queryKey: ["user"],
-  queryFn: fetchUser,
-});
+---
 
-// 2. 사용자 정보가 있으면 프로젝트 가져오기
-const { data: projects } = useQuery({
-  queryKey: ["projects", user?.id],
-  queryFn: () => fetchProjects(user.id),
-  enabled: !!user?.id, // user 데이터가 있을 때만 실행
-});
-```
+## 2) 폰트 포맷 비교
 
-### 3. 데이터 변형 (select)
+| 포맷                              | 특징                    | 장점                  | 주의점                  |
+| ------------------------------- | --------------------- | ------------------- | -------------------- |
+| **TTF (TrueType Font)**         | 데스크탑용 기본 폰트 포맷        | 높은 호환성              | 용량 큼, 웹 비최적화         |
+| **OTF (OpenType Font)**         | TTF 기반 + 고급 타이포그래피 기능 | 다양한 글자 조합, 인쇄 품질 우수 | 웹 성능 비효율             |
+| **WOFF (Web Open Font Format)** | 웹 전용 압축 포맷            | 압축 + 호환성            | WOFF2보다 비효율적         |
+| **WOFF2**                       | WOFF 개선판, 최신 브라우저 지원  | 압축률 높음, 웹 표준        | 구형 브라우저(IE11 이하) 미지원 |
 
-```jsx
-const { data: username } = useQuery({
-  queryKey: ["user"],
-  queryFn: fetchUser,
-  select: (user) => user.name, // 원본 데이터에서 name만 추출
-});
+> **결론:** 웹에서는 **WOFF2** 포맷이 기본 표준이다.
+> TTF 또는 OTF는 직접 사용하지 말고 변환 후 사용하는 것이 권장된다.
 
-// 캐시에는 전체 user 객체가 저장되고
-// 컴포넌트에는 name만 전달됨
-```
+---
 
-### 4. Optimistic Updates
+## 3) 웹 폰트 로드 방식 이해
 
-사용자 경험을 극대화하기 위해 서버 응답 전에 UI를 먼저 업데이트합니다.
+웹 폰트를 로드하는 대표적인 방식은 두 가지이다.
 
-```jsx
-const { mutate } = useMutation({
-  mutationFn: updateTodo,
-  onMutate: async (newTodo) => {
-    // 진행 중인 리페칭 취소
-    await queryClient.cancelQueries(["todos"]);
+### A. 로컬 폰트 파일 직접 사용
 
-    // 이전 데이터 백업
-    const previousTodos = queryClient.getQueryData(["todos"]);
-
-    // Optimistic Update
-    queryClient.setQueryData(["todos"], (old) => [...old, newTodo]);
-
-    return { previousTodos };
-  },
-  onError: (err, newTodo, context) => {
-    // 에러 발생 시 롤백
-    queryClient.setQueryData(["todos"], context.previousTodos);
-  },
-  onSettled: () => {
-    // 성공/실패 관계없이 최종 동기화
-    queryClient.invalidateQueries(["todos"]);
-  },
-});
-```
-
-## 상태 비교: isPending vs isFetching
-
-이 두 상태의 차이를 이해하는 것이 중요합니다.
-
-| 상황 | isPending | isFetching | 설명 |
-| --- | --- | --- | --- |
-| 최초 로딩 | `true` | `true` | 캐시 없음, 데이터 가져오는 중 |
-| 백그라운드 리페칭 | `false` | `true` | 캐시 있음, 업데이트 중 |
-| 데이터 표시 | `false` | `false` | 데이터 사용 가능 |
-
-```jsx
-function Todos() {
-  const { data, isPending, isFetching } = useQuery({
-    queryKey: ["todos"],
-    queryFn: fetchTodos,
-  });
-
-  // 최초 로딩
-  if (isPending) return <div>Loading...</div>;
-
-  return (
-    <div>
-      {/* 백그라운드 업데이트 표시 */}
-      {isFetching && <span>Updating...</span>}
-
-      {/* 데이터 표시 */}
-      {data.map(todo => <TodoItem key={todo.id} todo={todo} />)}
-    </div>
-  );
+```css
+@font-face {
+  font-family: 'Pretendard';
+  src: url('./fonts/Pretendard-Regular.woff2') format('woff2');
+  font-display: swap;
 }
 ```
 
-## 실전 예제: 완전한 Todo 앱
+* `font-family`: 웹에서 사용할 이름 정의
+* `src`: 실제 폰트 파일 경로 및 형식 지정
+* `format('woff2')`: 브라우저에 파일 형식 명시
+* `font-display: swap`: 로딩 중 시스템 폰트를 표시 후 교체
 
-```jsx
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
+**장점**
 
-// API 함수들
-const fetchTodos = async () => {
-  const { data } = await axios.get("/api/todos");
-  return data;
-};
+* 파일 직접 제어 가능 (서브셋, 캐싱 전략 적용)
+* 외부 네트워크 의존 없음
 
-const addTodo = async (content) => {
-  const { data } = await axios.post("/api/todos", { content });
-  return data;
-};
+**단점**
 
-const deleteTodo = async (id) => {
-  await axios.delete(`/api/todos/${id}`);
-};
+* CDN 캐싱 효과 없음
+* 서버 부하 및 관리 책임 발생
 
-function TodoApp() {
-  const queryClient = useQueryClient();
+---
 
-  // 데이터 조회
-  const { data: todos, isPending, isError } = useQuery({
-    queryKey: ["todos"],
-    queryFn: fetchTodos,
-    staleTime: 30 * 1000, // 30초 동안 fresh
-  });
+### B. 외부 CDN 사용
 
-  // 추가 뮤테이션
-  const addMutation = useMutation({
-    mutationFn: addTodo,
-    onSuccess: () => {
-      queryClient.invalidateQueries(["todos"]);
-    },
-  });
+```html
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css"
+/>
+```
 
-  // 삭제 뮤테이션
-  const deleteMutation = useMutation({
-    mutationFn: deleteTodo,
-    onSuccess: () => {
-      queryClient.invalidateQueries(["todos"]);
-    },
-  });
+**장점**
 
-  const handleAdd = (content) => {
-    addMutation.mutate(content);
-  };
+* 자동 압축 및 전역 캐싱
+* 빠른 적용 가능
 
-  const handleDelete = (id) => {
-    deleteMutation.mutate(id);
-  };
+**단점**
 
-  if (isPending) return <div>Loading...</div>;
-  if (isError) return <div>Error loading todos</div>;
+* 외부 의존성 존재
+* 폰트 수정 및 서브셋 작업 어려움
 
-  return (
-    <div>
-      <TodoForm onSubmit={handleAdd} />
-      <TodoList
-        todos={todos}
-        onDelete={handleDelete}
-        isDeleting={deleteMutation.isPending}
-      />
-    </div>
-  );
+---
+
+### C. 결론
+
+| 구분         | 장점                   | 단점       | 권장 상황          |
+| ---------- | -------------------- | -------- | -------------- |
+| **로컬 관리**  | 커스터마이징 용이, 성능 최적화 가능 | 직접 관리 필요 | 서비스 품질에 민감한 경우 |
+| **CDN 사용** | 손쉬운 적용, 유지보수 편리      | 외부 의존성   | 초기 구축 또는 프로토타입 |
+
+---
+
+## 4) 폰트 로딩 구조 및 `font-display` 동작
+
+브라우저는 텍스트 렌더링 시 폰트 로딩 상태에 따라 **FOIT(Flash of Invisible Text)** 또는 **FOUT(Flash of Unstyled Text)** 현상을 보인다.
+
+| 값        | 동작 방식               | 특징             |
+| -------- | ------------------- | -------------- |
+| auto     | 브라우저 기본 동작          | 브라우저마다 다름      |
+| block    | 로드 전 텍스트 숨김 → 이후 교체 | FOIT 발생 가능     |
+| swap     | 시스템 폰트 표시 후 교체      | UX 향상, 현대적 기본값 |
+| fallback | 짧은 block 후 swap     | 대부분 상황에서 권장    |
+| optional | 느리면 시스템 폰트 유지       | 저속 네트워크에 적합    |
+
+> 💡 실무에서는 `font-display: swap;` 속성이 가장 널리 사용된다.
+
+---
+
+## 5) DevTools를 통한 로딩 타이밍 분석
+
+1. Chrome DevTools → **Network 탭 → Filter “Fonts”**
+2. 페이지 새로고침 후 `Pretendard-Regular.woff2` 요청 시점 관찰
+3. **Throttling**을 “3G”로 설정하여 느린 네트워크 환경 시뮬레이션
+4. `font-display`별 렌더링 차이 비교
+
+| 설정       | 관찰 결과                        |
+| -------- | ---------------------------- |
+| swap     | 시스템 폰트로 즉시 표시 후 교체 (FOUT 발생) |
+| block    | 로딩 전 텍스트 미표시 (FOIT 발생)       |
+| fallback | 짧은 숨김 후 교체                   |
+| optional | 폰트 느릴 시 교체 생략                |
+
+---
+
+## 6) 폰트 포맷 변환 및 용량 최적화
+
+### 6.1 변환 방법
+
+#### (A) 온라인 변환 — Transfonter.org
+
+1. [https://transfonter.org](https://transfonter.org) 접속
+2. `.ttf` 업로드 후 출력 포맷으로 **WOFF2** 선택
+3. 변환 후 `fonts/` 폴더에 저장
+
+#### (B) CLI 변환 — macOS
+
+```bash
+brew install woff2
+woff2_compress NotoSansKR-Regular.ttf
+```
+
+결과: `NotoSansKR-Regular.woff2` 생성
+
+---
+
+### 6.2 용량 비교 예시
+
+| 포맷    | 용량    |
+| ----- | ----- |
+| TTF   | 6.2MB |
+| WOFF2 | 2.1MB |
+
+> ➜ 약 **3배 압축률 확보**, 로딩 및 렌더링 시간 단축
+
+---
+
+## 7) 폰트 서브셋(Subsetting)
+
+### 7.1 개념
+
+전체 폰트에서 실제 사용하는 글자만 포함하여 **용량을 줄이는 기법**.
+
+### 7.2 한글 조합 수
+
+* 초성(19) × 중성(21) × 종성(28) = **11,172자**
+* 불필요한 문자를 제거하면 최대 **60~70% 용량 절감 가능**
+
+### 7.3 서브셋 도구
+
+* [https://t.hi098123.com/font-subset](https://t.hi098123.com/font-subset)
+* 선택한 글자만 포함하는 **WOFF2 파일 생성 가능**
+
+### 7.4 사례
+
+| 구분     | 파일                       | 용량    |
+| ------ | ------------------------ | ----- |
+| 전체 폰트  | Pretendard-Regular.woff2 | 766KB |
+| 서브셋 폰트 | Pretendard-Subset.woff2  | 267KB |
+
+> ➜ 약 **3배 감소 (LCP 및 초기 렌더링 개선)**
+
+---
+
+## 8) Preload를 통한 로딩 우선순위 제어
+
+### 8.1 기본 방식
+
+```html
+<link href="./fonts/Pretendard-Regular.woff2" rel="stylesheet">
+```
+
+> CSS 파싱 후 로드되므로 폰트 다운로드가 지연될 수 있다.
+
+### 8.2 Preload 적용
+
+```html
+<link
+  rel="preload"
+  href="./fonts/Pretendard-Regular.woff2"
+  as="font"
+  type="font/woff2"
+  crossorigin="anonymous"
+/>
+```
+
+**장점**
+
+* HTML 파싱 중 폰트 다운로드 시작
+* 렌더링 차단 최소화
+* 캐시 활용으로 중복 다운로드 없음
+
+| 구분        | preload 사용   | preload 미사용 |
+| --------- | ------------ | ----------- |
+| 다운로드 시점   | HTML 파싱 중 즉시 | CSS 해석 후    |
+| 렌더링 차단    | 없음           | 일부 지연       |
+| 초기 텍스트 표시 | 빠름           | 늦음          |
+
+---
+
+## 9) 불필요한 폰트 굵기 제거
+
+Pretendard CSS에는 **100~900**까지 모든 `font-weight`가 정의되어 있다.
+프로젝트에서 실제 사용하는 굵기(예: 400, 500, 600, 700)만 남기면 리소스 낭비를 줄일 수 있다.
+
+```css
+/* Regular 400 */
+@font-face {
+  font-family: 'Pretendard';
+  font-weight: 400;
+  font-display: swap;
+  src: url('./fonts/Pretendard-Regular.woff2') format('woff2');
+}
+
+/* Medium 500 */
+@font-face {
+  font-family: 'Pretendard';
+  font-weight: 500;
+  font-display: swap;
+  src: url('./fonts/Pretendard-Medium.woff2') format('woff2');
+}
+
+/* SemiBold 600 */
+@font-face {
+  font-family: 'Pretendard';
+  font-weight: 600;
+  font-display: swap;
+  src: url('./fonts/Pretendard-SemiBold.woff2') format('woff2');
+}
+
+/* Bold 700 */
+@font-face {
+  font-family: 'Pretendard';
+  font-weight: 700;
+  font-display: swap;
+  src: url('./fonts/Pretendard-Bold.woff2') format('woff2');
 }
 ```
 
-## 결론
+> `preload`로 다운로드된 파일은 브라우저 캐시에 저장되므로, CSS에서 같은 파일을 다시 요청하더라도 **중복 다운로드는 발생하지 않는다.**
 
-### 배운 점
+---
 
-**1. 서버 상태는 클라이언트 상태와 다르다**
+## 10) 구형 브라우저 호환 설정
 
-- 비동기적이고, 공유되며, 시간에 민감한 특성을 가집니다
-- 이를 일반 상태 관리 도구로 다루면 복잡도가 증가합니다
-
-**2. 적절한 도구 선택의 중요성**
-
-- useEffect: 간단한 일회성 요청
-- Redux: 복잡한 클라이언트 상태 관리
-- TanStack Query: 서버 상태 관리
-
-### TanStack Query를 사용해야 하는 경우
-
-- 여러 컴포넌트에서 동일한 API 데이터를 공유해야 하는 경우
-- 자주 변경되거나 실시간성이 중요한 데이터를 다뤄야 하는 경우 (예: 주기적 갱신)
-- 서버 데이터 캐싱을 통해 네트워크 요청을 최소화하고 성능을 개선하고 싶은 경우
-- 복잡한 데이터 동기화 로직을 단순화하고 싶은 경우
-- Optimistic Update(낙관적 업데이트)가 필요한 경우
-- 네트워크 상태나 포커스 변화에 따른 자동 재요청/재시도가 필요한 경우
-
-### 마이그레이션 전략
-
-기존 프로젝트에 TanStack Query를 도입할 때는 점진적 접근이 효과적입니다.
-
-1. 가장 복잡한 데이터 패칭 로직부터 적용
-2. 자주 사용되는 공유 데이터에 적용
-3. 나머지 API 호출을 점진적으로 마이그레이션
-
-### 성능 고려사항
-
-```jsx
-// 너무 짧은 staleTime
-staleTime: 0 // 매번 리페칭 (기본값)
-
-// 데이터 특성에 맞는 staleTime 설정
-staleTime: 5 * 60 * 1000 // 자주 변하지 않는 데이터 (5분)
-staleTime: 30 * 1000      // 자주 변하는 데이터 (30초)
+```css
+@font-face {
+  font-family: 'Pretendard';
+  font-weight: 400;
+  font-display: swap;
+  src: 
+    url('./Pretendard-Regular.woff2') format('woff2'),
+    url('./Pretendard-Regular.woff') format('woff'),
+    url('./Pretendard-Regular.ttf') format('truetype');
+}
 ```
 
-TanStack Query는 단순한 데이터 패칭 도구를 넘어, 서버 상태 관리의 모범적인 패턴을 제공합니다. 복잡한 비동기 처리에 얽매이지 않고, 핵심 비즈니스 로직에 집중할 수 있도록 도와줍니다.
+브라우저는 상단부터 순차적으로 지원 여부를 검사하여 가능한 첫 번째 포맷을 선택한다.
+
+* 최신 브라우저: **WOFF2 사용**
+* 구형 브라우저: **WOFF 또는 TTF로 폴백(fallback)**
