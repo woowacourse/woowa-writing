@@ -1,31 +1,32 @@
-# 외부 API 최종적 일관성 보장 포기하기
+# 외부 API의 일관성 대신 지속 가능한 가용성 확보하기
 
 ## 예상 독자
-- 외부 API 의존도가 높은 서비스를 개발하는 백엔드 개발자
+- 외부 API 의존도가 높은 서비스를 개발하는 개발자
 - 시스템 안정성과 장애 대응에 관심 있는 개발자
-- 트랜잭션 아웃박스 패턴과 DLQ 적용을 고민하는 개발자
+- 트랜잭션 아웃박스 패턴과 DLQ 적용이 무엇인지 궁금한 개발자
 
-## 개요
-TIL(Today I Learned) 플랫폼에 AI 기반 태그 추천 기능을 도입하면서 외부 API 장애로 인한 데이터 정합성 불일치가 발생했습니다. 이 글에서는 Transactional Outbox Pattern, Failover, DLQ를 단계적으로 도입해 시스템 가용성을 높인 과정을 소개합니다.
+## 배경
+TIL(Today I Learned) 플랫폼에 AI 기반 태그 추출 기능을 도입하면서 외부 API 장애로 인한 데이터 정합성 불일치가 발생했습니다.   
+이 글에서는 기능의 데이터 정합성 문제를 해결하기 위한 여러 패턴들을 점진적으로 도입하며 가용성까지 고려한 과정을 소개합니다.
 
 ---
 
 ## 문제 상황
 
-사용자가 TIL을 작성하면 OpenAI나 Claude 같은 AI 서비스가 적절한 태그를 자동으로 추천하는 기능을 운영했습니다. 그러나 다음의 문제가 발생했습니다.
+과거 사용자가 TIL을 작성하면 OpenAI나 Claude 같은 AI 서비스가 적절한 태그를 자동으로 추천하는 기능을 구현했습니다. 그러나 시간이 지나며 다음의 문제가 발생했습니다.
 
 - **AI 서비스 장애 시 태그가 생성되지 않음**
 - **태그가 없어 유저 작성 TIL의 태그 기반 검색이 불가능**
 
 조사 결과, 간헐적 실패의 원인은 두 가지였습니다.
 
-1. OpenAI 서버 다운
+1. AI 서비스의 서버 다운
 2. API 할당량 초과
 
-![OpenAI 서버 상태](https://velog.velcdn.com/images/praisebak/post/7c8f375d-2dbc-4d9d-8b51-b5ff01cc5cb8/image.png)
+![AI 서버 상태](https://velog.velcdn.com/images/praisebak/post/7c8f375d-2dbc-4d9d-8b51-b5ff01cc5cb8/image.png)
 
-특정 외부 API는 예상보다 자주 장애가 발생했고, 이로 인해 서비스를 이용하던 사용자는 검색 기능을 사용할 수 없었습니다.
-기능 **최종적 일관성**을 보장할 수 있는 방법이 필요합니다.
+특정 외부 API는 예상보다 자주 장애가 발생했고, 이로 인해 서비스를 이용하던 사용자는 관련 기능을 사용할 수 없었습니다.   
+이에 기능의 가용성을 확보할 방법이 필요합니다.
 
 ---
 
@@ -33,55 +34,66 @@ TIL(Today I Learned) 플랫폼에 AI 기반 태그 추천 기능을 도입하면
 
 ### 핵심 요구사항
 - **TIL 저장은 AI 서비스 장애와 무관하게 성공해야 합니다**
-- **태그는 결과적으로 생성되어야 합니다**
+- **태그는 TIl 저장과 동시에 저장되진 않더라도 결과적으로는 생성되어야 합니다**
+- **실패시 이유 등을 알 수 있어야합니다.**
 
-이를 위해 세 가지 방어선을 단계적으로 설계했습니다.
+### 요구사항 요약
+위 요구사항을 요약해보겠습니다.   
+-  외부 API의 가용성 확보
+-  실패시 모니터링 용이
 
-### 1단계: Transactional Outbox Pattern
-외부 API 호출이 실패하면 그 요청을 DB에 저장해두고, 백그라운드 스케줄러가 주기적으로 재시도하는 패턴입니다. 서버가 재시작되어도 DB에 저장된 요청은 사라지지 않으므로, 결과적으로 태그가 생성됨을 보장할 수 있습니다.
+### 가용성 확보
+#### 가용성이란?
+가용성은 다음을 말합니다.
+> 서버와 네트워크, 프로그램 등의 정보 시스템이 정상적으로 사용 가능한 정도
 
-### 2단계: Failover
-하나의 AI 서비스(OpenAI)가 실패하면 즉시 다른 AI 서비스(Claude)로 전환하는 방식입니다. 주 서비스에 문제가 생겨도 대체 서비스로 기능을 계속 제공할 수 있어 가용성이 높아집니다.
+#### 가용성을 위해 시도할 수 있는 방법들
+1. 최종적 일관성
+- 당장은 아니어도, 나중에라도 기능이 성공하도록 하는 방법입니다.
+2. 대체 경로 확보
+- 현재 경로가(API 등) 실패하는 경우 대체 경로로 시도하는 방법입니다.
 
-### 3단계: DLQ (Dead Letter Queue)
-Outbox Pattern과 Failover를 모두 거쳤는데도 실패한 메시지를 별도 저장소에 격리하는 방식입니다. 이 경우 자동 복구가 불가능하므로, 개발자에게 Slack 알람을 보내 수동 조치를 유도합니다. DLQ에는 에러 메시지와 스택 트레이스가 함께 저장되어 빠른 원인 분석이 가능합니다.
+### 실패시 모니터링 용이
+- 모든 가용성 방법들이 실패하여 수동으로 개발자가 처리해야하는 경우입니다.   
+- 실패한 원인 등을 모니터링할 수 있도록 격리가 필요합니다.   
+
+이제 요구사항에 대해 정리해보았으니 서비스 요구사항에 적용해봅시다!
 
 ---
 
-## 1단계: 트랜잭션 아웃박스 패턴(Transactional Outbox Pattern) 도입
+### 다시보는 요구사항
+- **1. TIL 저장은 AI 서비스 장애와 무관하게 성공해야 합니다**
+- **2. 태그는 TIl 저장과 동시에 저장되진 않더라도 결과적으로는 생성되어야 합니다**
+- **3. 실패시 현황을 알 수 있어야합니다.**
 
-### 왜 트랜잭션 아웃박스 패턴이 필요한가?
-- TIL 생성에 성공한뒤 외부 API에 의한 태그 생성이 실패하는 경우, 데이터 정합성이 불일치합니다.
-- 태그 생성에 대해 **최종적 일관성**을 보장하기 위해 트랜잭션 아웃박스 패턴을 도입합니다.
-
-### 트랜잭션 아웃박스 패턴이란?
+## Transactional Outbox Pattern 도입
+### Transactional Outbox Pattern이란?
 ![](https://velog.velcdn.com/images/praisebak/post/0abd72eb-fda4-49bd-bde7-c813cf1f34a2/image.png)
 
 출처 : https://microservices.io/
 
-microservices.io에 따르면 다음과 같은 것을 트랜잭션 아웃박스라고 합니다.
+microservices.io에 따르면 다음을 트랜잭션 아웃박스 패턴이라고 합니다.
 
 > The solution is for the service that sends the message to first store the message in the database as part of the transaction that updates the business entities. A separate process then sends the messages to the message broker.
 
-번역 : 메시지를 전송하는 서비스가 비즈니스 엔티티를 업데이트하는 트랜잭션의 일부로서, 먼저 메시지를 데이터베이스에 저장하는 것이다.
-그 후, 별도의 프로세스가 데이터베이스에 저장된 메시지를 메시지 브로커로 전송한다.
+메시지를 전송하는 서비스가 비즈니스 엔티티를 업데이트하는 트랜잭션의 일부로서, 먼저 메시지를 데이터베이스에 저장합니다.
+그 후, 별도의 프로세스가 데이터베이스에 저장된 메시지를 메시지 브로커로 전송합니다.
 
-간단하게는, 메시지 전송(외부 api 호출)시에 메시지 그 자체를 데이터베이스에 저장하고, 이후에 전송한다고 볼 수 있습니다.
+간단하게는, 메시지 전송(외부 api 호출)시에 메시지 그 자체를 데이터베이스에 저장하고 추후에 전송하는 패턴이라고 설명할 수 있습니다.
 
-### 메시지 브로커를 써야하나요?
-- 해당 글에서는 메시지 브로커를 **스케줄링 + 주기적 polling** 방식으로 간소화시켜 같은 효과를 내보겠습니다.
+### 왜 Transactional Outbox이 필요한가?
+- TIL 생성에 성공한뒤 외부 API에 의한 태그 생성이 실패하는 경우 추후에 재시도할 방법이 필요합니다.
+- 여기서는 태그 생성에 대해 **최종적 일관성**을 보장하기 위해 트랜잭션 아웃박스 패턴을 도입합니다.
 
-### 재시도로는 최종적 일관성이 해소되지 않나요?
-재시도 방식은 서버가 재시작되는 순간 실패한 요청이 완전히 휘발되는 문제가 있었습니다.   
-따라서 최종적 일관성을 보장하려면 재시도 정보가 영구 저장되어야 합니다. 이것이 **트랜잭션 아웃박스 패턴**을 도입한 이유입니다.
+### 재시도로는 최종적 일관성을 확보할 수 없나요?
+- 단순 재시도는 서버가 재시작되는 순간 실패한 요청이 완전히 휘발되는 문제가 있었습니다.   
+- 최종적 일관성을 보장하려면 재시도 정보가 영구 저장되어야 합니다. 이것이 **Transactional Outbox**를 도입한 이유입니다.
 
-
-### TagCreationOutboxEvent 엔티티
+### TagCreationOutboxEvent Entity
 이제 본격적으로 트랜잭션 아웃박스 패턴을 구현해보겠습니다.
 
-트랜잭션 아웃박스 패턴을 위해 `재시도에 필요한 정보`와, `요청 상태`가 필요합니다.
+Transactional Outbox 패턴을 위해 `재시도에 필요한 정보`와, `요청 상태`가 필요합니다.
 다음 엔티티로 자세히 알아보겠습니다.
-
 
 ```java
 @Entity
@@ -105,20 +117,7 @@ public class TagCreationOutboxEvent extends BaseEntity {
     @Column(name = "status", nullable = false)
     private OutboxEventStatus status;
 
-    @Column(name = "retry_count", nullable = false)
-    @Builder.Default
-    private Integer retryCount = 0;
-
-    @Column(name = "scheduled_at", nullable = false)
     private LocalDateTime scheduledAt;
-
-    public void incrementRetryCount() {
-        this.retryCount++;
-    }
-
-    public boolean canRetry() {
-        return retryCount < 2 && status == OutboxEventStatus.FAILED;
-    }
 }
 ```
 
@@ -127,14 +126,13 @@ public class TagCreationOutboxEvent extends BaseEntity {
 
 상세 필드 설명:
 - **status**: 이벤트 처리 상태 추적 (PENDING, PROCESSING, COMPLETED, FAILED)
-- **retryCount**: 재시도 횟수 제한 (최대 2회)
-- **scheduledAt**: 다음 재시도 스케줄링을 위한 이전 스케줄링 시도 측정
+- **scheduledAt**: 언제 스케줄링 되었는지 기록
 
 
 ### 스케줄러 구현
 
 ```java
-@Scheduled(fixedDelay = 30000) // 30초마다
+@Scheduled(fixedDelay = 30_MIN)
 @Transactional
 public void processPendingEvents() {
     List<TagCreationOutboxEvent> pendingEvents = 
@@ -145,13 +143,14 @@ public void processPendingEvents() {
             processEvent(event.getId());
         } catch (Exception e) {
             log.error("Failed to process pending event {}", event.getId(), e);
+            throw e;
         }
     }
 }
 
 ```
 
-30초마다 대기 중인 이벤트를 처리합니다.
+30초마다 대기 중인 이벤트를 처리하게 합니다.
 
 ### 이벤트 저장 구현
 태그 생성 이벤트를 Outbox에 저장해줍니다.
@@ -176,24 +175,25 @@ public void scheduleTagCreation(TilCreatedEvent tilCreatedEvent) {
         log.info("Tag creation scheduled for TIL {}", tilCreatedEvent.getTilId());
 }
 ```
-이제 외부 api가 실패하는 경우에도 안전하게 영구적으로 이벤트를 저장함으로써
-**최종적 일관성**을 보장할 수 있습니다.
+
+- 이제 외부 api가 실패하는 경우에도 안전하게 영구적으로 이벤트를 저장하고
+  주기적으로 스케줄링하여 실행함으로써 **최종적 일관성**을 보장할 수 있습니다.
 
 ---
 
-## 2단계: Failover 시스템 구축
-지금까지 구현으로는 장기간 API 서버 자체가 다운된 경우 대응할 수 없습니다.   
-이런 **단일장애지점**을 없애기 위해 여러 AI 서비스를 순차적으로 시도하는 Failover 기반의 외부 API 시스템을 구축해봅시다.
+## Failover를 통한 대체 경로 확보
+지금까지 구현으로는 장기간 API 서버 자체가 다운된 경우 성공까지 많은 시간이 걸릴 것입니다.
+이런 **단일 병목,장애 지점**을 없애기 위하여 여러 AI API를 순차적으로 시도하도록 외부 API 시스템에 적용해봅시다.
 
 ### Failover란?
 ![](https://velog.velcdn.com/images/praisebak/post/029ea49b-0b8b-46c3-afb1-a59883377405/image.png)
-- failover는 실패하면, 다른 대체 경로로 요청을 하는 방식을 말합니다.
-- 해당 글에서는 open ai 요청이 실패하면, claude ai를 요청하도록 failover하는 것을 설계 목표로 합니다.
+- Failover는 실패하면, 다른 대체 경로로 요청을 하는 방식을 말합니다.
+- 해당 글에서는 OpenAI API 요청이 실패하면, Claude API를 요청하도록 Failover하도록 구현하겠습니다.
 
 사진 출처 : https://velog.io/@zxcvbnm5288/%ED%8E%98%EC%9D%BC%EC%98%A4%EB%B2%84Failover%EC%99%80-%ED%8E%98%EC%9D%BC%EB%B0%B1Failback
 
 ### AIClient 인터페이스 설계
-먼저 공통적으로 ai 클라이언트를 아우를 수 있는 인터페이스를 구현합시다.
+먼저 AI 클라이언트를 나타낼 인터페이스를 구현합시다.
 
 ```java
 public interface AIClient {
@@ -204,8 +204,8 @@ public interface AIClient {
 }
 ```
 
-### FailoverAIServiceManager 구현
-이제 위 인터페이스를 차례대로 호출하고 실패하면 failover 하도록 구현합시다.
+### AIService 구현
+`AIClient` 인터페이스를 구현한 구현체들을 차례대로 호출하도록 구현합니다.
 
 ```java
 public String callAIWithSimpleFallback(
@@ -214,18 +214,11 @@ public String callAIWithSimpleFallback(
 ) {
     for (AIClient client : aiClients) {
         try {
-            log.info("Attempting to call {} API", client.getClientName());
-            String result = client.callAI(messages, functionDefinition);
-            log.info("Successfully called {} API", client.getClientName());
-            return result;
+            return client.callAI(messages, functionDefinition);
 
         } catch (Exception e) {
             log.warn("Failed to call {} API: {}", 
                      client.getClientName(), e.getMessage());
-            if (isLastClient(client)) {
-                throw new RuntimeException("All AI services failed", e);
-            }
-            log.info("Trying next AI service");
         }
     }
 
@@ -233,35 +226,16 @@ public String callAIWithSimpleFallback(
 }
 ```
 
-테스트를 위해 openai client가 항상 예외를 반환하도록하여 테스트해보았습니다
-
-### 테스트 실행 로그
-
-```
-2025-07-15 10:30:15 INFO  FailoverAIServiceManager - Attempting to call openai API
-2025-07-15 10:30:16 WARN  FailoverAIServiceManager - Failed to call openai API: Connection timeout
-2025-07-15 10:30:16 INFO  FailoverAIServiceManager - Trying next AI service
-2025-07-15 10:30:16 INFO  FailoverAIServiceManager - Attempting to call Claude API
-2025-07-15 10:30:17 INFO  FailoverAIServiceManager - Successfully called Claude API
-```
-
-
-## 결과
-### 지금까지의 전체 구조
-전체 구조는 다음과 같습니다.
-![전체 플로우](https://velog.velcdn.com/images/praisebak/post/ca07ceb1-a06f-4f5e-9c58-5cf6ae87fcdb/image.png)
-
 ---
 
-## 3단계: DLQ로 최종 방어선 구축
-지금까지 트랜잭션 아웃박스 패턴과 failover로 실패하는 경우 재시도하는 방식으로 **최종적 일관성**을 보장했습니다.
-하지만 개발자는 트랜잭션 아웃박스 등으로 최종적 일관성을 보장한다는 것만 알지, 왜 실패했는지를 알지 못하는 상태입니다.
-외부 API에 대한 상태 관리가 중요한 경우 이는 문제가 생길 수 있습니다.
-해당 글에서는 **DLQ 패턴(Dead Letter Queue)**을 통해 실패한 이벤트를 잘 관리하는 방법에 대해서 알아보겠습니다.
+## Dead Letter Queue를 이용한 모니터링 용이
+지금까지 구현한 방식으로 가용성을 확보했습니다.
+하지만 장기간 장애가 발생한 경우나, 왜 실패했는지 사유 등은 알지 못하는 상태입니다.
+**Dead Letter Queue**를 통해 실패한 이벤트를 격리하여 모니터링을 용이하도록 해보겠습니다.
 
-### DLQ란?
+### Dead Letter Queue
 
-DLQ(Dead Letter Queue)는 처리하지 못한 메시지를 별도로 저장하는 특수 큐입니다. 정상 처리되지 않은 메시지를 격리하여 재처리나 분석을 가능하게 합니다.
+Dead Letter Queue(이하 DLQ)는 처리하지 못한 메시지를 별도로 저장하는 특수 큐입니다. 정상 처리되지 않은 메시지를 격리하여 재처리나 분석을 가능하게 합니다.
 
 ### Transactional Outbox Pattern과 DLQ의 차이
 
@@ -273,7 +247,7 @@ DLQ(Dead Letter Queue)는 처리하지 못한 메시지를 별도로 저장하�
 | 알람 | X | O |
 
 즉 DLQ는 실패한 이벤트를 잘 관리하기 위한 패턴입니다.
-최종적 일관성을 보장해주는 트랜잭션 아웃박스 패턴과는 결이 다르다고 볼 수 있습니다.
+최종적 일관성을 보장해주는 트랜잭션 아웃박스 패턴과는 목적이 다르다고 볼 수 있습니다.
 
 ### DLQEvent 엔티티 설계
 
@@ -370,51 +344,46 @@ public void sendAlarmIfNeeded(Long dlqEventId) {
 *Stack Trace:* ...
 ```
 
-알람 메시지에는 로그를 확인하지 않고도 디버깅할 수 있도록 stackTrace, 에러 메시지, 이벤트 정보를 포함했습니다.
-
-## 주의) 오래된 이벤트들 정리
-
-저희는 메시지 브로커가 아닌 데이터베이스를 사용하여 여러 패턴들을 구현했습니다.
-데이터베이스에 영구적으로 저장하다보니 시간이 지나며 여러 이벤트들을 쌓일 수 있습니다.
-한 달 이상 된 이벤트는 자동으로 삭제해줍시다.
-
-다음의 코드는 DLQ를 대상으로 오래된 이벤트를 삭제합니다.
-```java
-@Scheduled(cron = "0 0 3 * * *") // 매일 새벽 3시
-@Transactional
-public void cleanupOldDLQEvents() {
-    LocalDateTime oneMonthAgo = LocalDateTime.now().minusMonths(1);
-    int deletedCount = dlqEventRepository.deleteOldEvents(oneMonthAgo);
-    log.info("Cleaned up {} old DLQ events", deletedCount);
-}
-```
+알람 메시지에는 로그를 확인하지 않고도 디버깅할 수 있도록 stackTrace, 에러 메시지, 이벤트 정보를 포함합니다.
 
 ## 결론
-지금까지, 실패한 api를 **트랜잭션 아웃박스 패턴**과, **failover**로 최종적 일관성을 보장했습니다.   
-DLQ를 통해 실패하는 이벤트들도 개발자가 인식할 수 있게 합니다.
+지금까지, 실패한 api를 **Transactional Outbox Pattern**과, **Failover**로 최종적 일관성을 보장했습니다.   
+추가적으로 **DLQ**를 통해 실패하는 이벤트들을 개발자가 모니터링할 수 있게 하였습니다.
 
-### 배운 점
 
-1. **애플리케이션 레벨 재시도의 한계**: 무중단 배포나 스케일아웃 환경에서는 메모리 기반 재시도로 가용성을 보장하기 어렵습니다.
-2. **영구 저장소의 필요성**: DB나 메시지 큐처럼 서버가 공유할 수 있는 자원을 사용해야 합니다.
-3. **규모에 따른 선택**: 현재 서비스는 우아한테크코스 크루들에게만 제공되어 DB 기반 Transactional Outbox Pattern을 채택했지만, 처리량이 많아지면 메시지 큐 도입을 고려해야 합니다.
+# 문제
 
-### 한계와 SLA
+## 오래된 이벤트들 정리
+- 해당 글에서는 메시지 브로커가 아닌 데이터베이스를 사용하여 여러 패턴들을 구현했습니다.
+  - 데이터베이스에 영구적으로 저장하다보면 시간이 지나며 데이터베이스에 부담이 될 수 있습니다.
+- 또한 이벤트가 많이 쌓일수 있는 서비스에서는 데이터베이스 병목도 생길 수 있다는 점을 염두해야합니다.
+
+## 중복 실행 문제
+- 분산 환경에서는 중복하여 이벤트를 실행하는 경우도 생길 수 있습니다.
+  - 이를 엄밀하게 관리하기 위해서는 분산락 혹은 멱등성 보장을 보장할 방법을 고려해야합니다.
+
+# 배운 점
+
+1. **애플리케이션 레벨 재시도의 한계**: 무중단 배포나 분산 환경에서는 재시도는 휘발될 수 있습니다. 단순 재시도로는 가용성을 보장하기 어렵습니다.
+2. **영구 저장소의 필요성**: DB나 메시지 큐처럼 분산 서버가 공유할 수 있수 있고 영속성을 제공할 만한 방법을 사용합니다.
+3. **규모에 따른 선택**: 현재는 이벤트 생성 규모를 고려하여 DB 기반 Transactional Outbox 방식을 채택했지만, 처리량이 많아지면 메시지 큐 도입을 고려해야 합니다.
+
+# 결론
 
 3겹 방어(Transactional Outbox + Failover + DLQ)를 구축했지만, Slack API마저 실패하면 알람을 받지 못합니다. 이는 다음의 딜레마로 귀결됩니다.
-
-> 실패를 막기 위한 방어선은 실패할 수 있다.
-
-우리는 해결되지 않는 딜레마 대신에 다음의 질문을 던져야합니다.
-
+> 실패를 막기 위한 방어선도 실패할 수 있다.
 > **해당 기능의 안정성을 위해 얼마나 자원을 투자할 수 있는가?**
 
 아무리 방어선을 많이 두어도,가용성 100%는 불가능에 가깝습니다.
-대신 우리 서비스의 SLA 기준을 세우고 이를 충족하도록 설계하는 것이 이상적입니다.
-
+대신, 우리 서비스의 SLA 기준을 세우고 이를 충족하도록 설계하는 것은 가능합니다.
 ![AWS CloudFront SLA](https://velog.velcdn.com/images/praisebak/post/7652c147-5dfe-4cf6-8757-dce6da6b7f7e/image.png)
 
-예로, AWS CloudFront는 월별 가용성에 따라 요금을 환불하는 SLA를 제공합니다. 이처럼 현실적인 가용성 목표를 설정하고, 이를 달성하기 위한 적절한 방어 전략을 구축하는 것이 중요합니다.
+예로, AWS CloudFront는 월별 가용성에 따라 요금을 환불하는 SLA를 제공합니다. 
+
+해당 고찰로 무작정 기술로 해결할 수 있다고 생각하기보다
+현실적인 목표를 설정하고, 이를 달성하기 위한 적절한 전략을 생각하는것이 개발자가 가야할 방향이 아닐까 생각할 수 있었습니다.
+독자분들도 우리 서비스의 가용성 목표는 어느정도인지 다시 한번 생각해보면 어떨까요? 🤓   
+
 
 ---
 
