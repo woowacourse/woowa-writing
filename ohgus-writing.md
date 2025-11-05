@@ -10,7 +10,7 @@
 
 - `fetch().json()`의 반환 타입이 항상 `any`로 추론되는 상황이 불편한 경우
 - API Client·유틸 함수·공통 컴포넌트를 구현하면서
-  **“여기를 더 타입 안전하게 만들 수 있을 것 같은데…”** 라는 생각을 해본 경우
+  **여기를 더 타입 안전하게 만들 수 있을 것 같은데…** 라는 생각을 해본 경우
 - 코드 중복과 타입 안전성을 **동시에 개선할 수 있는 실전 패턴**을 찾고 있는 경우
 
 이 글의 목표는 다음과 같다.
@@ -21,9 +21,8 @@
 
 ### 1.2 대상 독자
 
-- 프론트엔드 / 백엔드 TypeScript 개발자
 - API Client, 데이터 레이어, 공통 유틸 구현을 담당하는 개발자
-- 코드 품질과 타입 안전성에 관심이 높은 주니어~미드 레벨 개발자
+- 코드 품질과 타입 안전성에 관심이 높은 주니어 레벨 개발자
 
 ---
 
@@ -91,7 +90,7 @@ console.log(user.nmae); // 오타지만 컴파일 에러 없음
 
 **제네릭(Generic)** 은 한 문장으로 다음과 같이 정의할 수 있다.
 
-> **“타입을 매개변수로 받는 함수 또는 타입 정의”**
+> **타입을 매개변수로 받는 함수 또는 타입 정의**
 
 일반 함수와 비교하면 개념이 보다 명확해진다.
 
@@ -190,14 +189,51 @@ console.log(user.name); // string, 자동완성 및 타입 체크 지원
 
 **제네릭 도입 전/후를 비교하면 다음과 같다.**
 
-| 항목            | 제네릭 도입 전                        | 제네릭 도입 후                  |
-| --------------- | ------------------------------------- | ------------------------------- |
-| 함수 개수       | 엔드포인트마다 별도 함수 정의         | 공통 제네릭 함수 1개로 통합     |
-| 반환 타입       | `any`                                 | `User`, `Post` 등 구체적인 타입 |
-| 자동완성        | 제한적                                | IDE 자동완성 적극 활용 가능     |
-| 에러 발견 시점  | 런타임                                | 컴파일 타임                     |
-| 리팩토링 안정성 | 응답 구조 변경 누락 위험              | 타입 에러로 변경 누락 즉시 감지 |
-| 유지보수        | 공통 로직 수정 시 여러 함수 수정 필요 | 공통 함수 하나만 수정하면 반영  |
+<table>
+  <thead>
+    <tr>
+      <th>항목</th>
+      <th>제네릭 도입 전</th>
+      <th>제네릭 도입 후</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>함수 개수</td>
+      <td>엔드포인트마다 별도 함수 정의</td>
+      <td>공통 제네릭 함수 1개로 통합</td>
+    </tr>
+    <tr>
+      <td>반환 타입</td>
+      <td>
+        <code>any</code>
+      </td>
+      <td>
+        <code>User</code>, <code>Post</code> 등 구체적인 타입
+      </td>
+    </tr>
+    <tr>
+      <td>자동완성</td>
+      <td>제한적</td>
+      <td>IDE 자동완성 적극 활용 가능</td>
+    </tr>
+    <tr>
+      <td>에러 발견 시점</td>
+      <td>런타임</td>
+      <td>컴파일 타임</td>
+    </tr>
+    <tr>
+      <td>리팩토링 안정성</td>
+      <td>응답 구조 변경 누락 위험</td>
+      <td>타입 에러로 변경 누락 즉시 감지</td>
+    </tr>
+    <tr>
+      <td>유지보수</td>
+      <td>공통 로직 수정 시 여러 함수 수정 필요</td>
+      <td>공통 함수 하나만 수정하면 반영</td>
+    </tr>
+  </tbody>
+</table>
 
 > **핵심 포인트**
 >
@@ -313,7 +349,7 @@ fetchApi<ApiResponse<User>>('/api/user');
 **포인트는 다음과 같다.**
 
 - `T extends BaseResponse`를 통해
-  **“모든 API 응답은 최소한 `success`를 포함한다”** 는 계약을 타입 수준에서 보장할 수 있다.
+  **모든 API 응답은 최소한 `success`를 포함한다** 는 계약을 타입 수준에서 보장할 수 있다.
 
 ### 6.2 `keyof`와 `Pick`을 이용한 타입 안전한 키 선택
 
@@ -350,7 +386,11 @@ const publicUser = pick(user, ['id', 'name', 'email']);
 - `K extends keyof T` → `K`는 `T`의 키 중 하나(또는 그 유니온)여야 함
 - `Pick<T, K>` → `T`에서 `K`에 해당하는 키만 추려낸 타입
 
-이 패턴은 **DTO 변환, 공개/비공개 데이터 분리, 응답 필드 제한** 등 다양한 상황에서 활용 가능하다.
+여기에서 `const result = {} as Pick<T, K>;` 구문은 **TS가 객체를 단계적으로 채워 넣는 패턴을 정확히 추론하지 못하기 때문에 사용하는 관용적인 단언 패턴**이다.
+함수 시그니처가 `Pick<T, K>`를 반환하고, 루프에서 실제로 해당 키만 복사하기 때문에 외부 관점에서 구조적으로 일치하는 안전한 단언으로 볼 수 있다.
+단언이 부담스럽다면, `Object.fromEntries` 기반 구현이나 검증 로직을 추가하는 방식으로 대체할 수도 있다.
+
+이 패턴은 DTO 변환, 공개/비공개 데이터 분리, 응답 필드 제한 등 다양한 상황에서 활용 가능하다.
 
 ---
 
@@ -423,18 +463,51 @@ const data = await apiClient.get<RoutieResponse>('/api/routie');
 
 **API Client 리팩토링 전/후 비교**
 
-| 항목            | 리팩토링 전                     | 리팩토링 후                             |
-| --------------- | ------------------------------- | --------------------------------------- |
-| `json()` 타입   | `any`                           | 구체적인 응답 타입(`RoutieResponse` 등) |
-| 자동완성        | 제한적                          | 필드 이름까지 정확하게 제안             |
-| 리팩토링 안정성 | 응답 구조 변경 누락 가능성 존재 | 타입 에러를 통해 변경 누락 즉시 감지    |
-| 추상화 수준     | Response 래핑 수준              | 타입 정보를 포함하는 도메인 수준 추상화 |
+<table>
+  <thead>
+    <tr>
+      <th>항목</th>
+      <th>리팩토링 전</th>
+      <th>리팩토링 후</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <code>json()</code> 타입
+      </td>
+      <td>
+        <code>any</code>
+      </td>
+      <td>
+        구체적인 응답 타입(<code>RoutieResponse</code> 등)
+      </td>
+    </tr>
+    <tr>
+      <td>자동완성</td>
+      <td>제한적</td>
+      <td>필드 이름까지 정확하게 제안</td>
+    </tr>
+    <tr>
+      <td>리팩토링 안정성</td>
+      <td>응답 구조 변경 누락 가능성 존재</td>
+      <td>타입 에러를 통해 변경 누락 즉시 감지</td>
+    </tr>
+    <tr>
+      <td>추상화 수준</td>
+      <td>Response 래핑 수준</td>
+      <td>타입 정보를 포함하는 도메인 수준 추상화</td>
+    </tr>
+  </tbody>
+</table>
 
 ### 7.4 요청/응답 타입을 동시에 다루는 변형
 
 POST/PATCH/DELETE 요청처럼 **요청 바디와 응답 타입을 모두 중요하게 다뤄야 하는 경우**는 다음과 같이 구현할 수 있다.
 
 ```tsx
+// TResponse를 먼저, TRequest를 나중에 배치
+// → "결과(응답) → 입력(요청)" 순서로, useMutation 패턴과 유사한 형태
 const createMutationMethod =
   <TResponse, TRequest>(method: 'POST' | 'PATCH' | 'DELETE') =>
   async (url: string, body?: TRequest): Promise<TResponse> => {
@@ -467,7 +540,12 @@ const newUser = await createUser('/api/users', {
 });
 ```
 
-이 패턴을 통해:
+여기서 **타입 매개변수 순서를 `TResponse → TRequest`로 두는 이유**는 다음과 같다.<br/>
+사용자가 가장 관심 있는 것은 보통 **무엇이 반환되는가(응답)** 이기 때문에 앞에 둔다.<br/>
+`useMutation<TData, TError, TVariables>`처럼 널리 쓰이는 패턴과 유사해,
+**다른 라이브러리와 함께 사용할 때 인지 부하가 줄어든다.**
+
+이 패턴을 통해
 
 - 요청/응답 스펙을 **타입 수준에서 명시**할 수 있고
 - 실제 구현과 API 문서 간 불일치가 발생할 경우, **타입 에러로 빠르게 감지**할 수 있다.
@@ -554,6 +632,55 @@ const result = echo('hello'); // result: string
 TypeScript는 일반적으로 강력한 타입 추론을 제공한다.
 **명시가 필요한 지점에서만 제네릭 타입 인자를 표기**하는 것이 좋다.
 
+### 8.6 Try-Catch와 에러 타입 다루기
+
+제네릭으로 **데이터 타입**을 안전하게 만들면서도, 에러 쪽은 여전히 `any`나 `Error` 한 가지 타입으로만 취급하는 경우가 많다. 에러까지 타입 안전하게 가져가려면 두 가지 방향을 고려할 수 있다.
+
+1. **반환 타입에 에러를 포함하는 패턴 (Result 타입)**
+
+```tsx
+// 성공/실패를 하나의 유니온 타입으로 정의
+type ApiResult<TData, TError = string> =
+  | { ok: true; data: TData }
+  | { ok: false; error: TError };
+
+async function safeFetch<T, E = string>(url: string): Promise<ApiResult<T, E>> {
+  try {
+    const res = await fetch(url);
+    if (!res.ok) {
+      return { ok: false, error: `HTTP ${res.status}` as E };
+    }
+    const data = await res.json();
+    return { ok: true, data };
+  } catch (e) {
+    return { ok: false, error: 'NETWORK_ERROR' as E };
+  }
+}
+```
+
+2. **try-catch 내부에서 에러 분기 로직을 명시적으로 두고, 호출부에서는 `ok` 여부에 따라 분기**
+
+```tsx
+const result = await safeFetch<User>('/api/user');
+
+if (!result.ok) {
+  // result.error는 TError 타입
+  console.error(result.error);
+} else {
+  // result.data는 User 타입
+  console.log(result.data.name);
+}
+```
+
+이 글의 본문에서는 데이터 타입에 초점을 맞추기 위해 에러 타입을 깊게 파고들지는 않았지만,
+실제 팀 도입 시에는 다음과 같은 기준을 함께 고민하는 것을 추천한다.
+
+- 에러를 **예외(`throw`)로 처리할지, Result 타입으로 다룰지**
+- 공통 에러 타입(`ApiError`)을 정의할지, 문자열/HTTP 코드 수준에서만 다룰지
+- 로깅/모니터링 시스템(`Sentry` 등)과 어떻게 연동할지
+
+데이터 타입을 제네릭으로 정리한 뒤, 다음 단계로 **에러 타입 설계까지 확장**하면 API 계층 전체의 안정성을 한 단계 더 끌어올릴 수 있다.
+
 ---
 
 ## 9. 결론 및 적용 가이드
@@ -583,26 +710,35 @@ TypeScript는 일반적으로 강력한 타입 추론을 제공한다.
 
 ### 9.2 실무 적용 순서 제안
 
-실제 코드베이스에 적용할 때는 다음 순서를 추천한다.
+실제 코드베이스에 제네릭 기반 API 패턴을 적용할 때는, 한 번에 모든 곳을 고치기보다는 **작은 단계부터 점진적으로 확장하는 방식**을 추천한다.
 
-1. **`fetch().json()`이 `any`인 지점을 한두 곳 선정**
+1. **1단계 – `fetch().json()`의 `any` 제거 (`fetchData<T>` 도입)**
 
-   - `fetchData<T>` 패턴으로 치환하고, 구체적인 응답 타입 정의를 추가한다.
+   - `fetch().json()`을 직접 사용하는 지점을 한두 곳 선정한다.
+   - `fetchData<T>` 제네릭 래퍼로 치환하고, 구체적인 응답 타입을 정의한다.
+   - 가장 영향 범위가 좁은 API부터 적용해 보면서, 팀 내 합의와 사용 패턴을 맞춰간다.
 
-2. 여러 API가 공통 응답 구조를 공유하고 있다면
+2. **2단계 – 공통 응답 구조 도입 (`ApiResponse<T>`, `PaginatedResponse<T>`)**
 
-   - `ApiResponse<T>`, `PaginatedResponse<T>`와 같은 제네릭 타입을 도입해 응답 구조를 통합한다.
+   - 여러 API가 공유하는 공통 응답 구조를 정리한다.
+   - `ApiResponse<T>`, `PaginatedResponse<T>` 같은 제네릭 응답 타입을 도입해,  
+     `response.success`, `response.data` 형태로 사용하는 패턴을 통일한다.
+   - 신규 API나 변경 예정 API부터 먼저 적용하고, 기존 엔드포인트는 점진적으로 마이그레이션한다.
 
-3. 공통 유틸 함수(`pick`, `omit`, `getFirst` 등)에
+3. **3단계 – API Client 제네릭화 (패턴 ④ 적용)**
 
-   - `T`, `K extends keyof T` 패턴을 적용하여 타입 안전성을 높인다.
+   - 공통 API Client 레이어(`apiClient`)를 제네릭 기반으로 재설계한다.
+   - GET/Mutation 메서드에 `<TResponse, TRequest>` 패턴을 도입해,  
+     각 엔드포인트의 요청/응답 타입이 함수 시그니처에 드러나도록 만든다.
+   - 도메인(유저, 결제, 게시글 등) 단위로 나누어, 가장 변경이 쉬운 영역부터 차례대로 마이그레이션한다.
 
-4. 마지막으로, 팀 차원에서
+4. **4단계 – 에러 타입 및 에러 처리 패턴 정리 (선택 적용)**
+   - `throw Error` 중심에서 벗어나, `ApiResult<TData, TError>`와 같은 Result 패턴 도입 여부를 검토한다.
+   - 공통 에러 타입(`ApiError`)을 정의하거나, HTTP 코드/에러 코드 기준으로 분류하는 규칙을 정리한다.
+   - 로깅·모니터링 시스템(Sentry 등)과 연동 전략을 함께 논의하면서, 핵심 API부터 적용해 나간다.
 
-   - API Client 패턴을 **제네릭 기반으로 표준화**할지 논의하고, 코드 리뷰 체크리스트에 반영한다.
-
-이 과정을 거치면, 타입스크립트의 큰 장점 중 하나인 **“타입 시스템을 통한 리팩토링 안전망”**을
-API 계층에서도 온전히 활용할 수 있다.
+“데이터 타입 → 응답 구조 → API Client → 에러 타입” 순으로 확장해 나가면,  
+각 단계마다 영향을 받는 범위를 명확히 나눌 수 있고, 팀 내부 합의도 단계별로 맞춰가기 수월하다.
 
 ---
 
