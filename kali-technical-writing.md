@@ -259,57 +259,57 @@ public void batchInsert(List<NotificationInsertDto> notificationInsertDtos) {
 ### 3.2.2. 제네릭 배치 읽기 메서드
 
 ```java
-// [ NotificationBatchService.java ]
-
-public <T> List<T> batchRead(
-        BiFunction<Long, Pageable, List<T>> queryFunction,
-        Function<T, Long> idExtractor,
+// [ ChunkRead.java ]
+public static <T> List<T> readChunk(
+        ChunkQueryFunction<T> queryFunction,
+        Long lastId,
         int chunkSize
 ) {
-    // - 결과 저장소 초기화 : 모든 배치 데이터를 담을 리스트 준비
-    List<T> allResults = new ArrayList<>();
-    Long lastId = null;
-
-    while (true) {
-        // - 청크 조회 : 마지막 ID 이후 데이터를 청크 단위로 조회
-        List<T> batch = queryFunction.apply(
-                lastId,
-                PageRequest.of(0, chunkSize, Sort.by("id"))
-        );
-        
-        // - 조회 종료 : 더 이상 조회할 데이터가 없으면 중단
-        if (batch.isEmpty()) {
-            break;
-        }
-
-        // - 결과 누적 : 조회한 배치 데이터를 전체 결과에 추가
-        allResults.addAll(batch);
-
-        // - 마지막 청크 확인 : 조회된 데이터가 청크 크기보다 작으면 종료
-        if (batch.size() < chunkSize) {
-            break;
-        }
-
-        // - 다음 청크 준비 : 마지막 ID 업데이트로 다음 조회 범위 설정
-        lastId = idExtractor.apply(batch.getLast());
-    }
-
-    // - 전체 결과 반환 : 모든 배치를 합친 최종 데이터 반환
-    return allResults;
+    return queryFunction.query(
+            lastId,
+            PageRequest.of(0, chunkSize, Sort.by("id"))
+    );
 }
 ```
 
 ### 3.2.3. 사용 예시
 
 ```java
-// [ ReminderScheduleService.java ]
+// [ NotificationBatchService.java ]
+public void processReminderNotifications(LocalDateTime now) {
+    NotificationMessageTemplate template = RemindNotificationMessageTemplateProvider.getRandomMessageTemplate();
 
-  private List<Long> getAllActiveByHourAndMinuteWithMember(LocalDateTime now) {
-      return notificationBatchService.batchRead((lastId, pageable) ->
-                      reminderScheduleRepository.findAllActiveMemberIdsByHourAndMinute(now.toLocalTime(), lastId, pageable),
-              id -> id,
-              1000);
-  }
+    Long lastId = null;
+
+    while (true) {
+        List<Long> memberIds = getMemberIdsForSendingNotification(now, lastId);
+
+        if (memberIds.isEmpty()) {
+            break;
+        }
+
+        saveAndSendNotifications(memberIds, template);
+
+        if (isLastChunk(memberIds)) {
+            break;
+        }
+
+        lastId = memberIds.getLast();
+    }
+}
+
+private List<Long> getMemberIdsForSendingNotification(LocalDateTime now, Long lastId) {
+    return ChunkReader.readChunk(
+            (id, pageable) -> reminderScheduleRepository
+                    .findAllActiveMemberIdsBySchedule(
+                            now.toLocalTime(),
+                            id,
+                            pageable
+                    ),
+            lastId,
+            CHUNK_SIZE
+    );
+}
 ```
 
 ### 3.2.4. 장점
@@ -317,30 +317,6 @@ public <T> List<T> batchRead(
 1. **재사용성**: 어떤 엔티티 조회에도 사용 가능
 2. **유연성**: 쿼리 함수와 ID 추출 로직을 외부에서 주입 가능
 3. **메모리 효율**: 청크 단위로 나누어 조회하여 메모리 부담 감소
-
-### 3.2.5. 전략 변경
-
-**변경 이유**: 알림 발송 로직과 저장 로직을 분리하여 트랜잭션 관리를 명확하게 하기 위함
-
-> **AS-IS**: 청크 조회 → 저장 → 다음 청크 조회 → 저장 (트랜잭션이 여러 번)
->
-> **TO-BE**: 모든 대상자 ID 수집 완료 → JDBC Batch Insert로 일괄 저장 (단일 트랜잭션)
-이 방식은 ID만 메모리에 보관하므로 메모리 부담이 크지 않으며,
-> 
-> 트랜잭션을 명확하게 분리하고 FCM 발송과 독립적으로 관리할 수 있다.
-
-### 3.2.6. 메모리 부담에 대한 고민
-
-많은 데이터를 메모리에 적재하는 것이 부담이 될 수 있지만, 실제로는 **ID 리스트만 조회하여 메모리에 보관**하기 때문에 부담이 적다.
-
-**Long 타입의 ID는 8바이트**에 불과하지만, **Member 엔티티 전체는 수십~수백 바이트**를 차지한다.
-
-예를 들어:
-
-- 10,000개의 ID: 약 80KB
-- 10,000개의 Member 엔티티: 수 MB ~ 수십 MB
-
-또한 JDBC Batch Insert를 사용하므로 **Member 엔티티를 조회할 필요 없이 ID만으로 INSERT**를 수행하여, 불필요한 SELECT 쿼리를 완전히 제거했다.
 
 ## 3.3. FCM MultiCast 적용
 
@@ -386,17 +362,16 @@ Topic 방식을 사용하려면 매분마다:
 
 public void sendMulticast(SendMessageByFcmTokensRequest sendMessageByFcmTokensRequest) {
     try {
-      firebaseMessaging.sendEachForMulticast(MulticastMessage.builder()
-              .setNotification(Notification.builder()
-                      .setTitle(sendMessageByFcmTokensRequest.title())
-                      .setBody(sendMessageByFcmTokensRequest.body())
-                      .build())
-              .addAllTokens(sendMessageByFcmTokensRequest.tokens())
-              .putData(ACTION, sendMessageByFcmTokensRequest.action().name())
-              .build());
-  } catch (FirebaseMessagingException e) {
-      throw new AlarmException(e);
-  }
+        BatchResponse batchResponse = firebaseMessaging.sendEachForMulticast(MulticastMessage.builder()
+                .addAllTokens(sendMessageByFcmTokensRequest.allTokens())
+                .putData("title", sendMessageByFcmTokensRequest.title())
+                .putData("body", sendMessageByFcmTokensRequest.body())
+                .putData(ACTION, sendMessageByFcmTokensRequest.action().name())
+                .build());
+
+    } catch (FirebaseMessagingException e) {
+        throw new AlarmException(e);
+    }
 }
 ```
 
@@ -484,26 +459,42 @@ public void onTokens(SendMessageByFcmTokensRequest sendMessageByFcmTokensRequest
 @Scheduled(cron = MINUTELY_CRON)
 public void scheduleReminderNotification() {
     LocalDateTime now = LocalDateTime.now();
-    executeReminderNotification(now);
+    processReminderNotifications(now);
 }
 
-public void executeReminderNotification(LocalDateTime now) {
-    // - 현재 시간에 알림 받을 멤버 조회 (배치 읽기)
-    List<Long> memberIds = getAllActiveByHourAndMinuteWithMember(now);
+public void processReminderNotifications(LocalDateTime now) {
+    NotificationMessageTemplate template = RemindNotificationMessageTemplateProvider.getRandomMessageTemplate();
 
-    if (memberIds.isEmpty()) {
-        return;
+    Long lastId = null;
+
+    while (true) {
+        List<Long> memberIds = getMemberIdsForSendingNotification(now, lastId);
+
+        if (memberIds.isEmpty()) {
+            break;
+        }
+
+        saveAndSendNotifications(memberIds, template);
+
+        if (isLastChunk(memberIds)) {
+            break;
+        }
+
+        lastId = memberIds.getLast();
     }
-
-    // - 알림 처리 (저장 + 발송)
-    notificationService.processReminderNotifications(memberIds, now);
 }
 
-private List<Long> getAllActiveByHourAndMinuteWithMember(LocalDateTime now) {
-    return notificationBatchService.batchRead((lastId, pageable) ->
-                    reminderScheduleRepository.findAllActiveMemberIdsByHourAndMinute(now.toLocalTime(), lastId, pageable),
-            id -> id,
-            1000);
+private List<Long> getMemberIdsForSendingNotification(LocalDateTime now, Long lastId) {
+    return ChunkReader.readChunk(
+            (id, pageable) -> reminderScheduleRepository
+                    .findAllActiveMemberIdsBySchedule(
+                            now.toLocalTime(),
+                            id,
+                            pageable
+                    ),
+            lastId,
+            CHUNK_SIZE
+    );
 }
 ```
 
@@ -511,29 +502,34 @@ private List<Long> getAllActiveByHourAndMinuteWithMember(LocalDateTime now) {
 // [ NotificationService.java ]
 
 @Transactional
-public void processReminderNotifications(
-        List<Long> allMemberIds,
-        LocalDateTime now
-) {
-    if (allMemberIds.isEmpty()) {
-        return;
-    }
-
+public void processReminderNotifications(LocalDateTime now) {
     NotificationMessageTemplate template = RemindNotificationMessageTemplateProvider.getRandomMessageTemplate();
 
-    // - 1. 알림 데이터 저장 (JDBC Batch Insert)
-    saveNotifications(allMemberIds, template);
+    Long lastId = null;
 
-    // - 2. FCM 알림 발송 이벤트 발행 (비동기 + AfterCommit)
-    sendFcmNotifications(allMemberIds, template);
+    while (true) {
+        List<Long> memberIds = getMemberIdsForSendingNotification(now, lastId);
+
+        if (memberIds.isEmpty()) {
+            break;
+        }
+
+        saveAndSendNotifications(memberIds, template);
+
+        if (isLastChunk(memberIds)) {
+            break;
+        }
+
+        lastId = memberIds.getLast();
+    }
 }
 
-private void sendFcmNotifications(List<Long> allMemberIds, NotificationMessageTemplate template) {
-    // - FCM Token 조회
-    List<String> tokens = fcmTokenRepository.findTokensByMemberIds(allMemberIds);
-    
-    // - 이벤트 발행 → AfterCommit 시점에 비동기로 FCM 발송
-    publisher.publishEvent(template.toSendMessageByFcmTokensRequest(tokens));
+private void saveAndSendNotifications(
+        List<Long> memberIds,
+        NotificationMessageTemplate template
+) {
+    savedNotifications(memberIds, template);
+    sendNotifications(memberIds, template);
 }
 
 private void saveNotifications(List<Long> allMemberIds, NotificationMessageTemplate template) {
@@ -541,6 +537,14 @@ private void saveNotifications(List<Long> allMemberIds, NotificationMessageTempl
             .map(memberId -> new NotificationInsertDto(template, memberId))
             .toList();
     notificationBatchRepository.batchInsert(notificationInsertDtos);
+}
+
+private void sendNotifications(
+        List<Long> memberIds,
+        NotificationMessageTemplate template
+) {
+    List<String> tokens = readDeviceTokens(memberIds);
+    publisher.publishEvent(template.toSendMessageByFcmTokensRequest(tokens));
 }
 ```
 
@@ -555,8 +559,10 @@ private void saveNotifications(List<Long> allMemberIds, NotificationMessageTempl
 # 4. 성능 비교
 
 ## 4.1. AS-IS vs TO-BE 성능 측정
-
-## 4.2. 처리 속도, 메모리 사용량 비교
+![img_6.png](img_6.png)
+![img_5.png](img_5.png)
+batch 부분 10만명 기준 처리 속도가 1m 26s 에서 229ms로 **99.734 % 감소**했다.
+메모리 사용량은 95% 개선되었다. (100만 기준, 400MB 》 24MB)
 
 # 5. 느낀점
 
