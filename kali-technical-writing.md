@@ -571,7 +571,6 @@ private void sendNotifications(
 
 batch 부분 10만명 기준 처리 속도가 1m 26s 에서 229ms로 **99.734 % 감소**했다.
 
-<br> 
 메모리 사용량은 95% 개선되었다. (100만 기준, 400MB 》 24MB)
 
 # 5. 느낀점
