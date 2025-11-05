@@ -63,9 +63,9 @@ if (QueryCountInspector.getCount() > 10) {
 }
 ```
 
-### **측정 결과**
+### 측정 결과
 
-쿼리 카운터를 적용한 후 로그를 확인해보니 GET /contents/keyword 요청 한 번에 **298개의 쿼리**가 실행되고 있었습니다.
+쿼리 카운터를 적용한 후 로그를 확인해보니 GET /contents/keyword 요청 한 번에 298개의 쿼리가 실행되고 있었습니다.
 
 ```
 "duration":"633ms","method":"GET","uri":"/contents/keyword"
@@ -102,7 +102,7 @@ public class Place {
 }
 ```
 
-문제의 API 로직은 다음과 같은 흐름을 가지고 있었습니다:
+문제의 API 로직은 다음과 같은 흐름을 가지고 있었습니다.
 
 1. Content 목록을 조회
 2. 각 Content에 포함된 Place 목록을 조회
@@ -124,9 +124,9 @@ Hibernate:
 ... (N번 반복)
 ```
 
-즉, Place 목록을 한 번에 가져온 뒤, place.getPlaceCategories()가 호출되는 시점마다 **추가 쿼리 N개**가 실행되었습니다.
+즉, Place 목록을 한 번에 가져온 뒤, place.getPlaceCategories()가 호출되는 시점마다 추가 쿼리 N개가 실행되었습니다.
 
-이것이 바로 전형적인 **N+1 쿼리 패턴입니다.
+이것이 바로 전형적인 N+1 쿼리 패턴입니다.
 
 ## Fetch 전략
 
@@ -191,7 +191,7 @@ ContentPlace 테이블
 
 이때 `Content`를 기준으로 `ContentPlace`를 `JOIN FETCH` 하는 JPQL을 실행하면, 데이터베이스는 내부적으로 다음과 같은 결과를 만듭니다. (총 2+3+1 = 6행)
 
-이제 **페이지 크기(size)를 2로 설정하여 첫 페이지를 조회**한다고 가정해 봅시다. 개발자의 의도는 `Content` 2개, 즉 "부산 여행"과 "서울 여행"을 받아보는 것입니다.
+이제 페이지 크기(size)를 2로 설정하여 첫 페이지를 조회한다고 가정해 봅시다. 개발자의 의도는 `Content` 2개, 즉 "부산 여행"과 "서울 여행"을 받아보는 것입니다.
 
 하지만 데이터베이스는 `LIMIT 2`와 같은 페이징 쿼리를 위 `JOIN FETCH` 결과 테이블에 그대로 적용합니다.
 
@@ -328,7 +328,7 @@ ORDER BY
 
 ## 부하테스트
 
-@BatchSize와 @EntityGraph 적용 전후의 성능 변화를 수치로 확인하기 위해 **k6**로 부하 테스트를 진행했습니다.
+@BatchSize와 @EntityGraph 적용 전후의 성능 변화를 수치로 확인하기 위해 k6로 부하 테스트를 진행했습니다.
 
 테스트는 동일한 조건(100 VUs, 10초 동안, 요청 100회)에서 수행되었습니다.
 
