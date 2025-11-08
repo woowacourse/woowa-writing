@@ -124,7 +124,7 @@ Snowflake와 정반대의 접근이다.
 [Monotonicity](https://en.wikipedia.org/wiki/Monotonic_function), 값이 한 방향으로만 변하는 성질이다.
 
 함수가 단조성을 가진다는 것은 계속 증가하거나, 계속 감소한다는 의미다.
-ID 생성기는 이 중 **단조 증가(monotonically increasing)**가 필요하다.
+ID 생성기는 이 중 **단조 증가**(monotonically increasing)가 필요하다.
 
 ---
 
