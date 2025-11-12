@@ -24,17 +24,20 @@ public class BottariTemplate {
 
 - 서비스
 
+```java
 @Transactional
 public Long createBottari(
-final Long id,
-final String ssaid
+	final Long id,
+	final String ssaid
 ) {
-final BottariTemplate bottariTemplate = bottariTemplateRepository.findById(id)
-.orElseThrow(() -> new BusinessException(ErrorCode.BOTTARI_TEMPLATE_NOT_FOUND));
-// 보따리 템플릿 정보를 바탕으로 내 체크리스트 생성하는 로직 생략
-bottariTemplate.increaseCount();
-return savedBottari.getId();
+	final BottariTemplate bottariTemplate = bottariTemplateRepository.findById(id)
+	.orElseThrow(() -> new BusinessException(ErrorCode.BOTTARI_TEMPLATE_NOT_FOUND));
+	// 보따리 템플릿 정보를 바탕으로 내 체크리스트 생성하는 로직 생략
+	bottariTemplate.increaseCount();
+	return savedBottari.getId();
 }
+
+```
 
 
 다음과 같이 가져간 횟수 필드를 추가하고, 누군가 보따리 템플릿을 가져가 자신의 체크리스트를 만드는 순간 가져간 횟수를 하나 올리는 기능을 간단하게 만들었다. 이 기능을 만들고 다음과 같이 1000번의 특정 보따리 템플릿을 가져가도록 API를 요청하였다.
