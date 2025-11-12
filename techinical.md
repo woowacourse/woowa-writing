@@ -129,7 +129,7 @@ public class UserControllerTest {
 
 ### Swagger vs REST Docs 정리
 
-| 기능 | Swagger (`springdoc-openapi`) | Spring REST Docs | 우위 |
+| 기능 | Swagger (`springdoc-openapi`) | Spring REST Docs | 비교 우위 |
 | :--- | :--- | :--- | :--- |
 | **정확성 보장** | 낮음 (개발자 규율에 의존) | **매우 높음** (테스트로 강제) | **REST Docs**: 서비스 안정성이 중요한 시스템에 필수 |
 | **상호작용 UI** | **기본 제공 (매우 우수)** | 기본 미제공 (정적 HTML) | **Swagger**: 빠른 프로토타이핑 및 API 탐색에 유리 |
