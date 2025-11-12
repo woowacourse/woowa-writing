@@ -114,7 +114,7 @@ Snowflake와 정반대의 접근이다.
 
 ---
 
-이를 이해하기 위해서 시계 역행과 단조성에 대해 먼저 살펴보자.
+이를 이해하기 위해서 시계 역행 상황과 단조성에 대해 먼저 살펴보자.
 
 ## 시계 역행
  
@@ -157,44 +157,34 @@ RFC를 찾아보자.
 
 [6.2. Monotonicity and Counters](https://www.rfc-editor.org/rfc/rfc9562.html?#name-monotonicity-and-counters)에서 관련 정보를 찾을 수 있었다.
 
-섹션은 이렇게 시작한다.
-
 > Monotonicity (each subsequent value being greater than the last) is the backbone of time-based sortable UUIDs.
 
-단조 증가가 핵심!
+해당 섹션은 단조 증가를 Time-based sortable ID의 핵심으로 정의하며 시작한다.
 
-이후 동일 ms 내 단조성 보장 등 여러 내용을 다루지만,
-우리는 시계 역행/카운터 오버플로우 대응만 살펴보자.
+이후 동일 ms 내 단조성 보장 방법 등 여러 내용을 다루지만, 우리는 시계 역행/카운터 오버플로우 대응만 살펴보자.
 
 ### Counter Rollover Handling
 
-카운터 롤오버(오버플로우)가 발생하면,
-
 > freeze the counter and wait for the timestamp to advance
-
-타임스탬프 증가를 기다리거나,   
-(Snowflake)
 
 > increment the timestamp ahead of the actual time and reinitialize the counter.
 
-타임스탬프를 실제 시간보다 증가시키고 카운터를 초기화.  
-(TSID)
+카운터 롤오버(오버플로우)가 발생하면, 
+- 타임스탬프 증가를 기다리거나(Snowflake) 
+- 타임스탬프를 실제 시간보다 증가시키고 카운터를 초기화(TSID)  
+
 
 ### Monotonic Error Checking
 
 > such as clock rollbacks, leap second handling, and counter rollovers
 
-시계 역행, 윤초, 카운터 롤오버 등이 발생하면,
-
 > they should at least report an appropriate error.
-
-적절한 오류를 보고하거나,  
-(Snowflake)
 
 > reuse the previous timestamp and increment the previous counter method.
 
-이전 타임스탬프를 재사용하고, 카운터를 증가.   
-(TSID)
+시계 역행, 윤초, 카운터 롤오버 등이 발생하면, 
+- 적절한 오류를 보고하거나(Snowflake)
+- 이전 타임스탬프를 재사용하고, 카운터를 증가(TSID)
 
 ---
 
@@ -204,20 +194,17 @@ RFC를 찾아보자.
 
 > can return an error or stall the UUID generator until the system clock catches up
 
-시스템 시계가 따라잡을 때까지 ID 생성기를 대기하거나 에러를 반환.
-
 > MUST NOT knowingly return duplicate values due to a counter rollover.
 
-카운터 롤오버 상황에서 중복된 값을 반환 금지.
+시스템 시계가 따라잡을 때까지 ID 생성기를 대기하거나 에러를 반환할 수 있지만, 카운터 롤오버 상황에서 중복된 값을 반환 금지함.
 
 ### Altering, Fuzzing, or Smearing
 
 > This specification makes no requirement or guarantee about how close the clock value needs to be to the actual time.
 
-시계 값이 실제 시간에 얼마나 가까워야 하는지에 대한 요구 사항이나 보장이 없음. (보정 전략의 정당성)
+시계 값이 실제 시간에 얼마나 가까워야 하는지에 대한 요구 사항이나 보장이 없음 -> 보정 전략의 정당성
 
-결론적으로, RFC 9562에서는 두 접근 모두 허용하며
-Snowflake는 정확성, TSID는 가용성을 우선으로 뒀음을 이해할 수 있다.
+결론적으로, RFC 9562에서는 두 접근 모두 허용하며 Snowflake는 정확성을, TSID는 가용성을 우선시했음을 이해할 수 있다.
 
 ---
 
@@ -228,6 +215,8 @@ RFC가 두 전략을 동등하게 허용한다면, 실제 구현체들은 어떤
 ![rfc-9562-implementations.png](rfc-9562-implementations.png)
 
 ### [Google UUID v7 (Go)](https://github.com/google/uuid/blob/master/version7.go)
+
+Google의 UUID v7은 증가 전략을 사용한다.
 
 ```go
 func getV7Time() (milli, seq int64) {
@@ -249,9 +238,9 @@ func getV7Time() (milli, seq int64) {
 }
 ```
 
-Google의 UUID v7은 증가 전략을 사용한다.
-
 ### [Monotonic-ULID (Java)](https://github.com/azam/ulidj/blob/main/src/main/java/io/azam/ulidj/MonotonicULID.java)
+
+Monotonic-ULID도 증가 전략을 사용한다.
 
 ```java
 private void mutate() {
@@ -270,7 +259,7 @@ private void mutate() {
           this.lastEntropy[i] = work;
         }
       }
-      if (carry) { // 오버플로우 (1ms 내 2^80회 증가 시)
+      if (carry) { // 오버플로우 (1ms 내 2^80회 증가, 현실적으로 불가능)
         System.arraycopy(previousEntropy, 0, this.lastEntropy, 0, ULID.ENTROPY_LENGTH);
         throw new IllegalStateException("ULID entropy overflowed for same millisecond"); // 예외
       }
@@ -281,9 +270,9 @@ private void mutate() {
   }
 ```
 
-Monotonic-ULID는 증가 전략을 사용하되, 오버플로우 상황에서는 예외를 던진다.
-
 ### [Sonyflake (Go)](https://github.com/sony/sonyflake/blob/master/v2/sonyflake.go)
+
+Sonyflake는 증가 전략과 대기 전략을 병행한다.
 
 ```go
 func (sf *Sonyflake) NextID() (int64, error) {
@@ -309,12 +298,8 @@ func (sf *Sonyflake) NextID() (int64, error) {
 }
 ```
 
-Sonyflake는 증가 전략과 대기 전략을 동시에 활용한다.
-
-이들의 공통점은 시계 역행 상황에서 예외를 던지기보다, 단조성을 지키며 계속 발급을 이어가려고 한다. 
-각자 우선순위에 따라 조금씩 다른 방법을 택했을 뿐이다.  
-가용성이 최우선인 곳, 시간 정확도를 포기할 수 없는 곳, ID 예측을 막아야 하는 곳.
-모두가 상황에 맞는 최선을 선택했다.
+이들의 공통점은 시계 역행 상황에서 예외를 던지기보다, 단조성을 지키며 계속 발급을 이어가려고 한다.  
+다만 각자의 설계 목표나 철학에 따라 다른 트레이드 오프를 택했을 뿐이다.
 
 ---
 
