@@ -31,7 +31,7 @@ API 문서를 만드는 여정은 보통 두 갈래 길에서 시작됩니다. �
 
 Gradle 기반 프로젝트라면 `build.gradle` 파일에 단 한 줄만 추가하면 모든 준비가 끝납니다.
 
-Groovy
+
 
 ```
 // build.gradle
