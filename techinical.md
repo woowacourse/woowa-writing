@@ -138,7 +138,7 @@ public class UserControllerTest {
 
 -----
 
-## 하이브리드 전략: 두 세 마리 토끼 잡기
+## 하이브리드 전략: 두 마리 토끼 잡기
 
 ### `restdocs-api-spec`으로 간극 메우기
 
