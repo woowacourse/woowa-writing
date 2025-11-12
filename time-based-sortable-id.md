@@ -118,7 +118,7 @@ Snowflake와 정반대의 접근이다.
 
 ## 시계 역행
  
-- [NTP(Network Time Protocol)](https://en.wikipedia.org/wiki/Network_Time_Protocol): 시스템 시계가 실제 시간과 차이가 클 때, 설정/상황에 따라 NTP는 시계를 뒤로 돌릴 수 있다. [Chrony](https://chrony-project.org/doc/3.4/chrony.conf.html) 같은 최신 구현체도 마찬가지다. (참고: [Linux man-pages: clock_gettime](https://man7.org/linux/man-pages/man2/clock_gettime.2.html))
+- [NTP(Network Time Protocol)](https://en.wikipedia.org/wiki/Network_Time_Protocol): 시스템 시계가 실제 시간과 차이가 클 때, 설정/상황에 따라 NTP는 시계를 과거 시점으로 조정할 수 있다. [Chrony](https://chrony-project.org/doc/3.4/chrony.conf.html) 같은 최신 구현체도 마찬가지다. (참고: [Linux man-pages: clock_gettime](https://man7.org/linux/man-pages/man2/clock_gettime.2.html))
 - VM 일시정지: 가상 머신이 일시정지되었다가 재개되면 시계가 뒤처질 수 있다. (참고: [Timekeeping best practices for Linux guests](https://knowledge.broadcom.com/external/article?legacyId=1006427), [Timekeeping within ESXi](https://blogs.vmware.com/cloud-foundation/2018/07/11/timekeeping-within-esxi/))
 - 윤초(Leap Second): 가장 최근의 윤초는 2016년 12월 31일 23:59:60이다. (참고: [AWS의 2016년 윤초 대응](https://aws.amazon.com/ko/blogs/korea/look-before-you-leap-december-31-2016-leap-second-on-aws/))
 
@@ -149,7 +149,7 @@ ID 생성기는 이 중 **단조 증가**(monotonically increasing)가 필요하
 혹시 정답이 있는 문제일까?  
 그저 두 시스템의 철학이 달랐던 걸까?
 
-표준을 찾아보자.
+RFC를 찾아보자.
 
 ---
 
@@ -223,8 +223,7 @@ Snowflake는 정확성, TSID는 가용성을 우선으로 뒀음을 이해할 �
 
 ## 추세
 
-표준이 두 전략을 동등하게 허용한다면, 실제 구현체들은 어떤 선택을 했을까?  
-RFC 9562에서 언급하는 다른 구현체들을 살펴봤다.
+RFC가 두 전략을 동등하게 허용한다면, 실제 구현체들은 어떤 선택을 했을까?
 
 ![rfc-9562-implementations.png](rfc-9562-implementations.png)
 
