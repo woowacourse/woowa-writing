@@ -126,251 +126,7 @@ BuildKit은 단순히 이전 레이어만 재사용하는 것을 넘어, 훨씬 
 
 ---
 
-## 최적화 1 - Dockerfile 순서
-
-> 캐시를 잘 활용하려면, 자주 바뀌지 않는 것을 앞에 두어야 한다.
-
-Docker 빌드 최적화의 가장 기본적인 원칙이다.
-
-위에서 설명한 바와 같이, 특정 레이어에서 캐시가 무효화되면 그 이후의 모든 레이어는 새로 빌드되어야 한다. 소스 코드는 개발 과정에서 계속해서 변경되므로, `COPY . .`와 같이 전체 소스 코드를 복사하는
-구문이 앞쪽에 있다면 캐시의 이점을 누릴 수 없다.
-
-### 나쁜 예시 (Bad Practice)
-
-```dockerfile
-FROM amazoncorretto:21
-WORKDIR /app
-
-# 소스 코드가 변경될 때마다 매번 모든 의존성을 새로 다운로드 받게 됨
-COPY . .
-RUN ./gradlew bootJar
-
-CMD ["java", "-jar", "build/libs/app.jar"]
-```
-
-위 Dockerfile은 소스 코드의 아주 작은 부분이 변경되어도, `COPY . .` 단계에서 캐시가 깨지기 때문에 `RUN ./gradlew bootJar` 명령어가 항상 다시 실행된다. 즉, 매번 Gradle
-의존성을 새로 다운로드하고 컴파일하는 비효율이 발생한다.
-
-### 좋은 예시 (Good Practice)
-
-이 문제를 해결하기 위해, 의존성 관련 파일과 실제 소스 코드를 분리하여 복사하는 전략을 사용한다.
-
-```dockerfile
-FROM amazoncorretto:21
-WORKDIR /app
-
-# 1. 의존성 관련 파일만 먼저 복사
-# (build.gradle, settings.gradle 등)
-COPY build.gradle settings.gradle ./
-COPY gradle ./gradle
-
-# 2. 의존성을 먼저 다운로드하여 레이어에 캐싱
-# 이 레이어는 build.gradle 파일이 변경될 때만 다시 실행됨
-RUN ./gradlew dependencies
-
-# 3. 전체 소스 코드 복사
-# 소스 코드 변경 시 이 지점부터 빌드가 다시 시작됨
-COPY . .
-
-# 4. 애플리케이션 빌드 (의존성은 캐시된 레이어 사용)
-RUN ./gradlew bootJar
-
-CMD ["java", "-jar", "build/libs/app.jar"]
-```
-
-![img_2.png](img_2.png)
-
-#### 개선 효과
-
-* `build.gradle` 파일이 변경되지 않는 한, `RUN ./gradlew dependencies` 단계는 캐시된 레이어를 사용한다.
-* 개발 중 소스 코드만 변경될 경우, `COPY . .` 단계부터 빌드가 다시 시작된다.
-* 하지만 이미 의존성 파일들은 이전 레이어에 다운로드되어 있으므로, `RUN ./gradlew bootJar`는 다시 의존성을 다운로드하지 않고 빠르게 컴파일 및 패키징만 수행한다.
-
-> 단순히 `COPY` 명령어의 순서와 대상을 조절하는 것만으로도 빌드 시간을 크게 단축시킬 수 있다.
-
----
-
-## 최적화 2 - 멀티 스테이지 빌드
-
-> 빌드 속도만큼 중요한 것은 바로 최종 이미지의 크기다.
-
-이미지 크기가 작을수록 레지스트리 PUSH, PULL 속도가 빨라지고, 배포 시간이 단축되며, 저장 공간을 절약할 수 있다.
-
-또한, 불필요한 도구나 파일이 없는 이미지는 보안적으로도 더 안전하다.
-
-### 뚱뚱 이미지
-
-일반적인 빌드 방식에서는 JDK, Gradle, 소스 코드 등 빌드에 필요했던 모든 파일들이 최종 이미지에 포함되는 경우가 많다. 하지만 실제 운영 환경에서 애플리케이션을 실행하는 데 필요한 것은 단지 JRE와
-컴파일된 `*.jar` 파일뿐이다.
-
-### 멀티 스테이지 빌드
-
-멀티 스테이지 빌드는 하나의 Dockerfile 안에서 여러 개의 `FROM` 명령어를 사용하여 빌드 환경과 실행 환경을 분리하는 기법이다.
-
-1. **빌더(Builder) 스테이지**: 첫 번째 스테이지에서는 JDK와 빌드 도구를 포함한 이미지에서 소스 코드를 컴파일하고 실행 가능한 아티팩트(예: `app.jar`)를 생성한다.
-2. **최종(Final) 스테이지**: 두 번째 스테이지에서는 JRE만 포함된 가벼운 베이스 이미지에서 시작하여, 빌더 스테이지에서 생성된 아티팩트만 `COPY --from=builder` 명령어로 가져온다.
-
-### 멀티 스테이지 빌드 예시
-
-```dockerfile
-# =========================================================
-# 1. 빌더(Builder) 스테이지: 앱을 빌드하는 환경
-# =========================================================
-FROM amazoncorretto:21 AS builder
-WORKDIR /app
-
-COPY build.gradle settings.gradle ./
-COPY gradle ./gradle
-RUN ./gradlew dependencies --no-daemon
-
-COPY . .
-RUN ./gradlew bootJar --no-daemon
-
-# =========================================================
-# 2. 최종(Final) 스테이지: 앱을 실행하는 환경
-# =========================================================
-FROM amazoncorretto:21-al2-jre
-WORKDIR /app
-
-# 빌더 스테이지에서 생성된 JAR 파일만 복사
-COPY --from=builder /app/build/libs/*.jar app.jar
-
-ENTRYPOINT ["java", "-jar", "app.jar"]
-```
-
-#### 효과
-
-* **이미지 크기 감소**: 최종 이미지에는 JDK, Gradle, 소스 코드 등이 전혀 포함되지 않고, 오직 JRE와 `app.jar` 파일만 남게 되어 이미지 크기가 수백 MB 이상 감소한다.
-* **보안 강화**: 공격에 사용될 수 있는 빌드 관련 도구나 불필요한 라이브러리가 제거되어 보안 표면이 줄어든다.
-* **관리 용이성**: 복잡한 셸 스크립트 없이도 Dockerfile 하나만으로 빌드와 실행 환경을 깔끔하게 분리하여 관리할 수 있다.
-
----
-
-## 최적화 3 - BuildKit 캐시 마운트 활용하기 (feat. Gradle)
-
-Dockerfile 순서를 최적화하고 멀티 스테이지 빌드를 적용했지만, 여전히 아쉬운 점이 남는다.
-
-`build.gradle` 파일에 작은 변경(주석 추가, 라이브러리 버전 수정 등)만 생겨도 의존성을 다운로드하는 레이어의 캐시가 깨지고, 모든 의존성을 처음부터 다시 받아와야 한다. 이 과정은 수 분이 소요될 수
-있는 매우 비싼 작업이다.
-
-### BuildKit의 cache 마운트
-
-이 문제를 해결하기 위해 BuildKit은 `RUN` 명령어에 `--mount=type=cache` 옵션을 제공한다. 이 옵션은 Docker 호스트의 캐시 디렉토리를 빌드 컨테이너의 특정 경로에 마운트하여,
-`RUN` 명령어가 실행되는 동안 해당 디렉토리의 내용을 유지하고 다음 빌드에서 재사용할 수 있게 해준다.
-
-### 캐시 마운트 적용 예시 (Gradle)
-
-Gradle은 다운로드한 의존성을 보통 `~/.gradle/caches` 디렉토리에 저장한다. 우리는 이 디렉토리를 캐시 마운트의 target으로 지정할 수 있다.
-
-```dockerfile
-# ... (이전 스테이지)
-
-# RUN 명령어에 --mount=type=cache 옵션 추가
-# target: 컨테이너 내에서 캐시로 사용할 경로
-# id (선택사항): 여러 캐시 마운트를 구분하기 위한 고유 ID
-RUN --mount=type=cache,target=/root/.gradle/caches,id=gradle-caches \
-    ./gradlew bootJar --no-daemon
-
-# ... (이후 스테이지)
-```
-
-#### 동작 방식
-
-1. `RUN` 명령어가 실행될 때, Docker는 호스트에 `gradle-caches`라는 이름의 캐시 볼륨이 있는지 확인한다.
-2. 이 캐시 볼륨을 컨테이너의 `/root/.gradle/caches` 경로에 마운트한다.
-3. `./gradlew bootJar`가 실행되면, 의존성을 다운로드할 때 이 마운트된 디렉토리를 사용한다. 이미 다운로드된 파일이 있다면 네트워크 통신 없이 바로 사용한다. 새로 다운로드된 파일은 이 디렉토리에
-   저장된다.
-4. `RUN` 명령어가 종료되면 마운트가 해제되지만, 캐시 디렉토리의 내용은 호스트에 그대로 남아 다음 빌드를 위해 유지된다.
-
-#### 개선 효과
-
-* **의존성 다운로드 시간 절약**: `build.gradle` 파일이 변경되어 레이어 캐시가 깨지더라도, Gradle은 캐시 마운트에 남아있는 파일들을 재사용하므로 의존성을 다시 다운로드하는 시간을 거의 없앨 수
-  있다.
-* **다양한 도구에 적용 가능**: 이 방식은 Gradle뿐만 아니라 Maven (`/root/.m2`), npm (`/root/.npm`), apt (`/var/cache/apt`) 등 다양한 패키지 매니저의
-  캐시 디렉토리에도 동일하게 적용할 수 있다.
-
-> 캐시 마운트는 CI/CD 환경처럼 매번 새로운 환경에서 빌드하는 경우에 강력한 효과를 발휘한다.
-
----
-
-## 최적화 4 - CI/CD 환경에서의 원격 캐시
-
-로컬 환경에서 캐시 마운트를 사용하면 빌드 속도가 크게 향상되지만, GitHub Actions와 같은 CI/CD 환경에서는 또 다른 문제가 발생한다.
-
-CI 작업은 대부분 매번 새로운 가상 머신이나 컨테이너 위에서 실행되기 때문에, 이전 작업에서 생성된 Docker 빌드 레이어 캐시나 캐시 마운트가 다음 작업으로 이어지지 않는다. 결국 CI 환경에서는 매번 '캐시
-없는' 상태에서 빌드를 시작하게 된다.
-
-이를 해결하기 위한 방법은 바로 **원격 캐시**이다.
-
-### 원격 캐시란?
-
-빌드 과정에서 생성된 캐시 데이터(레이어 등)를 Docker Hub, GitHub Container Registry(GHCR), AWS S3와 같은 원격 저장소에 저장하고, 다음 빌드 시에 가져와서 사용하는
-방식이다.
-
-BuildKit은 `--cache-from`과 `--cache-to` 플래그를 통해 이 기능을 지원한다.
-
-* `--cache-to`: 빌드가 완료된 후 캐시를 지정된 원격 저장소로 내보낸다.
-* `--cache-from`: 빌드를 시작하기 전, 지정된 원격 저장소에서 캐시를 가져온다.
-
-### 원격 캐시 적용 예시
-
-GitHub Actions 워크플로우에서 Docker Hub을 캐시 저장소로 사용하는 예시다.
-
-```yaml
-# .github/workflows/ci.yml
-
-name: CI
-
-on:
-  push:
-    branches: [ "main" ]
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          registry: docker.io
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Build and push
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          push: true
-            # Docker Hub 태그 형식: docker.io/<username>/<repo>:latest
-          tags: docker.io/${{ secrets.DOCKERHUB_USERNAME }}/my-app:latest
-
-            # 캐시 설정 (Docker Hub 레지스트리 활용)
-          cache-from: type=registry,ref=docker.io/${{ secrets.DOCKERHUB_USERNAME }}/my-app:cache
-          cache-to: type=registry,ref=docker.io/${{ secrets.DOCKERHUB_USERNAME }}/my-app:cache,mode=max
-```
-
-#### 동작 방식
-
-1. 워크플로우가 시작되면 `cache-from` 설정을 통해 `docker.io/${{ secrets.DOCKERHUB_USERNAME }}/my-app:cache` 이미지로부터 캐시 메타데이터를 가져온다.
-2. Docker 빌드가 진행되면서 가져온 캐시를 최대한 활용하여 빌드 시간을 단축한다.
-3. 빌드가 성공적으로 완료되면 `cache-to` 설정을 통해 새로운 캐시 레이어들을 `docker.io/${{ secrets.DOCKERHUB_USERNAME }}/my-app:cache` 이미지로 내보내 다음
-   빌드를 위해 저장한다.
-
-#### 개선 효과
-
-* **지속적인 캐시 활용**: CI 환경이 매번 초기화되더라도, 원격지에 저장된 캐시를 통해 빌드 속도를 꾸준히 빠르게 유지할 수 있다.
-* **협업**: 여러 개발자가 동일한 원격 캐시를 공유함으로써, 누가 빌드를 하든 빠른 속도를 경험할 수 있다.
-
----
-
-## 최적화 5 - 느린 QEMU 대신 네이티브 빌드로 전환하기
+## 최적화 1 - 느린 QEMU 대신 네이티브 빌드로 전환하기
 
 최근 개발 환경은 점점 더 다양해지고 있다. 많은 개발자들이 Apple Silicon(ARM64)이 탑재된 Mac을 사용하고, 클라우드 환경에서는 AWS Graviton(ARM64)과 같은 고효율 프로세서의 사용이
 늘고 있다. 이로 인해 단일 아키텍처(AMD64)뿐만 아니라 여러 아키텍처를 지원하는 Docker 이미지를 빌드해야 할 필요성이 커졌다.
@@ -480,6 +236,250 @@ jobs:
 
 ---
 
+## 최적화 2 - Dockerfile 순서
+
+> 캐시를 잘 활용하려면, 자주 바뀌지 않는 것을 앞에 두어야 한다.
+
+Docker 빌드 최적화의 가장 기본적인 원칙이다.
+
+위에서 설명한 바와 같이, 특정 레이어에서 캐시가 무효화되면 그 이후의 모든 레이어는 새로 빌드되어야 한다. 소스 코드는 개발 과정에서 계속해서 변경되므로, `COPY . .`와 같이 전체 소스 코드를 복사하는
+구문이 앞쪽에 있다면 캐시의 이점을 누릴 수 없다.
+
+### 나쁜 예시 (Bad Practice)
+
+```dockerfile
+FROM amazoncorretto:21
+WORKDIR /app
+
+# 소스 코드가 변경될 때마다 매번 모든 의존성을 새로 다운로드 받게 됨
+COPY . .
+RUN ./gradlew bootJar
+
+CMD ["java", "-jar", "build/libs/app.jar"]
+```
+
+위 Dockerfile은 소스 코드의 아주 작은 부분이 변경되어도, `COPY . .` 단계에서 캐시가 깨지기 때문에 `RUN ./gradlew bootJar` 명령어가 항상 다시 실행된다. 즉, 매번 Gradle
+의존성을 새로 다운로드하고 컴파일하는 비효율이 발생한다.
+
+### 좋은 예시 (Good Practice)
+
+이 문제를 해결하기 위해, 의존성 관련 파일과 실제 소스 코드를 분리하여 복사하는 전략을 사용한다.
+
+```dockerfile
+FROM amazoncorretto:21
+WORKDIR /app
+
+# 1. 의존성 관련 파일만 먼저 복사
+# (build.gradle, settings.gradle 등)
+COPY build.gradle settings.gradle ./
+COPY gradle ./gradle
+
+# 2. 의존성을 먼저 다운로드하여 레이어에 캐싱
+# 이 레이어는 build.gradle 파일이 변경될 때만 다시 실행됨
+RUN ./gradlew dependencies
+
+# 3. 전체 소스 코드 복사
+# 소스 코드 변경 시 이 지점부터 빌드가 다시 시작됨
+COPY . .
+
+# 4. 애플리케이션 빌드 (의존성은 캐시된 레이어 사용)
+RUN ./gradlew bootJar
+
+CMD ["java", "-jar", "build/libs/app.jar"]
+```
+
+![img_2.png](img_2.png)
+
+#### 개선 효과
+
+* `build.gradle` 파일이 변경되지 않는 한, `RUN ./gradlew dependencies` 단계는 캐시된 레이어를 사용한다.
+* 개발 중 소스 코드만 변경될 경우, `COPY . .` 단계부터 빌드가 다시 시작된다.
+* 하지만 이미 의존성 파일들은 이전 레이어에 다운로드되어 있으므로, `RUN ./gradlew bootJar`는 다시 의존성을 다운로드하지 않고 빠르게 컴파일 및 패키징만 수행한다.
+
+> 단순히 `COPY` 명령어의 순서와 대상을 조절하는 것만으로도 빌드 시간을 크게 단축시킬 수 있다.
+
+---
+
+## 최적화 3 - 멀티 스테이지 빌드
+
+> 빌드 속도만큼 중요한 것은 바로 최종 이미지의 크기다.
+
+이미지 크기가 작을수록 레지스트리 PUSH, PULL 속도가 빨라지고, 배포 시간이 단축되며, 저장 공간을 절약할 수 있다.
+
+또한, 불필요한 도구나 파일이 없는 이미지는 보안적으로도 더 안전하다.
+
+### 뚱뚱 이미지
+
+일반적인 빌드 방식에서는 JDK, Gradle, 소스 코드 등 빌드에 필요했던 모든 파일들이 최종 이미지에 포함되는 경우가 많다. 하지만 실제 운영 환경에서 애플리케이션을 실행하는 데 필요한 것은 단지 JRE와
+컴파일된 `*.jar` 파일뿐이다.
+
+### 멀티 스테이지 빌드
+
+멀티 스테이지 빌드는 하나의 Dockerfile 안에서 여러 개의 `FROM` 명령어를 사용하여 빌드 환경과 실행 환경을 분리하는 기법이다.
+
+1. **빌더(Builder) 스테이지**: 첫 번째 스테이지에서는 JDK와 빌드 도구를 포함한 이미지에서 소스 코드를 컴파일하고 실행 가능한 아티팩트(예: `app.jar`)를 생성한다.
+2. **최종(Final) 스테이지**: 두 번째 스테이지에서는 JRE만 포함된 가벼운 베이스 이미지에서 시작하여, 빌더 스테이지에서 생성된 아티팩트만 `COPY --from=builder` 명령어로 가져온다.
+
+### 멀티 스테이지 빌드 예시
+
+```dockerfile
+# =========================================================
+# 1. 빌더(Builder) 스테이지: 앱을 빌드하는 환경
+# =========================================================
+FROM amazoncorretto:21 AS builder
+WORKDIR /app
+
+COPY build.gradle settings.gradle ./
+COPY gradle ./gradle
+RUN ./gradlew dependencies --no-daemon
+
+COPY . .
+RUN ./gradlew bootJar --no-daemon
+
+# =========================================================
+# 2. 최종(Final) 스테이지: 앱을 실행하는 환경
+# =========================================================
+FROM amazoncorretto:21-al2-jre
+WORKDIR /app
+
+# 빌더 스테이지에서 생성된 JAR 파일만 복사
+COPY --from=builder /app/build/libs/*.jar app.jar
+
+ENTRYPOINT ["java", "-jar", "app.jar"]
+```
+
+#### 효과
+
+* **이미지 크기 감소**: 최종 이미지에는 JDK, Gradle, 소스 코드 등이 전혀 포함되지 않고, 오직 JRE와 `app.jar` 파일만 남게 되어 이미지 크기가 수백 MB 이상 감소한다.
+* **보안 강화**: 공격에 사용될 수 있는 빌드 관련 도구나 불필요한 라이브러리가 제거되어 보안 표면이 줄어든다.
+* **관리 용이성**: 복잡한 셸 스크립트 없이도 Dockerfile 하나만으로 빌드와 실행 환경을 깔끔하게 분리하여 관리할 수 있다.
+
+---
+
+## 최적화 4 - BuildKit 캐시 마운트 활용하기 (feat. Gradle)
+
+Dockerfile 순서를 최적화하고 멀티 스테이지 빌드를 적용했지만, 여전히 아쉬운 점이 남는다.
+
+`build.gradle` 파일에 작은 변경(주석 추가, 라이브러리 버전 수정 등)만 생겨도 의존성을 다운로드하는 레이어의 캐시가 깨지고, 모든 의존성을 처음부터 다시 받아와야 한다. 이 과정은 수 분이 소요될 수
+있는 매우 비싼 작업이다.
+
+### BuildKit의 cache 마운트
+
+이 문제를 해결하기 위해 BuildKit은 `RUN` 명령어에 `--mount=type=cache` 옵션을 제공한다. 이 옵션은 Docker 호스트의 캐시 디렉토리를 빌드 컨테이너의 특정 경로에 마운트하여,
+`RUN` 명령어가 실행되는 동안 해당 디렉토리의 내용을 유지하고 다음 빌드에서 재사용할 수 있게 해준다.
+
+### 캐시 마운트 적용 예시 (Gradle)
+
+Gradle은 다운로드한 의존성을 보통 `~/.gradle/caches` 디렉토리에 저장한다. 우리는 이 디렉토리를 캐시 마운트의 target으로 지정할 수 있다.
+
+```dockerfile
+# ... (이전 스테이지)
+
+# RUN 명령어에 --mount=type=cache 옵션 추가
+# target: 컨테이너 내에서 캐시로 사용할 경로
+# id (선택사항): 여러 캐시 마운트를 구분하기 위한 고유 ID
+RUN --mount=type=cache,target=/root/.gradle/caches,id=gradle-caches \
+    ./gradlew bootJar --no-daemon
+
+# ... (이후 스테이지)
+```
+
+#### 동작 방식
+
+1. `RUN` 명령어가 실행될 때, Docker는 호스트에 `gradle-caches`라는 이름의 캐시 볼륨이 있는지 확인한다.
+2. 이 캐시 볼륨을 컨테이너의 `/root/.gradle/caches` 경로에 마운트한다.
+3. `./gradlew bootJar`가 실행되면, 의존성을 다운로드할 때 이 마운트된 디렉토리를 사용한다. 이미 다운로드된 파일이 있다면 네트워크 통신 없이 바로 사용한다. 새로 다운로드된 파일은 이 디렉토리에
+   저장된다.
+4. `RUN` 명령어가 종료되면 마운트가 해제되지만, 캐시 디렉토리의 내용은 호스트에 그대로 남아 다음 빌드를 위해 유지된다.
+
+#### 개선 효과
+
+* **의존성 다운로드 시간 절약**: `build.gradle` 파일이 변경되어 레이어 캐시가 깨지더라도, Gradle은 캐시 마운트에 남아있는 파일들을 재사용하므로 의존성을 다시 다운로드하는 시간을 거의 없앨 수
+  있다.
+* **다양한 도구에 적용 가능**: 이 방식은 Gradle뿐만 아니라 Maven (`/root/.m2`), npm (`/root/.npm`), apt (`/var/cache/apt`) 등 다양한 패키지 매니저의
+  캐시 디렉토리에도 동일하게 적용할 수 있다.
+
+> 캐시 마운트는 CI/CD 환경처럼 매번 새로운 환경에서 빌드하는 경우에 강력한 효과를 발휘한다.
+
+---
+
+## 최적화 5 - CI/CD 환경에서의 원격 캐시
+
+로컬 환경에서 캐시 마운트를 사용하면 빌드 속도가 크게 향상되지만, GitHub Actions와 같은 CI/CD 환경에서는 또 다른 문제가 발생한다.
+
+CI 작업은 대부분 매번 새로운 가상 머신이나 컨테이너 위에서 실행되기 때문에, 이전 작업에서 생성된 Docker 빌드 레이어 캐시나 캐시 마운트가 다음 작업으로 이어지지 않는다. 결국 CI 환경에서는 매번 '캐시
+없는' 상태에서 빌드를 시작하게 된다.
+
+이를 해결하기 위한 방법은 바로 **원격 캐시**이다.
+
+### 원격 캐시란?
+
+빌드 과정에서 생성된 캐시 데이터(레이어 등)를 Docker Hub, GitHub Container Registry(GHCR), AWS S3와 같은 원격 저장소에 저장하고, 다음 빌드 시에 가져와서 사용하는
+방식이다.
+
+BuildKit은 `--cache-from`과 `--cache-to` 플래그를 통해 이 기능을 지원한다.
+
+* `--cache-to`: 빌드가 완료된 후 캐시를 지정된 원격 저장소로 내보낸다.
+* `--cache-from`: 빌드를 시작하기 전, 지정된 원격 저장소에서 캐시를 가져온다.
+
+### 원격 캐시 적용 예시
+
+GitHub Actions 워크플로우에서 Docker Hub을 캐시 저장소로 사용하는 예시다.
+
+```yaml
+# .github/workflows/ci.yml
+
+name: CI
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          registry: docker.io
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: true
+            # Docker Hub 태그 형식: docker.io/<username>/<repo>:latest
+          tags: docker.io/${{ secrets.DOCKERHUB_USERNAME }}/my-app:latest
+
+            # 캐시 설정 (Docker Hub 레지스트리 활용)
+          cache-from: type=registry,ref=docker.io/${{ secrets.DOCKERHUB_USERNAME }}/my-app:cache
+          cache-to: type=registry,ref=docker.io/${{ secrets.DOCKERHUB_USERNAME }}/my-app:cache,mode=max
+```
+
+#### 동작 방식
+
+1. 워크플로우가 시작되면 `cache-from` 설정을 통해 `docker.io/${{ secrets.DOCKERHUB_USERNAME }}/my-app:cache` 이미지로부터 캐시 메타데이터를 가져온다.
+2. Docker 빌드가 진행되면서 가져온 캐시를 최대한 활용하여 빌드 시간을 단축한다.
+3. 빌드가 성공적으로 완료되면 `cache-to` 설정을 통해 새로운 캐시 레이어들을 `docker.io/${{ secrets.DOCKERHUB_USERNAME }}/my-app:cache` 이미지로 내보내 다음
+   빌드를 위해 저장한다.
+
+#### 개선 효과
+
+* **지속적인 캐시 활용**: CI 환경이 매번 초기화되더라도, 원격지에 저장된 캐시를 통해 빌드 속도를 꾸준히 빠르게 유지할 수 있다.
+* **협업**: 여러 개발자가 동일한 원격 캐시를 공유함으로써, 누가 빌드를 하든 빠른 속도를 경험할 수 있다.
+
+---
+
 ## 최적화 여정의 결과
 
 지금까지 Docker 빌드 속도를 개선하기 위해 적용했던 여러 최적화 기법들을 살펴보았다.
@@ -499,7 +499,7 @@ jobs:
     * 멀티 스테이지 빌드는 이제 선택이 아닌 필수다. 최종 이미지의 크기를 줄여 보안을 강화하고 배포 속도를 높여야 한다.
 5. **다양한 환경을 대비해야 한다**
     * `buildx`를 이용한 Multi-Platform 빌드는 변화하는 개발 및 운영 환경에 유연하게 대응할 수 있게 한다.
-   
+
 ### 더 궁금한 점
 
 ![img_4.png](img_4.png)
