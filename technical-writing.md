@@ -6,20 +6,20 @@
 
 ## 📌 목차 
 
-> **들어가며**  
-> **1. 맥락을 공유하는 소통법**  
+> **[들어가며](https://github.com/ShinjungOh/woowa-writing/blob/184a263c56e973836d5630d0de1bee6452ed3207/technical-writing.md#%EB%93%A4%EC%96%B4%EA%B0%80%EB%A9%B0)**  
+> **[1. 맥락을 공유하는 소통법](https://github.com/ShinjungOh/woowa-writing/blob/184a263c56e973836d5630d0de1bee6452ed3207/technical-writing.md#1-%EB%A7%A5%EB%9D%BD%EC%9D%84-%EA%B3%B5%EC%9C%A0%ED%95%98%EB%8A%94-%EC%86%8C%ED%86%B5%EB%B2%95)**  
 >  CSS(Context Synchronize Session)   
 >  슬랙 업무보고 채널  
-> **2. 팀워크를 높이는 소프트 스킬 문화**    
+> **[2. 팀워크를 높이는 소프트 스킬 문화](https://github.com/ShinjungOh/woowa-writing/blob/184a263c56e973836d5630d0de1bee6452ed3207/technical-writing.md#2-%ED%8C%80%EC%9B%8C%ED%81%AC%EB%A5%BC-%EB%86%92%EC%9D%B4%EB%8A%94-%EC%86%8C%ED%94%84%ED%8A%B8%EC%8A%A4%ED%82%AC-%EB%AC%B8%ED%99%94)**    
 > 데일리 스크럼  
 > 익명 피드백    
-> **3. 한 주를 돌아보는 주간 회고**  
+> **[3. 한 주를 돌아보는 주간 회고](https://github.com/ShinjungOh/woowa-writing/blob/184a263c56e973836d5630d0de1bee6452ed3207/technical-writing.md#3-%ED%95%9C-%EC%A3%BC%EB%A5%BC-%EB%8F%8C%EC%95%84%EB%B3%B4%EB%8A%94-%EC%A3%BC%EA%B0%84%ED%9A%8C%EA%B3%A0)**  
 > 감정 회고  
 > 작업 방식 점검    
-> **4. 프로젝트 점검을 위한 행사**  
+> **[4. 프로젝트 점검을 위한 행사](https://github.com/ShinjungOh/woowa-writing/blob/184a263c56e973836d5630d0de1bee6452ed3207/technical-writing.md#4-%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8-%EC%A0%90%EA%B2%80%EC%9D%84-%EC%9C%84%ED%95%9C-%ED%96%89%EC%82%AC)**  
 > 이벤트스토밍  
 > QA    
-> **마치며**
+> **[마치며](https://github.com/ShinjungOh/woowa-writing/blob/184a263c56e973836d5630d0de1bee6452ed3207/technical-writing.md#%EB%A7%88%EC%B9%98%EB%A9%B0)**
 
 <br>
 
