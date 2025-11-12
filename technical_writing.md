@@ -1,9 +1,13 @@
+제목: 서비스 중단 없이 DB 스키마 변경하기
+
 # 문제 상황
 
 백엔드 개발자라면 한 번쯤 ALTER TABLE 구문을 실행하다가 WAS가 먹통이 되는 경험을 해봤을 것이다. 테이블이 잠기면서 쿼리들이 대기 상태에 빠지고, 타임아웃이 연쇄적으로 발생하는 상황 말이다.  
-물론 잠시 점검시간을 갖고 서비스를 중단한 뒤 DDL을 실행하면 간단하다. 하지만 대규모 서비스를 운영 중인데, 상대적으로 작은 스키마 변경을 위해 전체 서비스를 중단해야 한다면? 그 시간 동안 발생하는 손실은 상상하기 어렵다.  
-**그렇다면 서비스 중단 없이 안전하게 스키마를 변경할 방법은 없을까?**
-
+물론 잠시 점검 시간을 갖고 서비스를 중단한 뒤 DDL을 실행하면 간단하다. 하지만 대규모 서비스를 운영 중인데, 상대적으로 작은 스키마 변경을 위해 전체 서비스를 중단해야 한다면? 그 시간 동안 발생하는 손실은 상상하기 어렵다.  
+  
+**그렇다면 서비스 중단 없이 안전하게 스키마를 변경할 방법은 없을까?**  
+  
+> **이 글은 스키마 변경으로 서비스를 중단해본 경험이 있거나, 지금 당장 스키마를 변경해야 하지만 서비스 중단이 부담스러운 개발자를 위한 실전 가이드다.** 단순한 개념 소개가 아닌, 실무에 바로 적용할 수 있는 구체적인 방법을 다룬다.
 
 ## 두 가지 문제
 
@@ -82,7 +86,7 @@ ALTER TABLE users ..., LOCK=EXCLUSIVE;
   
 >**ALGORITHM과 LOCK**  
 >  
->MySQL은 DDL마다 사용 가능한 ALGORITHM과 LOCK 수준이 정해져 있다.  
+>MySQL은 DDL 종류별로 사용 가능한 ALGORITHM과 LOCK 수준이 정해져 있다.  
 >  
 > | ALGORITHM | 주로 사용되는 LOCK | DML 허용 | 의미 |
 > |-----------|------------------|---------|------|
@@ -150,13 +154,14 @@ ALGORITHM과 LOCK을 명시하지 않으면 MySQL이 자동으로 COPY 알고리
 
 ## Offline DDL의 Online Migration
 
-앞서 Offline DDL은 실행 중 모든 DML은 차단한다고 했다. 그럼 Offline DDL은 Online Migration이 불가능한 것일까?  
+앞서 Offline DDL은 실행 중 모든 DML을 차단한다고 했다. 그럼 Offline DDL은 Online Migration이 불가능한 것일까?  
   
 결론부터 말하자면, 그렇지 않다. Offline DDL 실행 중 테이블에 락이 걸리는 이유가 무엇일까?  
-  
-COPY 알고리즘을 사용하는 Offline DDL은 내부적으로 스키마 변경사항이 반영된 신규 테이블을 만들고, 여기에 기존 테이블 데이터를 복사한다. 이 과정에서 데이터 변경(INSERT, UPDATE, DELETE)이 발생하면 신규 테이블에 변경사항이 반영되지 않아 일관성을 해친다.  
-그렇다면 데이터 복사 간 일어나는 변경사항을 신규 테이블에도 반영할 수 있다면 어떨까? 우리는 이 아이디어를 통해 Offline DDL의 Online Migration을 실현할 수 있다.  
 
+COPY 알고리즘을 사용하는 Offline DDL은 내부적으로 스키마 변경사항이 반영된 신규 테이블을 만들고, 여기에 기존 테이블 데이터를 복사한다. 문제는 이 복사 과정에서 발생한다. 데이터를 복사하는 동안 
+기존 테이블에 데이터 변경(INSERT, UPDATE, DELETE)이 발생하면 신규 테이블에는 이 변경사항이 반영되지 않는다. 이렇게 되면 데이터 일관성이 깨지기 때문에 MySQL은 테이블에 락을 걸어 모든 쓰기 작업을 차단한다.  
+
+그렇다면 복사 중 발생하는 변경사항을 신규 테이블에도 실시간으로 반영할 수 있다면 어떨까? 락을 걸지 않아도 일관성을 유지할 수 있을 것이다. 이 아이디어를 통해 Offline DDL의 Online Migration을 실현할 수 있다.  
 
 ### Offline DDL Online migration 도구
 
@@ -278,7 +283,7 @@ Feature Flag는 애플리케이션 재배포 없이도 특정 기능을 켜고 �
   
 [실습 저장소](https://github.com/songsunkook/db-migration-test)에 단계별 PR이 있으니 직접 확인해보면 이해에 도움이 될 것이다.  
   
-1. Expand: 스키마 변경 대상 추가(DDL)
+**1. Expand: 스키마 변경 대상 추가(DDL)**
 - 스키마 변경에 대해 확장(추가)만 하고 기존 스키마는 유지한다.
 - Offline DDL이라면 Offline DDL Online Migration Tool 사용을 고려할 수 있다.
 - 신규 데이터는 아직 NULL 상태이다.
@@ -289,7 +294,7 @@ Feature Flag는 애플리케이션 재배포 없이도 특정 기능을 켜고 �
 ALTER TABLE users ADD COLUMN email VARCHAR(255);
 ```
 
-2. Dual Write: 기존/신규 스키마 쓰기 대응 애플리케이션 배포(APP)
+**2. Dual Write: 기존/신규 스키마 쓰기 대응 애플리케이션 배포(APP)**
 - 기존/신규 스키마 양쪽에 모두 쓰기 작업을 하는 애플리케이션을 배포한다.
 - 읽기는 아직 기존 스키마를 사용한다.
 - 신규 데이터는 양쪽에 동시 저장된다.
@@ -303,9 +308,9 @@ public void updateName(String firstName, String lastName) {
 }
 ```
 
-3. Back Fill: 기존 데이터 마이그레이션(BATCH)
+**3. Back Fill: 기존 데이터 마이그레이션(BATCH)**
 - 기존 데이터를 신규 스키마로 마이그레이션한다.
-- 보통 Spring Batch 등을 통해 배치 처리한다.
+- Spring Batch 등을 통해 배치 처리한다.
 - NULL인 신규 스키마를 실제 값으로 채운다.
 - https://github.com/songsunkook/db-migration-test/pull/3
 
@@ -315,7 +320,7 @@ UPDATE users
     WHERE full_name IS NULL;
 ```
 
-4. Read Conversion: 읽기 전환 애플리케이션 배포(APP)
+**4. Read Conversion: 읽기 전환 애플리케이션 배포(APP)**
 - Feature Flag로 신규 스키마 읽기를 점진적 전환한다.
 - 쓰기는 여전히 Dual Write를 유지한다.
 - https://github.com/songsunkook/db-migration-test/pull/4
@@ -329,7 +334,7 @@ public String getDisplayName() {
 }
 ```
 
-5. Clean Up: 코드 정리 애플리케이션 배포(APP)
+**5. Clean Up: 코드 정리 애플리케이션 배포(APP)**
 - Feature Flag를 제거한다.
 - Dual Write를 제거한다.(신규 스키마만 Write한다)
 - 기존 스키마 관련 코드를 제거한다.
@@ -341,7 +346,7 @@ public String getFullName() {
 }
 ```
 
-6. Contract: 기존 스키마 대상 제거(DDL)
+**6. Contract: 기존 스키마 대상 제거(DDL)**
 - 기존 스키마를 제거한다.
 - Offline DDL이라면 Offline DDL Online Migration Tool 사용을 고려할 수 있다.
 - 애플리케이션이 더이상 기존 스키마를 참조하지 않는다.
