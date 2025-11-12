@@ -261,3 +261,8 @@ fun main() {
 3. `Call` 객체를 `execute()`하고, `Response` 응답을 처리한다.
 
 3번 과정부터는 OkHttp를 통해 응답을 처리하는 방식과 동일하다.
+
+
+### 참고 문서 출처
+- [OkHttp](https://square.github.io/okhttp/)
+- [Retrofit](https://square.github.io/retrofit/)
