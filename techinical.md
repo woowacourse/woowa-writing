@@ -76,7 +76,7 @@ Spring REST Docs는 개발자가 직접 작성한 설명(Asciidoc)과 테스트 
 
 ![Pasted image 20251014083455.png](image/Pasted%20image%2020251014083455.png)
 
-#### RestDocs 구현 예시시
+#### RestDocs 구현 예시
 
 `build.gradle`에 Asciidoctor 플러그인을 설정하고 다음과 같이 테스트를 작성합니다.
 
