@@ -119,7 +119,7 @@ export default function useUserOrganizationsStatistics() {
 ### 3-1. 대안 검토 및 선택 이유 (참고)
 
 React Query를 도입하기 전, 우리는 다양한 데이터 패칭 및 상태 관리 라이브러리를 검토해봤다. <br/>
-우리가 중점적으로 봤던 부분은 **서버 상태**를 안정적으로 관리할 수 있는지, **데이터 동기화 및 캐싱(무한 스크롤)**문제를 해결할 수 있는지를 살펴봤다.
+우리가 중점적으로 봤던 부분은 **서버 상태**를 안정적으로 관리할 수 있는지, 데이터 동기화 및 캐싱(무한 스크롤)문제를 해결할 수 있는지를 살펴봤다.
 
 React Query 외에 고민해봤던 대안으로는 대표적으로 `RTK Query`와 `SWR`, `Apollo Client` 등이 있다.
 
@@ -174,7 +174,7 @@ React Query는 invalidateQueries 기능을 통해 <br/>
 > 이를 구현할 때는 `useMutation`과 `queryClient.invalidateQueries`를 함께 사용한다.<br/> `useMutation`은 데이터 수정(쓰기) 작업을 담당하고,<br/> 그 작업이 성공하면 `invalidateQueries`를 호출하여 관련된 쿼리들을 **무효화(invalidate)한다.**
 >
 > 여기서 “무효화”란, <br/>
-> React Query가 해당 쿼리의 캐시 데이터를 **“더 이상 신뢰할 수 없다”**고 표시하는 것을 의미한다. <br/>
+> React Query가 해당 쿼리의 캐시 데이터를 “더 이상 신뢰할 수 없다”고 표시하는 것을 의미한다. <br/>
 > 즉, 캐시는 남아 있지만 “이 데이터는 오래되었으니 새로 가져와야 한다"고 판단하고 데이터를 다시 refetch 하게 되는 것이다.
 >
 > 그 결과, React Query는 무효화된 쿼리를 **자동으로 다시 요청(refetch)** 하여 최신 데이터를 가져오고, 이를 사용하는 모든 컴포넌트를 즉시 업데이트한다.
