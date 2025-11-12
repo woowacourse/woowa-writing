@@ -6,14 +6,14 @@
 
 > 이거 서비스로 만들면 사람들이 쓸 것 같은데...
 
-머릿속을 스쳐간 아이디어는 있지만, 화면 설계, 디자인, UI 구현 등 프론트엔드 구현이 장벽이 되어 상상에만 그치고 구현으로는 이어지지 못하는 경험이 한 번 쯤은 있으실 거에요.
+머릿속을 스쳐간 아이디어는 있지만, 화면 설계, 디자인, UI 구현 등 프론트엔드 구현이 장벽이 되어 상상에만 그치고 구현으로는 이어지지 못하는 경험이 한 번쯤은 있으실 거에요.
 저 또한 그런 개발자 중 한 명이었습니다.
 
-사람의 언어(자연어)로 AI에게 프롬프팅해서 코드를 생성하는 방식을 바이브 코딩이라고 하죠. 요즘은 Lovable, Bolt, v0와 같은 no-code AI를 이용하면, 바이브 코딩으로 쉽고 빠르게 UI까지 갖춰진 프로토타입을 만들어볼 수 있습니다.
+사람의 언어(자연어)로 AI에게 프롬프팅해서 코드를 생성하는 방식을 바이브 코딩이라고 하죠. 요즘은 Lovable, Bolt, v0와 같은 no-code AI를 이용하면, 바이브 코딩으로 빠르게 UI까지 갖춰진 프로토타입을 만들어볼 수 있습니다.
 
 Lovable로 만든 프로토타입을 주변에 보여주고 사용성을 어느 정도 검증했다고 가정하겠습니다.
 
-Lovable 플랫폼에서 동작하는 프로토타입은 새로운 기능 추가, 유지 보수, 보안, 모니터링 등에 제약이 많습니다. 그래서 프로토타입을 실제 서비스로 발전시키기 위해서는 결국 자체 인프라 환경으로 마이그레이션해야 할 필요가 있습니다.
+Lovable 플랫폼에서 동작하는 프로토타입은 새로운 기능 추가, 유지보수, 보안, 모니터링 등에 제약이 많습니다. 그래서 프로토타입을 실제 서비스로 발전시키기 위해서는 결국 자체 인프라 환경으로 마이그레이션해야 할 필요가 있습니다.
 
 ![](https://velog.velcdn.com/images/heiler/post/c7f898f5-e8b2-40cb-ac05-108e0d96203e/image.png)
 
@@ -25,13 +25,13 @@ Lovable 플랫폼에서 동작하는 프로토타입은 새로운 기능 추가,
 프로토타입을 자체 인프라로 마이그레이션하는 일만 남았는데요.
 마이그레이션을 진행하던 중에 이런 의문이 들었습니다.
 
-> 새로운 프로토타입을 만들 때마다 인프라를 매번 웹 콘솔에서 수동으로 만들어야 할까?
+> 새로운 프로토타입을 만들 때마다 인프라를 매번 웹 콘솔에서 수동으로 반복해서 만들어야 할까?
 
-운영/모니터링이 가능한 최소 비용의 인프라 구조는 어떤 프로토타입이든 비슷할 것이라 생각했고, 이미 설계해 놓은 인프라를 템플릿으로 만들어 쉽게 재현할 수 있는 방법을 찾던 중에 Terraform을 접하게 됐습니다.
+운영/모니터링이 가능한 최소 비용의 인프라 구조는 어떤 프로토타입이든 비슷할 것이라 생각했고, 이미 설계해 놓은 인프라를 템플릿으로 만들어 쉽게 재현할 수 있는 방법으로 Terraform을 선택하게 됐습니다.
 
-Terraform을 학습하고 프로젝트에 도입하면서 "이 정도만 이해하고 있어도 누구든 충분히 Terraform을 사용할 수 있겠다" 느꼈던 내용들을 공유하고자 정리해 보았습니다.
+그리고 Terraform을 프로젝트에 도입하면서 "이 정도만 이해하고 있어도 누구든 충분히 Terraform을 사용할 수 있겠다" 느꼈던 내용들을 정리해 보았습니다.
 
-Terraform을 처음 접하거나, 프로젝트에 이제 막 도입하려는 분들께 도움이 되길 바랍니다. 😄
+Terraform을 처음 접하거나, 프로젝트에 이제 막 도입하려는 분들께 도움이 되길 바랍니다. ☺️
 
 ---    
 # ✅ Terraform 핵심 개념
@@ -61,11 +61,11 @@ HCL에서는 block, argument 구조로 코드를 작성하는데요.
 
 ![](https://velog.velcdn.com/images/heiler/post/c49c7bf9-d6a7-4d98-adb8-c9b94b0a088d/image.png)
 
-HCL을 학습하면서 느낀 점은 사용하는 클라우드(예: AWS)에 대한 이해만 있다면, 해당 클라우드에서 사용할 리소스를 HCL로 작성하는 것은 크게 어렵지 않을 것이라 생각했습니다.
+HCL을 학습하면서 느낌 점은 사용하는 클라우드(예: AWS)에 대한 이해만 있다면, 해당 클라우드에서 사용할 리소스를 HCL문법으로 작성하는 것은 크게 어렵지 않다는 것입니다.
 
-다만, HCL도 코드다 보니 추상화, 모듈화 구조 설계가 필요합니다.
+다만, HCL도 코드다 보니 추상화, 모듈 구조 설계가 필요합니다.
 
-HCL 문법에 대한 장벽보다 어떻게 모듈화 구조를 설계할지 고민하는 것이 더 어렵고 큰 진입 장벽이라고 생각해요.
+HCL 문법보다, 클라우드에 대한 이해가 필요한 점과 모듈 구조 설계를 해야한다는 점이 더 어렵고 큰 진입 장벽인 것 같습니다.
 
 ### 2) 선언적(Declarative)
 
@@ -133,8 +133,6 @@ provider "aws" {
 }
 ```
 
-
-
 ### 2) resource
 
 resource 블록은 VPC, Subnet, EC2, RDS와 같은 하나의 **리소스를 정의**하는 블록입니다.
@@ -159,7 +157,7 @@ resource "aws_instance" "app_instance" {
 
 variable 블록은 같은 모듈(폴더) 내 다른 Terraform 코드에서 사용할 수 있는 변수를 정의합니다.
 
-가령 같은 모듈에 variables.tf와 main.tf가 존재한다고 하겠습니다.
+가령 같은 모듈에 `variables.tf`와 `main.tf`가 존재한다고 하겠습니다.
 
 ```
 # 폴더 구조
@@ -196,7 +194,7 @@ resource "aws_eip" "app_eip" {
 }
 ```
 
-위 코드와 같이 main.tf에서 variables.tf에 정의한 변수를 사용할 수 있습니다.
+위 코드와 같이 `main.tf`에서 `variables.tf`에 정의한 변수를 사용할 수 있습니다.
 
 별다른 조치 없이 variable에 default 값을 입력하지 않으면, Terraform 코드를 실행하는 시점에 콘솔로 사용자 입력을 받게 됩니다.
 
@@ -237,7 +235,7 @@ Terraform에서는 하나의 폴더 단위를 모듈이라고 부릅니다.
 
 모듈화 해놓은 코드는 module 블록으로 불러와 재사용할 수 있고, variable을 함께 사용하면 환경별로 필요한 값만 다르게 설정할 수 있습니다.
 
-예를 들어 dev 환경과 prod 환경에서 EC2의 인스턴스 타입, 볼륨 타입, 볼륨 크기에만 차이를 두고 싶다면, 아래 코드와 같이 그 차이를 두고 싶은 값을 모듈에서 variables.tf로 분리해두고, 각 환경의 main.tf에서 다른 값을 주입하여 사용할 수 있습니다.
+예를 들어 dev 환경과 prod 환경에서 EC2의 인스턴스 타입, 볼륨 타입, 볼륨 크기에만 차이를 두고 싶다면, 아래 코드와 같이 그 차이를 두고 싶은 값을 모듈에서 `variables.tf`로 분리해두고, 각 환경의 `main.tf`에서 다른 값을 주입하여 사용할 수 있습니다.
 
 ```hcl
 # modules/application/variables.tf
@@ -386,7 +384,7 @@ resource "aws_instance" "app_instance" {
 
 Terraform에서 말하는 backend는 백엔드/프론트엔드의 백엔드와는 전혀 다른 의미입니다.
 
-backend는 Terraform **상태 파일(이하 상태 파일)을 저장하고 관리하는 위치**를 의미합니다.
+backend는 **Terraform 상태 파일(이하 상태 파일)을 저장하고 관리하는 위치**를 의미합니다.
 
 **상태 파일**을 쉽게 설명하면, 현재 Terraform으로 관리중인 리소스들의 상태를 JSON 형식으로 기록한 파일로, Terraform의 멱등성을 보장하기 위해 사용되는 아주 아주 중요한 파일입니다.
 
@@ -409,17 +407,17 @@ terraform {
 # ✅ Terraform 사용 중 겪었던 문제
 
 Terraform을 프로젝트에 도입하면서 온전하게 해결하지 못한 문제가 두 가지 있었습니다. 🥲
-부트스트랩 상태 파일 관리 문제와, Terraform에서 지원하지 않는 외부 서비스를 Terraform과 연계해서 사용해야 하는 문제였는데요.. 차례대로 설명드리겠습니다.
+부트스트랩 상태 파일 관리 문제와, Terraform에서 지원하지 않는 외부 서비스를 Terraform과 연계해서 사용해야 하는 문제였는데요. 차례대로 설명드리겠습니다.
 
 ## 1) 부트스트랩 상태 파일 관리 문제
 
 부트스트랩 상태 파일은 제가 임의로 붙인 이름이고, 명확히는 "백엔드 인프라 상태 파일을 저장하는 S3 버킷을 생성하는 Terraform 코드에 대한 상태 파일"을 말합니다.
 
-예를 들어 백엔드 인프라의 상태 파일을 `courseitda-backend-dev-terraform-state` 라는 이름의 S3 버킷에 저장한다고 해보겠습니다.
+예를 들어 백엔드 인프라의 상태 파일을 `courseitda-backend-dev-terraform-state` 라는 이름의 S3 버킷에 저장한다고 해보겠습니다. 이 `courseitda-backend-dev-terraform-state` S3 버킷을 만드는 Terraform 코드가 따로 존재합니다.
 
-이 `courseitda-backend-dev-terraform-state` S3 버킷을 만드는 Terraform 코드가 따로 존재하고, 그 코드에 대한 상태 파일을 앞으로 "부트스트랩 상태 파일"이라 부르겠습니다.
+그 코드에 대한 상태 파일을 앞으로 "부트스트랩 상태 파일"이라 부르겠습니다.
 
-backend로 S3를 사용하려면 이 부트스트랩 상태 파일을 수동으로 관리해야 했습니다.
+S3를 상태 파일의 원격 저장소로 사용하려면 이 부트스트랩 상태 파일을 수동으로 관리해야 했습니다.
 
 ```
 # 폴더 구조
@@ -461,7 +459,7 @@ your Terraform state and will henceforth be managed by Terraform.
 조금 번거롭지만 `terraform import <리소스명>` 명령어로 리소스를 하나씩 tfstate 파일에 다시 가져와 복원할 수 있습니다.
 
 Terraform Cloud를 사용하면 이런 부트스트랩 상태 파일 관리 문제를 줄일 수 있다고 해서,
-현재는 S3 backend에서 Terraform Cloud로 이전하는 것을 고민하고 있습니다.
+현재는 원격 상태 저장소를 S3에서 Terraform Cloud로 이전하는 것을 고민하고 있습니다.
 
 ## 2) CloudFront와 커스텀 도메인 연결
 
@@ -569,7 +567,7 @@ Terraform을 사용하면 이미 한 번 구축해 본 인프라를 전과 똑�
 인프라 자동화를 담당한 인원이 저 혼자였기에 복잡한 권한 분리 작업이 따로 필요 없어
 비교적 도입이 수월했다고 생각합니다.
 
-규모가 있는 팀 차원에서의 Terraform 도입은 레거시 인프라의 상황과 러닝 커브 등의 진입장벽을 고려해 신중하게 결정해야 할 것 같아요.
+규모가 있는 팀 차원에서의 Terraform 도입은 레거시 인프라의 상황과 러닝커브 등의 진입장벽을 고려해 신중하게 결정해야 할 것 같아요.
 
 혹시 동작하는 전체 Terraform 코드가 궁금하신 분들은 [코스잇다 레포지토리](https://github.com/courseitda/courseitda-backend/tree/develop/terraform)를 참고해 주세요.
 
@@ -583,3 +581,4 @@ Terraform을 사용하면 이미 한 번 구축해 본 인프라를 전과 똑�
 - [Terraform 공식 문서 - Standard Module Structure](https://developer.hashicorp.com/terraform/language/modules/develop/structure)
 - [Terraform 공식 문서 - State](https://developer.hashicorp.com/terraform/language/state)
 - [Terraform AWS Provider](https://registry.terraform.io/providers/hashicorp/aws/latest)
+- [10분 테코톡 - 헤일러의 Terraform으로 인프라 자동화하기](https://www.youtube.com/watch?v=57FJoXsbf2s)
