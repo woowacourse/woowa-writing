@@ -144,7 +144,7 @@ public class UserControllerTest {
 
 Spring REST Docs의 정확성은 필수적이지만, 상호작용이 불가능한 정적 문서는 사용자 경험을 저해합니다. 반대로 Swagger는 훌륭한 UI를 제공하지만, 정확성을 보장하지 못합니다.
 
-두 마리 토끼를 동시에 잡을 수는 없을까요? 꼭 한 방법을 선택해야만 할까요?
+두 마리 토끼를 동시에 잡을 수는 없을까요? 꼭 한 가지 방법을 선택해야만 할까요?
 
 ![restdocs-api-spec.png](image/restdocs-api-spec.png)
 
@@ -273,7 +273,6 @@ void apiSpecTest() throws Exception {
 ![Pasted image 20251014083526.png](image/Pasted%20image%2020251014083526.png)![[Pasted image 20251014083526.png]]
 2.  **명세 파일 복사 설정 (`build.gradle`)**: 빌드 시 `openapi3` 태스크로 생성된 `openapi3.yaml` 파일을 `bootJar`에 포함될 정적 리소스 폴더(`static/docs`)로 복사하는 Gradle 작업을 추가합니다.
 
-   Groovy
 
     ```groovy
     // build.gradle
