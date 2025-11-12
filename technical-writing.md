@@ -4,9 +4,8 @@
 
 ## 대상 독자
 
-- 검색 결과의 품질을 향상시키고 싶은 사람
-- 검색 시 원하는 결과가 상위에 노출되지 않아 고민인 서버 개발자
 - 관계형 DB의 `LIKE` 검색 또는 `전문(Full-Text)`검색보다 더 높은 품질의 검색 기능을 만들고싶은 개발자 
+- 검색 시 원하는 결과가 상위에 노출되지 않아 고민인 서버 개발자
 
 ## 서비스 배경
 
@@ -29,9 +28,9 @@
 그래서 유연한 검색을 위해 MySQL의 `Full-Text Search` 기능을 활용했습니다. 2-gram 파서를 이용해 단어를 두 글자 단위로 색인했고, 매칭되는 토큰 수에 비례해 점수를 매겼습니다.
 매칭되는 토큰의 수에 비례해 점수화하는 기능 덕분에 정확도가 있었습니다.
 
-이로써 단순 `LIKE`보다 유연한 검색이 가능해졌지만, 곧 새로운 한계에 부딪혔습니다.
+이로써 단순 `LIKE`보다 유연한 검색이 가능해졌지만, 곧 새로운 한계를 만났습니다.
 
-### Full-Text Search의 문제
+### MySQL Full-Text Search의 문제
 
 불만족스러운 검색 결과를 마주치는 상황이 많았습니다.
 
@@ -53,7 +52,7 @@
 2-gram을 사용하지 않고 유의미한 토큰을 추출하기 위해서는 형태소 분석이 필요했습니다.
 `“로드밸런서”`와 같이 복합명사들을 쪼개지 않도록 사전도 필요했습니다.
 
-#### 2. 세밀한 스코어링이 불가능합니다.
+#### 2. 세밀한 점수화가 불가능합니다.
 
 아래는 `“HTTPS 적용”`에 대한 검색 결과입니다.
 
@@ -61,9 +60,9 @@
 
 ![https-mysql2.png](https-mysql2.png)
 
-첫 번째를 비롯한 다른 주제의 글들이 상위에 있는 이유는 `“HTTPS”`라는 단어 자체가 많이 등장했기 때문입니다.
+첫 번째를 비롯한 다른 주제의 글들이 상위에 있는 이유는 `“HTTPS”` 또는 `“적용”`이라는 단어가 많이 등장했기 때문입니다.
 
-1위 문서인 소셜 로그인 설계 아티클의 경우 API의 URL에 `https://...`가 많아서 1등을 했습니다. 
+1위 문서인 `소셜 로그인 설계`의 경우 글의 내용에 `https://...`형태의 URL이 많아서 가장 높은 점수를 받았습니다. 
 
 즉 단어의 빈도만으로는 아티클의 관련도가 높다고 볼 수 없습니다.
 
@@ -84,24 +83,23 @@
 
 ## 검색 품질을 결정짓는 세 가지 축
 
-검색 품질은 단순히 “결과가 나온다”로 평가할 수 없습니다.
-사용자는 단어가 아니라 **의도**를 전달합니다.
+**관련도 높은 문서**들이 **상위**에 **많이** 노출될 때 검색 품질이 좋다고 할 수 있습니다.
 따라서 검색 품질은 아래 세 가지 요소에 의해 결정됩니다.
 
-1. **형태소 분석** – 사용자의 단어를 기계가 이해 가능한 언어로 해석  
-2. **사전(Synonym / Domain Dictionary)** – 서로 다른 단어를 같은 개념으로 연결  
-3. **스코어링(Scoring)** – 정말 중요한 문서를 위쪽에 노출
+1. **형태소 분석 및 사용자 사전** – 사용자의 검색어에서 유의미한 단어를 추출  
+2. **동의어 사전** – 같은 의미의 다른 단어를 연결  
+3. **스코어링** – 관련도 높은 문서를 상위로 노출
 
 ### 형태소 분석
 
-형태소 분석은 문장에서 **의미 단위를 추출하는 과정**입니다.  
+문장에서 **의미있는 단위를 추출**하기 위해 형태소 분석을 진행합니다.  
 예: `“리팩터링을 진행합니다.”` → `“리팩터링”` 
 
 이 과정을 통해 검색엔진은 단순 문자열이 아닌 **의미 단위로 색인**할 수 있습니다.
 
 ### 사용자 사전
 
-형태소 분석은 **복합 명사**를 분리하기도 합니다. **사용자 사전(User Dictionary)** 은 복합 명사를 분해하지 않도록 하나의 단위로 인식하도록 합니다.   
+형태소 분석 과정에서 **복합 명사**를 분리하기도 합니다. **사용자 사전(User Dictionary)** 은 복합 명사를 분해하지 않고 하나의 단위로 인식하도록 합니다.   
 
 예를들어 `“로그아웃”`을 `“로그”`, `“아웃”`으로 분리하면 의미가 훼손되므로, 사용자 사전을 통해 `“로그아웃”`을 **분리되지 않는 하나의 단어**로 등록해야 합니다.
 
@@ -126,85 +124,19 @@
 간단한 예시로 아래와 같이 점수를 평가할 수 있습니다.
 - 검색어가 제목에 있는 경우 점수 ↑
 - 검색어가 여러 개인 경우 문서에서 검색어들이 가까이 있을 수록 점수 ↑
-- `“설계”`, `“구현”`과 같은 상대적으로 비결정적인 흔한 단어는 점수 ↓
+- `“설계”`, `“구현”`과 같은 상대적으로 비결정적이고 흔한 단어는 점수 ↓
 
 ## 구현
 
-Elasticsearch를 이용해 위 세 가지를 구현했습니다.
+Elasticsearch를 이용해 위 세 가지를 구현했습니다. 자세한 구현 방법은 아래 링크를 참고하시기 바랍니다.
 
-```json
-{
-  "analysis": {
-    "analyzer": {
-      "article_common_analyzer": {
-        "filter": [
-          "nori_pos_with_stoptags",
-          "nori_readingform",
-          "lowercase",
-          "article_common_synonym"
-        ],
-        "tokenizer": "nori_tokenizer_with_dict",
-        "type": "custom"
-      }
-    },
-    "filter": {
-      "article_common_synonym": {
-        "synonyms_path": "synonyms.txt",
-        "type": "synonym_graph"
-      },
-      "nori_pos_with_stoptags": {
-        "stoptags": [
-          "EC",
-          "EF",
-          "EP",
-          "ETM",
-          "ETN",
-          "IC",
-          "JC",
-          "JKB",
-          "JKC",
-          "JKG",
-          "JKO",
-          "JKQ",
-          "JKS",
-          "JKV",
-          "JX",
-          "MAG",
-          "MAJ",
-          "MM",
-          "SP",
-          "SSC",
-          "SSO",
-          "SC",
-          "SE",
-          "XPN",
-          "XSA",
-          "XSN",
-          "XSV",
-          "UNA",
-          "NA",
-          "VSV",
-          "VX"
-        ],
-        "type": "nori_part_of_speech"
-      }
-    },
-    "tokenizer": {
-      "nori_tokenizer_with_dict": {
-        "decompound_mode": "mixed",
-        "discard_punctuation": "false",
-        "type": "nori_tokenizer",
-        "user_dictionary": "dictionary.txt"
-      }
-    }
-  }
-}
-
-```
+- [nori tokenizer : 한글 형태소 분석 및 사용자 사전](https://esbook.kimjmin.net/06-text-analysis/6.7-stemming/6.7.2-nori)
+- [Search with synonyms : 동의어 사전](https://www.elastic.co/docs/solutions/search/full-text/search-with-synonyms)
+- [Multi-match Query : 다중 필드 검색 API](https://www.elastic.co/docs/reference/query-languages/query-dsl/query-dsl-multi-match-query)
 
 ### 형태소 분석
 
-[nori 형태소 분석기](https://esbook.kimjmin.net/06-text-analysis/6.7-stemming/6.7.2-nori)를 커스텀하여 사용했습니다.
+[nori tokenizer](https://esbook.kimjmin.net/06-text-analysis/6.7-stemming/6.7.2-nori)를 커스텀하여 사용했습니다.
 어미, 조사, 감탄사 등 핵심과 무관한 단어를 색인하지 않도록 했습니다.
 
 예를들어 `"Flyway는 오픈소스 마이그레이션 툴이다"` 라는 문장은 다음과 같이 분석됩니다.
@@ -213,52 +145,31 @@ Elasticsearch를 이용해 위 세 가지를 구현했습니다.
   "tokens": [
     {
       "token": "flyway",
-      "start_offset": 0,
-      "end_offset": 6,
-      "type": "word",
-      "position": 0
+      "type": "word"
     },
     {
       "token": "오픈",
-      "start_offset": 8,
-      "end_offset": 10,
-      "type": "word",
-      "position": 3
+      "type": "word"
     },
     {
       "token": "소스",
-      "start_offset": 10,
-      "end_offset": 12,
-      "type": "word",
-      "position": 4
+      "type": "word"
     },
     {
       "token": "마이",
-      "start_offset": 13,
-      "end_offset": 15,
-      "type": "word",
-      "position": 6
+      "type": "word"
     },
     {
       "token": "그레이",
-      "start_offset": 15,
-      "end_offset": 18,
-      "type": "word",
-      "position": 7
+      "type": "word"
     },
     {
       "token": "션",
-      "start_offset": 18,
-      "end_offset": 19,
-      "type": "word",
-      "position": 8
+      "type": "word"
     },
     {
       "token": "툴",
-      "start_offset": 20,
-      "end_offset": 21,
-      "type": "word",
-      "position": 10
+      "type": "word"
     }
   ]
 }
@@ -286,31 +197,19 @@ Elasticsearch를 이용해 위 세 가지를 구현했습니다.
   "tokens": [
     {
       "token": "flyway",
-      "start_offset": 0,
-      "end_offset": 6,
-      "type": "word",
-      "position": 0
+      "type": "word"
     },
     {
       "token": "오픈소스",
-      "start_offset": 8,
-      "end_offset": 12,
-      "type": "word",
-      "position": 3
+      "type": "word"
     },
     {
       "token": "마이그레이션",
-      "start_offset": 13,
-      "end_offset": 19,
-      "type": "word",
-      "position": 4
+      "type": "word"
     },
     {
       "token": "툴",
-      "start_offset": 20,
-      "end_offset": 21,
-      "type": "word",
-      "position": 6
+      "type": "word"
     }
   ]
 }
@@ -319,7 +218,7 @@ Elasticsearch를 이용해 위 세 가지를 구현했습니다.
 
 ### 동의어 사전
 
-언어에는 수많은 동의어들이 존재할 수 있습니다. 모아온과 같은 **개발** 도메인에서는 다음과 같은 예시가 있습니다.
+언어에는 수많은 동의어들이 존재할 수 있습니다. 모아온과 같은 개발 도메인에서는 다음과 같은 예시가 있습니다.
 - 데이터베이스, DB
 - 로드밸런서, 로드밸런싱, 로드밸런스
 
@@ -340,45 +239,30 @@ Elasticsearch를 이용해 위 세 가지를 구현했습니다.
   "tokens": [
     {
       "token": "flyway",
-      "start_offset": 0,
-      "end_offset": 6,
-      "type": "word",
-      "position": 0
+      "type": "word"
     },
     {
       "token": "오픈소스",
-      "start_offset": 8,
-      "end_offset": 12,
-      "type": "word",
-      "position": 3
+      "type": "word"
     },
     {
       "token": "migration",
-      "start_offset": 13,
-      "end_offset": 19,
-      "type": "SYNONYM",
-      "position": 4
+      "type": "SYNONYM"
     },
     {
       "token": "마이그레이션",
-      "start_offset": 13,
-      "end_offset": 19,
-      "type": "word",
-      "position": 4
+      "type": "word"
     },
     {
       "token": "툴",
-      "start_offset": 20,
-      "end_offset": 21,
-      "type": "word",
-      "position": 6
+      "type": "word"
     }
   ]
 }
 
 ```
 
-이 결과에서 `"migration"`과 `"마이그레이션"`이 같은 의미로 인식되어, 검색 결과가 더 폭넓고 정확하게 노출됩니다.
+이 결과에서 `"migration"`과 `"마이그레이션"`이 같은 의미로 인식되어, 검색 결과가 더 폭넓게 확장됩니다.
 
 ### 스코어링
 
@@ -392,7 +276,7 @@ Elasticsearch를 이용해 위 세 가지를 구현했습니다.
 예를 들어 검색어가 제목에 포함된 경우 더 높은 점수를 부여합니다.
 제목은 글의 핵심 내용을 담을 가능성이 높기 때문입니다.
 
-또한 Elasticsearch의 기본 스코어링 알고리즘인 BM25는 단순히 단어 빈도에 정비례하지 않고,
+또한 Elasticsearch의 기본 스코어링 알고리즘인 [BM25](https://esbook.kimjmin.net/05-search/5.3-relevancy)는 단순히 단어 빈도에 정비례하지 않고,
 문서 길이와 단어의 희귀도 등을 함께 고려해 맥락에 따른 가중치를 부여합니다.
 
 이를 통해 검색어가 **글의 핵심이고**, **결정적일수록** 높은 점수를 받는 구조를 만들었습니다.
@@ -409,3 +293,4 @@ Elasticsearch를 이용해 위 세 가지를 구현했습니다.
 
 - [MySQL Full-Text Search](https://dev.mysql.com/doc/refman/8.4/en/fulltext-search.html)
 - [Elasticsearch](https://www.elastic.co/kr/elasticsearch)
+- [Elastic Guide Book - Relevancy](https://esbook.kimjmin.net/05-search/5.3-relevancy)
