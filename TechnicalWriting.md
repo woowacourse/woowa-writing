@@ -13,7 +13,7 @@
   - [4. Action(행동1) : React Query의 도입과 코드 전환](#4-action행동1--react-query의-도입과-코드-전환)
     - [4-1. 핵심 기능 ① — 데이터 동기화: (Invalidate Query)](#4-1-핵심-기능---데이터-동기화-invalidate-query)
     - [4-2. 핵심 기능 ② — 캐싱(Caching)과 staleness 관리](#4-2-핵심-기능---캐싱caching과-staleness-관리)
-  - [5. Action(행동2) 무한 스크롤에서의 적용: useInfiniteQuery](#5-action행동2-무한-스크롤에서의-적용-useinfinitequery)
+  - [5. Action(행동2) : 무한 스크롤에서의 적용: useInfiniteQuery](#5-action행동2--무한-스크롤에서의-적용-useinfinitequery)
     - [5-1. 페이지별 캐싱 전략 수립](#5-1-페이지별-캐싱-전략-수립)
   - [6. Result(결과) : 성능 최적화 및 결과](#6-result결과--성능-최적화-및-결과)
     - [✅ (1) 낙관적 업데이트(Optimistic Update)](#-1-낙관적-업데이트optimistic-update)
@@ -244,7 +244,7 @@ cacheTime = 5 * 60 * 1000; // 5분 동안 캐시 유지
 
 <br/>
 
-## 5. Action(행동2) 무한 스크롤에서의 적용: useInfiniteQuery
+## 5. Action(행동2) : 무한 스크롤에서의 적용: useInfiniteQuery
 
 ---
 
