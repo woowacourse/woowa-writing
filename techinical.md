@@ -5,7 +5,7 @@
 
 분명 Swagger 문서에는 필드가 그대로인데, 실제 서버 응답에서는 해당 필드가 빠져 있었기 때문입니다.
 
-원인이 제 실수였다는 것을 알았을 때의 미안함은 이루 말할 수 없었습니다.
+원인이 제 실수였다는 것을 알았을 때의 미안함은 매우 컸습니다.
 
 많은 개발자분들이 비슷한 경험을 해보셨을 겁니다. 이처럼 사소한 실수가 프로젝트 전체에 큰 혼란을 야기할 수 있다는 점에서 **정확하고 신뢰할 수 있는 API 문서**는 단순한 편의성 이상의 문제입니다.
 
@@ -64,7 +64,7 @@ Swagger는 속도가 중요할 때 훌륭한 선택지이지만, 문서 정확�
 
 ### 테스트 주도 접근법: Spring REST Docs
 
-![Pasted image 20251014083014.png](image/Pasted%20image%2020251014083014.png)![[Pasted image 20251014083014.png]]
+![Pasted image 20251014083014.png](image/Pasted%20image%2020251014083014.png)
 
 #### 핵심 원리: 테스트 결과물로 문서를 만듭니다
 
@@ -74,7 +74,7 @@ Spring REST Docs는 API 문서화에 대한 철학 자체가 다릅니다. 문�
 
 Spring REST Docs는 개발자가 직접 작성한 설명(Asciidoc)과 테스트 실행 중에 자동으로 추출된 **스니펫(snippet)** 을 조합하여 최종 문서를 완성합니다.
 
-![Pasted image 20251014083455.png](image/Pasted%20image%2020251014083455.png)![[Pasted image 20251014083455.png]]
+![Pasted image 20251014083455.png](image/Pasted%20image%2020251014083455.png)
 
 #### 구현: 테스트 코드로 문서를 서술합니다
 
@@ -146,12 +146,12 @@ Spring REST Docs의 정확성은 필수적이지만, 상호작용이 불가능�
 
 두 마리 토끼를 동시에 잡을 수는 없을까요? 꼭 한 방법을 선택해야만 할까요?
 
-![restdocs-api-spec.png](image/restdocs-api-spec.png)![[Pasted image 20251014083315.png]]
+![restdocs-api-spec.png](image/restdocs-api-spec.png)
 
 
 **`restdocs-api-spec`** 라이브러리는 바로 이 간극을 메워줍니다. 이 라이브러리의 목표는 Spring REST Docs의 테스트 주도 방식을 그대로 사용하면서, 최종 결과물로 **Asciidoc**스니펫 대신 업계 표준인 **OpenAPI 3.0 명세** 파일을 생성하는 것입니다.
 
-![Pasted image 20251014083327.png](image/Pasted%20image%2020251014083327.png)![[Pasted image 20251014083327.png]]
+![Pasted image 20251014083327.png](image/Pasted%20image%2020251014083327.png)
 
 > **[TMI] `restdocs-api-spec`은 누가 만들었을까?**
 > 이 라이브러리는 독일의 대표적인 **이커머스(전자상거래)** 솔루션 기업인 **ePages**에서 개발하고 관리하는 오픈소스 프로젝트입니다. 실제 프로덕션 환경에서 API 문서화의 신뢰성 문제를 해결하기 위해 직접 개발되어 지속적으로 업데이트되는 라이브러리입니다.
@@ -256,7 +256,7 @@ void apiSpecTest() throws Exception {
 
 중요한 점은 `responseFields`와 같은 핵심적인 API 계약 테스트의 원리는 그대로라는 것입니다. 우리는 단지 테스트로 검증된 결과물을 OpenAPI 명세서로 만들기 위해 포장 방식을 바꾼 것뿐입니다.
 
-![Pasted image 20251014083425.png](image/Pasted%20image%2020251014083425.png)![[Pasted image 20251014083425.png]]
+![Pasted image 20251014083425.png](image/Pasted%20image%2020251014083425.png)
 
 -----
 
