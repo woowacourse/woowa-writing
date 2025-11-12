@@ -9,8 +9,9 @@
 이 글은 네트워크 지연 문제로 고민하는 프론트엔드/모바일 개발자, 그리고 단순히 기능 구현을 넘어 뛰어난 사용자 경험을 제공하고 싶은 신입 개발자를 대상으로 한다. 낙관적 UI의 기본 개념부터 실제 앱('hEARit')에 적용한 코드와 데이터, 그리고 그 과정에서 마주한 고민과 배운 점까지 상세히 공유하고자 한다.
 
 <p align="center">
-    <img width="420" alt="ChatGPT Image 2025년 10월 14일 오후 04_49_00" src="https://github.com/user-attachments/assets/b727b66c-0b22-4e6f-91ea-acb46b937c62" />
+    <img width="420" alt="ChatGPT Image" src="https://github.com/user-attachments/assets/b727b66c-0b22-4e6f-91ea-acb46b937c62" />
 </p>
+<p align="center"><sub>Image generated with <b>ChatGPT (GPT-5, 2025)</b></sub></p>
 
 ## **1. 낙관적 UI란 무엇인가?**
 
