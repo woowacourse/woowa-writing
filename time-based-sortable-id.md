@@ -1,4 +1,8 @@
-# [TSID](https://github.com/f4b6a3/tsid-creator?tab=readme-ov-file#tsid-structure)
+# Time-based Sortable ID - 시계가 거꾸로 갈 때.
+
+---
+
+## [TSID](https://github.com/f4b6a3/tsid-creator?tab=readme-ov-file#tsid-structure)
 
 ```
                                             adjustable
@@ -18,7 +22,7 @@ The time component can be used for ~69 years if stored in a SIGNED 64 bits integ
 The time component can be used for ~139 years if stored in a UNSIGNED 64 bits integer field.
 ```
 
-# [Snowflake](https://github.com/twitter-archive/snowflake/tree/updated_deps?tab=readme-ov-file#solution)
+## [Snowflake](https://github.com/twitter-archive/snowflake/tree/updated_deps?tab=readme-ov-file#solution)
 
 ```
 id is composed of:
@@ -27,7 +31,8 @@ configured machine id - 10 bits - gives us up to 1024 machines
 sequence number - 12 bits - rolls over every 4096 per machine (with protection to avoid rollover in the same ms)
 ```
 
-상위 비트가 시간으로 구성되는 Snowflake와 TSID의 비트 구조.
+Snowflake와 TSID의 비트 구조다.
+상위 비트가 시간으로 구성되어 시간 순으로 정렬할 수 있다.
 
 ---
 
