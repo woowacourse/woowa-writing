@@ -208,7 +208,7 @@ public class SubwayStationRepositoryAdapter implements SubwayStationRepository {
     
     @Override
     public Optional<SubwayStation> findByName(final String name) {
-        // 로직
+        // 구현 로직 생략
     }
 
 }
