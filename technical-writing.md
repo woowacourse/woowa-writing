@@ -172,7 +172,7 @@ HTTP/3부터는 일부 구조가 UDP 기반으로 확장되었지만 여전히 T
 
 ![](https://velog.velcdn.com/images/wndkgus0225/post/512beb09-dd8d-40e2-a516-1a52c0761046/image.png)
 
-이 세 단계를 통해 양측은 데이터를 주고받을 수 있는 논리적 통로(Connection) 를 확보한다.
+이 세 단계를 통해 양측은 데이터를 주고받을 수 있는 논리적 통로(Connection)를 확보한다.
 
 TCP 연결로 데이터를 주고받을 수 있는 길을 확보하였기 때문에 HTTP 요청과 응답을 자유롭게 할 수 있다!
 
