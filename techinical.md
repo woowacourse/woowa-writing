@@ -304,7 +304,7 @@ void apiSpecTest() throws Exception {
     ```
 
 이제 `./gradlew bootJar`로 빌드하고 애플리케이션을 실행한 뒤 `http://localhost:8080/swagger-ui/index.html`로 접속하면, 직접 호스팅한 최신 버전의 Swagger UI를 확인할 수 있습니다.
-![Pasted image 20251014083557.png](image/Pasted%20image%2020251014083557.png)![[Pasted image 20251014083557.png]]
+![Pasted image 20251014083557.png](image/Pasted%20image%2020251014083557.png)
 
 -----
 
