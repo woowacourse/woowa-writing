@@ -24,7 +24,8 @@
 
 ## 그래서 AWS S3 Pre-signed URL이 뭔데?
 
-<img width="411" height="397" alt="image" src="https://github.com/user-attachments/assets/0cb5543a-70ed-46ef-9343-c93565128c06" />
+![지하철 일회용 승차권, Perplexity 생성 이미지](https://github.com/user-attachments/assets/149743c0-db74-4b0b-8f20-c06fadf39ab9)
+
 
 **제한된 접근 권한을 가진 일회용 티켓**과 비슷합니다. 특정 파일, 특정 작업(업로드/다운로드), 특정 시간 동안만 유효한 임시 접근 권한을 제공합니다.
 
@@ -232,7 +233,6 @@ interface ThirdPartyApiService {
 }
 ```
 
-- 
 
 ### 3단계 - ThirdPartyDataSource 구현
 
