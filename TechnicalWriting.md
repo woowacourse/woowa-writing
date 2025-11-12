@@ -236,6 +236,12 @@ cacheTime = 5 * 60 * 1000; // 5분 동안 캐시 유지
 반대로 **불필요한 네트워크 호출이 증가**할 수 있다는 단점도 있다.
 따라서 서비스 특성에 맞게 `staleTime`과 `cacheTime`을 조정하는 것이 중요하다.
 
+> **React Query 캐시 상태 흐름도** <br/>
+> fresh: 최신 데이터로 간주되어 바로 사용 가능 <br/>
+> stale: 캐시에 있지만, 일정 시간이 지나 재검증이 필요한 상태 <br/>
+> inactive: 사용 중인 컴포넌트가 없어도 일정 시간 캐시에 남아 있는 상태 <br/>
+> garbage collected: cacheTime이 지나 캐시에서 완전히 제거된 상태
+
 <br/>
 
 ## 5. Action(행동2) 무한 스크롤에서의 적용: useInfiniteQuery
