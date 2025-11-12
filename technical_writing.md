@@ -639,6 +639,10 @@ public List<HashtagPopularityProjection> getPopularHashtags(final int limit) {
 - 평균 CPU 사용률 약 **89.5% 감소** *(약 9.5배 개선)*  
 - 최대 CPU 사용률 약 **76.7% 감소** *(약 4.3배 개선)*
 
+> ### CPU 사용률이 100%를 초과했다?
+>
+> CPU 사용률이 100%를 초과하는 것은 멀티코어 환경이기 때문입니다. MySQL이 4코어 위에서 실행될 경우, 각 코어가 모두 100%를 사용하면 총 400%로 표시됩니다. 즉, 캐시 미적용 시에는 모든 코어가 쿼리 처리에 꽉 차 있는 상태였다는 뜻입니다. Redis 캐시를 도입하면, 동일한 요청 중 대부분이 DB까지 도달하지 않아 CPU 점유율이 크게 낮아집니다.
+
 궁금하신 분들을 위해 [더 자세한 실험 내용](https://github.com/woowacourse-teams/2025-bottari/issues/614)을 첨부하겠습니다.
 
 > ### 하이브리드 접근: 정답은 하나가 아닙니다.
