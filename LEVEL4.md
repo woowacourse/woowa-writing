@@ -105,10 +105,13 @@ CI/CD를 구축할 때, 단순히 코드를 빌드하고 배포하는 것만으�
 - Slack
     - GitHub Actions의 전용 액션(slackapi/slack-github-action)을 사용합니다.
     - 메시지에 성공/실패 여부(job.status)와 실행 기록 링크를 포함하여 즉시 확인 가능하도록 합니다.
+<img width="516" height="267" alt="스크린샷 2025-11-12 15 14 48" src="https://github.com/user-attachments/assets/2e0e25f5-8b88-4b5a-a1ae-0e4202c4db86" />
 
 - Discord
     - Webhook URL을 GitHub 시크릿(Secret)에 안전하게 저장한 뒤, curl 명령어 또는 전용 액션을 사용하여 메시지를 보냅니다.
     - 보안을 위해 민감 정보(Webhook URL)는 노출되지 않도록 관리합니다.
+  
+<img width="375" height="444" alt="스크린샷 2025-11-12 15 18 52" src="https://github.com/user-attachments/assets/68347ff1-9cf2-4ad1-b9b2-ef6ea7ae6a8d" /> (출처: Bottari 앱)
 
 - 이메일
     - SMTP 기반의 액션(dawidd6/action-send-mail)을 사용합니다.
