@@ -106,7 +106,7 @@ management:
 
 ![fd-error](image/fd-error.png)
 
-마지막으로 파일 디스크립터(File Descriptor, FD) 사용량을 살펴보겠습니다. 기본 헬스체크는 FD 사용 상태를 확인하지 않습니다. 우리 프로젝트는 SSE(Server-Sent Events)를 사용하여 실시간 가능 시간 투표 변화 여부를 클라이언트에 전달하는데, 각 SSE 연결마다 1개의 FD를 사용합니다. 현재 800명의 사용자가 SSE로 연결되어 있고, Spring Boot와 DB 연결 등 기타 리소스가 200개의 FD를 사용한다면, 총 1000개의 FD를 사용하는 상황입니다. 시스템의 기본 FD 제한이 1024개(`ulimit -n`)라면, 현재 여유 FD는 단 24개뿐입니다. 이때 헬스체크 요청이 들어오면 FD를 획득할 수 있기 때문에 헬스체크는 200 OK를 반환합니다.
+마지막으로 [파일 디스크립터](https://www.kernel.org/doc/html/latest/filesystems/files.html) (File Descriptor, FD) 사용량을 살펴보겠습니다. 기본 헬스체크는 FD 사용 상태를 확인하지 않습니다. 우리 프로젝트는 SSE(Server-Sent Events)를 사용하여 실시간 가능 시간 투표 변화 여부를 클라이언트에 전달하는데, 각 SSE 연결마다 1개의 FD를 사용합니다. 현재 800명의 사용자가 SSE로 연결되어 있고, Spring Boot와 DB 연결 등 기타 리소스가 200개의 FD를 사용한다면, 총 1000개의 FD를 사용하는 상황입니다. 시스템의 기본 FD 제한이 1024개(`ulimit -n`)라면, 현재 여유 FD는 단 24개뿐입니다. 이때 헬스체크 요청이 들어오면 FD를 획득할 수 있기 때문에 헬스체크는 200 OK를 반환합니다.
 
 하지만 이 상태에서 새로운 사용자 연결이나 DB 쿼리가 발생하면 어떻게 될까요? 25번째 연결 시도부터는 "Too many open files" 에러가 발생하며 연결에 실패하게 됩니다. 헬스체크는 "FD를 하나라도 획득할 수 있으면" 정상으로 판단하지만, 실제로는 "서비스를 안정적으로 운영할 수 있는 충분한 FD 여유"가 있는지를 확인하지 못하는 것입니다.
 
@@ -282,3 +282,9 @@ public class FileDescriptorHealthIndicator implements HealthIndicator {
 헬스체크 실패 시 롤백이 되지 않던 문제를 해결하는 과정에서, 우리는 기능이 동작하는 것만큼이나 그 상태를 명확히 확인할 수 있다는 것이 중요하다는 가시성의 가치를 깨달았습니다. 또한 단순한 `UP/DOWN` 확인을 넘어 DB 커넥션 풀, FD 등 애플리케이션의 생명과 직결된 리소스들을 종합적으로 확인하는 헬스체크의 중요성을 알게 되었습니다. 완벽한 검증을 위해 시스템에 부담을 주는 대신, 실용적이면서도 핵심을 짚는 검증 방식을 선택하는 방식의 중요성도 배울 수 있었습니다.
 
 결국 진정한 무중단 배포란 한 번의 구축으로 완성되는 것이 아니라, 우리 서비스의 특성을 이해하고 잠재적인 실패 요소를 계속해서 찾아내며 다듬어가는 과정이었습니다. 이 글이 저희와 비슷한 고민을 하고 있는 분들의 시행착오를 조금이나마 줄여주고, 더 안정적인 시스템을 만들어나가는 여정에 작은 도움이 되었으면 좋겠습니다.
+
+### 참고 자료
+
+- [File management in the Linux kernel](https://www.kernel.org/doc/html/latest/filesystems/files.html)
+- [Spring Boot Actuator Docs](https://docs.spring.io/spring-boot/docs/3.0.5/reference/html/actuator.html#actuator.endpoints.health.writing-custom-health-indicators)
+- [Toss Tech - Spring Boot Actuator의 헬스체크 살펴보기](https://toss.tech/article/how-to-work-health-check-in-spring-boot-actuator)
