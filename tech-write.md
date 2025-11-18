@@ -7,7 +7,7 @@ Spring Data JPA와 MySQL을 사용하는 프로젝트에서 SQL 쿼리 성능 �
 사용된 프로그램의 버전은 다음과 같습니다.
 
 - MySQL 서버: 8.0.43
-- Spring : 3.5.3
+- Spring: 3.5.3
 
 # 미션 등장
 
