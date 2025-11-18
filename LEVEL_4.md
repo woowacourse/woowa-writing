@@ -8,7 +8,7 @@
 
 ## 이 주제를 선택한 계기
 
-우아한테크코스 레벨2에서 HttpClient 미션을 진행할 때였습니다. 리뷰어님께 이런 질문을 받았습니다.
+우아한테크코스 안드로이드 레벨2에서 OkHttp를 이용하여 HttpClient 미션을 진행할 때였습니다. 저는 다음과 같은 질문을 받았습니다.
 
 > "왜 Retrofit을 쓰나요? OkHttp로도 충분하지 않나요?"  
 > "왜 OkHttp를 쓰나요? HttpURLConnection으로도 할 수 있는데요?"
@@ -43,7 +43,10 @@ fun request() {
     thread {
         val url = URL("https://api.example.com/posts/1")
         val connection = url.openConnection() as HttpURLConnection
-        
+
+        // HTTP 메서드 지정
+        connection.requestMethod = "GET"
+
         val title = if (connection.responseCode == HttpURLConnection.HTTP_OK) {
             val content = connection.inputStream.bufferedReader().use { it.readText() }
             JSONObject(content).getString("title")
@@ -65,8 +68,8 @@ fun request() {
 - URL이나 파라미터 오타도 런타임에야 발견됩니다
 
 #### 스레드 관리의 어려움
-- 메인 스레드에서 네트워크 요청을 할 수 없어 `thread {}`로 감싸야 합니다
-- UI 업데이트를 위해 다시 `runOnUiThread {}`를 써야 합니다
+- 메인 스레드에서 네트워크 요청을 할 수 없어 `thread {}` 등 백그라운드 스레드에서 실행해야 합니다
+- UI 업데이트를 위해 다시 `runOnUiThread {}` 등 메인 스레드로 전환해야 합니다
 
 #### 복잡한 예외 처리
 - 네트워크 중단, 응답 실패, 파싱 오류를 모두 직접 처리해야 합니다
@@ -213,7 +216,7 @@ lifecycleScope.launch {
 
 ---
 
-## Retrofit 내부 동작 원리 - 어떻게 인터페이스만으로 동작할까?
+## 심화 단계: Retrofit 내부 동작 원리 - 어떻게 인터페이스만으로 동작할까?
 
 Retrofit의 마법 같은 동작은 **리플렉션(Reflection)**과 **동적 프록시(Dynamic Proxy)**를 활용합니다.
 
@@ -312,7 +315,7 @@ when (val result = repository.getPost()) {
 
 ---
 
-## 실전 사례: Gzip 압축 대응기
+## 실전 사례: gzip 압축 대응기
 
 팀 프로젝트에서 API 응답 압축을 도입하면서 겪은 경험을 공유하겠습니다.
 
@@ -322,11 +325,11 @@ when (val result = repository.getPost()) {
 
 ### 시행착오
 
-OkHttp의 Transparent GZIP 기능을 명시적으로 활성화했더니 앱이 크래시했습니다. 원인은 **Retrofit이 이미 내부적으로 gzip 헤더(`Content-Encoding: gzip`)를 자동으로 처리**하고 있었기 때문입니다. OkHttp와 Retrofit이 동시에 압축 해제를 시도하면서 충돌이 발생한 것이죠.
+OkHttp의 Transparent gzip 기능을 명시적으로 활성화했더니 앱이 크래시했습니다. 원인은 **Retrofit이 이미 내부적으로 gzip 헤더(`Content-Encoding: gzip`)를 자동으로 처리**하고 있었기 때문입니다. OkHttp와 Retrofit이 동시에 압축 해제를 시도하면서 충돌이 발생한 것이죠.
 
 ### 해결과 검증
 
-명시적 설정을 제거하고, Android Studio의 App Inspector로 성능을 측정했습니다:
+명시적 설정을 제거하고, gzip 도입 전과 후를 비교하기 위해 Android Studio의 App Inspector로 성능을 측정했습니다:
 
 - **응답 크기**: 209KB → 9.3KB (약 95% 감소)
 - **응답 시간**: 476ms → 261ms (약 45% 개선)
@@ -381,9 +384,6 @@ API 명세가 바뀌어도 인터페이스만 수정하면 됩니다. URL이 변
 
 10개의 API를 관리하든 100개의 API를 관리하든, 코드 복잡도는 선형적으로 증가하지 않습니다. 각 API가 독립적인 메서드로 표현되어 있어, 특정 API만 수정하거나 디버깅하기가 매우 쉽습니다.
 
-### 팀 협업의 효율
-
-네트워크 로직이 추상화되어 있어 백엔드 개발자와의 소통도 간편합니다. "이 엔드포인트에 이런 파라미터를 추가해주세요"라는 요청이 오면, 인터페이스에 `@Query` 하나만 추가하면 끝입니다.
 
 ### 안전성과 생산성의 균형
 
