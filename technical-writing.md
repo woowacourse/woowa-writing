@@ -379,7 +379,8 @@ private fun launchUCropActivity(sourceUri: Uri) {
 
 코드를 통해 다음과 같은 크롭 UI 가이드를 만들 수 있습니다.
 
-<img width="972" height="727" alt="Image" src="https://github.com/user-attachments/assets/b2d0ba3b-b0ee-47c0-8b69-46a9df1d3a74" />
+![야구보구 어플리케이션 화면 캡쳐, 적용한 프로필 이미지는 Perplexity 생성](https://github.com/user-attachments/assets/e474ceef-8e4c-44e5-b336-8c055df367c5)
+
 
 ### 이미지 처리 라이브러리 선택 과정
 
