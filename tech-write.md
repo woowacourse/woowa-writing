@@ -1,3 +1,12 @@
+# 목차
+
+- 개요
+- 미션 등장
+- Spring Data JPA 실제 쿼리 확인
+- EXPLAIN은 무엇인가?
+- EXPLAIN ANALYZE는 무엇인가?
+- SHOW PROFILING
+
 # 개요
 
 Spring Data JPA와 MySQL을 사용하는 프로젝트에서 SQL 쿼리 성능 측정 방법을 정리한 글입니다.
