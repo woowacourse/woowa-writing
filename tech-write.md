@@ -1,8 +1,10 @@
 # 개요
 
-Spring Data JPA와 MySQL을 사용하는 프로젝트에서 SQL 쿼리 성능 측정 과정을 정리한 글입니다.
+Spring Data JPA와 MySQL을 사용하는 프로젝트에서 SQL 쿼리 성능 측정 방법을 정리한 글입니다.
 
-이 글은 MySQL의 DML과 인덱스, Spring Data JPA에 대한 기본적인 이해가 필요합니다.
+대상 독자는 MySQL 성능 최적화 필요 여부를 확인하고 싶은 사람, MySQL 성능 최적화가 잘 이루어졌는지 확인하고 싶은 사람이 대상입니다.
+
+MySQL의 SELECT, INSERT와 같은 데이터 조작 언어(DML)와 인덱스, Spring Data JPA를 경험 후 읽기를 권장합니다.
 
 사용된 프로그램의 버전은 다음과 같습니다.
 
