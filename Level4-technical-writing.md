@@ -1,4 +1,4 @@
-# 소프트 딜리트를 적용하는 이유와 사례
+# Soft Delete를 적용하는 이유와 사례
 
 ## 서론 - 삭제는 진짜 삭제일까?
 
@@ -29,8 +29,7 @@ WHERE id = 123;
 ## 대상 독자
 
 - 백엔드 개발자(Java, Spring, JPA 환경)
-- 데이터베이스 개발자
-- 소프트 딜리트를 처음 접하는 개발자
+- Soft Delete를 처음 접하는 백엔드 개발자
 
 ## 사전 지식
 
@@ -42,18 +41,21 @@ WHERE id = 123;
 
 # 목차
 
-1. 하드 딜리트의 한계
-2. 소프트 딜리트란 무엇인가?
-3. Spring Boot + JPA에서 소프트 딜리트 구현
-4. @Where Deprecated 주의사항
-5. 소프트 딜리트 구현 방법 비교 정리
-6. 실무 적용 사례
-7. 소프트 딜리트 적용시 주의할 점
-8. 마무리
+1. Hard Delete의 한계
+2. Soft 딜리트란 무엇인가?
+3. Spring Boot + JPA에서 Soft Delete 구현
+4. Soft Delete 구현 방법 비교 정리
+5. 실무 적용 사례
+6. Soft Delete 적용시 주의할 점
+7. 마무리
 
 ---
 
-## 1. 하드 딜리트의 한계
+### 참고
+
+본문에서 등장하는 모든 코드는 Java + Spring Data JPA 기반으로 작성되었습니다.
+
+## 1. Hard Delete의 한계
 
 ```java
 userRepeository.deleteById(userId);
@@ -74,23 +76,23 @@ userRepeository.deleteById(userId);
 <br>
 데이터를 삭제한 것 처럼 위장하면 될 것입니다.
 
-## 2. 소프트 딜리트란 무엇인가?
+## 2. Soft 딜리트란 무엇인가?
 
-소프트 딜리트란 데이터를 물리적으로 삭제하지 않고, 삭제 여부를 표시하는 플래그 또는 타임스탬프를 사용하여 삭제처리 하는 방식입니다.
+Soft 딜리트란 데이터를 물리적으로 삭제하지 않고, 삭제 여부를 표시하는 플래그 또는 타임스탬프를 사용하여 삭제처리 하는 방식입니다.
 
 ### 2.1 왜 등장하였는가?
 
 데이터를 물리적으로 삭제하는 것에는 한계가 있었습니다.
 
-- GDPR, 개인정보보호법 등 법적 요구사항
+- 법적 요구: GDPR, 개인정보보호법 등
 - 비즈니스 요구: 고객 문의 대응, 데이터 복구, 감사 추적
 - 기술적 요구: 외래키 무결성 유지
 
-위와 같은 이유로 데이터를 논리적으로 삭제하는 소프트 딜리트가 등장하였습니다.
+위와 같은 이유로 데이터를 논리적으로 삭제하는 Soft 딜리트가 등장하였습니다.
 
-## 3. Spring Boot + JPA에서 소프트 딜리트 구현
+## 3. Spring Boot + JPA에서 Soft Delete 구현
 
-소프트 딜리트 구현방법에는 크게 3가지 방법이 있습니다. 하나씩 알아보겠습니다.
+Soft Delete 구현방법에는 크게 3가지 방법이 있습니다. 하나씩 알아보겠습니다.
 
 ### 3.1 수동 구현
 
@@ -101,6 +103,7 @@ userRepeository.deleteById(userId);
 @Entity
 @Table(name = "users")
 public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -170,7 +173,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
 위 방식이 적합한 상황
 
-- 소프트 딜리트 적용 범위가 제한적일 때 (일부 엔티티에 한정)
+- Soft Delete 적용 범위가 제한적일 때 (일부 엔티티에 한정)
 - 프레임워크 의존도를 최소화 하고 싶을 때
 - 삭제 조건을 쿼리마다 다르게 적용해야 할 때
 
@@ -197,12 +200,15 @@ public class User {
 @SoftDelete는 디폴트로 boolean 타입의 deleted 필드가 추가되며, 엔티티 내부에 자바코드로 동일한 이름의 필드를 지정할 수 없습니다.
 <br>
 deleted 외에도 필드명은 자유롭게 커스텀이 가능하고, boolean 타입이 싫을 경우 converter를 사용할 수 있습니다.
+<br>
+여기서 말하는 converter는 JPA의 `AttributeConverter`를 의미합니다.  
+엔티티 필드 타입과 데이터베이스 컬럼 타입이 다를 때, 변환 로직을 개발자가 직접 정의할 수 있는 기능입니다.
 
 ```java
 
 @Service
 public class UserService {
-
+   
     private final UserRepository userRepository;
 
     @Transactional
@@ -215,7 +221,7 @@ public class UserService {
 }
 ```
 
-서비스 레이어에서 delete() 메서드가 호출되면 JPA 내부적으로 DELETE 쿼리 대신 UPDATE 쿼리를 발생시켜 자동으로 소프트 딜리트를 수행합니다.
+서비스 레이어에서 delete() 메서드가 호출되면 JPA 내부적으로 DELETE 쿼리 대신 UPDATE 쿼리를 발생시켜 자동으로 Soft Delete를 수행합니다.
 
 ```java
 
@@ -233,7 +239,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
 - 최소한의 코드로 구현 가능
 - 모든 쿼리에 자동으로 삭제 조건 적용
-- delete() 호출 시 자동으로 소프트 딜리트 수행
+- delete() 호출 시 자동으로 Soft Delete 수행
 - Hibernate 공식 지원으로 안정성 확보
 
 단점
@@ -246,12 +252,14 @@ public interface UserRepository extends JpaRepository<User, Long> {
 적합한 상황
 
 - Hibernate 6.4+ 사용 가능한 환경
-- 대부분의 엔티티에 소프트 딜리트 적용
+- 대부분의 엔티티에 Soft Delete 적용
 - 삭제된 데이터 조회 필요성이 낮을 때
 
 ### 3.3 @SQLDelete + @SQLRestriction (Hibernate 5.x 이상)
 
-@SoftDelete와 동일하게 DELETE 쿼리를 UPDATE로 치환하고, 조회 시 자동 필터링을 할 수 있습니다.
+@SoftDelete와 동일하게 엔티티 삭제 시 DELETE 쿼리를 UPDATE로 치환하고,  
+조회할 때 삭제된 데이터를 자동으로 제외해주는 방식입니다.  
+Hibernate 5.x 환경에서도 사용할 수 있어 레거시 프로젝트에서도 널리 활용됩니다.
 
 ```java
 
@@ -276,12 +284,46 @@ public class User {
 }
 ```
 
-@SQLDelete 어노테이션의 속성으로 쿼리문을 지정할 수 있습니다.
+### @SQLDelete — DELETE → UPDATE 로 치환
+
 <br>
-@SQLDelete 는 플래그로 LocalDateTime 사용이 불가능 하다는 단점과 하나의 컬럼만 사용가능한 단점이 있는 @SoftDelete와 달리, 실행될 쿼리문을 직접 정의해줌으로써 2개 이상의 플래그 사용이
-가능합니다.
+@SQLDelete는 엔티티가 삭제될 때 실행될 SQL을 직접 작성할 수 있는 기능입니다.
 <br>
-@SQLRestriction 어노테이션의 속성으로 조회시 조건을 지정할 수 있습니다.
+Hibernate는 userRepository.delete(user)가 호출되면 실제로는 다음과 같이 UPDATE를 실행합니다.
+@SoftDelete와는 달리, 삭제 플래그를 여러 개 사용할 수 있으며
+deleted_at, is_deleted처럼 여러개의 컬럼으로 구성된 삭제 정보를 관리할 수 있습니다.
+
+```sql 
+UPDATE users
+SET is_deleted = true,
+    deleted_at = NOW()
+WHERE id = ?
+```
+
+### @SQLRestriction — 조회 시 자동 필터링
+
+@SQLRestriction("is_deleted = false")를 적용하면
+<br>
+해당 엔티티를 조회할 때 Hibernate가 생성하는 모든 SELECT 쿼리에
+조건문이 자동으로 붙습니다.
+
+이 조건은 다음 위치 중 하나에 삽입됩니다.
+
+- WHERE 절
+- JOIN 시 ON 절
+
+```sql
+SELECT *
+FROM users
+WHERE is_deleted = false;
+```
+
+Hibernate는 엔티티 메타데이터(EntityPersister)에
+**이 엔티티는 항상 is_deleted = false 조건을 붙여야 한다**라는 규칙을 저장하고,
+쿼리 생성 시 이를 자동으로 포함합니다.
+
+따라서 개발자는 삭제 조건을 매번 쿼리에 넣을 필요가 없고,
+조건 누락으로 발생하는 버그를 예방할 수 있습니다.
 
 ```java
 
@@ -300,7 +342,7 @@ public class UserService {
 }
 ```
 
-서비스 레이어에서 delete() 메서드가 호출되면 JPA 내부적으로 DELETE 쿼리 대신 UPDATE 쿼리를 발생시켜 자동으로 소프트 딜리트를 수행합니다.
+서비스 레이어에서 delete() 메서드가 호출되면 JPA 내부적으로 DELETE 쿼리 대신 UPDATE 쿼리를 발생시켜 자동으로 Soft Delete를 수행합니다.
 
 ```java
 public interface UserRepository extends JpaRepository<User, Long> {
@@ -317,7 +359,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
 - Hibernate 5.x부터 사용 가능 (Spring Boot 2.x 환경에서도 동작)
 - 모든 쿼리에 자동으로 삭제 조건 적용
-- delete() 호출 시 자동으로 소프트 딜리트 수행
+- delete() 호출 시 자동으로 Soft Delete 수행
 - deleted_at 컬럼 직접 제어 가능
 
 단점
@@ -331,48 +373,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 - @SoftDelete 사용 불가능한 레거시 프로젝트
 - 삭제 시각(deleted_at)을 명시적으로 관리하고 싶을 때
 
-## 4. @Where Deprecated 주의사항
-
-Hibernate 6.3부터 @Where 어노테이션이 Deprecated되었습니다. 따라서
-반드시 @SQLRestriction을 사용해야 합니다.
-
-### 4.1 Hibernate 버전별 사용 방법
-
-**Hibernate 5.x ~ 6.2 (Spring Boot 2.x ~ 3.1)**
-
-```java
-
-@Entity
-@Where(clause = "deleted_at IS NULL")  // 구버전에서만 동작
-public class User {
-    // ...
-}
-```
-
-**Hibernate 6.3+ (Spring Boot 3.2+)**
-
-```java
-
-@Entity
-@SQLRestriction("deleted_at IS NULL")  // 신버전 권장
-public class User {
-    // ...
-}
-```
-
-만약, @Where에서 @SQLRestriction으로 마이그레이션을 해야 한다면
-<br>
-@Where와 @SQLRestriction의 문법은 동일합니다.
-<br>
-그래서 단순 어노테이션 이름만 변경하면 됩니다.
-<br>
-Hibernate 6.3+에서 @Where 사용 시 컴파일 경고가 발생하여 @SQLRestriction로 변경해야 함을 알 수 있습니다.
-
-```html
-Warning: @Where is deprecated, use @SQLRestriction instead
-```
-
-## 5. 소프트 딜리트 구현 방법 비교 정리
+## 4. Soft Delete 구현 방법 비교 정리
 
 | 항목                 | 수동 구현 | `@SoftDelete` | `@SQLDelete` + `@SQLRestriction` |
 |--------------------|-------|---------------|----------------------------------|
@@ -385,13 +386,13 @@ Warning: @Where is deprecated, use @SQLRestriction instead
 | **실수 위험**          | 높음    | 낮음            | 낮음                               |
 | **Deprecated 위험**  | 없음    | 없음            | `@Where` 사용 시 있음                 |
 
-3가지 방법 모두 소프트 딜리트를 구현할 수 있는 방법입니다.
+3가지 방법 모두 Soft Delete를 구현할 수 있는 방법입니다.
 <br>
 정해진 답은 없으며, 현재 자신의 프로젝트 상황, 팀의 상황에 따라서 최적을 선택을 하면 됩니다.
 
 ## 6. 실무 적용 사례
 
-실무에서 소프트 딜리트를 적용한 사례를 소개합니다.
+실무에서 Soft Delete를 적용한 사례를 소개합니다.
 
 프로젝트 환경
 
@@ -405,23 +406,24 @@ Warning: @Where is deprecated, use @SQLRestriction instead
 
 선택 이유
 
-- 두개의 삭제 플래그(isDeleted, deletedAt)를 사용해야 하는 상황
+- 두 개의 삭제 플래그(isDeleted, deletedAt)를 사용해야 하는 상황
+    - 다양한 삭제 조건 조회를 위해서 두개의 삭제 플래그 사용을 결정
 - 가장 간단한 방법인 @SoftDelete는 하나의 컬럼만 지원하기 때문에 제외
 - 삭제 플래그로 LocalDateTime 타입을 사용해야 하는 상황
 - @SoftDelete는 LocalDateTime 타입의 타임스탬프를 지원하지 않기 때문에 제외
 
 적용 결과
 
-- 소프트 딜리트 조건 누락에 대한 부담감이 해소되었습니다. (어노테이션을 이용해 자동으로 소프트 딜리트가 이뤄지기 때문)
+- Soft Delete 조건 누락에 대한 부담감이 해소되었습니다. (어노테이션을 이용해 자동으로 Soft 딜리트가 이뤄지기 때문)
 - 코드 리뷰시 삭제 조건 확인 불필요로 리뷰에 집중할 수 있게 되었습니다.
 
-## 7. 소프트 딜리트 적용시 주의할 점
+## 7. Soft Delete 적용시 주의할 점
 
-### 7.1 네이티브 쿼리는 소프트 딜리트 어노테이션 적용이 되지 않는다.
+### 7.1 네이티브 쿼리는 Soft Delete 어노테이션 적용이 되지 않는다.
 
 ![img.png](img.png)
 
-데이터베이스에 4개의 레코드가 존재하고, '도기' 레코드는 소프트 딜리트 되었습니다.
+데이터베이스에 4개의 레코드가 존재하고, '도기' 레코드는 Soft Delete 되었습니다.
 
 ```java
 
@@ -454,16 +456,16 @@ List<Member> findAllMemberForNativeQuery();
 ]
 ```
 
-소프트 딜리트 상태의 레코드를 포함해 조회되는 것을 확인 할 수 있습니다.
+Soft Delete 상태의 레코드를 포함해 조회되는 것을 확인 할 수 있습니다.
 
 이유가 무엇일까요?
 <br>
 네이티브 쿼리는 영속성 컨텍스트를 거치지 않기 때문에,
-Hibernate에서 제공하는 소프트 딜리트 관련 어노테이션(@SQLDelete, @SQLRestriction, @SoftDelete)이 적용되지 않습니다.
+Hibernate에서 제공하는 Soft Delete 관련 어노테이션(@SQLDelete, @SQLRestriction, @SoftDelete)이 적용되지 않습니다.
 
 따라서 네이티브 쿼리를 사용할 경우, 논리적으로 삭제된 레코드도 조회될 수 있으므로 주의해야 합니다.
 
-### 7.2 벌크 삭제 연산은 하드 딜리트 한다.
+### 7.2 벌크 삭제 연산은 Hard Delete 한다.
 
 ```java
 
@@ -479,7 +481,7 @@ JPA에서 제공하는 대표적인 벌크 삭제 쿼리 메서드입니다.
 <br>
 따라서 deleteALlInBatch를 사용하여 한번의 쿼리로 다량의 레코드를 삭제할 수 있습니다.
 
-하지만 이러한 벌크 삭제 연산은 소프트 딜리트 관련 어노테이션이 적용되지 않습니다.
+하지만 이러한 벌크 삭제 연산은 Soft Delete 관련 어노테이션이 적용되지 않습니다.
 
 ![img_2.png](img_2.png)
 
@@ -519,33 +521,33 @@ hibernate에서 벌크 연산은 엔티티를 1건씩 로딩하지 않고 바로
 
 ### 7.3 조회 성능을 고려해야 한다.
 
-소프트 딜리트를 적용하면 모든 조회 쿼리에 deleted_at IS NULL 조건이 자동으로 추가됩니다.
+Soft Delete를 적용하면 모든 조회 쿼리에 deleted_at IS NULL 조건이 자동으로 추가됩니다.
 <br>
 이 조건은 하이버네이트가 엔티티 메타데이터(EntityPersister)를 참조할 때 항상 포함되며, 벌크 연산처럼 엔티티를 개별 로딩하지 않는 경우에도 동일하게 적용됩니다.
 
 따라서,테이블의 데이터가 많아질수록 조회 성능에 영향을 줄 수 있습니다.
 
-예를들어 member 테이블에 100만건의 레코드가 존재하고, 90만건이 소프트 딜리트 되어있다면
+예를들어 member 테이블에 100만건의 레코드가 존재하고, 90만건이 Soft Delete 되어있다면
 member를 조회하기 위해 모든 레코드의 where 조건을 걸어 확인해야 합니다. 즉, 풀스캔이 되고, 조회 성능이 저하될 수 있습니다.
 
-따라서 소프트 딜리트를 사용하는 경우, 다음 사항을 함께 고려해야 합니다
+따라서 Soft Delete를 사용하는 경우, 다음 사항을 함께 고려해야 합니다
 
 - 삭제 플래그가 되는 컬럼에 인덱스를 생성하여 조건 필터링 비용을 최소화합니다.
-- 삭제 데이터가 많아지는 경우, 주기적으로 물리 삭제(hard delete)를 수행해 테이블 크기를 관리합니다.
-- 대용량 테이블에서는 소프트 딜리트 전용 파티션 또는 별도 보관 테이블로 데이터를 이관하는 전략을 검토해야 합니다.
+- 삭제 데이터가 많아지는 경우, 주기적으로 Hard delete를 수행해 테이블 크기를 관리합니다.
+- 대용량 테이블에서는 Soft Delete 전용 파티션 또는 별도 보관 테이블로 데이터를 이관하는 전략을 검토해야 합니다.
 
 ## 마무리
 
 지금까지
 
-- 소프트 딜리트가 무엇인지
-- Spring + JPA 환경에서 어떻게 소프트 딜리트를 적용할 수 있을지
+- Soft 딜리트가 무엇인지
+- Spring + JPA 환경에서 어떻게 Soft Delete를 적용할 수 있을지
 - 실무 적용 사례
-- 소프트 딜리트 사용시 주의할 점
+- Soft Delete 사용시 주의할 점
 
 에 대해서 알아봤습니다.
 
-소프트 딜리트는 단순한 삭제 방식이 아니라, 데이터를 안전하게 관리하기 위한 전략입니다.
+Soft 딜리트는 단순한 삭제 방식이 아니라, 데이터를 안전하게 관리하기 위한 전략입니다.
 <br>
 서비스 규모가 커질수록 데이터는 단순히 저장되는 것이 아니라, 기록되고 추적되어야 하는 자산이 됩니다.
 
@@ -553,4 +555,4 @@ member를 조회하기 위해 모든 레코드의 where 조건을 걸어 확인�
 “어떤 데이터를, 언제, 어떻게 지킬 것인가”입니다.
 
 프로젝트의 성격과 데이터의 민감도, 그리고 시스템의 성능 요구사항을 종합적으로 판단해
-하드 딜리트와 소프트 딜리트 중 최적의 방식을 선택해야 합니다.
+하드 딜리트와 Soft Delete 중 최적의 방식을 선택해야 합니다.
