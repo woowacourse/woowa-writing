@@ -2,7 +2,7 @@
 
 Spring Data JPA와 MySQL을 사용하는 프로젝트에서 SQL 쿼리 성능 측정 과정을 정리한 글입니다.
 
-이 글은 MySQL의 MDL과 인덱스, Spring Data JPA에 대한 기본적인 이해가 필요합니다.
+이 글은 MySQL의 DML과 인덱스, Spring Data JPA에 대한 기본적인 이해가 필요합니다.
 
 사용된 프로그램의 버전은 다음과 같습니다.
 
