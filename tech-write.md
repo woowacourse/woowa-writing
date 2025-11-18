@@ -37,9 +37,15 @@ MySQL의 SELECT, INSERT와 같은 데이터 조작 언어(DML)와 인덱스, Spr
 
 # Spring Data JPA 실제 쿼리 확인
 
-MySQL 쿼리 성능 측정을 위해서 웹 어플리케이션에서 사용하는 쿼리를 알아야 합니다.
+데이터베이스에서 쿼리 성능을 측정하려면 대상이 되는 쿼리가 필요합니다.
 
-Spring Data JPA가 만드는 쿼리를 확인하려면 Spring 설정을 변경해야 합니다.
+성능 문제가 발생한 서비스에서 사용하는 쿼리는 Spring Data JPA가 생성합니다.
+
+기본 설정의 Spring Data JPA는 생성하는 쿼리를 콘솔에 출력하지 않습니다.
+
+Spring Data JPA가 생성하는 쿼리를 콘솔에 출력하려면 Spring 설정을 변경해야 합니다.
+
+콘솔 출력은 시스템 자원을 소모하므로 운영 환경에서는 출력 관련 설정을 끄는 것을 권장합니다.
 
 ```yaml
 spring:
@@ -51,20 +57,14 @@ spring:
         use_sql_comments: true
 ```
 
-- show-sql: true 
-  - **Hibernate가 생성하는 모든 SQL 쿼리**를 콘솔에 출력합니다.
+> - show-sql: true 
+>   - Spring Data JPA 구현체 `하이버네이트(Hibernate)`가 생성하는 모든 SQL 쿼리를 콘솔에 출력합니다.
+> - format_sql: true 
+>   - 콘솔에 출력하는 SQL 문을 보기 좋게 줄바꿈과 들여쓰기를 사용하여 포맷(format)합니다.
+> - use_sql_comments: true 
+>   - 하이버네이트(Hibernate)가 생성하는 SQL에 주석을 추가합니다.
 
-- format_sql: true 
-  - 콘솔에 출력하는 **SQL 문을 보기 좋게 줄바꿈과 들여쓰기를 사용하여 포맷(format)합니다.**
-
-- use_sql_comments: true 
-  - **Hibernate가 생성하는 SQL에 주석을 추가합니다.**
-
-위 설정은 쿼리를 콘솔에 출력하므로 애플리케이션 성능 하락이 발생합니다.
-
-따라서 개발 환경이나 디버깅 상황에서만 사용하는 것이 좋습니다.
-
-이 설정을 적용하고 API를 호출하면, 콘솔에 다음과 같이 실제 실행된 SQL이 출력됩니다.
+설정을 적용하고 API를 호출하면 콘솔에 Spring Data JPA가 생성한 SQL이 출력됩니다.
 
 ```sql
 select
@@ -85,9 +85,9 @@ limit
     ?
 ```
 
-이로서 Spring Data JPA가 생성하는 쿼리를 확인했습니다.
+이 방법으로 서비스에서 사용하는 Spring Data JPA 생성 쿼리를 확인했습니다.
 
-이제 다음 단계에서 확인한 쿼리를 분석해 보겠습니다.
+다음 단계에서 방금 확인한 쿼리를 사용하여 성능을 측정하겠습니다. 
 
 # EXPLAIN은 무엇인가?
 
