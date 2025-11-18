@@ -19,8 +19,9 @@ MySQL의 SELECT, INSERT와 같은 데이터 조작 언어(DML)와 인덱스, Spr
 
 사용된 프로그램의 버전은 다음과 같습니다.
 
-- MySQL 서버: 8.0.43
+- Java: JDK21
 - Spring Boot: 3.5.3
+- MySQL 서버: 8.0.43
 
 # 미션 등장
 
