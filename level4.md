@@ -1,14 +1,14 @@
 # 🔒 락(Lock) 개념과 MySQL(InnoDB) 락(Lock)
 동시성 문제를 계기로 Lock을 공부하면서 공식 문서, 책, 블로그 등 다양한 자료를 찾아보았다. 그러나 자료마다 설명이 조금씩 달랐고, *Real MySQL 8.0*의 설명조차 MySQL 공식 문서와 일치하지 않는 부분이 존재했다. 이는 DBMS마다 지원하는 Lock의 세부 종류와 동작 방식이 다르기 때문에, 통일된 기준 문서를 찾기 어렵기 때문이다.
 
-따라서 이번 글은 이러한 혼란을 겪는 사람들을 위해 작성되었다. 글의 전반부에서는 **SQL 표준 문서를 기준으로 Lock의 개념을 정리**하고, 후반부에서는 **MySQL(InnoDB)를 중심으로 실제 Lock 동작을 쿼리로 검증하며 정리한 내용**을 다룬다.
+따라서 이번 글은 이러한 혼란을 겪는 사람들을 위해 작성되었다. 글의 전반부에서는 **SQL 표준 문서, 혹은 일반적인 개념 기준으로 Lock의 개념을 정리**하고, 후반부에서는 **MySQL(InnoDB)를 중심으로 실제 Lock 동작을 쿼리로 검증하며 정리한 내용**을 다룬다.
 
 <br>
 <br>
 
 # 📎 목차
-- [✅ Lock 지원 단위](https://github.com/soeun2537/woowa-writing/blob/level4/level4.md#-lock-%EC%A7%80%EC%9B%90-%EB%8B%A8%EC%9C%84)
-- [✅ Lock 종류](https://github.com/soeun2537/woowa-writing/blob/level4/level4.md#-lock-%EC%A2%85%EB%A5%98)
+- [✅ Lock 지원 개념적 단위](https://github.com/soeun2537/woowa-writing/blob/level4/level4.md#-lock-%EC%A7%80%EC%9B%90-%EB%8B%A8%EC%9C%84)
+- [✅ Lock 개념적 종류](https://github.com/soeun2537/woowa-writing/blob/level4/level4.md#-lock-%EC%A2%85%EB%A5%98)
 - [✅ MySQL 엔진의 Lock](https://github.com/soeun2537/woowa-writing/blob/level4/level4.md#-mysql-%EC%97%94%EC%A7%84%EC%9D%98-lock)
 - [✅ InnoDB 엔진의 Lock](https://github.com/soeun2537/woowa-writing/blob/level4/level4.md#-innodb-%EC%97%94%EC%A7%84%EC%9D%98-lock)
 - [📍 참고 자료](https://github.com/soeun2537/woowa-writing/blob/level4/level4.md#-%EC%B0%B8%EA%B3%A0-%EC%9E%90%EB%A3%8C)
@@ -16,7 +16,7 @@
 <br>
 <br>
 
-# ✅ Lock 지원 단위
+# ✅ Lock 지원 개념적 단위
 > SQL 표준 문서에서 정의하는 Lock의 지원 단위는 Table과 Row에 한정된다. 그 외 Page/Block, Index, Database 수준의 Lock은 Oracle, SQL Server, MySQL 등 각 DBMS가 자체적으로 확장하여 제공한다.
 > 
 > 예를 들어, SQL Server는 RID, Page, Extent, HoBT, Table 단위 Lock을 지원하고, MySQL(InnoDB)는 Global 단위를 추가로 제공한다. 따라서 실제 사용 가능한 Lock 단위는 DBMS 공식 문서를 반드시 확인해야 한다.
@@ -66,7 +66,7 @@ DB 저장소에서 일정 크기(보통 4KB~16KB)의 데이터 묶음인 **페�
 <br>
 <br>
 
-# ✅ Lock 종류
+# ✅ Lock 개념적 종류
 SQL-92에서는 트랜잭션 격리 수준을 구현하기 위해 Lock 모드를 정의한다. SQL-92에는 **공유 락(Shared), 배타 락(Exclusive), 내재 락(Intent)** 등이 정의되어 있으며, **업데이트 락(Update)** 은 SQL Server 확장 기능이다.
 
 <br>
