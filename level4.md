@@ -112,6 +112,8 @@ SQL-92에서는 트랜잭션 격리 수준을 구현하기 위해 Lock 모드를
 >
 > <img src="images/mysql_engine_1.png" width="400px">
 > <img src="images/mysql_engine_2.png" width="400px">
+>
+> 출처: Real MySQL 8.0
 
 <br>
 
