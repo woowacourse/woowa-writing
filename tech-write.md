@@ -169,7 +169,7 @@ SELECT * FROM festabook.lineup;
 
 ### type
 
-`type`은 테이블이 조인(join)되는 방법을 설명합니다. 쉽게 설명하면 데이터에 접근하는 방식을 알려줍니다. `type`값으로 인덱스가 잘 사용하는지 확인하여 개선이 필요한지 알 수 있습니다. 
+`type`은 테이블이 조인(join)되는 방법을 설명합니다. 쉽게 설명하면 데이터에 접근하는 방식을 알려줍니다. `type`값으로 인덱스가 잘 사용하는지 확인하여 개선이 필요한지 알 수 있습니다. 이 글에서는 자주 등장하는 `type`값을 소개합니다. 모든 `type`값 정보를 확인하려면 [explain-join-types](https://dev.mysql.com/doc/refman/8.0/en/explain-output.html#explain-join-types)을 참고하세요.
 
 ### type 값
 
