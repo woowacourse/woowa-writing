@@ -217,7 +217,7 @@ SELECT * FROM festabook.lineup;
 
 - `Using join buffer`: 조인 과정에서 적절한 인덱스가 없어서 메모리를 사용해 조인 작업을 처리했다는 정보입니다. 인덱스를 생성하여 **개선**해야 합니다.
 
-## EXPALIN 정리
+### EXPALIN 정리
 
 주어진 쿼리를 실제로 실행하지 않고 빠르게 분석하여 성능 문제 발생 여부를 파악하는 `EXPLAIN`을 알아봤습니다. `type`값과 `extra`값으로 인덱스가 잘 사용됐는지 파악하는 방법을 소개했습니다. 이 정보와 데이터 양으로 성능 개선 필요성을 확인할 수 있습니다.
 
@@ -273,7 +273,7 @@ SET profiling = 0;
 SET profiling = 1;
 ```
 
-## SHOW PROFILING 정리
+### SHOW PROFILING 정리
 
 `SHOW PROFILING`은 네트워크 소요시간과 웹 어플리케이션 서버 처리 시간을 제외한 순수 쿼리 전체 동작 속도를 측정할 수 있습니다.
 
