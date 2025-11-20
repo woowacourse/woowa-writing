@@ -263,7 +263,7 @@ SHOW PROFILES;
 
 ### SHOW PROFILES 정리
 
-`SHOW PROFILES`으로 쿼리 전체 소요 시간을 확인하는 방법을 소개했습니다. `SHOW PROFILES` 결과와 `EXPLAIN ANALYZE` 결과 정보로 쿼리 실행 전후의 부가적인 단계에 병목이 없는지 확인할 수 있습니다.
+`SHOW PROFILES`으로 쿼리 전체 소요 시간을 확인하는 방법을 소개했습니다. `SHOW PROFILES` 결과와 `EXPLAIN ANALYZE` 결과 정보로 쿼리 실행 전후의 부가적인 단계에 병목이 없는지 확인할 수 있습니다. `SHOW PROFILES`에 대해 더 알고싶다면 [SHOW PROFILE Statement](https://dev.mysql.com/doc/refman/8.0/en/show-profile.html)글을 참고하세요.
 
 # 마무리
 
