@@ -13,9 +13,8 @@ CI/CD의 주요 목표는 개발 작업을 자동화하여 더 나은 소프트�
 - **투명성 및 책임성 증대**: CI/CD 파이프라인은 지속적인 피드백을 통해 전체 소프트웨어 개발 프로세스를 비즈니스 측면에서 투명하게 처리하며, 프로젝트 상태를 한눈에 확인하고 책임 소재를 추적할 수
   있습니다.
 - **성능 향상**: 성숙한 CI/CD 관행을 활용하는 우수한 DevOps 팀은 코드 커밋부터 프로덕션 배포까지 리드 타임이 단축되고, 코드 배포 빈도가 증가하며, 변경 실패율이 훨씬 낮습니다 (2024 DORA
-  보고서
-  기준).
-  <br><br>
+  보고서 기준).
+  <br>
 
 ## CI/CD 도구
 
@@ -105,12 +104,12 @@ CI/CD를 구축할 때, 단순히 코드를 빌드하고 배포하는 것만으�
 - Slack
     - GitHub Actions의 전용 액션(slackapi/slack-github-action)을 사용합니다.
     - 메시지에 성공/실패 여부(job.status)와 실행 기록 링크를 포함하여 즉시 확인 가능하도록 합니다.
-<img width="516" height="267" alt="스크린샷 2025-11-12 15 14 48" src="https://github.com/user-attachments/assets/2e0e25f5-8b88-4b5a-a1ae-0e4202c4db86" />
+      <img width="516" height="267" alt="스크린샷 2025-11-12 15 14 48" src="https://github.com/user-attachments/assets/2e0e25f5-8b88-4b5a-a1ae-0e4202c4db86" />
 
 - Discord
     - Webhook URL을 GitHub 시크릿(Secret)에 안전하게 저장한 뒤, curl 명령어 또는 전용 액션을 사용하여 메시지를 보냅니다.
     - 보안을 위해 민감 정보(Webhook URL)는 노출되지 않도록 관리합니다.
-  
+
 <img width="375" height="444" alt="스크린샷 2025-11-12 15 18 52" src="https://github.com/user-attachments/assets/68347ff1-9cf2-4ad1-b9b2-ef6ea7ae6a8d" /> (출처: Bottari 앱)
 
 - 이메일
@@ -268,13 +267,13 @@ groups: 앱을 받을 테스터 그룹
 
 - 업로드된 앱 빌드를 다운로드할 수 있도록 초대할 테스터 그룹의 이름입니다. Firebase App Distribution에서는 테스터 목록을 미리 그룹으로 묶어 관리할 수 있습니다.
 
-file: 배포할 빌드 파일의 경로
-
-- CI 워크플로에서 최종적으로 빌드된 APK 또는 AAB 파일이 저장된 로컬 파일 시스템 내의 경로입니다.
-
 releaseNote: 릴리즈 노트 파일 경로
 
 - 테스터에게 앱 업데이트와 함께 전달할 버전 변경 내용 또는 릴리즈 노트가 포함된 텍스트 파일의 로컬 경로입니다.
+
+- file: 배포할 빌드 파일의 경로
+
+- CI 워크플로에서 최종적으로 빌드된 APK 또는 AAB 파일이 저장된 로컬 파일 시스템 내의 경로입니다.
 
 ### Google Play Store 자동 배포
 
@@ -317,20 +316,18 @@ releaseFiles: 배포할 파일의 경로
 - (예: ./android/app/build/outputs/bundle/release/app-release.aab)
 
 track: 배포할 트랙 지정: Google Play Console에서 앱을 배포할 대상 그룹(트랙)을 지정합니다.
+<br>역할: 배포된 앱이 어떤 사용자 그룹에게 공개될지 결정합니다.
 
 - 주요 트랙의 종류:
     - alpha (알파): 내부 테스터나 QA 팀에게 가장 먼저 배포.
     - beta (베타): 더 넓은 범위의 외부 베타 테스터에게 배포.
-    - production (프로덕션): 일반 사용자에게 공식적으로 출시. (예: track: alpha)
-
-역할: 배포된 앱이 어떤 사용자 그룹에게 공개될지 결정합니다.
+        - production (프로덕션): 일반 사용자에게 공식적으로 출시. (예: track: alpha)
 
 whatsNewDirectory: 릴리즈 노트 디렉토리
+<br>역할: 업로드 시 해당 버전의 릴리즈 노트 내용을 Play Store에 자동으로 등록합니다.
 
 - Play Store에 표시될 새로운 기능/변경 사항(릴리즈 노트)을 담고 있는 텍스트 파일들이 저장된 디렉토리입니다. 이 디렉토리에는 언어 코드별로 파일이 있어야 합니다 (예: whatsnew-ko-KR).
 - (예: ./android/app/whatsnew)
-
-역할: 업로드 시 해당 버전의 릴리즈 노트 내용을 Play Store에 자동으로 등록합니다.
 
 ## 결론
 
