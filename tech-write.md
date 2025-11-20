@@ -34,7 +34,7 @@ spring:
     show-sql: true
     properties:
       hibernate:
-        format_sql: true          # 자동 줄바꿈 + 들여쓰기
+        format_sql: true
         use_sql_comments: true
 ```
 
