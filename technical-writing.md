@@ -25,6 +25,8 @@
 
 > 이 글을 읽으면 복잡한 상태도 쿼리 옵션과 커스텀 훅으로 깔끔하게 정리하고, 로딩 때문에 사용자가 답답함을 느끼지 않도록 UI를 설계하는 방법을 배울 수 있습니다.
 
+![image4](/assets/bottom-thumbnail.svg)
+
 ## 1. TanStack Query v5 소개
 
 TanStack Query는 React 애플리케이션에서 서버 상태를 관리하는 데 유용한 라이브러리입니다. `데이터 패칭, 캐싱, 동기화 및 업데이트를 간편하게 처리`할 수 있도록 도와줍니다. 특히 v5에서는 성능과 사용성을 더욱 개선하여 개발자들이 더욱 쉽게 사용할 수 있도록 설계되었습니다.
@@ -54,7 +56,7 @@ pnpm add @tanstack/react-query
 yarn add @tanstack/react-query
 ```
 
-설치가 완료되면, React 애플리케이션의 최상위 컴포넌트에서 QueryClientProvider로 감싸줍니다.
+설치가 완료되면, React 애플리케이션의 최상위 컴포넌트에서 `QueryClientProvider`로 감싸줍니다.
 
 ```tsx
 // App.tsx
@@ -185,8 +187,8 @@ export const projectQueries = {
       queryKey: projectQueries.all,
       queryFn: ({ pageParam }) => getProjects(pageParam),
       getNextPageParam: (lastPage) =>
-        lastPage.hasNext ? lastPage.nextCursor : "",
-      initialPageParam: "",
+        lastPage.hasNext ? lastPage.nextCursor : null,
+      initialPageParam: null,
     }),
 };
 ```
@@ -270,14 +272,14 @@ export default useProjectList;
 - 스켈레톤을 지연 표시해 화면이 갑자기 바뀌는 현상을 줄이고, 사용자가 느끼는 속도를 높였습니다.
 - 상황별 가이드: 추가 데이터가 필요할 땐 `fetchNextPage`, 전체 리셋이나 필터 변경 시엔 `resetQueries`가 적합합니다.
 
-### 바로 적용 체크리스트
+### 적용 체크리스트
 
-- `QueryClientProvider`로 앱 전체를 감쌉니다.
-- `infiniteQueryOptions`에서 `getNextPageParam`과 `initialPageParam`을 꼭 설정합니다.
-- `useInfiniteQuery`로 받은 데이터를 `pages.flatMap`으로 한 번에 펼칩니다.
-- 센티널 역할을 하는 DOM 요소와 `useInfiniteScroll` 훅을 연결합니다.
-- 로딩, 에러, 빈 상태, 스켈레톤 지연 표시를 모두 고려해 UI를 구성합니다.
-- `hasNext`와 `scrollEnabled` 같은 조건으로 중복 호출을 막습니다.
+- [ ] `QueryClientProvider`로 앱 전체를 감쌉니다.
+- [ ] `infiniteQueryOptions`에서 `getNextPageParam`과 `initialPageParam`을 꼭 설정합니다.
+- [ ] `useInfiniteQuery`로 받은 데이터를 `pages.flatMap`으로 한 번에 펼칩니다.
+- [ ] 센티널 역할을 하는 DOM 요소와 `useInfiniteScroll` 훅을 연결합니다.
+- [ ] 로딩, 에러, 빈 상태, 스켈레톤 지연 표시를 모두 고려해 UI를 구성합니다.
+- [ ] `hasNext`와 `scrollEnabled` 같은 조건으로 중복 호출을 막습니다.
 
 ### 다음 단계
 
@@ -292,8 +294,7 @@ export default useProjectList;
 - [React-Query(tanstack query v5)로 만들어보는 무한스크롤](https://velog.io/@fromjjong/React-Querytanstack-query-v5%EB%A1%9C-%EB%A7%8C%EB%93%A4%EC%96%B4%EB%B3%B4%EB%8A%94-%EB%AC%B4%ED%95%9C%EC%8A%A4%ED%81%AC%EB%A1%A4)
 - [Next.js TanStack Query V5 무한 스크롤 구현](https://velog.io/@white0_0/Next.js-TanStack-Query-V5-%EB%AC%B4%ED%95%9C-%EC%8A%A4%ED%81%AC%EB%A1%A4-%EA%B5%AC%ED%98%84)
 - [Tanstack query를 활용한 무한 스크롤 UI 구현하기](https://ji-hoon.github.io/blog/implement-infinite-scroll-w-tanstack-query)
-- [Tanstack-Query(React-Query) v5 와 IntersectionObserver를 ...](https://sikk.tistory.com/282)
+- [Tanstack-Query(React-Query) v5 와 IntersectionObserver를 이용한 무한스크롤(useInfiniteQuery)](https://sikk.tistory.com/282)
+- [useInfiniteQuery | TanStack Query React Docs](https://tanstack.com/query/v4/docs/framework/react/reference/useInfiniteQuery)
 
 무한 스크롤을 통해 사용자에게 더 나은 경험을 제공해보세요!
-
-![image4](/assets/bottom-thumbnail.svg)
