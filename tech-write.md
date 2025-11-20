@@ -151,9 +151,9 @@ ROLLBACK;
 
 # 쿼리 실행 계획 확인 방법 EXPLAIN
 
-`EXPLAIN` 명령어는 MySQL이 쿼리를 실행하는 방법에 대한 정보를 제공합니다. [MySQL 공식문서: EXPLAIN](https://dev.mysql.com/doc/refman/8.0/en/explain-output.html)
+`EXPLAIN ANALYZE`는 쿼리를 실제로 실행하고 결과를 확인하므로 쿼리 작업이 끝날 때 까지 기다려야 합니다. `EXPLAIN ANALYZE`으로 100초 걸리는 쿼리를 분석하려면 100초를 기다려야 합니다. 쿼리가 효율적으로 동작하는지 빠르게 확인하려면 `EXPLAIN`을 사용합니다. `EXPLAIN` 명령어는 MySQL이 쿼리를 실행하는 방법에 대한 정보를 제공합니다. [MySQL 공식문서: EXPLAIN](https://dev.mysql.com/doc/refman/8.0/en/explain-output.html)
 
-`EXPLAIN` 사용 방법은 쿼리 접두에 EXPLAIN을 붙이면 됩니다.
+`EXPLAIN`은 주어진 쿼리를 실제로 실행하지 않고 쿼리를 실행하는 방법에 대한 정보를 제공합니다. 사용 방법은 쿼리의 접두로 `EXPLAIN`을 붙입니다.
 
 ```sql
 # EXPLAIN 예시
@@ -161,43 +161,42 @@ EXPLAIN
 SELECT * FROM festabook.lineup;
 ```
 
-`EXPLAIN` 접두가 붙은 쿼리는 실제로 동작하지 않습니다.
+### 쿼리 실행 계획 
 
-따라서 INSERT, UPDATE, DELETE 쓰기 작업 쿼리가 데이터베이스에 영향을 미치지 않습니다.
+`EXPLAIN`은 주어진 쿼리가 테이블에 접근하는 방식을 행(Row) 단위로 보여줍니다. 이 글에서는 다양한 정보가 있는 열(Column)에서 성능과 연관된 `type`과 `extra`를 설명합니다.
 
-`EXPLAIN` 명령어는 쿼리가 각 테이블에 접근하는 방식을 행(Row) 단위로 보여주며, 정해진 열(Column)을 통해 실행 계획을 설명합니다
+![explain.png](img/01_EXPLAIN.png)
 
-![image.png](img/2.png)
+### type
 
-성능과 밀접하게 연관된 열은 type과 Extra입니다.
+`type`은 테이블이 조인(join)되는 방법을 설명합니다. 쉽게 설명하면 데이터에 접근하는 방식을 알려줍니다. `type`값으로 인덱스가 잘 사용하는지 확인하여 개선이 필요한지 알 수 있습니다. 
 
-## Type
+### type 값
 
-`EXPLAIN` 결과 열(Column)의 type 값은 데이터에 접근하는 방식을 알려줍니다.
+다음 목록은 가장 좋은 유형부터 가장 나쁜 유형 순서로 `type`값을 설명합니다. 나쁜 유형에서 전체 데이터가 적다면 쿼리 속도가 빠르고, 좋은 유형에서 결과 행이 많다면 쿼리 속도가 느려집니다.
 
-type 값을 확인하면 인덱스를 잘 사용하는지, 개선이 필요한지 파악할 수 있습니다.
+- `system`: 테이블에 데이터가 하나만 있는 경우입니다.
 
-### Type 값
+- `const`: 쿼리의 결과가 최대 한개의 행인 경우입니다. 테이블을 한 번만 읽기 때문에 쿼리 속도가 빠릅니다. `const`는 `PRIMARY KEY`, `UNIQUE INDEX`를 사용한 경우 나타납니다.
 
-- system: 테이블에 데이터가 하나 뿐인 경우. 
+- `eq_ref`: 두 테이블의 조인 상황에서 하나의 행에 조인되는 반대쪽 테이블의 행을 하나만 읽는 경우입니다. 특별한 상황에 사용되는 `eq_ref`는 `system`, `const`이외 가능한 최상의 `type`값입니다. 반대쪽 테이블의 행을 하나만 읽는 다는 점에서 `PRIMARY KEY`또는 `UNIQUE NOT NULL INDEX`를 사용한 경우 나타납니다.
 
-- const: 쿼리로 탐색되는 행이 최대 한개인 경우.  
-PRIMARY KEY, UNIQUE INDEX를 사용한 경우 주로 나타남.
+- `ref`: 두 테이블의 조인 상황, WHERE에서 하나의 행에 읽히는 반대쪽 테이블의 행이 인덱스를 사용하는 경우입니다. `eq_ref`는 인덱스에서 행을 하나만 읽으며, `ref`는 인덱스에서 여러 행을 읽습니다. 따라서 `PRIMARY KEY`또는 `UNIQUE INDEX`를 사용한 경우 나타납니다. `ref`값은 좋은 `type`값입니다.
 
-- eq_ref: 드라이빙 테이블에서 읽은 하나의 행에 대해 조인되는 테이블에서 정확히 하나의 행만 찾는 경우.  
-PRIMARY KEY나 UNIQUE NOT NULL 인덱스를 사용해야 한다.
+- `index_merge`: `WHERE key1 = 10 OR key2 = 20`같은 쿼리에서 `key1= 10`의 결과 행과 `key2 = 20`의 결과 행을 합치는 것 처럼 동작할 때 나타나는 `type`값입니다. 하나의 테이블에 여러 인덱스가 있는 경우에 `index_merge`값이 사용되며, 여러 테이블간 작업에서는 `index_merge`가 사용되지 않습니다. WHERE 조건이 합집합, 교집합, 교집합의 합집합인 경우에 나타납니다. 주어진 쿼리가 `index_merge`를 예상했지만 사용되지 않는 경우 다음 항등 변환을 사용하는 것을 추천합니다.
+> ```sql
+> (x AND y) OR z => (x OR z) AND (y OR z)
+> (x OR y) AND z => (x AND z) OR (y AND z)
+> ```
 
-- ref: 인덱스를 사용하여 조건에 맞는 여러 행을 찾는 경우.  
-JOIN이나 WHERE 절에서 인덱스를 잘 사용했다는 의미이다.
+- `range`: 인덱스를 사용해서 특정 범위의 행을 읽는 경우입니다. 다음 연산자를 사용한 경우 나타납니다. 
 
-- range: 인덱스를 사용해서 특정 범위의 행을 찾는 경우.
+> `=`, `!=`, `>`, `>=`, `<`, `<=`, `IS NULL`, `<=>`, `BETWEEN`, `LIKE`, `IN()` 
 
-- index_merge: 여러 인덱스를 동시에 사용하여 결과를 병합하는 경우. (개선 고려)
+- `index`: 인덱스의 모든 데이터를 읽는 경우입니다. 인덱스 데이터를 읽는 점을 제외하면 `ALL`과 동일합니다. 일반적으로 인덱스의 크기가 테이블 데이터보다 작으므로 `index`는 `ALL`보다 빠르지만 개선이 필요합니다.
 
-- index: 풀 인덱스 스캔이 발생한 경우.  
-커버링 인덱스이거나, ORDER BY, GROUP BY를 사용한 경우 발생함. (개선 필요)
+- `ALL`: 테이블의 모든 데이터를 읽는 경우입니다. 테이블의 데이터가 일정하지 않고 증가한다면 인덱스를 사용하여 개선해야 합니다. `풀 테이블 스캔`이라고도 불립니다.
 
-- ALL: 모든 데이터를 확인하는 경우. 풀 테이블 스캔이라고도 불린다. (개선 필요)
 
 ## Extra
 
@@ -263,6 +262,7 @@ SHOW PROFILES;
 ```
 
 ![image.png](img/2.png)
+![show_profiling.png](img/02_SHOW_PROFILING.png)
 
 가장 중요한 열(Column) 값은 Duration 입니다.
 
