@@ -225,6 +225,8 @@ ALTER TABLE users ADD COLUMN nickname VARCHAR(50);
 
 # ✅ InnoDB 엔진의 Lock
 InnoDB는 트랜잭션과 MVCC 기반 동시성 제어를 위해 더 세밀한 레벨의 락을 제공한다.
+> MVCC: 하나의 레코드에 여러 버전(스냅샷)을 유지해, 트랜잭션마다 자신만의 시점에서 일관된 데이터를 읽을 수 있게 해 주는 동시성 제어 방식이다.
+
 ![innodb_engine_1.png](images/innodb_engine_1.png)
 
 <br>
