@@ -61,8 +61,8 @@ DB 저장소에서 일정 크기(보통 4KB~16KB)의 데이터 묶음인 **페�
 
 <br>
 
-## ▶ 컬럼(Column)
-**특정 행의 일부 컬럼 단위**로 Lock을 설정하는 방식이다.
+## ▶ 열(Column)
+**특정 행의 일부 열 단위**로 Lock을 설정하는 방식이다.
 - 이론적으로는 가능하지만, 구현 난이도가 높고 실질적 효용이 낮아 상용 DBMS에서는 거의 사용되지 않는다.
 
 <br>
@@ -295,7 +295,7 @@ INSERT INTO users (name, age) VALUES ('Miso', 23);
 <br>
 
 ## ▶ 자동 증가 락(Auto Increment Lock)
-**AUTO_INCREMENT 컬럼에 값을 INSERT할 때 사용되는 테이블 단위** 락이다.
+**AUTO_INCREMENT 열에 값을 INSERT할 때 사용되는 테이블 단위** 락이다.
 - AUTO_INCREMENT 값이 중복되거나 충돌하지 않도록 한 번에 하나의 트랜잭션만 시퀀스를 증가시킬 수 있도록 보장한다.
 - MySQL 8.0부터는 락 방식이 개선되어 병목 현상이 크게 완화되었다.
   - 설정 변수 innodb_autoinc_lock_mode의 기본값이 2(Interleaved)로 되어 있으며, 이 모드에서는 INSERT 실행 시점에만 잠깐 테이블을 잠갔다가 즉시 해제한다.
