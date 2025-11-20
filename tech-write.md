@@ -115,7 +115,7 @@ where (l1_0.deleted = 0)
 
 ### EXPLAIN ANALYZE 주의사항
 
-`EXPLAIN ANALYZE` 명령어는 쿼리가 실제로 실행되고 반영됩니다. 따라서 `EXPLAIN ANALYZE`를 INSERT, UPDATE, DELETE와 같은 쓰기 작업과 데이터 정의어(DDL)과 같은 오토 커밋(Auto Commit)이 발생하는 쿼리에 사용하면 실제로 반영됩니다. 쓰기 작업의 성능을 측정하려면 트랜잭션을 사용하여 데이터베이스에 반영 되지 않도록 해야 합니다.
+`EXPLAIN ANALYZE` 명령어는 쿼리가 실제로 실행되고 반영됩니다. 따라서 INSERT, UPDATE, DELETE와 같은 쓰기 작업과 데이터 정의어(DDL)과 같은 오토 커밋(Auto Commit)이 발생하는 쿼리를 사용하면 실제로 반영됩니다. 쓰기 작업의 성능 측정에서는 트랜잭션을 사용하여 데이터베이스에 반영 되지 않도록 해야 합니다.
 
 ```sql
 # 트랜잭션 시작
@@ -226,6 +226,8 @@ SELECT * FROM festabook.lineup;
 
 이전 소개한 `EXPLAIN ANALYZE`는 쿼리의 각 구간별 실행 시간을 확인합니다. 
 쿼리의 모든 구간을 합친 전체 소요 시간을 확인할 때는 `SHOW PROFILES`을 사용합니다. `SHOW PROFILES`을 사용하면 쿼리 파싱, 실행 계획 판단 과정, 락 등의 작업 시간이 포함된 쿼리 전체 소요 시간을 확인할 수 있습니다. 
+
+`SHOW PROFILES`는 실제로 실행된 쿼리 정보를 기록합니다. INSERT, UPDATE, DELETE와 같은 쓰기 작업과 데이터 정의어(DDL)과 같은 오토 커밋(Auto Commit)이 발생하는 쿼리를 사용하면 실제로 반영됩니다. 쓰기 작업의 성능 측정에서는 트랜잭션을 사용하여 데이터베이스에 반영 되지 않도록 해야 합니다.
 
 `SHOW PROFILES` 사용 방법은 다음 세가지 명령어를 사용합니다.
 - `SET profiling = 1;`
