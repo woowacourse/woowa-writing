@@ -5,8 +5,8 @@
 - 개요
 - 쿼리 성능 측정 필요성과 방법
 - Spring Data JPA 실제 쿼리 확인
-- 쿼리 성능 측정을 위한 EXPLAIN ANALYZE
-- EXPLAIN은 무엇인가?
+- 쿼리 성능 측정 방법 EXPLAIN ANALYZE
+- 쿼리 실행 계획 확인 방법 EXPLAIN
 - SHOW PROFILING
 
 # 개요
@@ -67,7 +67,7 @@ limit
 
 이 방법으로 서비스에서 사용하는 Spring Data JPA 생성 쿼리를 확인했습니다. 다음 단계에서 방금 확인한 쿼리를 사용하여 성능을 측정하겠습니다. 
 
-# 쿼리 성능 측정을 위한 EXPLAIN ANALYZE
+# 쿼리 성능 측정 방법 EXPLAIN ANALYZE
 
 `EXPLAIN ANALYZE`는 MySQL 8.0 부터 제공되는 쿼리의 실행 시간을 분석하는 도구입니다. [MySQL 공식 문서: EXPLAIN ANALYZE](https://dev.mysql.com/blog-archive/mysql-explain-analyze)
 
@@ -149,7 +149,7 @@ ROLLBACK;
 
 쿼리를 실제로 실행하여 쿼리의 각 영역별 실제 소요시간을 사용하는 `EXPLAIN ANALYZE`을 알아봤습니다. 이를 통해 쿼리의 특정 구간에 큰 병목 지점을 확인하거나, 목표 응답 시간 달성 여부를 확인할 수 있습니다.
 
-# EXPLAIN은 무엇인가?
+# 쿼리 실행 계획 확인 방법 EXPLAIN
 
 `EXPLAIN` 명령어는 MySQL이 쿼리를 실행하는 방법에 대한 정보를 제공합니다. [MySQL 공식문서: EXPLAIN](https://dev.mysql.com/doc/refman/8.0/en/explain-output.html)
 
