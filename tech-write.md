@@ -8,7 +8,7 @@
 - 쿼리 성능 측정 방법 EXPLAIN ANALYZE
 - 쿼리 실행 계획 확인 방법 EXPLAIN
 - 쿼리 전체 소요 시간 확인 방법 SHOW PROFILES
-- 마무리
+- 마치며
 
 # 개요
 
@@ -265,10 +265,10 @@ SHOW PROFILES;
 
 `SHOW PROFILES`으로 쿼리 전체 소요 시간을 확인하는 방법을 소개했습니다. `SHOW PROFILES` 결과와 `EXPLAIN ANALYZE` 결과 정보로 쿼리 실행 전후의 부가적인 단계에 병목이 없는지 확인할 수 있습니다. `SHOW PROFILES`에 대해 더 알고싶다면 [SHOW PROFILE Statement](https://dev.mysql.com/doc/refman/8.0/en/show-profile.html)글을 참고하세요.
 
-# 마무리
+# 마치며
 
-EXPLAIN, EXPLAIN ANALYZE, SHOW PROFILES를 사용하여 개선할 쿼리를 찾고, 동작 시간을 파악하여 개선하는 방법을 알아봤습니다. 
+이번 글을 작성하며 실제 서비스에서 `EXPLAIN`을 통해 `type` 값이 `ALL`이나 `index`로 나타나는 비효율적인 쿼리를 식별하고 개선하는 과정을 거쳤습니다. `EXPLAIN ANALYZE`를 통해 개선 전후를 비교하니, 인덱스가 적절히 활용되는 `range` 이상의 성능에서는 100만 건의 데이터도 0.01ms 수준으로 빠르게 조회됨을 확인했습니다. 특히 `eq_ref`와 인덱스를 잘 활용하는 `type`값을 비교하며 인덱스 읽기 반복 횟수가 낮을수록 쿼리 시간이 빨라지는 것을 확인했습니다.
 
-MySQL 내부에서 동작하는 시간을 확인했습니다.
+데이터베이스에서 인덱스 도입과 쿼리 개선으로 조회 시간을 줄일 수 있지만 물리적으로 0ms를 만들 수 없습니다. 이는 요청 수가 많아지면 지연이 발생함을 의미합니다. 따라서 쿼리 최적화 이후에는 캐싱(Caching)이나 로드 밸런싱(Load Balancing)과 같이 부하를 분산하는 방법을 학습하는 것도 좋을 것 같습니다.
 
-실제 웹 어플리케이션 응답 시간을 확인하기 위해서는 K6, JMeter 와 같은 웹 성능 분석 도구를 사용해야 합니다.
+이 글이 MySQL 쿼리 성능 측정의 필요성을 느끼고 방법을 고민하던 분들께 실질적인 도움이 되기를 바랍니다.
