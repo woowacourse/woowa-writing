@@ -261,7 +261,6 @@ SET profiling = 0;
 SHOW PROFILES;
 ```
 
-![image.png](img/2.png)
 ![show_profiling.png](img/02_SHOW_PROFILING.png)
 
 가장 중요한 열(Column) 값은 Duration 입니다.
