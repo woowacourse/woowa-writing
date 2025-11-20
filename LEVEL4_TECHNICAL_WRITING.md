@@ -87,14 +87,6 @@ public CompletableFuture<Map<Place, List<RecommendedPlace>>> recommendPlacesAsyn
 ) {
     return recommendPlaces(targets, requirement).toFuture();
 }
-
-private Mono<Map<Place, List<RecommendedPlace>>> recommendPlaces(final List<Place> targets, final String requirement) {
-    Map<Place, List<KakaoApiResponse>> searchedAllPlaces = searchPlacesWithRequirement(targets, requirement);
-
-    return Flux.fromIterable(searchedAllPlaces.entrySet())
-            .flatMap(entry -> processPlaceFilteringAsync(entry.getKey(), entry.getValue(), requirement))
-            .collectMap(Map.Entry::getKey, Map.Entry::getValue);
-}
 ```
 
 해당 두 로직을 장소 후보지 선정 이후 동시에 실행하였습니다.
