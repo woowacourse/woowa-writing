@@ -91,7 +91,7 @@ Android의 **메모리 매핑(memory mapping)** 은 바로 이 원리를 기반�
 모든 프로세스를 한쪽으로 몰아 비어 있는 공간을 연속적으로 만드는 방식
 단, 성능 비용이 매우 높음
 
-<img width="600" height="200" alt="image" src="https://github.com/user-attachments/assets/909f6651-dacd-4bb3-9483-b07cfef64a53" />
+<img width="400" height="250" alt="image" src="https://github.com/user-attachments/assets/909f6651-dacd-4bb3-9483-b07cfef64a53" />
 
 #### 해결 방법
 - **압축(Compaction)**: 모든 프로세스를 한쪽으로 몰아 연속 공간을 확보 (단, 비용이 매우 큼)
