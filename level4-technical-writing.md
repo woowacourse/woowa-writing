@@ -18,7 +18,7 @@
 
 ![](image/polling.png)
 
-**폴링**(**Polling**)은 실시간 통신을 구현하는 가ㄴ장 고전적이고 직관적인 방법이다. 클라이언트가 주기적으로, 예를 들어 2초마다 한 번씩, 서버에게 "**혹시 새로운 데이터 있나요?**"라고 계속해서 HTTP 요청을 보내는 방식이다. 서버는 새로운 데이터의 유무와 상관없이 매번 요청에 대한 응답을 반환힌다.
+**폴링**(**Polling**)은 실시간 통신을 구현하는 가장 고전적이고 직관적인 방법이다. 클라이언트가 주기적으로, 예를 들어 2초마다 한 번씩, 서버에게 "**혹시 새로운 데이터 있나요?**"라고 계속해서 HTTP 요청을 보내는 방식이다. 서버는 새로운 데이터의 유무와 상관없이 매번 요청에 대한 응답을 반환힌다.
 
 이 방식의 가장 큰 **장점**은 구현이 매우 간단하며 HTTP 요청/응답이라는 웹의 가장 기본적인 모델을 따르기 때문에 아주 오래된 브라우저를 포함한 거의 모든 환경에서 완벽하게 동작한다는 것이다. 하지만 그 단순함은 명백한 **단점**을 동반한다. 실제 데이터의 변경이 없는 대부분의 시간에도 클라이언트는 불필요한 요청을 계속해서 보내야 한다. 이는 네트워크 대역폭을 낭비하고, 서버는 끊임없이 들어오는 요청을 처리하느라 상당한 리소스를 소모하게 된다. 또한 데이터가 발생한 시점과 다음 폴링 주기가 돌아오는 시점 사이에 필연적으로 **지연**(**latency**)이 발생해 진정한 의미의 실시간성을 제공하기 어렵다.
 
@@ -34,7 +34,7 @@
 
 **서버-전송 이벤트**(**Server-Sent Events, SSE**)는 이름에서 알 수 있듯이 **서버에서 클라이언트로 데이터를 밀어주는**(**push**) **단방향 스트리밍 기술**이다. 클라이언트가 최초에 한 번 연결을 요청하면 서버는 그 연결을 계속 유지하면서 필요할 때마다 클라이언트에게 데이터를 스트림 형태로 전송한다. 마치 라디오 방송국이 청취자에게 계속해서 방송을 송출하는 것과 같다.
 
-SSE의 가장 큰 **장점**은 WebSocket에 비해 훨씬 구현이 간단하고 가볍다는 점이다. 기존 HTTP 프로토콜을 그대로 사용하며 클라이언트는 브라우저에 내장된 `EventSource` API를 통해 단 몇 줄의 코드로 서버 이벤트를 구독할 수 있다. 또한 네트워크 문제 등으로 연결이 일시적으로 끊어졌을 때 자동으로 재연결을 시도하는 표준 메커니즘이 내장되어 있어 안정성 확보에 유리하다.
+SSE의 가장 큰 **장점**은 WebSocket에 비해 훨씬 구현이 간단하고 가볍다는 점이다. 기존 HTTP 프로토콜을 그대로 사용하며 클라이언트는 브라우저에 내장된 [`EventSource`](https://developer.mozilla.org/en-US/docs/Web/API/EventSource) API를 통해 단 몇 줄의 코드로 서버 이벤트를 구독할 수 있다. 또한 네트워크 문제 등으로 연결이 일시적으로 끊어졌을 때 자동으로 재연결을 시도하는 표준 메커니즘이 내장되어 있어 안정성 확보에 유리하다.
 
 하지만 명백한 **단점**도 존재한다. 데이터 흐름이 오직 서버에서 클라이언트로만 향하는 **단방향**(**one-way**) **통신**이다. 클라이언트가 서버로 데이터를 보내려면 별도의 HTTP 요청(POST)을 사용해야 한다. 또한 Internet Explorer(IE)와 같은 일부 구형 브라우저에서는 지원되지 않는다는 호환성 제약이 있다.
 
@@ -76,9 +76,10 @@ SSE의 가장 큰 **장점**은 WebSocket에 비해 훨씬 구현이 간단하�
 
 ## 아인슈타임 프로젝트에 SSE 적용하기
 
+[아인슈타임 프로젝트 GitHub Repo](https://github.com/woowacourse-teams/2025-estime)
+
 아인슈타임 프로젝트에서는 '특정 세션(방)에 참여한 사용자들에게 갱신된 투표 현황을 실시간으로 알려주는 기능'이 필요했다. 이 요구사항을 분석한 결과, 데이터의 흐름이 대부분 서버에서 클라이언트로 향하는 **단방향**이었고, 클라이언트가 서버로 보내는 데이터는 기존의 **RESTful API**(HTTP POST/PUT 등)로 충분히 처리 가능했다. 이를 바탕으로 WebSocket의 양방향 통신은 오버엔지니어링이고, 가볍고 안정적인 HTTP 기반의 SSE가 적절하다고 판단했다.
 
-[아인슈타임 프로젝트 GitHub Repo](https://github.com/woowacourse-teams/2025-estime)
 
 ### 1. 실시간 통신 기술: SSE
 
@@ -94,36 +95,35 @@ SSE 관련 로직을 `com.estime.common.sse` 패키지 내에서 여러 컴포
 
 #### 주요 컴포넌트와 역할
 
-- **Presentation: `SseController`**
-    - HTTP 요청을 받아 SSE 구독 흐름을 시작시킨다.
-    - `GET /api/v1/sse/rooms/{session}/stream` 엔드포인트를 통해 클라이언트의 구독 요청을 받고, 실제 구독 처리는 `SseSubscriptionManager`에게 위임한 뒤 반환된 `SseEmitter` 객체를 클라이언트에 전달하는 역할만 수행한다.
+- **Presentation**
+  - **`SseController`**
+      - HTTP 요청을 받아 SSE 구독 흐름을 시작시킨다.
+      - `GET /api/v1/sse/rooms/{session}/stream` 엔드포인트를 통해 클라이언트의 구독 요청을 받고, 실제 구독 처리는 `SseSubscriptionManager`에게 위임한 뒤 반환된 `SseEmitter` 객체를 클라이언트에 전달하는 역할만 수행한다.
 
-- **Application: `SseSubscriptionManager`**
-    - 구독 프로세스의 전체적으로 관리한다.
-    - 클라이언트의 구독 요청이 들어왔을 때 새로운 `SseConnection` 객체를 생성하고 `SseConnectionManager`에 저장을 요청하는 등, 구독에 필요한 모든 절차를 조율한다. 또한 초기 연결이 성공했음을 클라이언트에게 알리기 위해 `SseSender`를 통해 "connected" 이벤트를 전송한다.
-    - 가장 중요한 책임 중 하나는 `SseEmitter`의 생명주기(`onCompletion`, `onTimeout`, `onError`) 콜백을 설정하는 것이다. 이 콜백들은 어떤 이유로든 연결이 종료될 경우, `SseConnectionManager`에서 해당 연결 정보를 안전하게 삭제하도록 하여 메모리 누수를 원천적으로 방지한다.
+- **Application**
+  - **`SseSubscriptionManager`**
+      - 구독 프로세스의 전체적으로 관리한다.
+      - 클라이언트의 구독 요청이 들어왔을 때 새로운 `SseConnection` 객체를 생성하고 `SseConnectionManager`에 저장을 요청하는 등, 구독에 필요한 모든 절차를 조율한다. 또한 초기 연결이 성공했음을 클라이언트에게 알리기 위해 `SseSender`를 통해 "connected" 이벤트를 전송한다.
+      - 가장 중요한 책임 중 하나는 `SseEmitter`의 생명주기(`onCompletion`, `onTimeout`, `onError`) 콜백을 설정하는 것이다. 이 콜백들은 어떤 이유로든 연결이 종료될 경우, `SseConnectionManager`에서 해당 연결 정보를 안전하게 삭제하도록 하여 메모리 누수를 원천적으로 방지한다.
 
-- **Application: `SseConnectionManager`**
+  - **`SseConnectionManager`**
+      - 활성화된 연결들의 저장소 역할을 한다. 
+      - 내부적으로 `Map<RoomSession, Map<UUID, SseConnection>>` 형태의 `ConcurrentHashMap`을 사용하여 수많은 연결들을 스레드-안전(thread-safe)하게 관리한다.
+      - 연결들을 `RoomSession` 별로 그룹화하여 특정 방에 속한 모든 클라이언트에게 메시지를 보내는(broadcast) 연산을 효율적으로 처리할 수 있다. 또한 연결이 삭제될 때 만약 해당 `RoomSession`에 더 이상 활성 연결이 없다면 외부 Map에서 `RoomSession` 키 자체를 삭제하여 불필요한 리소스를 완전히 정리한다.
 
-    - 활성화된 연결들의 저장소 역할을 한다. 
-    - 내부적으로 `Map<RoomSession, Map<UUID, SseConnection>>` 형태의 `ConcurrentHashMap`을 사용하여 수많은 연결들을 스레드-안전(thread-safe)하게 관리한다.
-    - 연결들을 `RoomSession` 별로 그룹화하여 특정 방에 속한 모든 클라이언트에게 메시지를 보내는(broadcast) 연산을 효율적으로 처리할 수 있다. 또한 연결이 삭제될 때 만약 해당 `RoomSession`에 더 이상 활성 연결이 없다면 외부 Map에서 `RoomSession` 키 자체를 삭제하여 불필요한 리소스를 완전히 정리한다.
+  - **`SseSender`**
+      - 이벤트 발송 책임을 담당한다.
+      - `send()`: 단일 `SseConnection`에 메시지를 보낸다. 메시지 전송 중 `IOException`이 발생하면(클라이언트 연결 끊김 등) 즉시 저장소에서 해당 연결을 삭제하는 로직(`sseConnectionManager::delete`)을 실패 시 콜백(`onFailure`)으로 전달한다. 이를 통해 죽은 연결(dead connection)에 불필요한 메시지를 보내려는 시도를 막고 리소스를 즉각 회수힌다.
+      - `broadcast()`: 특정 `RoomSession`에 속한 모든 연결을 `SseConnectionManager`에서 찾아 각각에 대해 `send()`를 호출한다.
 
-- **Application: `SseSender`**
+  - **`SseService`**
+      - 외부에서 사용할 수 있는 인터페이스(Facade)를 제공한다. 
+      - SSE 모듈 외부의 다른 서비스(`RoomApplicationService`)는 인터페이스를 통해 상호작용한다. 다른 서비스는 SSE의 복잡한 내부 구조를 전혀 알 필요 없으며 `SseService.sendMessageByRoomSession(...)` 메서드 호출 하나만으로 특정 방에 있는 모든 클라이언트에게 이벤트를 보낼 수 있다.
 
-    - 이벤트 발송 책임을 담당한다.
-    - `send()`: 단일 `SseConnection`에 메시지를 보낸다. 메시지 전송 중 `IOException`이 발생하면(클라이언트 연결 끊김 등) 즉시 저장소에서 해당 연결을 삭제하는 로직(`sseConnectionManager::delete`)을 실패 시 콜백(`onFailure`)으로 전달한다. 이를 통해 죽은 연결(dead connection)에 불필요한 메시지를 보내려는 시도를 막고 리소스를 즉각 회수힌다.
-    - `broadcast()`: 특정 `RoomSession`에 속한 모든 연결을 `SseConnectionManager`에서 찾아 각각에 대해 `send()`를 호출한다.
-
-- **Application: `SseService`**
-
-    - 외부에서 사용할 수 있는 인터페이스(Facade)를 제공한다. 
-    - SSE 모듈 외부의 다른 서비스(`RoomApplicationService`)는 인터페이스를 통해 상호작용한다. 다른 서비스는 SSE의 복잡한 내부 구조를 전혀 알 필요 없으며 `SseService.sendMessageByRoomSession(...)` 메서드 호출 하나만으로 특정 방에 있는 모든 클라이언트에게 이벤트를 보낼 수 있다.
-
-- **Domain: `SseConnection`**
-
-    - SSE 연결 하나를 추상화한 도메인 객체다. 
-    - 고유 ID(UUID), 소속된 `RoomSession`, 그리고 실제 통신 주체인 `SseEmitter`를 상태로 가진다. `send()` 메서드는 `try-catch` 로직을 내부에 캡슐화하여 예외 발생 시 외부에서 주입받은 `onFailure` 콜백을 실행하는 구조를 가진다.
+- **Domain**
+  - **`SseConnection`**
+      - SSE 연결 하나를 추상화한 도메인 객체다. 
+      - 고유 ID(UUID), 소속된 `RoomSession`, 그리고 실제 통신 주체인 `SseEmitter`를 상태로 가진다. `send()` 메서드는 `try-catch` 로직을 내부에 캡슐화하여 예외 발생 시 외부에서 주입받은 `onFailure` 콜백을 실행하는 구조를 가진다.
 
 ### 3. 트랜잭션과 예외 처리
 
@@ -151,3 +151,4 @@ SSE를 프로젝트에 도입하며 겪었던 문제 중 하나는 '언제' �
 
 - [MDN Web Docs: Server-Sent Events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events)
 - [MDN Web Docs: WebSocket](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API)
+- [MDN Web Docs: EventSource](https://developer.mozilla.org/en-US/docs/Web/API/EventSource)
