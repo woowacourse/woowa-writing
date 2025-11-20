@@ -7,7 +7,7 @@
 - Spring Data JPA 실제 쿼리 확인
 - 쿼리 성능 측정 방법 EXPLAIN ANALYZE
 - 쿼리 실행 계획 확인 방법 EXPLAIN
-- 쿼리 전체 소요 시간 확인 방법 SHOW PROFILING
+- 쿼리 전체 소요 시간 확인 방법 SHOW PROFILES
 - 마무리
 
 # 개요
@@ -222,61 +222,46 @@ SELECT * FROM festabook.lineup;
 
 주어진 쿼리를 실제로 실행하지 않고 빠르게 분석하여 성능 문제 발생 여부를 파악하는 `EXPLAIN`을 알아봤습니다. `type`값과 `extra`값으로 인덱스가 잘 사용됐는지 파악하는 방법을 소개했습니다. 이 정보와 데이터 양으로 성능 개선 필요성을 확인할 수 있습니다.
 
-# 쿼리 전체 소요 시간 확인 방법 SHOW PROFILING
+# 쿼리 전체 소요 시간 확인 방법 SHOW PROFILES
 
-`EXPLAIN ANALYZE`는 쿼리 실행 시간을 보여줍니다.
+이전 소개한 `EXPLAIN ANALYZE`는 쿼리의 각 구간별 실행 시간을 확인합니다. 
+쿼리의 모든 구간을 합친 전체 소요 시간을 확인할 때는 `SHOW PROFILES`을 사용합니다. `SHOW PROFILES`을 사용하면 쿼리 파싱, 실행 계획 판단 과정, 락 등의 작업 시간이 포함된 쿼리 전체 소요 시간을 확인할 수 있습니다. 
 
-만약 쿼리 파싱, 최적화, 락(Lock)등 쿼리 시작부터 응답까지의 전체 소요 시간을 확인하려면 `SHOW PROFILING`을 사용해야 합니다.
-
-`EXPLAIN ANALYZE`는 쿼리 자체의 효율의 개선을 확인하는 지표로 사용합니다.
-
-`SHOW PROFILING`는 MySQL에서 쿼리 실행 전후의 부가적인 단계에 병목이 없는지 확인하는 지표로 사용합니다.
-
-`SHOW PROFILING`는 다음 명령어를 사용합니다.
+`SHOW PROFILES` 사용 방법은 다음 세가지 명령어를 사용합니다.
 - `SET profiling = 1;`
 - `SET profiling = 0;`
 - `SHOW PROFILES;` 
 
+다음은 `SHOW PROFILES` 예제 sql입니다.
 ```sql
 # 쿼리 기록 시작 (이전 쿼리 기록이 사라집니다.)
 SET profiling = 1;
 
+# 전체 소요 시간을 확인할 쿼리
 select l1_0.id
-from lineup l1_0
-         left join festival f1_0 on f1_0.id = l1_0.festival_id and (f1_0.deleted = 0)
+from lineup l1_0 left join festival f1_0 
+    on f1_0.id = l1_0.festival_id and (f1_0.deleted = 0) 
 where (l1_0.deleted = 0)
   and f1_0.id = 2911
-  and l1_0.performance_at = '2026-08-13 06:30:45.000000' limit     1;
+  and l1_0.performance_at = '2026-08-13 06:30:45.000000' 
+limit 1;
 
-# 쿼리 기록을 종료합니다.
+# 쿼리 기록 종료
 SET profiling = 0;
-```
 
-```sql
+
 # 쿼리 기록을 확인합니다.
 SHOW PROFILES;
 ```
 
+`SHOW PROFILES` 구문에서 아래 사진처럼 결과를 출력합니다.
 ![show_profiling.png](img/02_SHOW_PROFILING.png)
 
-가장 중요한 열(Column) 값은 Duration 입니다.
+쿼리 전체 소요 시간 정보를 나타내는 열(Column)은 `Duration`이며 값의 단위는 초(Second)입니다.
 
-Duration은 해당 쿼리에 소요된 전체 시간 값을 나타내며, 값의 단위는 초(Second)입니다.
+### SHOW PROFILES 정리
 
-`SHOW PROFILING` 기록을 지우고 새로 측정하려면, 
-기록 종료 후 다시 기록을 시작하면 됩니다.
-
-```sql
-# 쿼리 기록 종료
-SET profiling = 0;
-
-# 새로운 쿼리 기록 시작 (이전 쿼리 기록 삭제)
-SET profiling = 1;
-```
-
-### SHOW PROFILING 정리
-
-`SHOW PROFILING`은 네트워크 소요시간과 웹 어플리케이션 서버 처리 시간을 제외한 순수 쿼리 전체 동작 속도를 측정할 수 있습니다.
+`SHOW PROFILES`으로 쿼리 전체 소요 시간을 확인하는 방법을 소개했습니다. `SHOW PROFILES` 결과와 `EXPLAIN ANALYZE` 결과 정보로 쿼리 실행 전후의 부가적인 단계에 병목이 없는지 확인할 수 있습니다.
 
 # 마무리
 
