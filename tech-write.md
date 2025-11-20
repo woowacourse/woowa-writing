@@ -7,7 +7,7 @@
 - Spring Data JPA 실제 쿼리 확인
 - 쿼리 성능 측정 방법 EXPLAIN ANALYZE
 - 쿼리 실행 계획 확인 방법 EXPLAIN
-- SHOW PROFILING
+- 쿼리 전체 소요 시간 확인 방법 SHOW PROFILING
 
 # 개요
 
@@ -221,7 +221,7 @@ SELECT * FROM festabook.lineup;
 
 주어진 쿼리를 실제로 실행하지 않고 빠르게 분석하여 성능 문제 발생 여부를 파악하는 `EXPLAIN`을 알아봤습니다. `type`값과 `extra`값으로 인덱스가 잘 사용됐는지 파악하는 방법을 소개했습니다. 이 정보와 데이터 양으로 성능 개선 필요성을 확인할 수 있습니다.
 
-# SHOW PROFILING
+# 쿼리 전체 소요 시간 확인 방법 SHOW PROFILING
 
 `EXPLAIN ANALYZE`는 쿼리 실행 시간을 보여줍니다.
 
