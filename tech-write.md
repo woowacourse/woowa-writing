@@ -8,6 +8,7 @@
 - 쿼리 성능 측정 방법 EXPLAIN ANALYZE
 - 쿼리 실행 계획 확인 방법 EXPLAIN
 - 쿼리 전체 소요 시간 확인 방법 SHOW PROFILING
+- 마무리
 
 # 개요
 
