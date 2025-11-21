@@ -72,7 +72,7 @@ limit
 
 `EXPLAIN ANALYZE`는 MySQL 8.0 부터 제공되는 쿼리의 실행 시간을 분석하는 도구입니다. [MySQL 공식 문서: EXPLAIN ANALYZE](https://dev.mysql.com/blog-archive/mysql-explain-analyze)
 
-`EXPLAIN ANALYZE`는 주어진 쿼리를 실제로 실행하고 쿼리의 각 영역별 동작 시간을 분석합니다. 사용 방법은 쿼리의 접두로 `EXPLAIN ANALYZE`를 붙입니다.
+`EXPLAIN ANALYZE`는 주어진 쿼리를 실제로 실행하고 쿼리의 각 영역별 동작 시간을 분석합니다. 사용 방법은 쿼리의 접두로 `EXPLAIN ANALYZE`를 붙이는 것입니다.
 
 ```sql
 # EXPLAIN ANALYZE 예시
@@ -87,7 +87,7 @@ where (l1_0.deleted = 0)
 
 ### 쿼리 동작 순서
 
-`EXPLAIN ANALYZE`는 계층 구조로 이루어진 데이터를 응답합니다. 각 쿼리의 영역별로 계층 구조가 나뉘며, 계층 구조의 안쪽부터 바깥쪽 순서로 수행됩니다. 
+`EXPLAIN ANALYZE`는 계층 구조로 이루어진 데이터로 응답합니다. 각 쿼리의 영역별로 계층 구조가 나뉘며, 계층 구조의 안쪽부터 바깥쪽 순서로 수행됩니다. 
 
 다음 결과는 `Index lookup...` -> `Filter: ...` -> `Limit: 1 row(s)...` 순서로 작업했다는 의미입니다.
 
@@ -100,7 +100,7 @@ where (l1_0.deleted = 0)
 
 ### 예상 비용과 실제 시간
 
-데이터베이스가 해당 작업을 처리하는데 예상한 비용(Cost)과 실제 시간을 확인해보겠습니다. 여기서 말하는 비용(Cost)은 같은 작업을 처리하는 다양한 방법이 있을 때, 우선순위를 가리기 위해 필요한 자원을 추상적으로 수치화한 값입니다. 따라서 저희의 관심사인 실제 시간을 확인하는 방법을 중점으로 설명 하겠습니다.
+데이터베이스가 해당 작업을 처리하는데 예상한 비용(Cost)과 실제 시간을 확인하겠습니다. 여기서 말하는 비용(Cost)은 같은 작업을 처리하는 다양한 방법이 있을 때, 우선순위를 가리기 위해 필요한 자원을 추상적으로 수치화한 값입니다. 따라서 저희의 관심사인 실제 시간을 확인하는 방법을 중점으로 설명하겠습니다.
 
 ```sql
 -> Index lookup on l1_0 using FK_LINEUP_ON_FESTIVAL (festival_id=2911)  (cost=7.09 rows=9) (actual time=0.0236..0.0236 rows=1 loops=1)
@@ -115,7 +115,7 @@ where (l1_0.deleted = 0)
 
 ### EXPLAIN ANALYZE 주의사항
 
-`EXPLAIN ANALYZE` 명령어는 쿼리가 실제로 실행되고 반영됩니다. 따라서 INSERT, UPDATE, DELETE와 같은 쓰기 작업과 데이터 정의어(DDL)과 같은 오토 커밋(Auto Commit)이 발생하는 쿼리를 사용하면 실제로 반영됩니다. 쓰기 작업의 성능 측정에서는 트랜잭션을 사용하여 데이터베이스에 반영 되지 않도록 해야 합니다.
+`EXPLAIN ANALYZE`는 쿼리가 실제로 실행되고 반영됩니다. 따라서 INSERT, UPDATE, DELETE와 같은 쓰기 작업과 데이터 정의어(DDL)과 같은 오토 커밋(Auto Commit)이 발생하는 쿼리를 사용하면 실제로 반영됩니다. 쓰기 작업의 성능 측정에서는 트랜잭션을 사용하여 데이터베이스에 반영되지 않도록 해야 합니다.
 
 ```sql
 # 트랜잭션 시작
@@ -152,7 +152,7 @@ ROLLBACK;
 
 # 쿼리 실행 계획 확인 방법 EXPLAIN
 
-`EXPLAIN ANALYZE`는 쿼리를 실제로 실행하고 결과를 확인하므로 쿼리 작업이 끝날 때 까지 기다려야 합니다. `EXPLAIN ANALYZE`으로 100초 걸리는 쿼리를 분석하려면 100초를 기다려야 합니다. 쿼리가 효율적으로 동작하는지 빠르게 확인하려면 `EXPLAIN`을 사용합니다. `EXPLAIN` 명령어는 MySQL이 쿼리를 실행하는 방법에 대한 정보를 제공합니다. [MySQL 공식문서: EXPLAIN](https://dev.mysql.com/doc/refman/8.0/en/explain-output.html)
+`EXPLAIN ANALYZE`는 쿼리를 실제로 실행하고 결과를 확인하므로 쿼리 작업이 끝날 때 까지 기다려야 합니다. `EXPLAIN ANALYZE`으로 100초 걸리는 쿼리를 분석하려면 100초를 기다려야 합니다. 쿼리가 효율적으로 동작하는지 빠르게 확인하려면 `EXPLAIN`을 사용합니다. `EXPLAIN`은 MySQL이 쿼리를 실행하는 방법에 대한 정보를 제공합니다. [MySQL 공식문서: EXPLAIN](https://dev.mysql.com/doc/refman/8.0/en/explain-output.html)
 
 `EXPLAIN`은 주어진 쿼리를 실제로 실행하지 않고 쿼리를 실행하는 방법에 대한 정보를 제공합니다. 사용 방법은 쿼리의 접두로 `EXPLAIN`을 붙입니다.
 
@@ -170,7 +170,7 @@ SELECT * FROM festabook.lineup;
 
 ### type
 
-`type`은 테이블이 조인(join)되는 방법을 설명합니다. 쉽게 설명하면 데이터에 접근하는 방식을 알려줍니다. `type`값으로 인덱스가 잘 사용하는지 확인하여 개선이 필요한지 알 수 있습니다. 이 글에서는 자주 등장하는 `type`값을 소개합니다. 모든 `type`값 정보를 확인하려면 [explain-join-types](https://dev.mysql.com/doc/refman/8.0/en/explain-output.html#explain-join-types)을 참고하세요.
+`type`은 테이블이 조인(join)되는 방법을 설명합니다. 쉽게 말해 데이터에 접근하는 방식을 알려줍니다. `type`값으로 인덱스가 잘 사용되는지 확인하여 개선이 필요한지 알 수 있습니다. 이 글에서는 자주 등장하는 `type`값을 소개합니다. 모든 `type`값 정보를 확인하려면 [explain-join-types](https://dev.mysql.com/doc/refman/8.0/en/explain-output.html#explain-join-types)을 참고하세요.
 
 ### type 값
 
@@ -224,12 +224,12 @@ SELECT * FROM festabook.lineup;
 
 # 쿼리 전체 소요 시간 확인 방법 SHOW PROFILES
 
-이전 소개한 `EXPLAIN ANALYZE`는 쿼리의 각 구간별 실행 시간을 확인합니다. 
+앞써 소개한 `EXPLAIN ANALYZE`는 쿼리의 각 구간별 실행 시간을 확인합니다. 
 쿼리의 모든 구간을 합친 전체 소요 시간을 확인할 때는 `SHOW PROFILES`을 사용합니다. `SHOW PROFILES`을 사용하면 쿼리 파싱, 실행 계획 판단 과정, 락 등의 작업 시간이 포함된 쿼리 전체 소요 시간을 확인할 수 있습니다. 
 
-`SHOW PROFILES`는 실제로 실행된 쿼리 정보를 기록합니다. INSERT, UPDATE, DELETE와 같은 쓰기 작업과 데이터 정의어(DDL)과 같은 오토 커밋(Auto Commit)이 발생하는 쿼리를 사용하면 실제로 반영됩니다. 쓰기 작업의 성능 측정에서는 트랜잭션을 사용하여 데이터베이스에 반영 되지 않도록 해야 합니다.
+`SHOW PROFILES`는 실제로 실행된 쿼리 정보를 기록합니다. INSERT, UPDATE, DELETE와 같은 쓰기 작업과 데이터 정의어(DDL)과 같은 오토 커밋(Auto Commit)이 발생하는 쿼리를 사용하면 실제로 반영됩니다. 쓰기 작업의 성능 측정에서는 트랜잭션을 사용하여 데이터베이스에 반영되지 않도록 해야 합니다.
 
-`SHOW PROFILES` 사용 방법은 다음 세가지 명령어를 사용합니다.
+`SHOW PROFILES` 사용 방법은 다음 세 가지 명령어를 사용합니다.
 - `SET profiling = 1;`
 - `SET profiling = 0;`
 - `SHOW PROFILES;` 
@@ -269,6 +269,6 @@ SHOW PROFILES;
 
 이번 글을 작성하며 실제 서비스에서 `EXPLAIN`을 통해 `type` 값이 `ALL`이나 `index`로 나타나는 비효율적인 쿼리를 식별하고 개선하는 과정을 거쳤습니다. `EXPLAIN ANALYZE`를 통해 개선 전후를 비교하니, 인덱스가 적절히 활용되는 `range` 이상의 성능에서는 100만 건의 데이터도 0.01ms 수준으로 빠르게 조회됨을 확인했습니다. 특히 `eq_ref`와 인덱스를 잘 활용하는 `type`값을 비교하며 인덱스 읽기 반복 횟수가 낮을수록 쿼리 시간이 빨라지는 것을 확인했습니다.
 
-데이터베이스에서 인덱스 도입과 쿼리 개선으로 조회 시간을 줄일 수 있지만 물리적으로 0ms를 만들 수 없습니다. 이는 요청 수가 많아지면 지연이 발생함을 의미합니다. 따라서 쿼리 최적화 이후에는 캐싱(Caching)이나 로드 밸런싱(Load Balancing)과 같이 부하를 분산하는 방법을 학습하는 것도 좋을 것 같습니다.
+데이터베이스에서 인덱스 도입과 쿼리 개선으로 조회 시간을 줄일 수 있지만 물리적으로 0ms를 만들 수 없습니다. 이는 요청 수가 많아지면 지연이 발생함을 의미합니다. 따라서 쿼리 최적화 이후에는 캐싱(Caching)이나 로드 밸런싱(Load Balancing)과 같이 부하를 분산하는 방법을 학습하는 것도 좋습니다.
 
 이 글이 MySQL 쿼리 성능 측정의 필요성을 느끼고 방법을 고민하던 분들께 실질적인 도움이 되기를 바랍니다.
