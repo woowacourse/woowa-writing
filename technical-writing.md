@@ -244,7 +244,7 @@ class UserManager {
 
 ### 2.3. 코드 가독성 관점
 
-Kotlin의 가장 큰 장점 중 하나는 **Null 안전성(Null Safety)** 입니다. 하지만 모든 프로퍼티를 `Nullable`로 선언하고 매번 `?.`(Safe Call)이나 `!!`(Non-null asserted call)을 쓰면 코드 가독성이 떨어집니다.
+Kotlin의 장점 중 하나는 **Null 안전성(Null Safety)** 입니다. 하지만 모든 프로퍼티를 `Nullable`로 선언하고 매번 `?.`(Safe Call)이나 `!!`(Non-null asserted call)을 쓰면 코드 가독성이 떨어집니다.
 
 ```kotlin
 // Nullable 타입을 사용할 경우
