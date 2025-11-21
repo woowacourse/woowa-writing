@@ -247,7 +247,7 @@ resilience4j.circuitbreaker:
 
 ## 적용 효과
 
-서킷브레이커를 적용한 뒤, 다음과 같은 변화를 체감했습다.
+서킷브레이커를 적용한 뒤, 다음과 같은 변화를 체감했습니다.
 
 **1. 빠른 실패 응답으로 사용자 경험 개선**
 ```
@@ -265,7 +265,7 @@ resilience4j.circuitbreaker:
 - 외부 API 정상화 시 자동으로 Closed 상태 전환
 - 수동 개입 없이 시스템 복구
 
-실제로 테스트 결과 서킷브레이커 적용 전에는 39.28%였던 요청 실패율이 적용 후 0%로 감소했습다.
+실제로 테스트 결과 서킷브레이커 적용 전에는 39.28%였던 요청 실패율이 적용 후 0%로 감소했습니다.
 
 <img src="img/before_circuitbreaker.png" width="300px" title="before_circuitbreaker"/>
 <img src="img/after_circuitbreaker.png" width="280px" title="after_circuitbreaker"/>
