@@ -140,7 +140,7 @@ public Response recover(ExternalApiException e) {
 
 <img src="img/circuitbreaker_status_4.png" width="650px" title="CircuitBreaker_status_4"/>
 
-### 상태 전환 흐름
+### 서킷브레이커의 상태 전환 흐름
 
 <img src="img/circuitbreaker_status_5.png" width="650px" title="CircuitBreaker_status_5"/>
 
@@ -148,7 +148,7 @@ public Response recover(ExternalApiException e) {
 
 ---
 
-## Moitz 프로젝트 적용 사례
+## 프로젝트 적용 사례
 
 ### 서비스 구조
 
