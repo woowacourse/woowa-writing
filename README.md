@@ -141,4 +141,4 @@ Criticism is futile because it puts a person on the defensive and usually makes
 
 내가 느끼기에 아직까지 나의 저울질은 나름 성공적이었던 것 같다.
 
-앞으로도 쉽지 않겠지만 내 주변 사람에게 더 많은 성장을 가져다줄 수 있는 사람이 되도록 노력할 것이다.
+앞으로도 내 주변 사람에게 더 많은 성장을 가져다줄 수 있는 사람이 되도록 노력할 것이다.
