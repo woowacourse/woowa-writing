@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 390" role="img" aria-label="서버 경유 업로드와 presigned 업로드 비교. A에서는 사진 바이트가 브라우저에서 서버로, 서버에서 S3로 두 번 이동한다. B에서는 브라우저가 서버에서 URL만 받아 S3에 직접 올리고, 서버는 S3에 저장된 결과를 확인한다." font-family="'IBM Plex Sans KR','Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR',sans-serif">
+  <defs>
+    <marker id="f1-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="10" markerHeight="10" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#151B2C"/></marker>
+    <marker id="f1-m" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="10" markerHeight="10" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#667085"/></marker>
+    <marker id="f1-al" viewBox="0 0 10 10" refX="2" refY="5" markerWidth="16" markerHeight="16" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#151B2C"/></marker>
+    <marker id="f1-bl" viewBox="0 0 10 10" refX="2" refY="5" markerWidth="16" markerHeight="16" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#246BFE"/></marker>
+  </defs>
+  <rect width="960" height="390" fill="#FFFFFF"/>
+
+  <!-- A. 서버 경유 -->
+  <rect x="16" y="16" width="452" height="312" rx="10" fill="#F6F8FB" stroke="#E3E7EE"/>
+  <text x="36" y="46" font-size="15" font-weight="700" fill="#151B2C">A. 서버가 파일을 받는다</text>
+  <text x="36" y="65" font-size="12" fill="#667085">처음 떠올린 구조</text>
+
+  <line x1="110" y1="250" x2="184" y2="148" stroke="#151B2C" stroke-width="6" marker-end="url(#f1-al)"/>
+  <line x1="288" y1="138" x2="362" y2="240" stroke="#151B2C" stroke-width="6" marker-end="url(#f1-al)"/>
+  <line x1="162" y1="277" x2="322" y2="277" stroke="#C4CAD6" stroke-width="2" stroke-dasharray="2 6" stroke-linecap="round"/>
+
+  <text x="138" y="188" font-size="13" font-weight="700" fill="#151B2C" text-anchor="end">① 사진 20MB</text>
+  <text x="136" y="204" font-size="11" fill="#667085" text-anchor="end">multipart 요청</text>
+  <text x="348" y="188" font-size="13" font-weight="700" fill="#151B2C">② S3로 다시 20MB</text>
+  <text x="348" y="204" font-size="11" fill="#667085" class="m" font-family="'IBM Plex Mono',Consolas,monospace">putObject</text>
+  <text x="242" y="268" font-size="11" fill="#98A1B3" text-anchor="middle">직접 경로 없음</text>
+
+  <rect x="180" y="84" width="120" height="54" rx="8" fill="#FFFFFF" stroke="#151B2C" stroke-width="1.5"/>
+  <text x="240" y="107" font-size="14" font-weight="700" fill="#151B2C" text-anchor="middle">스프링 서버</text>
+  <text x="240" y="126" font-size="11.5" fill="#B45309" text-anchor="middle">파일이 지나간다</text>
+
+  <rect x="40" y="250" width="120" height="54" rx="8" fill="#FFFFFF" stroke="#151B2C" stroke-width="1.5"/>
+  <text x="100" y="273" font-size="14" font-weight="700" fill="#151B2C" text-anchor="middle">브라우저</text>
+  <text x="100" y="292" font-size="11.5" fill="#667085" text-anchor="middle">지원자 기기</text>
+
+  <rect x="324" y="250" width="120" height="54" rx="8" fill="#FFFFFF" stroke="#151B2C" stroke-width="1.5"/>
+  <text x="384" y="273" font-size="14" font-weight="700" fill="#151B2C" text-anchor="middle">Amazon S3</text>
+  <text x="384" y="292" font-size="11.5" fill="#667085" text-anchor="middle">private 버킷</text>
+
+  <!-- B. presigned -->
+  <rect x="492" y="16" width="452" height="312" rx="10" fill="#F4F8FF" stroke="#B8D5FF"/>
+  <text x="512" y="46" font-size="15" font-weight="700" fill="#151B2C">B. 브라우저가 S3에 직접 올린다</text>
+  <text x="512" y="65" font-size="12" fill="#1D5CE5">예술in이 쓰는 구조</text>
+
+  <line x1="586" y1="250" x2="668" y2="138" stroke="#151B2C" stroke-width="1.6" marker-end="url(#f1-a)"/>
+  <line x1="764" y1="138" x2="846" y2="250" stroke="#667085" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#f1-m)"/>
+  <line x1="638" y1="277" x2="787" y2="277" stroke="#246BFE" stroke-width="6" marker-end="url(#f1-bl)"/>
+
+  <text x="612" y="188" font-size="13" font-weight="700" fill="#151B2C" text-anchor="end">① 업로드 요청</text>
+  <text x="610" y="204" font-size="11" fill="#667085" text-anchor="end">메타데이터만</text>
+  <text x="824" y="188" font-size="13" font-weight="700" fill="#151B2C">③ 완료 확인</text>
+  <text x="824" y="204" font-size="11" fill="#667085">HEAD로 크기·타입 비교</text>
+  <text x="718" y="267" font-size="13" font-weight="700" fill="#1D5CE5" text-anchor="middle">② PUT 20MB</text>
+  <text x="718" y="297" font-size="11" fill="#667085" text-anchor="middle">presigned URL로 직접</text>
+
+  <rect x="656" y="84" width="120" height="54" rx="8" fill="#FFFFFF" stroke="#151B2C" stroke-width="1.5"/>
+  <text x="716" y="107" font-size="14" font-weight="700" fill="#151B2C" text-anchor="middle">스프링 서버</text>
+  <text x="716" y="126" font-size="11.5" fill="#1D5CE5" text-anchor="middle">허가서 발급 · 검수</text>
+
+  <rect x="516" y="250" width="120" height="54" rx="8" fill="#FFFFFF" stroke="#151B2C" stroke-width="1.5"/>
+  <text x="576" y="273" font-size="14" font-weight="700" fill="#151B2C" text-anchor="middle">브라우저</text>
+  <text x="576" y="292" font-size="11.5" fill="#667085" text-anchor="middle">지원자 기기</text>
+
+  <rect x="800" y="250" width="120" height="54" rx="8" fill="#FFFFFF" stroke="#151B2C" stroke-width="1.5"/>
+  <text x="860" y="273" font-size="14" font-weight="700" fill="#151B2C" text-anchor="middle">Amazon S3</text>
+  <text x="860" y="292" font-size="11.5" fill="#667085" text-anchor="middle">private 버킷</text>
+
+  <!-- 범례 -->
+  <line x1="40" y1="356" x2="80" y2="356" stroke="#151B2C" stroke-width="6"/>
+  <text x="92" y="360.5" font-size="12" fill="#667085">사진 바이트</text>
+  <line x1="190" y1="356" x2="230" y2="356" stroke="#151B2C" stroke-width="1.6"/>
+  <text x="242" y="360.5" font-size="12" fill="#667085">JSON 요청</text>
+  <line x1="340" y1="356" x2="380" y2="356" stroke="#667085" stroke-width="1.6" stroke-dasharray="5 4"/>
+  <text x="392" y="360.5" font-size="12" fill="#667085">서버가 S3에 보내는 확인 요청</text>
+</svg>

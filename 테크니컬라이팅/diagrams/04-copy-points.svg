@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1240 330" role="img" aria-label="사진이 메모리로 복사되는 세 지점. 사진 선택기의 File은 디스크 참조라 선택 직후 메모리 Blob으로 복사한다. IndexedDB에 저장했다가 로그인 후 꺼낸 Blob은 다시 디스크 참조일 수 있어 복원 직후 또 복사한다. 업로드 직전에는 이미 복사한 Blob이면 복사를 생략하고 S3에 PUT한다." font-family="'IBM Plex Sans KR','Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR',sans-serif">
+  <defs>
+    <marker id="f4-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="10" markerHeight="10" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#151B2C"/></marker>
+    <marker id="f4-b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="10" markerHeight="10" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#246BFE"/></marker>
+  </defs>
+  <rect width="1240" height="330" fill="#FFFFFF"/>
+
+  <!-- 로그인 전 -->
+  <text x="24" y="52" font-size="12.5" font-weight="700" fill="#151B2C">로그인 전</text>
+
+  <rect x="24" y="72" width="150" height="56" rx="8" fill="#FFF7ED" stroke="#D97706" stroke-width="1.5"/>
+  <text x="99" y="96" font-size="13" font-weight="700" fill="#151B2C" text-anchor="middle">사진 선택기</text>
+  <text x="99" y="115" font-size="11" fill="#B45309" text-anchor="middle">File · 디스크 참조</text>
+  <line x1="174" y1="100" x2="212" y2="100" stroke="#151B2C" stroke-width="1.4" marker-end="url(#f4-a)"/>
+
+  <rect x="214" y="84" width="90" height="32" rx="16" fill="#246BFE"/>
+  <text x="259" y="105" font-size="13" font-weight="700" fill="#FFFFFF" text-anchor="middle">① 복사</text>
+  <text x="259" y="136" font-size="11" fill="#667085" text-anchor="middle">선택 직후</text>
+  <line x1="304" y1="100" x2="342" y2="100" stroke="#151B2C" stroke-width="1.4" marker-end="url(#f4-a)"/>
+
+  <rect x="344" y="72" width="150" height="56" rx="8" fill="#EEF5FF" stroke="#246BFE" stroke-width="1.5"/>
+  <text x="419" y="96" font-size="13" font-weight="700" fill="#151B2C" text-anchor="middle">지원서 상태</text>
+  <text x="419" y="115" font-size="11" fill="#1D5CE5" text-anchor="middle">메모리 Blob · READY</text>
+  <line x1="494" y1="100" x2="548" y2="100" stroke="#151B2C" stroke-width="1.4" marker-end="url(#f4-a)"/>
+  <text x="521" y="92" font-size="11" fill="#667085" text-anchor="middle" class="m" font-family="'IBM Plex Mono',Consolas,monospace">put</text>
+
+  <!-- IndexedDB -->
+  <rect x="550" y="72" width="120" height="186" rx="10" fill="#F6F8FB" stroke="#151B2C" stroke-width="1.2"/>
+  <text x="610" y="142" font-size="13" font-weight="700" fill="#151B2C" text-anchor="middle">IndexedDB</text>
+  <text x="610" y="160" font-size="11" fill="#667085" text-anchor="middle" class="m" font-family="'IBM Plex Mono',Consolas,monospace">drafts</text>
+  <text x="610" y="188" font-size="11" fill="#667085" text-anchor="middle">로그인을</text>
+  <text x="610" y="203" font-size="11" fill="#667085" text-anchor="middle">지나도 남는다</text>
+
+  <!-- 로그인 후 -->
+  <text x="700" y="186" font-size="12.5" font-weight="700" fill="#151B2C">로그인 후 · 새 페이지</text>
+  <line x1="670" y1="230" x2="698" y2="230" stroke="#151B2C" stroke-width="1.4" marker-end="url(#f4-a)"/>
+  <text x="684" y="221" font-size="11" fill="#667085" text-anchor="middle" class="m" font-family="'IBM Plex Mono',Consolas,monospace">get</text>
+
+  <rect x="700" y="202" width="140" height="56" rx="8" fill="#FFF7ED" stroke="#D97706" stroke-width="1.5"/>
+  <text x="770" y="226" font-size="13" font-weight="700" fill="#151B2C" text-anchor="middle">꺼낸 Blob</text>
+  <text x="770" y="245" font-size="11" fill="#B45309" text-anchor="middle">다시 디스크 참조</text>
+  <text x="770" y="286" font-size="11" fill="#B45309" text-anchor="middle">메모리 Blob을 저장해도</text>
+  <text x="770" y="302" font-size="11" fill="#B45309" text-anchor="middle">꺼내면 디스크 참조일 수 있다</text>
+  <line x1="840" y1="230" x2="876" y2="230" stroke="#151B2C" stroke-width="1.4" marker-end="url(#f4-a)"/>
+
+  <rect x="878" y="214" width="90" height="32" rx="16" fill="#246BFE"/>
+  <text x="923" y="235" font-size="13" font-weight="700" fill="#FFFFFF" text-anchor="middle">② 복사</text>
+  <text x="923" y="266" font-size="11" fill="#667085" text-anchor="middle">복원 직후</text>
+  <line x1="968" y1="230" x2="1004" y2="230" stroke="#151B2C" stroke-width="1.4" marker-end="url(#f4-a)"/>
+
+  <rect x="1006" y="214" width="90" height="32" rx="16" fill="#FFFFFF" stroke="#246BFE" stroke-width="1.8"/>
+  <text x="1051" y="235" font-size="13" font-weight="700" fill="#1D5CE5" text-anchor="middle">③ 확인</text>
+  <text x="1051" y="266" font-size="11" fill="#667085" text-anchor="middle">업로드 직전</text>
+  <text x="1051" y="281" font-size="10.5" fill="#667085" text-anchor="middle">복사본이면 생략</text>
+  <line x1="1096" y1="230" x2="1132" y2="230" stroke="#246BFE" stroke-width="1.8" marker-end="url(#f4-b)"/>
+
+  <rect x="1134" y="202" width="90" height="56" rx="8" fill="#FFFFFF" stroke="#151B2C" stroke-width="1.5"/>
+  <text x="1179" y="226" font-size="13" font-weight="700" fill="#151B2C" text-anchor="middle">S3 PUT</text>
+  <text x="1179" y="245" font-size="11" fill="#1D5CE5" text-anchor="middle">메모리 바이트</text>
+
+  <!-- 범례 -->
+  <rect x="24" y="291" width="14" height="14" rx="3" fill="#FFF7ED" stroke="#D97706"/>
+  <text x="46" y="302.5" font-size="11.5" fill="#667085">디스크 참조</text>
+  <rect x="150" y="291" width="14" height="14" rx="3" fill="#EEF5FF" stroke="#246BFE"/>
+  <text x="172" y="302.5" font-size="11.5" fill="#667085">메모리 Blob</text>
+  <rect x="276" y="291" width="26" height="14" rx="7" fill="#246BFE"/>
+  <text x="310" y="302.5" font-size="11.5" fill="#667085">복사 지점</text>
+  <rect x="400" y="291" width="26" height="14" rx="7" fill="#FFFFFF" stroke="#246BFE" stroke-width="1.5"/>
+  <text x="434" y="302.5" font-size="11.5" fill="#667085">조건부 복사</text>
+</svg>
