@@ -1,3 +1,5 @@
+> **레벨4 테크니컬 라이팅**: [DB에서 일기 원문을 숨기기까지](LV4_TECHNICAL_WRITING_IQ.md) | [A4 7페이지 PDF](4-assets/diary-encryption-technical-writing.pdf)
+
 # 어떤 의미를 가지고 살아야 될까?
 
 > *"질문하는 만큼 세상이 바뀐다."*
