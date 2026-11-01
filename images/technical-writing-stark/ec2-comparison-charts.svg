@@ -1,0 +1,4534 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="843.84pt" height="181.44pt" viewBox="0 0 843.84 181.44" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:date>2026-10-21T22:07:51.468288</dc:date>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.11.2, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 181.44 
+L 843.84 181.44 
+L 843.84 0 
+L 0 0 
+z
+" style="fill: #ffffff"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 4.2192 150.5952 
+L 308.0016 150.5952 
+L 308.0016 41.7312 
+L 4.2192 41.7312 
+z
+" style="fill: #ffffff"/>
+   </g>
+   <g id="matplotlib.axis_1">
+    <g id="xtick_1">
+     <g id="line2d_1">
+      <path d="M 4.2192 144.60768 
+L 4.2192 41.7312 
+" clip-path="url(#pa666e37410)" style="fill: none; stroke: #eeeeee; stroke-width: 0.7; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_2"/>
+     <g id="text_1">
+      <!-- 0 -->
+      <g style="fill: #999999" transform="translate(1.538184 157.164536) scale(0.09 -0.09)">
+       <defs>
+        <path id="PortfolioChart-Regular-32c9" d="M 1906 -63 
+Q 1406 -63 1053 209 
+Q 700 481 512 1003 
+Q 325 1525 325 2263 
+Q 325 2994 512 3516 
+Q 700 4038 1056 4313 
+Q 1413 4588 1906 4588 
+Q 2400 4588 2756 4313 
+Q 3113 4038 3300 3516 
+Q 3488 2994 3488 2263 
+Q 3488 1525 3303 1003 
+Q 3119 481 2762 209 
+Q 2406 -63 1906 -63 
+z
+M 1906 438 
+Q 2231 438 2462 650 
+Q 2694 863 2816 1272 
+Q 2938 1681 2938 2263 
+Q 2938 2844 2816 3256 
+Q 2694 3669 2462 3884 
+Q 2231 4100 1906 4100 
+Q 1581 4100 1350 3884 
+Q 1119 3669 994 3256 
+Q 869 2844 869 2263 
+Q 869 1681 991 1272 
+Q 1113 863 1347 650 
+Q 1581 438 1906 438 
+z
+" transform="scale(0.015625)"/>
+       </defs>
+       <use xlink:href="#PortfolioChart-Regular-32c9"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_2">
+     <g id="line2d_3">
+      <path d="M 102.213523 144.60768 
+L 102.213523 41.7312 
+" clip-path="url(#pa666e37410)" style="fill: none; stroke: #eeeeee; stroke-width: 0.7; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_4"/>
+     <g id="text_2">
+      <!-- 100 -->
+      <g style="fill: #999999" transform="translate(94.878523 157.164536) scale(0.09 -0.09)">
+       <defs>
+        <path id="PortfolioChart-Regular-32ca" d="M 2025 0 
+L 1456 0 
+L 1456 3938 
+L 1431 3938 
+L 331 3206 
+L 331 3775 
+L 1456 4525 
+L 2025 4525 
+L 2025 0 
+z
+" transform="scale(0.015625)"/>
+       </defs>
+       <use xlink:href="#PortfolioChart-Regular-32ca"/>
+       <use xlink:href="#PortfolioChart-Regular-32c9" transform="translate(43.84375 0)"/>
+       <use xlink:href="#PortfolioChart-Regular-32c9" transform="translate(103.421875 0)"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_3">
+     <g id="line2d_5">
+      <path d="M 200.207845 144.60768 
+L 200.207845 41.7312 
+" clip-path="url(#pa666e37410)" style="fill: none; stroke: #eeeeee; stroke-width: 0.7; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_6"/>
+     <g id="text_3">
+      <!-- 200 -->
+      <g style="fill: #999999" transform="translate(192.204876 157.164536) scale(0.09 -0.09)">
+       <defs>
+        <path id="PortfolioChart-Regular-32cb" d="M 419 413 
+L 1963 2038 
+Q 2269 2363 2431 2559 
+Q 2594 2756 2675 2943 
+Q 2756 3131 2756 3331 
+Q 2756 3556 2637 3731 
+Q 2519 3906 2316 4003 
+Q 2113 4100 1856 4100 
+Q 1594 4100 1394 3994 
+Q 1194 3888 1084 3694 
+Q 975 3500 975 3250 
+L 444 3250 
+Q 444 3644 628 3947 
+Q 813 4250 1141 4419 
+Q 1469 4588 1875 4588 
+Q 2281 4588 2600 4422 
+Q 2919 4256 3100 3968 
+Q 3281 3681 3281 3331 
+Q 3281 3075 3187 2837 
+Q 3094 2600 2875 2315 
+Q 2656 2031 2244 1606 
+L 1206 538 
+L 1206 500 
+L 3363 500 
+L 3363 0 
+L 425 0 
+L 419 413 
+z
+" transform="scale(0.015625)"/>
+       </defs>
+       <use xlink:href="#PortfolioChart-Regular-32cb"/>
+       <use xlink:href="#PortfolioChart-Regular-32c9" transform="translate(58.6875 0)"/>
+       <use xlink:href="#PortfolioChart-Regular-32c9" transform="translate(118.265625 0)"/>
+      </g>
+     </g>
+    </g>
+   </g>
+   <g id="matplotlib.axis_2"/>
+   <g id="patch_3">
+    <path d="M 4.2192 66.40704 
+L 165.014817 66.40704 
+L 165.014817 53.34336 
+L 4.2192 53.34336 
+z
+" clip-path="url(#pa666e37410)" style="fill: #c9cdd2"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 4.2192 102.69504 
+L 169.963531 102.69504 
+L 169.963531 89.63136 
+L 4.2192 89.63136 
+z
+" clip-path="url(#pa666e37410)" style="fill: #969ea8"/>
+   </g>
+   <g id="patch_5">
+    <path d="M 4.2192 138.98304 
+L 241.648011 138.98304 
+L 241.648011 125.91936 
+L 4.2192 125.91936 
+z
+" clip-path="url(#pa666e37410)" style="fill: #171717"/>
+   </g>
+   <g id="text_4">
+    <!-- 01 · JOIN 집계 -->
+    <g style="fill: #777777" transform="translate(4.2192 49.35168) scale(0.1 -0.1)">
+     <defs>
+      <path id="PortfolioChart-Regular-2" transform="scale(0.015625)"/>
+      <path id="PortfolioChart-Regular-3362" d="M 813 1575 
+Q 706 1575 612 1631 
+Q 519 1688 466 1782 
+Q 413 1876 413 1982 
+Q 413 2088 466 2182 
+Q 519 2276 612 2329 
+Q 706 2382 813 2382 
+Q 919 2382 1012 2329 
+Q 1106 2276 1159 2182 
+Q 1213 2088 1213 1982 
+Q 1213 1876 1159 1782 
+Q 1106 1688 1012 1631 
+Q 919 1575 813 1575 
+z
+" transform="scale(0.015625)"/>
+      <path id="PortfolioChart-Regular-8a" d="M 2800 4525 
+L 2800 1294 
+Q 2800 869 2640 562 
+Q 2481 256 2187 96 
+Q 1894 -63 1500 -63 
+Q 1125 -63 831 75 
+Q 538 213 372 469 
+Q 206 725 206 1069 
+L 763 1069 
+Q 763 881 859 737 
+Q 956 594 1122 516 
+Q 1288 438 1500 438 
+Q 1856 438 2043 656 
+Q 2231 875 2231 1294 
+L 2231 4525 
+L 2800 4525 
+z
+" transform="scale(0.015625)"/>
+      <path id="PortfolioChart-Regular-b1" d="M 4325 2263 
+Q 4325 1563 4069 1034 
+Q 3813 506 3359 221 
+Q 2906 -63 2325 -63 
+Q 1744 -63 1291 221 
+Q 838 506 581 1034 
+Q 325 1563 325 2263 
+Q 325 2969 581 3494 
+Q 838 4019 1291 4303 
+Q 1744 4588 2325 4588 
+Q 2906 4588 3359 4303 
+Q 3813 4019 4069 3494 
+Q 4325 2969 4325 2263 
+z
+M 3781 2263 
+Q 3781 2831 3590 3237 
+Q 3400 3644 3072 3853 
+Q 2744 4063 2325 4063 
+Q 1913 4063 1581 3853 
+Q 1250 3644 1059 3237 
+Q 869 2831 869 2263 
+Q 869 1694 1059 1287 
+Q 1250 881 1581 672 
+Q 1913 463 2325 463 
+Q 2744 463 3072 672 
+Q 3400 881 3590 1287 
+Q 3781 1694 3781 2263 
+z
+" transform="scale(0.015625)"/>
+      <path id="PortfolioChart-Regular-76" d="M 1063 0 
+L 500 0 
+L 500 4525 
+L 1063 4525 
+L 1063 0 
+z
+" transform="scale(0.015625)"/>
+      <path id="PortfolioChart-Regular-a4" d="M 4094 0 
+L 3556 0 
+L 1106 3525 
+L 1063 3525 
+L 1063 0 
+L 500 0 
+L 500 4525 
+L 1044 4525 
+L 3494 994 
+L 3538 994 
+L 3538 4525 
+L 4094 4525 
+L 4094 0 
+z
+" transform="scale(0.015625)"/>
+      <path id="PortfolioChart-Regular-23d1" d="M 2131 4131 
+Q 2131 3656 1931 3234 
+Q 1731 2813 1372 2503 
+Q 1013 2194 550 2031 
+L 294 2419 
+Q 713 2550 1038 2809 
+Q 1363 3069 1547 3412 
+Q 1731 3756 1731 4131 
+L 1731 4569 
+L 2131 4569 
+L 2131 4131 
+z
+M 2225 4131 
+Q 2225 3775 2409 3450 
+Q 2594 3125 2919 2881 
+Q 3244 2638 3656 2513 
+L 3406 2125 
+Q 2944 2275 2584 2569 
+Q 2225 2863 2022 3269 
+Q 1819 3675 1819 4131 
+L 1819 4569 
+L 2225 4569 
+L 2225 4131 
+z
+M 3506 4275 
+L 431 4275 
+L 431 4675 
+L 3506 4675 
+L 3506 4275 
+z
+M 4813 2044 
+L 4325 2044 
+L 4325 5050 
+L 4813 5050 
+L 4813 2044 
+z
+M 1700 1094 
+L 4325 1094 
+L 4325 1769 
+L 4813 1769 
+L 4813 -431 
+L 1213 -431 
+L 1213 1769 
+L 1700 1769 
+L 1700 1094 
+z
+M 4325 -31 
+L 4325 700 
+L 1700 700 
+L 1700 -31 
+L 4325 -31 
+z
+" transform="scale(0.015625)"/>
+      <path id="PortfolioChart-Regular-6c4" d="M 3650 3094 
+L 2400 3094 
+L 2400 3500 
+L 3650 3500 
+L 3650 3094 
+z
+M 3644 1700 
+L 2356 1700 
+L 2356 2106 
+L 3644 2106 
+L 3644 1700 
+z
+M 4981 -506 
+L 4513 -506 
+L 4513 5050 
+L 4981 5050 
+L 4981 -506 
+z
+M 3856 -225 
+L 3388 -225 
+L 3388 4900 
+L 3856 4900 
+L 3856 -225 
+z
+M 2619 4338 
+Q 2619 3594 2400 2931 
+Q 2181 2269 1715 1700 
+Q 1250 1131 519 694 
+L 219 1050 
+Q 869 1438 1297 1931 
+Q 1725 2425 1934 3009 
+Q 2144 3594 2144 4250 
+L 2144 4338 
+L 2619 4338 
+z
+M 2338 3931 
+L 469 3931 
+L 469 4338 
+L 2338 4338 
+L 2338 3931 
+z
+" transform="scale(0.015625)"/>
+     </defs>
+     <use xlink:href="#PortfolioChart-Regular-32c9"/>
+     <use xlink:href="#PortfolioChart-Regular-32ca" transform="translate(59.578125 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-2" transform="translate(103.421875 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-3362" transform="translate(128.515625 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-2" transform="translate(153.90625 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-8a" transform="translate(179 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-b1" transform="translate(230.5625 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-76" transform="translate(303.21875 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-a4" transform="translate(327.640625 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-2" transform="translate(399.421875 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-23d1" transform="translate(424.515625 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-6c4" transform="translate(510.9375 0)"/>
+    </g>
+   </g>
+   <g id="text_5">
+    <!-- 164.09 req/s -->
+    <g style="fill: #171717" transform="translate(170.894477 63.429888) scale(0.1 -0.1)">
+     <defs>
+      <path id="PortfolioChart-Regular-32cf" d="M 2000 -63 
+Q 1563 -56 1194 144 
+Q 825 344 587 822 
+Q 350 1300 350 2088 
+Q 350 2881 559 3443 
+Q 769 4006 1153 4297 
+Q 1538 4588 2069 4588 
+Q 2463 4588 2772 4438 
+Q 3081 4288 3281 4016 
+Q 3481 3744 3538 3388 
+L 2981 3388 
+Q 2925 3594 2806 3753 
+Q 2688 3913 2500 4000 
+Q 2313 4088 2069 4088 
+Q 1700 4088 1434 3884 
+Q 1169 3681 1025 3293 
+Q 881 2906 881 2363 
+L 938 2363 
+Q 1069 2550 1247 2684 
+Q 1425 2819 1644 2891 
+Q 1863 2963 2100 2963 
+Q 2500 2963 2840 2769 
+Q 3181 2575 3378 2234 
+Q 3575 1894 3575 1463 
+Q 3575 1038 3378 688 
+Q 3181 338 2822 137 
+Q 2463 -63 2000 -63 
+z
+M 2000 431 
+Q 2288 431 2522 568 
+Q 2756 706 2893 943 
+Q 3031 1181 3031 1456 
+Q 3031 1738 2900 1969 
+Q 2769 2200 2537 2334 
+Q 2306 2469 2013 2469 
+Q 1725 2469 1484 2328 
+Q 1244 2188 1103 1953 
+Q 963 1719 956 1450 
+Q 956 1188 1093 953 
+Q 1231 719 1468 575 
+Q 1706 431 2000 431 
+z
+" transform="scale(0.015625)"/>
+      <path id="PortfolioChart-Regular-32cd" d="M 313 1388 
+L 2350 4525 
+L 2688 4525 
+L 2688 3813 
+L 2450 3813 
+L 919 1456 
+L 919 1419 
+L 3675 1419 
+L 3675 925 
+L 313 925 
+L 313 1388 
+z
+M 2506 1063 
+L 2506 1281 
+L 2506 4525 
+L 3044 4525 
+L 3044 0 
+L 2506 0 
+L 2506 1063 
+z
+" transform="scale(0.015625)"/>
+      <path id="PortfolioChart-Regular-3359" d="M 813 -38 
+Q 706 -38 612 18 
+Q 519 75 466 169 
+Q 413 263 413 369 
+Q 413 475 466 569 
+Q 519 663 612 716 
+Q 706 769 813 769 
+Q 919 769 1012 716 
+Q 1106 663 1159 569 
+Q 1213 475 1213 369 
+Q 1213 263 1159 169 
+Q 1106 75 1012 18 
+Q 919 -38 813 -38 
+z
+" transform="scale(0.015625)"/>
+      <path id="PortfolioChart-Regular-32d2" d="M 1931 4588 
+Q 2369 4588 2737 4388 
+Q 3106 4188 3340 3709 
+Q 3575 3231 3575 2444 
+Q 3575 1650 3369 1087 
+Q 3163 525 2775 231 
+Q 2388 -63 1856 -63 
+Q 1469 -63 1156 90 
+Q 844 244 644 516 
+Q 444 788 388 1144 
+L 944 1144 
+Q 994 938 1116 778 
+Q 1238 619 1425 528 
+Q 1613 438 1856 438 
+Q 2225 438 2494 644 
+Q 2763 850 2906 1240 
+Q 3050 1631 3050 2175 
+L 2988 2175 
+Q 2856 1988 2678 1853 
+Q 2500 1719 2284 1647 
+Q 2069 1575 1831 1575 
+Q 1431 1575 1090 1769 
+Q 750 1963 550 2303 
+Q 350 2644 350 3069 
+Q 350 3494 547 3841 
+Q 744 4188 1103 4391 
+Q 1463 4594 1931 4588 
+z
+M 1931 4094 
+Q 1644 4094 1406 3956 
+Q 1169 3819 1034 3584 
+Q 900 3350 900 3075 
+Q 900 2800 1031 2569 
+Q 1163 2338 1394 2203 
+Q 1625 2069 1913 2069 
+Q 2200 2069 2440 2212 
+Q 2681 2356 2822 2590 
+Q 2963 2825 2963 3088 
+Q 2963 3350 2828 3581 
+Q 2694 3813 2459 3953 
+Q 2225 4094 1931 4094 
+z
+" transform="scale(0.015625)"/>
+      <path id="PortfolioChart-Regular-2b4" d="M 431 3394 
+L 950 3394 
+L 950 2875 
+L 988 2875 
+Q 1081 3138 1322 3294 
+Q 1563 3450 1863 3450 
+Q 2019 3450 2144 3438 
+L 2144 2894 
+Q 2113 2906 2013 2918 
+Q 1913 2931 1819 2931 
+Q 1581 2931 1387 2828 
+Q 1194 2725 1081 2544 
+Q 969 2363 969 2138 
+L 969 0 
+L 431 0 
+L 431 3394 
+z
+" transform="scale(0.015625)"/>
+      <path id="PortfolioChart-Regular-1e9" d="M 1856 -69 
+Q 1375 -69 1015 147 
+Q 656 363 462 756 
+Q 269 1150 269 1669 
+Q 269 2188 462 2591 
+Q 656 2994 1003 3216 
+Q 1350 3438 1806 3438 
+Q 2194 3438 2525 3269 
+Q 2856 3100 3062 2719 
+Q 3269 2338 3269 1744 
+L 3269 1519 
+L 644 1519 
+L 644 1975 
+L 2725 1975 
+Q 2725 2263 2612 2484 
+Q 2500 2706 2290 2834 
+Q 2081 2963 1806 2963 
+Q 1506 2963 1281 2816 
+Q 1056 2669 931 2422 
+Q 806 2175 806 1894 
+L 806 1588 
+Q 806 1213 937 947 
+Q 1069 681 1306 543 
+Q 1544 406 1856 406 
+Q 2050 406 2206 459 
+Q 2363 513 2472 597 
+Q 2581 681 2644 794 
+L 3219 794 
+Q 3138 538 2950 344 
+Q 2763 150 2481 40 
+Q 2200 -69 1856 -69 
+z
+" transform="scale(0.015625)"/>
+      <path id="PortfolioChart-Regular-2b1" d="M 2738 519 
+L 2700 519 
+Q 2594 356 2500 243 
+Q 2406 131 2209 31 
+Q 2013 -69 1713 -69 
+Q 1294 -69 966 147 
+Q 638 363 453 763 
+Q 269 1163 269 1688 
+Q 269 2219 453 2616 
+Q 638 3013 966 3225 
+Q 1294 3438 1719 3438 
+Q 2019 3438 2216 3341 
+Q 2413 3244 2506 3131 
+Q 2600 3019 2700 2856 
+L 2756 2856 
+L 2756 3394 
+L 3281 3394 
+L 3281 -1275 
+L 2738 -1275 
+L 2738 519 
+z
+M 1788 413 
+Q 2094 413 2312 575 
+Q 2531 738 2643 1028 
+Q 2756 1319 2756 1700 
+Q 2756 2081 2647 2362 
+Q 2538 2644 2319 2800 
+Q 2100 2956 1788 2956 
+Q 1475 2956 1256 2793 
+Q 1038 2631 925 2347 
+Q 813 2063 813 1700 
+Q 813 1331 925 1040 
+Q 1038 750 1256 581 
+Q 1475 413 1788 413 
+z
+" transform="scale(0.015625)"/>
+      <path id="PortfolioChart-Regular-337a" d="M 581 -681 
+L 94 -681 
+L 1550 4738 
+L 2044 4738 
+L 581 -681 
+z
+" transform="scale(0.015625)"/>
+      <path id="PortfolioChart-Regular-2c3" d="M 2319 2513 
+Q 2263 2738 2091 2859 
+Q 1919 2981 1631 2981 
+Q 1425 2981 1262 2915 
+Q 1100 2850 1006 2731 
+Q 913 2613 913 2469 
+Q 913 2300 1056 2181 
+Q 1200 2063 1494 1994 
+L 2000 1869 
+Q 2456 1763 2681 1534 
+Q 2906 1306 2906 950 
+Q 2906 656 2750 425 
+Q 2594 194 2294 62 
+Q 1994 -69 1575 -69 
+Q 1194 -69 919 40 
+Q 644 150 478 365 
+Q 313 581 269 888 
+L 831 888 
+Q 881 644 1062 522 
+Q 1244 400 1563 400 
+Q 1800 400 1978 462 
+Q 2156 525 2253 644 
+Q 2350 763 2350 919 
+Q 2350 1100 2215 1222 
+Q 2081 1344 1794 1406 
+L 1281 1525 
+Q 838 1631 606 1865 
+Q 375 2100 375 2438 
+Q 375 2725 534 2953 
+Q 694 3181 978 3309 
+Q 1263 3438 1631 3438 
+Q 1975 3438 2237 3322 
+Q 2500 3206 2656 2997 
+Q 2813 2788 2844 2513 
+L 2319 2513 
+z
+" transform="scale(0.015625)"/>
+     </defs>
+     <use xlink:href="#PortfolioChart-Regular-32ca"/>
+     <use xlink:href="#PortfolioChart-Regular-32cf" transform="translate(43.84375 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-32cd" transform="translate(105.171875 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-3359" transform="translate(164.359375 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-32c9" transform="translate(187.265625 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-32d2" transform="translate(246.84375 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-2" transform="translate(308.171875 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-2b4" transform="translate(333.265625 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-1e9" transform="translate(366.53125 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-2b1" transform="translate(421.8125 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-337a" transform="translate(479.71875 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-2c3" transform="translate(513.125 0)"/>
+    </g>
+   </g>
+   <g id="text_6">
+    <!-- 02 · 코드 최적화 -->
+    <g style="fill: #777777" transform="translate(4.2192 85.63968) scale(0.1 -0.1)">
+     <defs>
+      <path id="PortfolioChart-Regular-2954" d="M 4388 4100 
+L 838 4100 
+L 838 4506 
+L 4388 4506 
+L 4388 4100 
+z
+M 5288 250 
+L 225 250 
+L 225 669 
+L 5288 669 
+L 5288 250 
+z
+M 4669 3969 
+Q 4663 3450 4653 3134 
+Q 4644 2819 4594 2372 
+Q 4544 1925 4438 1400 
+L 3956 1456 
+Q 4063 1956 4116 2397 
+Q 4169 2838 4178 3178 
+Q 4188 3519 4188 3969 
+L 4188 4506 
+L 4669 4506 
+L 4669 3969 
+z
+M 756 2588 
+L 675 3019 
+L 4306 3169 
+L 4306 2800 
+L 756 2588 
+z
+M 2694 519 
+L 2213 519 
+L 2213 2106 
+L 2694 2106 
+L 2694 519 
+z
+" transform="scale(0.015625)"/>
+      <path id="PortfolioChart-Regular-edc" d="M 4713 1969 
+L 875 1969 
+L 875 2375 
+L 4713 2375 
+L 4713 1969 
+z
+M 5313 250 
+L 225 250 
+L 225 663 
+L 5313 663 
+L 5313 250 
+z
+M 4656 4125 
+L 1363 4125 
+L 1363 2194 
+L 875 2194 
+L 875 4531 
+L 4656 4531 
+L 4656 4125 
+z
+" transform="scale(0.015625)"/>
+      <path id="PortfolioChart-Regular-275c" d="M 2331 900 
+L 1850 900 
+L 1850 2119 
+L 2331 2119 
+L 2331 900 
+z
+M 2238 3938 
+Q 2238 3463 2038 3059 
+Q 1838 2656 1484 2368 
+Q 1131 2081 663 1938 
+L 425 2313 
+Q 844 2438 1162 2675 
+Q 1481 2913 1659 3238 
+Q 1838 3563 1838 3938 
+L 1838 4069 
+L 2238 4069 
+L 2238 3938 
+z
+M 2331 3938 
+Q 2331 3581 2515 3268 
+Q 2700 2956 3022 2725 
+Q 3344 2494 3763 2375 
+L 3531 1988 
+Q 3063 2131 2700 2412 
+Q 2338 2694 2134 3087 
+Q 1931 3481 1931 3938 
+L 1931 4069 
+L 2331 4069 
+L 2331 3938 
+z
+M 3638 3913 
+L 563 3913 
+L 563 4319 
+L 3638 4319 
+L 3638 3913 
+z
+M 2331 4138 
+L 1850 4138 
+L 1850 5006 
+L 2331 5006 
+L 2331 4138 
+z
+M 4781 -519 
+L 4294 -519 
+L 4294 5050 
+L 4781 5050 
+L 4781 -519 
+z
+M 256 1050 
+Q 1000 1056 1544 1068 
+Q 2088 1081 2722 1122 
+Q 3356 1163 3925 1244 
+L 3963 881 
+Q 3375 775 2744 722 
+Q 2113 669 1559 656 
+Q 1006 644 325 644 
+L 256 1050 
+z
+" transform="scale(0.015625)"/>
+      <path id="PortfolioChart-Regular-2201" d="M 2069 4019 
+Q 2069 3525 1869 3081 
+Q 1669 2638 1316 2309 
+Q 963 1981 506 1813 
+L 250 2200 
+Q 656 2350 978 2628 
+Q 1300 2906 1481 3272 
+Q 1663 3638 1663 4019 
+L 1663 4481 
+L 2069 4481 
+L 2069 4019 
+z
+M 2156 4025 
+Q 2156 3669 2328 3331 
+Q 2500 2994 2812 2734 
+Q 3125 2475 3525 2331 
+L 3269 1944 
+Q 2819 2106 2478 2418 
+Q 2138 2731 1947 3150 
+Q 1756 3569 1756 4025 
+L 1756 4481 
+L 2156 4481 
+L 2156 4025 
+z
+M 4481 3181 
+L 3225 3181 
+L 3225 3594 
+L 4481 3594 
+L 4481 3181 
+z
+M 3400 4263 
+L 406 4263 
+L 406 4663 
+L 3400 4663 
+L 3400 4263 
+z
+M 4831 -506 
+L 4338 -506 
+L 4338 1019 
+L 1094 1019 
+L 1094 1425 
+L 4831 1425 
+L 4831 -506 
+z
+M 4831 1719 
+L 4338 1719 
+L 4338 5050 
+L 4831 5050 
+L 4831 1719 
+z
+" transform="scale(0.015625)"/>
+      <path id="PortfolioChart-Regular-3054" d="M 2181 831 
+L 1688 831 
+L 1688 1738 
+L 2181 1738 
+L 2181 831 
+z
+M 4538 -506 
+L 4044 -506 
+L 4044 5050 
+L 4538 5050 
+L 4538 -506 
+z
+M 5425 2269 
+L 4388 2269 
+L 4388 2681 
+L 5425 2681 
+L 5425 2269 
+z
+M 156 975 
+Q 1213 975 2075 1006 
+Q 2938 1038 3706 1150 
+L 3738 775 
+Q 3175 681 2569 634 
+Q 1963 588 1416 572 
+Q 869 556 238 556 
+L 156 975 
+z
+M 3606 3969 
+L 256 3969 
+L 256 4369 
+L 3606 4369 
+L 3606 3969 
+z
+M 1938 3644 
+Q 2325 3644 2622 3516 
+Q 2919 3388 3087 3156 
+Q 3256 2925 3256 2613 
+Q 3256 2306 3087 2078 
+Q 2919 1850 2622 1722 
+Q 2325 1594 1938 1594 
+Q 1550 1594 1250 1722 
+Q 950 1850 787 2078 
+Q 625 2306 625 2613 
+Q 625 2925 787 3156 
+Q 950 3388 1250 3516 
+Q 1550 3644 1938 3644 
+z
+M 1938 3263 
+Q 1688 3263 1494 3181 
+Q 1300 3100 1190 2953 
+Q 1081 2806 1081 2613 
+Q 1081 2425 1187 2278 
+Q 1294 2131 1491 2056 
+Q 1688 1981 1938 1981 
+Q 2188 1981 2381 2056 
+Q 2575 2131 2681 2278 
+Q 2788 2425 2788 2613 
+Q 2788 2806 2681 2953 
+Q 2575 3100 2381 3181 
+Q 2188 3263 1938 3263 
+z
+M 2181 4113 
+L 1688 4113 
+L 1688 5038 
+L 2181 5038 
+L 2181 4113 
+z
+" transform="scale(0.015625)"/>
+     </defs>
+     <use xlink:href="#PortfolioChart-Regular-32c9"/>
+     <use xlink:href="#PortfolioChart-Regular-32cb" transform="translate(59.578125 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-2" transform="translate(118.265625 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-3362" transform="translate(143.359375 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-2" transform="translate(168.75 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-2954" transform="translate(193.84375 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-edc" transform="translate(280.265625 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-2" transform="translate(366.6875 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-275c" transform="translate(391.78125 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-2201" transform="translate(478.203125 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-3054" transform="translate(564.625 0)"/>
+    </g>
+   </g>
+   <g id="text_7">
+    <!-- 169.14 req/s -->
+    <g style="fill: #171717" transform="translate(175.84319 99.717888) scale(0.1 -0.1)">
+     <use xlink:href="#PortfolioChart-Regular-32ca"/>
+     <use xlink:href="#PortfolioChart-Regular-32cf" transform="translate(43.84375 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-32d2" transform="translate(105.171875 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-3359" transform="translate(164.015625 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-32ca" transform="translate(180.953125 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-32cd" transform="translate(224.796875 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-2" transform="translate(287.203125 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-2b4" transform="translate(312.296875 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-1e9" transform="translate(345.5625 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-2b1" transform="translate(400.84375 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-337a" transform="translate(458.75 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-2c3" transform="translate(492.15625 0)"/>
+    </g>
+   </g>
+   <g id="text_8">
+    <!-- 03 · Caffeine -->
+    <g style="fill: #777777" transform="translate(4.2192 121.92768) scale(0.1 -0.1)">
+     <defs>
+      <path id="PortfolioChart-Regular-32cc" d="M 1988 -63 
+Q 1544 -63 1191 87 
+Q 838 238 634 509 
+Q 431 781 413 1138 
+L 981 1138 
+Q 1000 931 1134 772 
+Q 1269 613 1491 525 
+Q 1713 438 1981 438 
+Q 2275 438 2512 541 
+Q 2750 644 2881 822 
+Q 3013 1000 3013 1231 
+Q 3013 1481 2884 1672 
+Q 2756 1863 2509 1969 
+Q 2263 2075 1913 2075 
+L 1544 2075 
+L 1544 2569 
+L 1913 2569 
+Q 2188 2569 2400 2666 
+Q 2613 2763 2728 2938 
+Q 2844 3113 2844 3344 
+Q 2844 3569 2741 3741 
+Q 2638 3913 2447 4006 
+Q 2256 4100 2000 4100 
+Q 1756 4100 1543 4012 
+Q 1331 3925 1197 3765 
+Q 1063 3606 1050 3388 
+L 506 3388 
+Q 525 3738 728 4013 
+Q 931 4288 1268 4438 
+Q 1606 4588 2006 4588 
+Q 2425 4588 2740 4425 
+Q 3056 4263 3225 3984 
+Q 3394 3706 3388 3375 
+Q 3394 3125 3300 2915 
+Q 3206 2706 3031 2562 
+Q 2856 2419 2619 2350 
+L 2619 2319 
+Q 2913 2275 3125 2125 
+Q 3338 1975 3453 1747 
+Q 3569 1519 3563 1231 
+Q 3569 869 3362 572 
+Q 3156 275 2793 106 
+Q 2431 -63 1988 -63 
+z
+" transform="scale(0.015625)"/>
+      <path id="PortfolioChart-Regular-29" d="M 3588 3100 
+Q 3525 3406 3340 3622 
+Q 3156 3838 2890 3950 
+Q 2625 4063 2325 4063 
+Q 1913 4063 1581 3853 
+Q 1250 3644 1059 3237 
+Q 869 2831 869 2263 
+Q 869 1694 1059 1287 
+Q 1250 881 1581 672 
+Q 1913 463 2325 463 
+Q 2625 463 2887 575 
+Q 3150 688 3337 903 
+Q 3525 1119 3588 1419 
+L 4150 1419 
+Q 4069 969 3812 631 
+Q 3556 294 3172 115 
+Q 2788 -63 2325 -63 
+Q 1744 -63 1291 221 
+Q 838 506 581 1034 
+Q 325 1563 325 2263 
+Q 325 2969 581 3494 
+Q 838 4019 1291 4303 
+Q 1744 4588 2325 4588 
+Q 2781 4588 3168 4409 
+Q 3556 4231 3812 3897 
+Q 4069 3563 4150 3100 
+L 3588 3100 
+z
+" transform="scale(0.015625)"/>
+      <path id="PortfolioChart-Regular-1a0" d="M 2506 1575 
+Q 2450 1575 1963 1538 
+L 1606 1513 
+Q 1225 1488 1015 1347 
+Q 806 1206 806 938 
+Q 806 763 897 644 
+Q 988 525 1150 462 
+Q 1313 400 1519 400 
+Q 1813 400 2025 515 
+Q 2238 631 2350 822 
+Q 2463 1013 2463 1231 
+L 2463 2288 
+Q 2463 2506 2378 2659 
+Q 2294 2813 2122 2891 
+Q 1950 2969 1694 2969 
+Q 1388 2969 1191 2844 
+Q 994 2719 931 2513 
+L 369 2513 
+Q 406 2788 584 2997 
+Q 763 3206 1056 3322 
+Q 1350 3438 1719 3438 
+Q 2013 3438 2294 3350 
+Q 2575 3263 2784 2997 
+Q 2994 2731 2994 2238 
+L 2994 0 
+L 2463 0 
+L 2463 463 
+L 2438 463 
+Q 2375 331 2247 209 
+Q 2119 88 1909 3 
+Q 1700 -81 1425 -81 
+Q 1100 -81 837 44 
+Q 575 169 422 406 
+Q 269 644 269 963 
+Q 269 1494 631 1709 
+Q 994 1925 1544 1963 
+Q 1606 1969 2144 2000 
+L 2500 2013 
+L 2506 1575 
+z
+" transform="scale(0.015625)"/>
+      <path id="PortfolioChart-Regular-214" d="M 1950 2944 
+L 113 2944 
+L 113 3394 
+L 1950 3394 
+L 1950 2944 
+z
+M 656 3856 
+Q 656 4131 775 4328 
+Q 894 4525 1112 4631 
+Q 1331 4738 1625 4738 
+Q 1719 4738 1825 4728 
+Q 1931 4719 2025 4700 
+L 2025 4219 
+Q 1875 4244 1744 4244 
+Q 1463 4244 1331 4122 
+Q 1200 4000 1200 3738 
+L 1200 0 
+L 656 0 
+L 656 3856 
+z
+" transform="scale(0.015625)"/>
+      <path id="PortfolioChart-Regular-23a" d="M 431 3394 
+L 969 3394 
+L 969 0 
+L 431 0 
+L 431 3394 
+z
+M 700 3956 
+Q 600 3956 512 4003 
+Q 425 4050 375 4134 
+Q 325 4219 325 4313 
+Q 325 4413 375 4494 
+Q 425 4575 512 4622 
+Q 600 4669 700 4669 
+Q 806 4669 893 4622 
+Q 981 4575 1031 4494 
+Q 1081 4413 1081 4313 
+Q 1081 4219 1031 4134 
+Q 981 4050 893 4003 
+Q 806 3956 700 3956 
+z
+" transform="scale(0.015625)"/>
+      <path id="PortfolioChart-Regular-276" d="M 969 0 
+L 431 0 
+L 431 3394 
+L 950 3394 
+L 950 2863 
+L 994 2863 
+Q 1125 3138 1369 3288 
+Q 1613 3438 1988 3438 
+Q 2338 3438 2594 3297 
+Q 2850 3156 2990 2868 
+Q 3131 2581 3131 2156 
+L 3131 0 
+L 2594 0 
+L 2594 2119 
+Q 2594 2381 2503 2568 
+Q 2413 2756 2241 2856 
+Q 2069 2956 1825 2956 
+Q 1575 2956 1381 2850 
+Q 1188 2744 1078 2534 
+Q 969 2325 969 2038 
+L 969 0 
+z
+" transform="scale(0.015625)"/>
+     </defs>
+     <use xlink:href="#PortfolioChart-Regular-32c9"/>
+     <use xlink:href="#PortfolioChart-Regular-32cc" transform="translate(59.578125 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-2" transform="translate(121.296875 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-3362" transform="translate(146.390625 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-2" transform="translate(171.78125 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-29" transform="translate(196.875 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-1a0" transform="translate(266.21875 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-214" transform="translate(319.734375 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-214" transform="translate(353.421875 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-1e9" transform="translate(384.90625 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-23a" transform="translate(440.1875 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-276" transform="translate(461.96875 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-1e9" transform="translate(517.640625 0)"/>
+    </g>
+   </g>
+   <g id="text_9">
+    <!-- 242.29 req/s -->
+    <g style="fill: #171717" transform="translate(247.52767 136.005888) scale(0.1 -0.1)">
+     <defs>
+      <path id="PortfolioChart-Bold-32cb" d="M 350 678 
+L 1978 2175 
+Q 2219 2406 2353 2557 
+Q 2488 2709 2558 2864 
+Q 2628 3019 2628 3194 
+Q 2628 3388 2534 3536 
+Q 2441 3684 2278 3762 
+Q 2116 3841 1909 3841 
+Q 1700 3841 1539 3756 
+Q 1378 3672 1292 3511 
+Q 1206 3350 1206 3138 
+L 313 3138 
+Q 313 3572 514 3901 
+Q 716 4231 1080 4409 
+Q 1444 4588 1919 4588 
+Q 2397 4588 2762 4419 
+Q 3128 4250 3329 3947 
+Q 3531 3644 3531 3253 
+Q 3531 2988 3429 2741 
+Q 3328 2494 3073 2194 
+Q 2819 1894 2350 1469 
+L 1659 803 
+L 1659 772 
+L 3597 772 
+L 3597 0 
+L 353 0 
+L 350 678 
+z
+" transform="scale(0.015625)"/>
+      <path id="PortfolioChart-Bold-32cd" d="M 281 1544 
+L 2194 4525 
+L 2831 4525 
+L 2831 3494 
+L 2450 3494 
+L 1231 1594 
+L 1231 1556 
+L 3947 1556 
+L 3947 800 
+L 281 800 
+L 281 1544 
+z
+M 2478 1028 
+L 2491 1356 
+L 2491 4525 
+L 3375 4525 
+L 3375 0 
+L 2478 0 
+L 2478 1028 
+z
+" transform="scale(0.015625)"/>
+      <path id="PortfolioChart-Bold-3359" d="M 903 -56 
+Q 763 -56 641 17 
+Q 519 91 450 211 
+Q 381 331 381 472 
+Q 381 609 450 729 
+Q 519 850 641 919 
+Q 763 988 903 988 
+Q 1044 988 1164 919 
+Q 1284 850 1356 729 
+Q 1428 609 1428 472 
+Q 1428 331 1356 211 
+Q 1284 91 1164 17 
+Q 1044 -56 903 -56 
+z
+" transform="scale(0.015625)"/>
+      <path id="PortfolioChart-Bold-32d2" d="M 2009 4588 
+Q 2513 4588 2922 4370 
+Q 3331 4153 3582 3658 
+Q 3834 3163 3834 2381 
+Q 3838 1622 3609 1072 
+Q 3381 522 2961 229 
+Q 2541 -63 1972 -63 
+Q 1528 -63 1175 112 
+Q 822 288 606 589 
+Q 391 891 344 1272 
+L 1269 1272 
+Q 1309 1106 1404 987 
+Q 1500 869 1645 806 
+Q 1791 744 1972 744 
+Q 2275 744 2487 919 
+Q 2700 1094 2808 1420 
+Q 2916 1747 2916 2200 
+L 2875 2200 
+Q 2769 2006 2594 1862 
+Q 2419 1719 2192 1642 
+Q 1966 1566 1716 1566 
+Q 1316 1566 992 1753 
+Q 669 1941 484 2273 
+Q 300 2606 297 3019 
+Q 297 3472 511 3830 
+Q 725 4188 1115 4389 
+Q 1506 4591 2009 4588 
+z
+M 2013 3850 
+Q 1788 3850 1603 3742 
+Q 1419 3634 1316 3451 
+Q 1213 3269 1213 3047 
+Q 1216 2825 1319 2644 
+Q 1422 2463 1601 2356 
+Q 1781 2250 2003 2250 
+Q 2231 2250 2417 2359 
+Q 2603 2469 2712 2655 
+Q 2822 2841 2819 3053 
+Q 2819 3269 2712 3451 
+Q 2606 3634 2425 3742 
+Q 2244 3850 2013 3850 
+z
+" transform="scale(0.015625)"/>
+      <path id="PortfolioChart-Bold-2" transform="scale(0.015625)"/>
+      <path id="PortfolioChart-Bold-2b4" d="M 363 3394 
+L 1256 3394 
+L 1256 2803 
+L 1294 2803 
+Q 1384 3116 1603 3280 
+Q 1822 3444 2109 3444 
+Q 2259 3444 2406 3413 
+L 2406 2588 
+Q 2347 2609 2228 2623 
+Q 2109 2638 2009 2638 
+Q 1803 2638 1640 2548 
+Q 1478 2459 1383 2298 
+Q 1288 2138 1288 1928 
+L 1288 0 
+L 363 0 
+L 363 3394 
+z
+" transform="scale(0.015625)"/>
+      <path id="PortfolioChart-Bold-1e9" d="M 1903 -66 
+Q 1391 -66 1011 146 
+Q 631 359 426 753 
+Q 222 1147 222 1678 
+Q 222 2203 426 2601 
+Q 631 3000 1003 3219 
+Q 1375 3438 1866 3438 
+Q 2325 3438 2684 3245 
+Q 3044 3053 3250 2665 
+Q 3456 2278 3456 1719 
+L 3456 1459 
+L 600 1459 
+L 600 2038 
+L 2584 2038 
+Q 2584 2244 2493 2405 
+Q 2403 2566 2243 2656 
+Q 2084 2747 1881 2747 
+Q 1666 2747 1497 2648 
+Q 1328 2550 1233 2378 
+Q 1138 2206 1134 2003 
+L 1134 1459 
+Q 1134 1206 1231 1015 
+Q 1328 825 1504 725 
+Q 1681 625 1916 625 
+Q 2072 625 2200 670 
+Q 2328 716 2417 789 
+Q 2506 863 2553 963 
+L 3434 963 
+Q 3369 653 3164 420 
+Q 2959 188 2636 61 
+Q 2313 -66 1903 -66 
+z
+" transform="scale(0.015625)"/>
+      <path id="PortfolioChart-Bold-2b1" d="M 2603 541 
+L 2575 541 
+Q 2491 372 2377 247 
+Q 2263 122 2069 34 
+Q 1875 -53 1613 -53 
+Q 1222 -53 908 150 
+Q 594 353 414 748 
+Q 234 1144 234 1694 
+Q 234 2256 418 2650 
+Q 603 3044 914 3241 
+Q 1225 3438 1613 3438 
+Q 1881 3438 2075 3348 
+Q 2269 3259 2381 3128 
+Q 2494 2997 2575 2825 
+L 2619 2825 
+L 2619 3394 
+L 3528 3394 
+L 3528 -1275 
+L 2603 -1275 
+L 2603 541 
+z
+M 1900 684 
+Q 2128 684 2292 809 
+Q 2456 934 2542 1165 
+Q 2628 1397 2628 1700 
+Q 2628 2006 2543 2231 
+Q 2459 2456 2295 2576 
+Q 2131 2697 1900 2697 
+Q 1669 2697 1506 2573 
+Q 1344 2450 1261 2225 
+Q 1178 2000 1178 1700 
+Q 1178 1400 1261 1170 
+Q 1344 941 1506 812 
+Q 1669 684 1900 684 
+z
+" transform="scale(0.015625)"/>
+      <path id="PortfolioChart-Bold-337a" d="M 856 -681 
+L 63 -681 
+L 1519 4738 
+L 2319 4738 
+L 856 -681 
+z
+" transform="scale(0.015625)"/>
+      <path id="PortfolioChart-Bold-2c3" d="M 2300 2384 
+Q 2269 2572 2122 2675 
+Q 1975 2778 1744 2778 
+Q 1594 2778 1475 2736 
+Q 1356 2694 1286 2614 
+Q 1216 2534 1216 2434 
+Q 1213 2316 1317 2228 
+Q 1422 2141 1653 2094 
+L 2266 1969 
+Q 2759 1869 3001 1642 
+Q 3244 1416 3244 1050 
+Q 3244 719 3055 467 
+Q 2866 216 2527 75 
+Q 2188 -66 1738 -66 
+Q 1284 -66 954 64 
+Q 625 194 434 433 
+Q 244 672 206 1003 
+L 1134 1003 
+Q 1175 809 1329 707 
+Q 1484 606 1741 606 
+Q 1906 606 2032 647 
+Q 2159 688 2229 767 
+Q 2300 847 2300 953 
+Q 2300 1091 2189 1175 
+Q 2078 1259 1841 1306 
+L 1278 1419 
+Q 791 1516 542 1759 
+Q 294 2003 297 2378 
+Q 297 2703 472 2942 
+Q 647 3181 970 3309 
+Q 1294 3438 1731 3438 
+Q 2156 3438 2472 3309 
+Q 2788 3181 2966 2943 
+Q 3144 2706 3166 2384 
+L 2300 2384 
+z
+" transform="scale(0.015625)"/>
+     </defs>
+     <use xlink:href="#PortfolioChart-Bold-32cb"/>
+     <use xlink:href="#PortfolioChart-Bold-32cd" transform="translate(59.5625 0)"/>
+     <use xlink:href="#PortfolioChart-Bold-32cb" transform="translate(125.28125 0)"/>
+     <use xlink:href="#PortfolioChart-Bold-3359" transform="translate(186.359375 0)"/>
+     <use xlink:href="#PortfolioChart-Bold-32cb" transform="translate(214.578125 0)"/>
+     <use xlink:href="#PortfolioChart-Bold-32d2" transform="translate(275.65625 0)"/>
+     <use xlink:href="#PortfolioChart-Bold-2" transform="translate(339.96875 0)"/>
+     <use xlink:href="#PortfolioChart-Bold-2b4" transform="translate(363.0625 0)"/>
+     <use xlink:href="#PortfolioChart-Bold-1e9" transform="translate(400.375 0)"/>
+     <use xlink:href="#PortfolioChart-Bold-2b1" transform="translate(457.796875 0)"/>
+     <use xlink:href="#PortfolioChart-Bold-337a" transform="translate(518.59375 0)"/>
+     <use xlink:href="#PortfolioChart-Bold-2c3" transform="translate(555.75 0)"/>
+    </g>
+   </g>
+  </g>
+  <g id="axes_2">
+   <g id="patch_6">
+    <path d="M 396.6048 150.5952 
+L 527.4 150.5952 
+L 527.4 47.1744 
+L 396.6048 47.1744 
+z
+" style="fill: #ffffff"/>
+   </g>
+   <g id="matplotlib.axis_3">
+    <g id="xtick_4">
+     <g id="line2d_7"/>
+     <g id="text_10">
+      <!-- 01 -->
+      <g style="fill: #999999" transform="translate(416.992025 161.712388) scale(0.08 -0.08)">
+       <use xlink:href="#PortfolioChart-Regular-32c9"/>
+       <use xlink:href="#PortfolioChart-Regular-32ca" transform="translate(59.578125 0)"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_5">
+     <g id="line2d_8"/>
+     <g id="text_11">
+      <!-- 02 -->
+      <g style="fill: #999999" transform="translate(457.271775 161.712388) scale(0.08 -0.08)">
+       <use xlink:href="#PortfolioChart-Regular-32c9"/>
+       <use xlink:href="#PortfolioChart-Regular-32cb" transform="translate(59.578125 0)"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_6">
+     <g id="line2d_9"/>
+     <g id="text_12">
+      <!-- 03 -->
+      <g style="fill: #999999" transform="translate(498.024025 161.712388) scale(0.08 -0.08)">
+       <use xlink:href="#PortfolioChart-Regular-32c9"/>
+       <use xlink:href="#PortfolioChart-Regular-32cc" transform="translate(59.578125 0)"/>
+      </g>
+     </g>
+    </g>
+    <g id="text_13">
+     <!-- 개별 핀 조회 -->
+     <g style="fill: #333333" transform="translate(435.696072 180.115708) scale(0.11 -0.11)">
+      <defs>
+       <path id="PortfolioChart-Bold-61c" d="M 5075 -575 
+L 4306 -575 
+L 4306 5119 
+L 5075 5119 
+L 5075 -575 
+z
+M 4538 2319 
+L 3569 2319 
+L 3569 2959 
+L 4538 2959 
+L 4538 2319 
+z
+M 2644 4409 
+Q 2644 3575 2450 2889 
+Q 2256 2203 1798 1623 
+Q 1341 1044 563 597 
+L 100 1144 
+Q 753 1525 1143 1986 
+Q 1534 2447 1709 3001 
+Q 1884 3556 1884 4253 
+L 1884 4409 
+L 2644 4409 
+z
+M 2116 3775 
+L 388 3775 
+L 388 4409 
+L 2116 4409 
+L 2116 3775 
+z
+M 3788 -322 
+L 3044 -322 
+L 3044 4969 
+L 3788 4969 
+L 3788 -322 
+z
+" transform="scale(0.015625)"/>
+       <path id="PortfolioChart-Bold-16c4" d="M 4353 3794 
+L 2931 3794 
+L 2931 4388 
+L 4353 4388 
+L 4353 3794 
+z
+M 4353 2756 
+L 2931 2756 
+L 2931 3359 
+L 4353 3359 
+L 4353 2756 
+z
+M 4959 2188 
+L 4169 2188 
+L 4169 5119 
+L 4959 5119 
+L 4959 2188 
+z
+M 4959 456 
+L 1984 456 
+L 1984 -281 
+L 1181 -281 
+L 1181 1041 
+L 4169 1041 
+L 4169 1363 
+L 1175 1363 
+L 1175 1975 
+L 4959 1975 
+L 4959 456 
+z
+M 5128 -513 
+L 1181 -513 
+L 1181 116 
+L 5128 116 
+L 5128 -513 
+z
+M 1213 4203 
+L 2331 4203 
+L 2331 4872 
+L 3122 4872 
+L 3122 2347 
+L 409 2347 
+L 409 4872 
+L 1213 4872 
+L 1213 4203 
+z
+M 2331 2975 
+L 2331 3603 
+L 1213 3603 
+L 1213 2975 
+L 2331 2975 
+z
+" transform="scale(0.015625)"/>
+       <path id="PortfolioChart-Bold-2f40" d="M 4928 928 
+L 4131 928 
+L 4131 5106 
+L 4928 5106 
+L 4928 928 
+z
+M 5063 -478 
+L 1109 -478 
+L 1109 166 
+L 5063 166 
+L 5063 -478 
+z
+M 1903 -213 
+L 1109 -213 
+L 1109 1313 
+L 1903 1313 
+L 1903 -213 
+z
+M 3506 4003 
+L 416 4003 
+L 416 4634 
+L 3506 4634 
+L 3506 4003 
+z
+M 263 2325 
+Q 1250 2325 2117 2356 
+Q 2984 2388 3728 2478 
+L 3778 1888 
+Q 3009 1766 2178 1727 
+Q 1347 1688 350 1688 
+L 263 2325 
+z
+M 1638 2175 
+L 872 2175 
+L 872 4128 
+L 1638 4128 
+L 1638 2175 
+z
+M 3034 2175 
+L 2272 2175 
+L 2272 4128 
+L 3034 4128 
+L 3034 2175 
+z
+" transform="scale(0.015625)"/>
+       <path id="PortfolioChart-Bold-2270" d="M 5372 88 
+L 172 88 
+L 172 734 
+L 5372 734 
+L 5372 88 
+z
+M 3169 547 
+L 2366 547 
+L 2366 2000 
+L 3169 2000 
+L 3169 547 
+z
+M 3016 4159 
+Q 3016 3559 2736 3061 
+Q 2456 2563 1928 2223 
+Q 1400 1884 691 1750 
+L 378 2381 
+Q 984 2481 1429 2748 
+Q 1875 3016 2108 3384 
+Q 2341 3753 2341 4159 
+L 2341 4366 
+L 3016 4366 
+L 3016 4159 
+z
+M 3178 4159 
+Q 3178 3750 3414 3387 
+Q 3650 3025 4104 2765 
+Q 4559 2506 5181 2413 
+L 4869 1784 
+Q 4150 1913 3615 2244 
+Q 3081 2575 2795 3067 
+Q 2509 3559 2509 4159 
+L 2509 4366 
+L 3178 4366 
+L 3178 4159 
+z
+M 4919 4034 
+L 600 4034 
+L 600 4681 
+L 4919 4681 
+L 4919 4034 
+z
+" transform="scale(0.015625)"/>
+       <path id="PortfolioChart-Bold-308c" d="M 2434 731 
+L 1641 731 
+L 1641 1659 
+L 2434 1659 
+L 2434 731 
+z
+M 4947 -575 
+L 4156 -575 
+L 4156 5119 
+L 4947 5119 
+L 4947 -575 
+z
+M 525 1031 
+Q 1541 1038 2330 1070 
+Q 3119 1103 3844 1197 
+L 3894 606 
+Q 3075 463 2204 420 
+Q 1334 378 300 378 
+L 194 1031 
+L 525 1031 
+z
+M 3763 3853 
+L 306 3853 
+L 306 4478 
+L 3763 4478 
+L 3763 3853 
+z
+M 2031 3628 
+Q 2450 3628 2775 3493 
+Q 3100 3359 3281 3117 
+Q 3463 2875 3463 2559 
+Q 3463 2247 3281 2006 
+Q 3100 1766 2775 1630 
+Q 2450 1494 2031 1494 
+Q 1622 1494 1298 1628 
+Q 975 1763 795 2005 
+Q 616 2247 616 2559 
+Q 616 2875 795 3117 
+Q 975 3359 1298 3493 
+Q 1622 3628 2031 3628 
+z
+M 2031 3025 
+Q 1841 3025 1691 2970 
+Q 1541 2916 1456 2811 
+Q 1372 2706 1372 2559 
+Q 1372 2416 1456 2312 
+Q 1541 2209 1691 2154 
+Q 1841 2100 2031 2100 
+Q 2231 2100 2384 2153 
+Q 2538 2206 2619 2311 
+Q 2700 2416 2700 2559 
+Q 2700 2706 2619 2811 
+Q 2538 2916 2384 2970 
+Q 2231 3025 2031 3025 
+z
+M 2441 4122 
+L 1641 4122 
+L 1641 5091 
+L 2441 5091 
+L 2441 4122 
+z
+" transform="scale(0.015625)"/>
+      </defs>
+      <use xlink:href="#PortfolioChart-Bold-61c"/>
+      <use xlink:href="#PortfolioChart-Bold-16c4" transform="translate(86.421875 0)"/>
+      <use xlink:href="#PortfolioChart-Bold-2" transform="translate(172.84375 0)"/>
+      <use xlink:href="#PortfolioChart-Bold-2f40" transform="translate(195.9375 0)"/>
+      <use xlink:href="#PortfolioChart-Bold-2" transform="translate(282.359375 0)"/>
+      <use xlink:href="#PortfolioChart-Bold-2270" transform="translate(305.453125 0)"/>
+      <use xlink:href="#PortfolioChart-Bold-308c" transform="translate(391.875 0)"/>
+     </g>
+    </g>
+   </g>
+   <g id="matplotlib.axis_4">
+    <g id="ytick_1">
+     <g id="line2d_10">
+      <path d="M 396.6048 150.5952 
+L 527.4 150.5952 
+" clip-path="url(#p5866ac341b)" style="fill: none; stroke: #eeeeee; stroke-width: 0.7; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_11"/>
+     <g id="text_14">
+      <!-- 0 -->
+      <g style="fill: #999999" transform="translate(388.33855 154.403794) scale(0.08 -0.08)">
+       <use xlink:href="#PortfolioChart-Regular-32c9"/>
+      </g>
+     </g>
+    </g>
+    <g id="ytick_2">
+     <g id="line2d_12">
+      <path d="M 396.6048 124.74 
+L 527.4 124.74 
+" clip-path="url(#p5866ac341b)" style="fill: none; stroke: #eeeeee; stroke-width: 0.7; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_13"/>
+     <g id="text_15">
+      <!-- 100 -->
+      <g style="fill: #999999" transform="translate(380.0648 128.548594) scale(0.08 -0.08)">
+       <use xlink:href="#PortfolioChart-Regular-32ca"/>
+       <use xlink:href="#PortfolioChart-Regular-32c9" transform="translate(43.84375 0)"/>
+       <use xlink:href="#PortfolioChart-Regular-32c9" transform="translate(103.421875 0)"/>
+      </g>
+     </g>
+    </g>
+    <g id="ytick_3">
+     <g id="line2d_14">
+      <path d="M 396.6048 98.8848 
+L 527.4 98.8848 
+" clip-path="url(#p5866ac341b)" style="fill: none; stroke: #eeeeee; stroke-width: 0.7; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_15"/>
+     <g id="text_16">
+      <!-- 200 -->
+      <g style="fill: #999999" transform="translate(378.8773 102.693394) scale(0.08 -0.08)">
+       <use xlink:href="#PortfolioChart-Regular-32cb"/>
+       <use xlink:href="#PortfolioChart-Regular-32c9" transform="translate(58.6875 0)"/>
+       <use xlink:href="#PortfolioChart-Regular-32c9" transform="translate(118.265625 0)"/>
+      </g>
+     </g>
+    </g>
+    <g id="ytick_4">
+     <g id="line2d_16">
+      <path d="M 396.6048 73.0296 
+L 527.4 73.0296 
+" clip-path="url(#p5866ac341b)" style="fill: none; stroke: #eeeeee; stroke-width: 0.7; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_17"/>
+     <g id="text_17">
+      <!-- 300 -->
+      <g style="fill: #999999" transform="translate(378.6348 76.838194) scale(0.08 -0.08)">
+       <use xlink:href="#PortfolioChart-Regular-32cc"/>
+       <use xlink:href="#PortfolioChart-Regular-32c9" transform="translate(61.71875 0)"/>
+       <use xlink:href="#PortfolioChart-Regular-32c9" transform="translate(121.296875 0)"/>
+      </g>
+     </g>
+    </g>
+    <g id="ytick_5">
+     <g id="line2d_18">
+      <path d="M 396.6048 47.1744 
+L 527.4 47.1744 
+" clip-path="url(#p5866ac341b)" style="fill: none; stroke: #eeeeee; stroke-width: 0.7; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_19"/>
+     <g id="text_18">
+      <!-- 400 -->
+      <g style="fill: #999999" transform="translate(378.5798 50.982994) scale(0.08 -0.08)">
+       <use xlink:href="#PortfolioChart-Regular-32cd"/>
+       <use xlink:href="#PortfolioChart-Regular-32c9" transform="translate(62.40625 0)"/>
+       <use xlink:href="#PortfolioChart-Regular-32c9" transform="translate(121.984375 0)"/>
+      </g>
+     </g>
+    </g>
+   </g>
+   <g id="patch_7">
+    <path d="M 411.31926 150.5952 
+L 430.93854 150.5952 
+L 430.93854 84.279875 
+L 411.31926 84.279875 
+z
+" clip-path="url(#p5866ac341b)" style="fill: #c9cdd2"/>
+   </g>
+   <g id="patch_8">
+    <path d="M 452.19276 150.5952 
+L 471.81204 150.5952 
+L 471.81204 94.179712 
+L 452.19276 94.179712 
+z
+" clip-path="url(#p5866ac341b)" style="fill: #969ea8"/>
+   </g>
+   <g id="patch_9">
+    <path d="M 493.06626 150.5952 
+L 512.68554 150.5952 
+L 512.68554 115.305044 
+L 493.06626 115.305044 
+z
+" clip-path="url(#p5866ac341b)" style="fill: #171717"/>
+   </g>
+   <g id="text_19">
+    <!-- 256.49 ms -->
+    <g style="fill: #171717" transform="translate(401.300916 81.177251) scale(0.082 -0.082)">
+     <defs>
+      <path id="PortfolioChart-Regular-32ce" d="M 1900 -63 
+Q 1500 -63 1169 93 
+Q 838 250 644 522 
+Q 450 794 431 1138 
+L 975 1138 
+Q 1000 938 1128 778 
+Q 1256 619 1459 525 
+Q 1663 431 1900 431 
+Q 2188 431 2419 562 
+Q 2650 694 2781 922 
+Q 2913 1150 2913 1431 
+Q 2913 1725 2778 1956 
+Q 2644 2188 2403 2322 
+Q 2163 2456 1863 2456 
+Q 1569 2463 1356 2366 
+Q 1144 2269 1019 2050 
+L 475 2050 
+L 794 4525 
+L 3244 4525 
+L 3244 4025 
+L 1263 4025 
+L 1094 2700 
+L 1138 2700 
+Q 1294 2819 1512 2891 
+Q 1731 2963 1963 2963 
+Q 2388 2963 2731 2769 
+Q 3075 2575 3269 2228 
+Q 3463 1881 3463 1444 
+Q 3463 1013 3259 669 
+Q 3056 325 2700 131 
+Q 2344 -63 1900 -63 
+z
+" transform="scale(0.015625)"/>
+      <path id="PortfolioChart-Regular-26f" d="M 431 3394 
+L 950 3394 
+L 950 2863 
+L 994 2863 
+Q 1106 3138 1340 3288 
+Q 1575 3438 1906 3438 
+Q 2125 3438 2300 3372 
+Q 2475 3306 2603 3178 
+Q 2731 3050 2813 2863 
+L 2850 2863 
+Q 2938 3044 3084 3172 
+Q 3231 3300 3431 3369 
+Q 3631 3438 3869 3438 
+Q 4181 3438 4412 3309 
+Q 4644 3181 4775 2922 
+Q 4906 2663 4906 2269 
+L 4906 0 
+L 4369 0 
+L 4369 2263 
+Q 4369 2619 4175 2787 
+Q 3981 2956 3681 2956 
+Q 3450 2956 3281 2859 
+Q 3113 2763 3025 2594 
+Q 2938 2425 2938 2206 
+L 2938 0 
+L 2394 0 
+L 2394 2319 
+Q 2394 2506 2309 2653 
+Q 2225 2800 2075 2878 
+Q 1925 2956 1731 2956 
+Q 1531 2956 1356 2850 
+Q 1181 2744 1075 2553 
+Q 969 2363 969 2119 
+L 969 0 
+L 431 0 
+L 431 3394 
+z
+" transform="scale(0.015625)"/>
+     </defs>
+     <use xlink:href="#PortfolioChart-Regular-32cb"/>
+     <use xlink:href="#PortfolioChart-Regular-32ce" transform="translate(58.6875 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-32cf" transform="translate(118.359375 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-3359" transform="translate(176.375 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-32cd" transform="translate(201.765625 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-32d2" transform="translate(264.171875 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-2" transform="translate(325.5 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-26f" transform="translate(350.59375 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-2c3" transform="translate(434 0)"/>
+    </g>
+   </g>
+   <g id="text_20">
+    <!-- 218.20 ms -->
+    <g style="fill: #171717" transform="translate(443.030291 91.077088) scale(0.082 -0.082)">
+     <defs>
+      <path id="PortfolioChart-Regular-32d1" d="M 1938 -63 
+Q 1469 -63 1103 100 
+Q 738 263 534 550 
+Q 331 838 331 1200 
+Q 331 1488 450 1738 
+Q 569 1988 781 2150 
+Q 994 2313 1250 2350 
+L 1250 2375 
+Q 1031 2431 862 2575 
+Q 694 2719 600 2931 
+Q 506 3144 506 3388 
+Q 506 3731 693 4006 
+Q 881 4281 1206 4434 
+Q 1531 4588 1938 4588 
+Q 2344 4588 2672 4434 
+Q 3000 4281 3187 4006 
+Q 3375 3731 3375 3388 
+Q 3375 3144 3278 2931 
+Q 3181 2719 3012 2575 
+Q 2844 2431 2625 2375 
+L 2625 2350 
+Q 2881 2313 3090 2150 
+Q 3300 1988 3425 1738 
+Q 3550 1488 3550 1200 
+Q 3550 838 3344 550 
+Q 3138 263 2772 100 
+Q 2406 -63 1938 -63 
+z
+M 1938 431 
+Q 2256 431 2493 531 
+Q 2731 631 2859 812 
+Q 2988 994 2988 1231 
+Q 2988 1481 2853 1678 
+Q 2719 1875 2478 1987 
+Q 2238 2100 1938 2100 
+Q 1638 2100 1397 1987 
+Q 1156 1875 1022 1678 
+Q 888 1481 894 1231 
+Q 888 994 1016 812 
+Q 1144 631 1381 531 
+Q 1619 431 1938 431 
+z
+M 1938 2575 
+Q 2194 2575 2397 2672 
+Q 2600 2769 2712 2944 
+Q 2825 3119 2825 3344 
+Q 2825 3569 2715 3741 
+Q 2606 3913 2403 4006 
+Q 2200 4100 1938 4100 
+Q 1675 4100 1472 4006 
+Q 1269 3913 1159 3741 
+Q 1050 3569 1050 3344 
+Q 1050 3119 1165 2944 
+Q 1281 2769 1481 2672 
+Q 1681 2575 1938 2575 
+z
+" transform="scale(0.015625)"/>
+     </defs>
+     <use xlink:href="#PortfolioChart-Regular-32cb"/>
+     <use xlink:href="#PortfolioChart-Regular-32ca" transform="translate(58.6875 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-32d1" transform="translate(102.53125 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-3359" transform="translate(160.96875 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-32cb" transform="translate(186.359375 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-32c9" transform="translate(245.046875 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-2" transform="translate(304.625 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-26f" transform="translate(329.71875 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-2c3" transform="translate(413.125 0)"/>
+    </g>
+   </g>
+   <g id="text_21">
+    <!-- 136.49 ms -->
+    <g style="fill: #171717" transform="translate(482.565525 112.20242) scale(0.082 -0.082)">
+     <defs>
+      <path id="PortfolioChart-Bold-32ca" d="M 2303 0 
+L 1359 0 
+L 1359 3631 
+L 1334 3631 
+L 300 2975 
+L 300 3813 
+L 1419 4525 
+L 2303 4525 
+L 2303 0 
+z
+" transform="scale(0.015625)"/>
+      <path id="PortfolioChart-Bold-32cc" d="M 2034 -63 
+Q 1541 -63 1150 106 
+Q 759 275 539 581 
+Q 319 888 309 1275 
+L 1256 1275 
+Q 1266 1116 1369 987 
+Q 1472 859 1647 787 
+Q 1822 716 2034 716 
+Q 2256 716 2436 795 
+Q 2616 875 2712 1014 
+Q 2809 1153 2806 1331 
+Q 2809 1516 2706 1659 
+Q 2603 1803 2408 1883 
+Q 2213 1963 1950 1963 
+L 1528 1963 
+L 1528 2656 
+L 1950 2656 
+Q 2172 2656 2347 2732 
+Q 2522 2809 2615 2946 
+Q 2709 3084 2706 3259 
+Q 2709 3431 2628 3564 
+Q 2547 3697 2394 3769 
+Q 2241 3841 2044 3841 
+Q 1844 3841 1678 3770 
+Q 1513 3700 1411 3570 
+Q 1309 3441 1300 3269 
+L 400 3269 
+Q 413 3653 628 3953 
+Q 844 4253 1214 4420 
+Q 1584 4588 2044 4588 
+Q 2509 4588 2865 4422 
+Q 3222 4256 3419 3965 
+Q 3616 3675 3609 3316 
+Q 3616 3069 3508 2866 
+Q 3400 2663 3204 2533 
+Q 3009 2403 2753 2356 
+L 2753 2322 
+Q 3084 2281 3317 2139 
+Q 3550 1997 3669 1775 
+Q 3788 1553 3781 1269 
+Q 3788 891 3563 586 
+Q 3338 281 2938 109 
+Q 2538 -63 2034 -63 
+z
+" transform="scale(0.015625)"/>
+      <path id="PortfolioChart-Bold-32cf" d="M 2109 -63 
+Q 1606 -59 1197 159 
+Q 788 378 534 875 
+Q 281 1372 281 2159 
+Q 281 2913 511 3461 
+Q 741 4009 1161 4298 
+Q 1581 4588 2144 4588 
+Q 2591 4588 2942 4416 
+Q 3294 4244 3509 3944 
+Q 3725 3644 3772 3269 
+L 2844 3269 
+Q 2806 3428 2711 3545 
+Q 2616 3663 2472 3722 
+Q 2328 3781 2144 3781 
+Q 1841 3781 1633 3607 
+Q 1425 3434 1315 3112 
+Q 1206 2791 1203 2341 
+L 1241 2341 
+Q 1347 2541 1523 2683 
+Q 1700 2825 1926 2901 
+Q 2153 2978 2400 2978 
+Q 2803 2978 3128 2790 
+Q 3453 2603 3636 2270 
+Q 3819 1938 3819 1516 
+Q 3819 1059 3605 700 
+Q 3391 341 3002 139 
+Q 2613 -63 2109 -63 
+z
+M 2103 678 
+Q 2331 678 2514 786 
+Q 2697 894 2801 1080 
+Q 2906 1266 2906 1488 
+Q 2906 1716 2803 1900 
+Q 2700 2084 2519 2187 
+Q 2338 2291 2109 2291 
+Q 1884 2291 1700 2184 
+Q 1516 2078 1409 1893 
+Q 1303 1709 1297 1484 
+Q 1300 1269 1404 1084 
+Q 1509 900 1692 789 
+Q 1875 678 2103 678 
+z
+" transform="scale(0.015625)"/>
+      <path id="PortfolioChart-Bold-26f" d="M 363 3394 
+L 1244 3394 
+L 1244 2800 
+L 1281 2800 
+Q 1394 3103 1641 3270 
+Q 1888 3438 2228 3438 
+Q 2456 3438 2645 3361 
+Q 2834 3284 2962 3140 
+Q 3091 2997 3150 2800 
+L 3181 2800 
+Q 3256 2994 3403 3137 
+Q 3550 3281 3756 3359 
+Q 3963 3438 4206 3438 
+Q 4525 3438 4767 3302 
+Q 5009 3166 5143 2905 
+Q 5278 2644 5278 2278 
+L 5278 0 
+L 4350 0 
+L 4350 2103 
+Q 4350 2381 4203 2526 
+Q 4056 2672 3819 2672 
+Q 3647 2672 3523 2598 
+Q 3400 2525 3333 2392 
+Q 3266 2259 3266 2078 
+L 3266 0 
+L 2369 0 
+L 2369 2128 
+Q 2369 2291 2305 2416 
+Q 2241 2541 2122 2606 
+Q 2003 2672 1847 2672 
+Q 1691 2672 1564 2595 
+Q 1438 2519 1363 2375 
+Q 1288 2231 1288 2041 
+L 1288 0 
+L 363 0 
+L 363 3394 
+z
+" transform="scale(0.015625)"/>
+     </defs>
+     <use xlink:href="#PortfolioChart-Bold-32ca"/>
+     <use xlink:href="#PortfolioChart-Bold-32cc" transform="translate(46.875 0)"/>
+     <use xlink:href="#PortfolioChart-Bold-32cf" transform="translate(110.796875 0)"/>
+     <use xlink:href="#PortfolioChart-Bold-3359" transform="translate(172.1875 0)"/>
+     <use xlink:href="#PortfolioChart-Bold-32cd" transform="translate(200.40625 0)"/>
+     <use xlink:href="#PortfolioChart-Bold-32d2" transform="translate(266.125 0)"/>
+     <use xlink:href="#PortfolioChart-Bold-2" transform="translate(330.4375 0)"/>
+     <use xlink:href="#PortfolioChart-Bold-26f" transform="translate(353.53125 0)"/>
+     <use xlink:href="#PortfolioChart-Bold-2c3" transform="translate(441.46875 0)"/>
+    </g>
+   </g>
+  </g>
+  <g id="axes_3">
+   <g id="patch_10">
+    <path d="M 548.496 150.5952 
+L 679.2912 150.5952 
+L 679.2912 47.1744 
+L 548.496 47.1744 
+z
+" style="fill: #ffffff"/>
+   </g>
+   <g id="matplotlib.axis_5">
+    <g id="xtick_7">
+     <g id="line2d_20"/>
+     <g id="text_22">
+      <!-- 01 -->
+      <g style="fill: #999999" transform="translate(568.883225 161.712388) scale(0.08 -0.08)">
+       <use xlink:href="#PortfolioChart-Regular-32c9"/>
+       <use xlink:href="#PortfolioChart-Regular-32ca" transform="translate(59.578125 0)"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_8">
+     <g id="line2d_21"/>
+     <g id="text_23">
+      <!-- 02 -->
+      <g style="fill: #999999" transform="translate(609.162975 161.712388) scale(0.08 -0.08)">
+       <use xlink:href="#PortfolioChart-Regular-32c9"/>
+       <use xlink:href="#PortfolioChart-Regular-32cb" transform="translate(59.578125 0)"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_9">
+     <g id="line2d_22"/>
+     <g id="text_24">
+      <!-- 03 -->
+      <g style="fill: #999999" transform="translate(649.915225 161.712388) scale(0.08 -0.08)">
+       <use xlink:href="#PortfolioChart-Regular-32c9"/>
+       <use xlink:href="#PortfolioChart-Regular-32cc" transform="translate(59.578125 0)"/>
+      </g>
+     </g>
+    </g>
+    <g id="text_25">
+     <!-- 시도 집계 -->
+     <g style="fill: #333333" transform="translate(593.610631 180.115708) scale(0.11 -0.11)">
+      <defs>
+       <path id="PortfolioChart-Bold-1cdc" d="M 2231 3828 
+Q 2231 3078 2048 2431 
+Q 1866 1784 1497 1292 
+Q 1128 800 578 547 
+L 94 1213 
+Q 578 1419 911 1819 
+Q 1244 2219 1409 2737 
+Q 1575 3256 1575 3828 
+L 1575 4678 
+L 2231 4678 
+L 2231 3828 
+z
+M 2384 3828 
+Q 2384 3284 2545 2792 
+Q 2706 2300 3031 1912 
+Q 3356 1525 3822 1328 
+L 3353 688 
+Q 2825 928 2458 1400 
+Q 2091 1872 1909 2494 
+Q 1728 3116 1728 3828 
+L 1728 4678 
+L 2384 4678 
+L 2384 3828 
+z
+M 4931 -591 
+L 4122 -591 
+L 4122 5119 
+L 4931 5119 
+L 4931 -591 
+z
+" transform="scale(0.015625)"/>
+       <path id="PortfolioChart-Bold-dc4" d="M 4803 1934 
+L 784 1934 
+L 784 2569 
+L 4803 2569 
+L 4803 1934 
+z
+M 5372 69 
+L 172 69 
+L 172 722 
+L 5372 722 
+L 5372 69 
+z
+M 3153 513 
+L 2369 513 
+L 2369 2278 
+L 3153 2278 
+L 3153 513 
+z
+M 4763 4078 
+L 1581 4078 
+L 1581 2281 
+L 784 2281 
+L 784 4709 
+L 4763 4709 
+L 4763 4078 
+z
+" transform="scale(0.015625)"/>
+       <path id="PortfolioChart-Bold-23d1" d="M 2228 4259 
+Q 2228 3741 2042 3289 
+Q 1856 2838 1489 2503 
+Q 1122 2169 594 2003 
+L 184 2628 
+Q 644 2759 958 3011 
+Q 1272 3263 1423 3586 
+Q 1575 3909 1575 4259 
+L 1575 4625 
+L 2228 4625 
+L 2228 4259 
+z
+M 2384 4259 
+Q 2384 3931 2534 3625 
+Q 2684 3319 2992 3083 
+Q 3300 2847 3747 2722 
+L 3350 2097 
+Q 2825 2250 2461 2570 
+Q 2097 2891 1915 3325 
+Q 1734 3759 1734 4259 
+L 1734 4625 
+L 2384 4625 
+L 2384 4259 
+z
+M 3531 4166 
+L 403 4166 
+L 403 4800 
+L 3531 4800 
+L 3531 4166 
+z
+M 4928 2025 
+L 4131 2025 
+L 4131 5119 
+L 4928 5119 
+L 4928 2025 
+z
+M 1913 1256 
+L 4134 1256 
+L 4134 1791 
+L 4928 1791 
+L 4928 -513 
+L 1128 -513 
+L 1128 1791 
+L 1913 1791 
+L 1913 1256 
+z
+M 4134 128 
+L 4134 641 
+L 1913 641 
+L 1913 128 
+L 4134 128 
+z
+" transform="scale(0.015625)"/>
+       <path id="PortfolioChart-Bold-6c4" d="M 3550 2966 
+L 2381 2966 
+L 2381 3613 
+L 3550 3613 
+L 3550 2966 
+z
+M 3531 1550 
+L 2353 1550 
+L 2353 2194 
+L 3531 2194 
+L 3531 1550 
+z
+M 5097 -575 
+L 4347 -575 
+L 4347 5119 
+L 5097 5119 
+L 5097 -575 
+z
+M 3909 -325 
+L 3156 -325 
+L 3156 4984 
+L 3909 4984 
+L 3909 -325 
+z
+M 2644 4438 
+Q 2644 3597 2444 2909 
+Q 2244 2222 1783 1645 
+Q 1322 1069 550 609 
+L 81 1169 
+Q 731 1553 1123 2011 
+Q 1516 2469 1695 3022 
+Q 1875 3575 1875 4275 
+L 1875 4438 
+L 2644 4438 
+z
+M 2141 3797 
+L 413 3797 
+L 413 4438 
+L 2141 4438 
+L 2141 3797 
+z
+" transform="scale(0.015625)"/>
+      </defs>
+      <use xlink:href="#PortfolioChart-Bold-1cdc"/>
+      <use xlink:href="#PortfolioChart-Bold-dc4" transform="translate(86.421875 0)"/>
+      <use xlink:href="#PortfolioChart-Bold-2" transform="translate(172.84375 0)"/>
+      <use xlink:href="#PortfolioChart-Bold-23d1" transform="translate(195.9375 0)"/>
+      <use xlink:href="#PortfolioChart-Bold-6c4" transform="translate(282.359375 0)"/>
+     </g>
+    </g>
+   </g>
+   <g id="matplotlib.axis_6">
+    <g id="ytick_6">
+     <g id="line2d_23">
+      <path d="M 548.496 150.5952 
+L 679.2912 150.5952 
+" clip-path="url(#pb9ddfd9204)" style="fill: none; stroke: #eeeeee; stroke-width: 0.7; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_24"/>
+    </g>
+    <g id="ytick_7">
+     <g id="line2d_25">
+      <path d="M 548.496 124.74 
+L 679.2912 124.74 
+" clip-path="url(#pb9ddfd9204)" style="fill: none; stroke: #eeeeee; stroke-width: 0.7; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_26"/>
+    </g>
+    <g id="ytick_8">
+     <g id="line2d_27">
+      <path d="M 548.496 98.8848 
+L 679.2912 98.8848 
+" clip-path="url(#pb9ddfd9204)" style="fill: none; stroke: #eeeeee; stroke-width: 0.7; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_28"/>
+    </g>
+    <g id="ytick_9">
+     <g id="line2d_29">
+      <path d="M 548.496 73.0296 
+L 679.2912 73.0296 
+" clip-path="url(#pb9ddfd9204)" style="fill: none; stroke: #eeeeee; stroke-width: 0.7; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_30"/>
+    </g>
+    <g id="ytick_10">
+     <g id="line2d_31">
+      <path d="M 548.496 47.1744 
+L 679.2912 47.1744 
+" clip-path="url(#pb9ddfd9204)" style="fill: none; stroke: #eeeeee; stroke-width: 0.7; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_32"/>
+    </g>
+   </g>
+   <g id="patch_11">
+    <path d="M 563.21046 150.5952 
+L 582.82974 150.5952 
+L 582.82974 63.108368 
+L 563.21046 63.108368 
+z
+" clip-path="url(#pb9ddfd9204)" style="fill: #c9cdd2"/>
+   </g>
+   <g id="patch_12">
+    <path d="M 604.08396 150.5952 
+L 623.70324 150.5952 
+L 623.70324 96.545949 
+L 604.08396 96.545949 
+z
+" clip-path="url(#pb9ddfd9204)" style="fill: #969ea8"/>
+   </g>
+   <g id="patch_13">
+    <path d="M 644.95746 150.5952 
+L 664.57674 150.5952 
+L 664.57674 114.885734 
+L 644.95746 114.885734 
+z
+" clip-path="url(#pb9ddfd9204)" style="fill: #171717"/>
+   </g>
+   <g id="text_26">
+    <!-- 338.37 ms -->
+    <g style="fill: #171717" transform="translate(553.355475 60.005744) scale(0.082 -0.082)">
+     <defs>
+      <path id="PortfolioChart-Regular-32d0" d="M 2644 3994 
+L 2644 4025 
+L 250 4025 
+L 250 4525 
+L 3225 4525 
+L 3225 4000 
+L 1156 0 
+L 569 0 
+L 2644 3994 
+z
+" transform="scale(0.015625)"/>
+     </defs>
+     <use xlink:href="#PortfolioChart-Regular-32cc"/>
+     <use xlink:href="#PortfolioChart-Regular-32cc" transform="translate(61.71875 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-32d1" transform="translate(123.4375 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-3359" transform="translate(181.875 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-32cc" transform="translate(204.625 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-32d0" transform="translate(266.34375 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-2" transform="translate(321.515625 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-26f" transform="translate(346.609375 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-2c3" transform="translate(430.015625 0)"/>
+    </g>
+   </g>
+   <g id="text_27">
+    <!-- 209.05 ms -->
+    <g style="fill: #171717" transform="translate(594.321225 93.443325) scale(0.082 -0.082)">
+     <use xlink:href="#PortfolioChart-Regular-32cb"/>
+     <use xlink:href="#PortfolioChart-Regular-32c9" transform="translate(58.6875 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-32d2" transform="translate(118.265625 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-3359" transform="translate(177.109375 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-32c9" transform="translate(200.015625 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-32ce" transform="translate(259.59375 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-2" transform="translate(319.265625 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-26f" transform="translate(344.359375 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-2c3" transform="translate(427.765625 0)"/>
+    </g>
+   </g>
+   <g id="text_28">
+    <!-- 138.11 ms -->
+    <g style="fill: #171717" transform="translate(636.270975 111.78311) scale(0.082 -0.082)">
+     <defs>
+      <path id="PortfolioChart-Bold-32d1" d="M 2056 -63 
+Q 1550 -63 1145 103 
+Q 741 269 512 562 
+Q 284 856 284 1219 
+Q 284 1497 415 1739 
+Q 547 1981 773 2137 
+Q 1000 2294 1278 2334 
+L 1278 2369 
+Q 1041 2416 853 2558 
+Q 666 2700 559 2912 
+Q 453 3125 453 3369 
+Q 453 3716 662 3995 
+Q 872 4275 1237 4431 
+Q 1603 4588 2056 4588 
+Q 2513 4588 2880 4431 
+Q 3247 4275 3455 3995 
+Q 3663 3716 3663 3369 
+Q 3663 3125 3555 2912 
+Q 3447 2700 3261 2558 
+Q 3075 2416 2834 2369 
+L 2834 2334 
+Q 3113 2294 3339 2137 
+Q 3566 1981 3700 1739 
+Q 3834 1497 3834 1219 
+Q 3834 856 3604 562 
+Q 3375 269 2970 103 
+Q 2566 -63 2056 -63 
+z
+M 2056 653 
+Q 2291 653 2472 737 
+Q 2653 822 2753 972 
+Q 2853 1122 2853 1309 
+Q 2853 1506 2750 1662 
+Q 2647 1819 2465 1906 
+Q 2284 1994 2056 1994 
+Q 1831 1994 1650 1906 
+Q 1469 1819 1366 1662 
+Q 1263 1506 1266 1309 
+Q 1263 1122 1363 972 
+Q 1463 822 1644 737 
+Q 1825 653 2056 653 
+z
+M 2056 2659 
+Q 2253 2659 2411 2739 
+Q 2569 2819 2656 2958 
+Q 2744 3097 2744 3272 
+Q 2744 3450 2658 3587 
+Q 2572 3725 2414 3801 
+Q 2256 3878 2056 3878 
+Q 1859 3878 1701 3801 
+Q 1544 3725 1458 3587 
+Q 1372 3450 1372 3272 
+Q 1372 3097 1461 2958 
+Q 1550 2819 1706 2739 
+Q 1863 2659 2056 2659 
+z
+" transform="scale(0.015625)"/>
+     </defs>
+     <use xlink:href="#PortfolioChart-Bold-32ca"/>
+     <use xlink:href="#PortfolioChart-Bold-32cc" transform="translate(46.875 0)"/>
+     <use xlink:href="#PortfolioChart-Bold-32d1" transform="translate(110.796875 0)"/>
+     <use xlink:href="#PortfolioChart-Bold-3359" transform="translate(173.0625 0)"/>
+     <use xlink:href="#PortfolioChart-Bold-32ca" transform="translate(192.4375 0)"/>
+     <use xlink:href="#PortfolioChart-Bold-32ca" transform="translate(239.3125 0)"/>
+     <use xlink:href="#PortfolioChart-Bold-2" transform="translate(286.1875 0)"/>
+     <use xlink:href="#PortfolioChart-Bold-26f" transform="translate(309.28125 0)"/>
+     <use xlink:href="#PortfolioChart-Bold-2c3" transform="translate(397.21875 0)"/>
+    </g>
+   </g>
+  </g>
+  <g id="axes_4">
+   <g id="patch_14">
+    <path d="M 700.3872 150.5952 
+L 831.1824 150.5952 
+L 831.1824 47.1744 
+L 700.3872 47.1744 
+z
+" style="fill: #ffffff"/>
+   </g>
+   <g id="matplotlib.axis_7">
+    <g id="xtick_10">
+     <g id="line2d_33"/>
+     <g id="text_29">
+      <!-- 01 -->
+      <g style="fill: #999999" transform="translate(720.774425 161.712388) scale(0.08 -0.08)">
+       <use xlink:href="#PortfolioChart-Regular-32c9"/>
+       <use xlink:href="#PortfolioChart-Regular-32ca" transform="translate(59.578125 0)"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_11">
+     <g id="line2d_34"/>
+     <g id="text_30">
+      <!-- 02 -->
+      <g style="fill: #999999" transform="translate(761.054175 161.712388) scale(0.08 -0.08)">
+       <use xlink:href="#PortfolioChart-Regular-32c9"/>
+       <use xlink:href="#PortfolioChart-Regular-32cb" transform="translate(59.578125 0)"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_12">
+     <g id="line2d_35"/>
+     <g id="text_31">
+      <!-- 03 -->
+      <g style="fill: #999999" transform="translate(801.806425 161.712388) scale(0.08 -0.08)">
+       <use xlink:href="#PortfolioChart-Regular-32c9"/>
+       <use xlink:href="#PortfolioChart-Regular-32cc" transform="translate(59.578125 0)"/>
+      </g>
+     </g>
+    </g>
+    <g id="text_32">
+     <!-- 시군구 집계 -->
+     <g style="fill: #333333" transform="translate(740.748628 180.115708) scale(0.11 -0.11)">
+      <defs>
+       <path id="PortfolioChart-Bold-770" d="M 4428 4209 
+L 806 4209 
+L 806 4850 
+L 4428 4850 
+L 4428 4209 
+z
+M 5372 2069 
+L 172 2069 
+L 172 2700 
+L 5372 2700 
+L 5372 2069 
+z
+M 3203 853 
+L 2406 853 
+L 2406 2325 
+L 3203 2325 
+L 3203 853 
+z
+M 4756 4359 
+Q 4756 3803 4726 3375 
+Q 4697 2947 4578 2400 
+L 3781 2481 
+Q 3866 2844 3905 3167 
+Q 3944 3491 3953 3737 
+Q 3963 3984 3963 4359 
+L 3963 4850 
+L 4756 4850 
+L 4756 4359 
+z
+M 4844 -478 
+L 772 -478 
+L 772 166 
+L 4844 166 
+L 4844 -478 
+z
+M 1572 16 
+L 772 16 
+L 772 1369 
+L 1572 1369 
+L 1572 16 
+z
+" transform="scale(0.015625)"/>
+       <path id="PortfolioChart-Bold-76c" d="M 4369 4147 
+L 763 4147 
+L 763 4778 
+L 4369 4778 
+L 4369 4147 
+z
+M 5359 1716 
+L 172 1716 
+L 172 2359 
+L 5359 2359 
+L 5359 1716 
+z
+M 3138 -581 
+L 2338 -581 
+L 2338 1913 
+L 3138 1913 
+L 3138 -581 
+z
+M 4750 4272 
+Q 4750 3841 4739 3541 
+Q 4728 3241 4676 2842 
+Q 4625 2444 4522 1975 
+L 3734 2063 
+Q 3838 2506 3886 2892 
+Q 3934 3278 3943 3575 
+Q 3953 3872 3953 4269 
+L 3953 4778 
+L 4750 4778 
+L 4750 4272 
+z
+" transform="scale(0.015625)"/>
+      </defs>
+      <use xlink:href="#PortfolioChart-Bold-1cdc"/>
+      <use xlink:href="#PortfolioChart-Bold-770" transform="translate(86.421875 0)"/>
+      <use xlink:href="#PortfolioChart-Bold-76c" transform="translate(172.84375 0)"/>
+      <use xlink:href="#PortfolioChart-Bold-2" transform="translate(259.265625 0)"/>
+      <use xlink:href="#PortfolioChart-Bold-23d1" transform="translate(282.359375 0)"/>
+      <use xlink:href="#PortfolioChart-Bold-6c4" transform="translate(368.78125 0)"/>
+     </g>
+    </g>
+   </g>
+   <g id="matplotlib.axis_8">
+    <g id="ytick_11">
+     <g id="line2d_36">
+      <path d="M 700.3872 150.5952 
+L 831.1824 150.5952 
+" clip-path="url(#p135f08d3fe)" style="fill: none; stroke: #eeeeee; stroke-width: 0.7; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_37"/>
+    </g>
+    <g id="ytick_12">
+     <g id="line2d_38">
+      <path d="M 700.3872 124.74 
+L 831.1824 124.74 
+" clip-path="url(#p135f08d3fe)" style="fill: none; stroke: #eeeeee; stroke-width: 0.7; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_39"/>
+    </g>
+    <g id="ytick_13">
+     <g id="line2d_40">
+      <path d="M 700.3872 98.8848 
+L 831.1824 98.8848 
+" clip-path="url(#p135f08d3fe)" style="fill: none; stroke: #eeeeee; stroke-width: 0.7; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_41"/>
+    </g>
+    <g id="ytick_14">
+     <g id="line2d_42">
+      <path d="M 700.3872 73.0296 
+L 831.1824 73.0296 
+" clip-path="url(#p135f08d3fe)" style="fill: none; stroke: #eeeeee; stroke-width: 0.7; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_43"/>
+    </g>
+    <g id="ytick_15">
+     <g id="line2d_44">
+      <path d="M 700.3872 47.1744 
+L 831.1824 47.1744 
+" clip-path="url(#p135f08d3fe)" style="fill: none; stroke: #eeeeee; stroke-width: 0.7; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_45"/>
+    </g>
+   </g>
+   <g id="patch_15">
+    <path d="M 715.10166 150.5952 
+L 734.72094 150.5952 
+L 734.72094 76.894827 
+L 715.10166 76.894827 
+z
+" clip-path="url(#p135f08d3fe)" style="fill: #c9cdd2"/>
+   </g>
+   <g id="patch_16">
+    <path d="M 755.97516 150.5952 
+L 775.59444 150.5952 
+L 775.59444 95.26147 
+L 755.97516 95.26147 
+z
+" clip-path="url(#p135f08d3fe)" style="fill: #969ea8"/>
+   </g>
+   <g id="patch_17">
+    <path d="M 796.84866 150.5952 
+L 816.46794 150.5952 
+L 816.46794 114.222576 
+L 796.84866 114.222576 
+z
+" clip-path="url(#p135f08d3fe)" style="fill: #171717"/>
+   </g>
+   <g id="text_33">
+    <!-- 285.05 ms -->
+    <g style="fill: #171717" transform="translate(705.369675 73.792203) scale(0.082 -0.082)">
+     <use xlink:href="#PortfolioChart-Regular-32cb"/>
+     <use xlink:href="#PortfolioChart-Regular-32d1" transform="translate(58.6875 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-32ce" transform="translate(119.328125 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-3359" transform="translate(176.359375 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-32c9" transform="translate(199.265625 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-32ce" transform="translate(258.84375 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-2" transform="translate(318.515625 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-26f" transform="translate(343.609375 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-2c3" transform="translate(427.015625 0)"/>
+    </g>
+   </g>
+   <g id="text_34">
+    <!-- 214.01 ms -->
+    <g style="fill: #171717" transform="translate(747.492394 92.158846) scale(0.082 -0.082)">
+     <use xlink:href="#PortfolioChart-Regular-32cb"/>
+     <use xlink:href="#PortfolioChart-Regular-32ca" transform="translate(58.6875 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-32cd" transform="translate(102.53125 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-3359" transform="translate(161.71875 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-32c9" transform="translate(184.625 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-32ca" transform="translate(244.203125 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-2" transform="translate(288.046875 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-26f" transform="translate(313.140625 0)"/>
+     <use xlink:href="#PortfolioChart-Regular-2c3" transform="translate(396.546875 0)"/>
+    </g>
+   </g>
+   <g id="text_35">
+    <!-- 140.68 ms -->
+    <g style="fill: #171717" transform="translate(786.378034 111.119952) scale(0.082 -0.082)">
+     <defs>
+      <path id="PortfolioChart-Bold-32c9" d="M 2113 -63 
+Q 1547 -63 1139 209 
+Q 731 481 514 1004 
+Q 297 1528 297 2263 
+Q 297 2997 514 3519 
+Q 731 4041 1140 4314 
+Q 1550 4588 2113 4588 
+Q 2675 4588 3084 4314 
+Q 3494 4041 3712 3517 
+Q 3931 2994 3931 2263 
+Q 3931 1525 3714 1003 
+Q 3497 481 3087 209 
+Q 2678 -63 2113 -63 
+z
+M 2113 713 
+Q 2375 713 2570 884 
+Q 2766 1056 2869 1404 
+Q 2972 1753 2969 2263 
+Q 2969 2769 2866 3117 
+Q 2763 3466 2569 3641 
+Q 2375 3816 2113 3816 
+Q 1850 3816 1658 3641 
+Q 1466 3466 1359 3117 
+Q 1253 2769 1253 2263 
+Q 1253 1753 1358 1404 
+Q 1463 1056 1656 884 
+Q 1850 713 2113 713 
+z
+" transform="scale(0.015625)"/>
+     </defs>
+     <use xlink:href="#PortfolioChart-Bold-32ca"/>
+     <use xlink:href="#PortfolioChart-Bold-32cd" transform="translate(46.875 0)"/>
+     <use xlink:href="#PortfolioChart-Bold-32c9" transform="translate(112.59375 0)"/>
+     <use xlink:href="#PortfolioChart-Bold-3359" transform="translate(175.734375 0)"/>
+     <use xlink:href="#PortfolioChart-Bold-32cf" transform="translate(201.078125 0)"/>
+     <use xlink:href="#PortfolioChart-Bold-32d1" transform="translate(265.390625 0)"/>
+     <use xlink:href="#PortfolioChart-Bold-2" transform="translate(329.703125 0)"/>
+     <use xlink:href="#PortfolioChart-Bold-26f" transform="translate(352.796875 0)"/>
+     <use xlink:href="#PortfolioChart-Bold-2c3" transform="translate(440.734375 0)"/>
+    </g>
+   </g>
+  </g>
+  <g id="line2d_46">
+   <path d="M 358.632 170.5536 
+L 358.632 3.6288 
+" style="fill: none; stroke: #dedede; stroke-width: 0.7; stroke-linecap: square"/>
+  </g>
+  <g id="text_36">
+   <!-- 핀·시도·시군구 합계 -->
+   <g style="fill: #888888" transform="translate(260.0451 16.734136) scale(0.09 -0.09)">
+    <defs>
+     <path id="PortfolioChart-Regular-2f40" d="M 4813 944 
+L 4325 944 
+L 4325 5044 
+L 4813 5044 
+L 4813 944 
+z
+M 4944 -388 
+L 1188 -388 
+L 1188 25 
+L 4944 25 
+L 4944 -388 
+z
+M 1681 -188 
+L 1188 -188 
+L 1188 1319 
+L 1681 1319 
+L 1681 -188 
+z
+M 3481 4119 
+L 475 4119 
+L 475 4519 
+L 3481 4519 
+L 3481 4119 
+z
+M 319 2194 
+Q 1269 2194 2141 2225 
+Q 3013 2256 3756 2350 
+L 3794 1975 
+Q 3031 1863 2193 1825 
+Q 1356 1788 381 1788 
+L 319 2194 
+z
+M 1506 2094 
+L 1031 2094 
+L 1031 4206 
+L 1506 4206 
+L 1506 2094 
+z
+M 2919 2094 
+L 2444 2094 
+L 2444 4206 
+L 2919 4206 
+L 2919 2094 
+z
+" transform="scale(0.015625)"/>
+     <path id="PortfolioChart-Regular-1cdc" d="M 2119 3556 
+Q 2119 2938 1906 2353 
+Q 1694 1769 1328 1325 
+Q 963 881 506 650 
+L 194 1063 
+Q 606 1256 953 1643 
+Q 1300 2031 1506 2537 
+Q 1713 3044 1713 3556 
+L 1713 4569 
+L 2119 4569 
+L 2119 3556 
+z
+M 2200 3556 
+Q 2200 3063 2403 2578 
+Q 2606 2094 2953 1716 
+Q 3300 1338 3706 1150 
+L 3406 763 
+Q 2963 981 2591 1409 
+Q 2219 1838 2003 2400 
+Q 1788 2963 1788 3556 
+L 1788 4569 
+L 2200 4569 
+L 2200 3556 
+z
+M 4806 -519 
+L 4313 -519 
+L 4313 5050 
+L 4806 5050 
+L 4806 -519 
+z
+" transform="scale(0.015625)"/>
+     <path id="PortfolioChart-Regular-dc4" d="M 4713 2044 
+L 875 2044 
+L 875 2444 
+L 4713 2444 
+L 4713 2044 
+z
+M 5313 194 
+L 225 194 
+L 225 606 
+L 5313 606 
+L 5313 194 
+z
+M 2994 438 
+L 2513 438 
+L 2513 2269 
+L 2994 2269 
+L 2994 438 
+z
+M 4656 4194 
+L 1369 4194 
+L 1369 2256 
+L 875 2256 
+L 875 4594 
+L 4656 4594 
+L 4656 4194 
+z
+" transform="scale(0.015625)"/>
+     <path id="PortfolioChart-Regular-770" d="M 4450 4344 
+L 869 4344 
+L 869 4750 
+L 4450 4750 
+L 4450 4344 
+z
+M 5313 2194 
+L 225 2194 
+L 225 2588 
+L 5313 2588 
+L 5313 2194 
+z
+M 3025 850 
+L 2544 850 
+L 2544 2356 
+L 3025 2356 
+L 3025 850 
+z
+M 4644 4313 
+Q 4644 3781 4612 3356 
+Q 4581 2931 4463 2375 
+L 3975 2438 
+Q 4063 2813 4100 3141 
+Q 4138 3469 4147 3722 
+Q 4156 3975 4156 4313 
+L 4156 4750 
+L 4644 4750 
+L 4644 4313 
+z
+M 4763 -388 
+L 869 -388 
+L 869 25 
+L 4763 25 
+L 4763 -388 
+z
+M 1363 -94 
+L 869 -94 
+L 869 1350 
+L 1363 1350 
+L 1363 -94 
+z
+" transform="scale(0.015625)"/>
+     <path id="PortfolioChart-Regular-76c" d="M 4369 4281 
+L 863 4281 
+L 863 4688 
+L 4369 4688 
+L 4369 4281 
+z
+M 5288 1894 
+L 225 1894 
+L 225 2300 
+L 5288 2300 
+L 5288 1894 
+z
+M 2994 -519 
+L 2500 -519 
+L 2500 2031 
+L 2994 2031 
+L 2994 -519 
+z
+M 4619 4200 
+Q 4619 3806 4609 3518 
+Q 4600 3231 4553 2856 
+Q 4506 2481 4406 2044 
+L 3919 2106 
+Q 4019 2525 4066 2890 
+Q 4113 3256 4122 3537 
+Q 4131 3819 4131 4200 
+L 4131 4688 
+L 4619 4688 
+L 4619 4200 
+z
+" transform="scale(0.015625)"/>
+     <path id="PortfolioChart-Regular-2f69" d="M 4569 1819 
+L 4081 1819 
+L 4081 5050 
+L 4569 5050 
+L 4569 1819 
+z
+M 5406 3206 
+L 4356 3206 
+L 4356 3625 
+L 5406 3625 
+L 5406 3206 
+z
+M 1544 981 
+L 4081 981 
+L 4081 1575 
+L 4569 1575 
+L 4569 -431 
+L 1056 -431 
+L 1056 1575 
+L 1544 1575 
+L 1544 981 
+z
+M 4081 -38 
+L 4081 594 
+L 1544 594 
+L 1544 -38 
+L 4081 -38 
+z
+M 3550 4069 
+L 238 4069 
+L 238 4475 
+L 3550 4475 
+L 3550 4069 
+z
+M 1894 3813 
+Q 2294 3813 2594 3694 
+Q 2894 3575 3062 3353 
+Q 3231 3131 3231 2838 
+Q 3231 2544 3062 2325 
+Q 2894 2106 2594 1984 
+Q 2294 1863 1894 1863 
+Q 1494 1863 1191 1984 
+Q 888 2106 722 2325 
+Q 556 2544 556 2838 
+Q 556 3131 722 3353 
+Q 888 3575 1191 3694 
+Q 1494 3813 1894 3813 
+z
+M 1894 3431 
+Q 1638 3438 1438 3363 
+Q 1238 3288 1131 3150 
+Q 1025 3013 1025 2838 
+Q 1025 2663 1131 2525 
+Q 1238 2388 1438 2313 
+Q 1638 2238 1894 2238 
+Q 2150 2238 2350 2313 
+Q 2550 2388 2659 2525 
+Q 2769 2663 2769 2838 
+Q 2769 3019 2656 3153 
+Q 2544 3288 2347 3363 
+Q 2150 3438 1894 3431 
+z
+M 2138 4256 
+L 1650 4256 
+L 1650 5100 
+L 2138 5100 
+L 2138 4256 
+z
+" transform="scale(0.015625)"/>
+    </defs>
+    <use xlink:href="#PortfolioChart-Regular-2f40"/>
+    <use xlink:href="#PortfolioChart-Regular-3362" transform="translate(86.421875 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-1cdc" transform="translate(111.8125 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-dc4" transform="translate(198.234375 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-3362" transform="translate(284.65625 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-1cdc" transform="translate(310.046875 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-770" transform="translate(396.46875 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-76c" transform="translate(482.890625 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-2" transform="translate(569.3125 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-2f69" transform="translate(594.40625 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-6c4" transform="translate(680.828125 0)"/>
+   </g>
+  </g>
+  <g id="text_37">
+   <!-- 낮을수록 좋음 · 세 그래프 동일 눈금 (0–400ms) -->
+   <g style="fill: #888888" transform="translate(383.9472 34.4736) scale(0.09 -0.09)">
+    <defs>
+     <path id="PortfolioChart-Regular-aae" d="M 4569 1900 
+L 4081 1900 
+L 4081 5056 
+L 4569 5056 
+L 4569 1900 
+z
+M 5406 3269 
+L 4431 3269 
+L 4431 3688 
+L 5406 3688 
+L 5406 3269 
+z
+M 988 2513 
+L 494 2513 
+L 494 4744 
+L 988 4744 
+L 988 2513 
+z
+M 938 2756 
+Q 1594 2756 2219 2812 
+Q 2844 2869 3494 3000 
+L 3556 2588 
+Q 2881 2456 2243 2397 
+Q 1606 2338 938 2338 
+L 494 2338 
+L 494 2756 
+L 938 2756 
+z
+M 2994 1238 
+Q 2994 813 2722 456 
+Q 2450 100 1990 -137 
+Q 1531 -375 988 -475 
+L 794 -100 
+Q 1269 -25 1678 175 
+Q 2088 375 2334 653 
+Q 2581 931 2581 1238 
+L 2581 1419 
+L 2994 1419 
+L 2994 1238 
+z
+M 3094 1238 
+Q 3094 938 3344 659 
+Q 3594 381 4003 178 
+Q 4413 -25 4881 -106 
+L 4688 -488 
+Q 4144 -388 3684 -141 
+Q 3225 106 2953 462 
+Q 2681 819 2681 1238 
+L 2681 1419 
+L 3094 1419 
+L 3094 1238 
+z
+M 4669 1213 
+L 1006 1213 
+L 1006 1619 
+L 4669 1619 
+L 4669 1213 
+z
+" transform="scale(0.015625)"/>
+     <path id="PortfolioChart-Regular-2144" d="M 2756 4950 
+Q 3375 4950 3815 4840 
+Q 4256 4731 4487 4515 
+Q 4719 4300 4719 3994 
+Q 4719 3681 4487 3465 
+Q 4256 3250 3815 3137 
+Q 3375 3025 2756 3019 
+Q 2138 3025 1697 3137 
+Q 1256 3250 1022 3465 
+Q 788 3681 788 3994 
+Q 788 4300 1022 4515 
+Q 1256 4731 1697 4840 
+Q 2138 4950 2756 4950 
+z
+M 2756 4581 
+Q 2300 4581 1972 4512 
+Q 1644 4444 1472 4309 
+Q 1300 4175 1300 3994 
+Q 1300 3800 1469 3665 
+Q 1638 3531 1966 3462 
+Q 2294 3394 2756 3394 
+Q 3219 3394 3547 3462 
+Q 3875 3531 4047 3668 
+Q 4219 3806 4219 3994 
+Q 4219 4175 4044 4306 
+Q 3869 4438 3541 4509 
+Q 3213 4581 2756 4581 
+z
+M 5288 2244 
+L 225 2244 
+L 225 2644 
+L 5288 2644 
+L 5288 2244 
+z
+M 4638 519 
+L 1338 519 
+L 1338 -156 
+L 850 -156 
+L 850 881 
+L 4156 881 
+L 4156 1388 
+L 838 1388 
+L 838 1763 
+L 4638 1763 
+L 4638 519 
+z
+M 4806 -444 
+L 850 -444 
+L 850 -56 
+L 4806 -56 
+L 4806 -444 
+z
+" transform="scale(0.015625)"/>
+     <path id="PortfolioChart-Regular-1c18" d="M 2938 4531 
+Q 2938 4025 2622 3603 
+Q 2306 3181 1787 2906 
+Q 1269 2631 688 2531 
+L 488 2931 
+Q 994 3000 1459 3234 
+Q 1925 3469 2215 3809 
+Q 2506 4150 2506 4531 
+L 2506 4850 
+L 2938 4850 
+L 2938 4531 
+z
+M 3013 4531 
+Q 3013 4156 3306 3812 
+Q 3600 3469 4069 3234 
+Q 4538 3000 5038 2931 
+L 4838 2531 
+Q 4256 2631 3740 2909 
+Q 3225 3188 2906 3609 
+Q 2588 4031 2588 4531 
+L 2588 4850 
+L 3013 4850 
+L 3013 4531 
+z
+M 2988 -506 
+L 2506 -506 
+L 2506 1613 
+L 2988 1613 
+L 2988 -506 
+z
+M 5288 1506 
+L 225 1506 
+L 225 1919 
+L 5288 1919 
+L 5288 1506 
+z
+" transform="scale(0.015625)"/>
+     <path id="PortfolioChart-Regular-125d" d="M 5306 1581 
+L 219 1581 
+L 219 1988 
+L 5306 1988 
+L 5306 1581 
+z
+M 4650 3563 
+L 1369 3563 
+L 1369 2806 
+L 881 2806 
+L 881 3931 
+L 4156 3931 
+L 4156 4506 
+L 863 4506 
+L 863 4906 
+L 4650 4906 
+L 4650 3563 
+z
+M 4769 2575 
+L 881 2575 
+L 881 2969 
+L 4769 2969 
+L 4769 2575 
+z
+M 3000 1788 
+L 2519 1788 
+L 2519 2769 
+L 3000 2769 
+L 3000 1788 
+z
+M 4681 -456 
+L 4188 -456 
+L 4188 756 
+L 788 756 
+L 788 1156 
+L 4681 1156 
+L 4681 -456 
+z
+" transform="scale(0.015625)"/>
+     <path id="PortfolioChart-Regular-228b" d="M 2994 2538 
+L 2513 2538 
+L 2513 3394 
+L 2994 3394 
+L 2994 2538 
+z
+M 2869 4538 
+Q 2869 4131 2566 3815 
+Q 2263 3500 1756 3306 
+Q 1250 3113 656 3056 
+L 494 3425 
+Q 1000 3469 1447 3622 
+Q 1894 3775 2166 4015 
+Q 2438 4256 2438 4538 
+L 2438 4713 
+L 2869 4713 
+L 2869 4538 
+z
+M 3075 4538 
+Q 3075 4256 3347 4015 
+Q 3619 3775 4066 3622 
+Q 4513 3469 5019 3425 
+L 4856 3056 
+Q 4269 3113 3766 3306 
+Q 3263 3500 2956 3815 
+Q 2650 4131 2650 4538 
+L 2650 4713 
+L 3075 4713 
+L 3075 4538 
+z
+M 4838 4488 
+L 688 4488 
+L 688 4875 
+L 4838 4875 
+L 4838 4488 
+z
+M 4825 1206 
+L 700 1206 
+L 700 1594 
+L 4825 1594 
+L 4825 1206 
+z
+M 5306 2331 
+L 219 2331 
+L 219 2738 
+L 5306 2738 
+L 5306 2331 
+z
+M 2756 931 
+Q 3294 931 3669 850 
+Q 4044 769 4241 603 
+Q 4438 438 4438 200 
+Q 4438 -38 4241 -203 
+Q 4044 -369 3669 -453 
+Q 3294 -538 2756 -538 
+Q 1944 -538 1512 -350 
+Q 1081 -163 1081 200 
+Q 1081 444 1275 606 
+Q 1469 769 1844 850 
+Q 2219 931 2756 931 
+z
+M 2756 588 
+Q 2381 588 2115 544 
+Q 1850 500 1712 415 
+Q 1575 331 1575 200 
+Q 1575 75 1715 -15 
+Q 1856 -106 2122 -150 
+Q 2388 -194 2756 -194 
+Q 3131 -194 3397 -150 
+Q 3663 -106 3800 -15 
+Q 3938 75 3938 200 
+Q 3938 331 3800 415 
+Q 3663 500 3400 544 
+Q 3138 588 2756 588 
+z
+M 3000 1338 
+L 2513 1338 
+L 2513 2119 
+L 3000 2119 
+L 3000 1338 
+z
+" transform="scale(0.015625)"/>
+     <path id="PortfolioChart-Regular-214c" d="M 2756 4925 
+Q 3363 4925 3803 4800 
+Q 4244 4675 4481 4437 
+Q 4719 4200 4719 3869 
+Q 4719 3544 4481 3312 
+Q 4244 3081 3803 2956 
+Q 3363 2831 2756 2831 
+Q 2156 2831 1712 2956 
+Q 1269 3081 1028 3312 
+Q 788 3544 788 3869 
+Q 788 4200 1028 4437 
+Q 1269 4675 1712 4800 
+Q 2156 4925 2756 4925 
+z
+M 2756 4531 
+Q 2313 4531 1981 4453 
+Q 1650 4375 1472 4225 
+Q 1294 4075 1294 3869 
+Q 1294 3669 1469 3525 
+Q 1644 3381 1975 3303 
+Q 2306 3225 2756 3219 
+Q 3200 3225 3531 3303 
+Q 3863 3381 4041 3525 
+Q 4219 3669 4219 3869 
+Q 4219 4075 4041 4225 
+Q 3863 4375 3531 4453 
+Q 3200 4531 2756 4531 
+z
+M 4669 -431 
+L 844 -431 
+L 844 1394 
+L 4669 1394 
+L 4669 -431 
+z
+M 1331 -31 
+L 4188 -31 
+L 4188 1000 
+L 1331 1000 
+L 1331 -31 
+z
+M 5288 1944 
+L 225 1944 
+L 225 2350 
+L 5288 2350 
+L 5288 1944 
+z
+" transform="scale(0.015625)"/>
+     <path id="PortfolioChart-Regular-1b38" d="M 3525 2638 
+L 2431 2638 
+L 2431 3056 
+L 3525 3056 
+L 3525 2638 
+z
+M 1788 3450 
+Q 1788 2881 1628 2337 
+Q 1469 1794 1172 1366 
+Q 875 938 475 694 
+L 163 1063 
+Q 538 1281 819 1662 
+Q 1100 2044 1250 2509 
+Q 1400 2975 1400 3450 
+L 1400 4525 
+L 1788 4525 
+L 1788 3450 
+z
+M 1875 3469 
+Q 1875 3025 2015 2581 
+Q 2156 2138 2422 1772 
+Q 2688 1406 3044 1194 
+L 2763 813 
+Q 2369 1050 2084 1472 
+Q 1800 1894 1650 2412 
+Q 1500 2931 1500 3469 
+L 1500 4525 
+L 1875 4525 
+L 1875 3469 
+z
+M 4988 -506 
+L 4513 -506 
+L 4513 5050 
+L 4988 5050 
+L 4988 -506 
+z
+M 3838 -225 
+L 3375 -225 
+L 3375 4931 
+L 3838 4931 
+L 3838 -225 
+z
+" transform="scale(0.015625)"/>
+     <path id="PortfolioChart-Regular-7f8" d="M 4388 4050 
+L 775 4050 
+L 775 4456 
+L 4388 4456 
+L 4388 4050 
+z
+M 5288 313 
+L 225 313 
+L 225 719 
+L 5288 719 
+L 5288 313 
+z
+M 4606 3900 
+Q 4606 3425 4597 3069 
+Q 4588 2713 4544 2238 
+Q 4500 1763 4400 1200 
+L 3900 1250 
+Q 4006 1781 4056 2247 
+Q 4106 2713 4115 3072 
+Q 4125 3431 4125 3900 
+L 4125 4456 
+L 4606 4456 
+L 4606 3900 
+z
+" transform="scale(0.015625)"/>
+     <path id="PortfolioChart-Regular-1198" d="M 775 1238 
+Q 1350 1238 1834 1269 
+Q 2319 1300 2850 1388 
+L 2894 988 
+Q 2350 894 1859 859 
+Q 1369 825 775 825 
+L 413 825 
+L 413 1238 
+L 775 1238 
+z
+M 2494 2500 
+L 888 2500 
+L 888 1081 
+L 413 1081 
+L 413 2906 
+L 2019 2906 
+L 2019 4031 
+L 400 4031 
+L 400 4444 
+L 2494 4444 
+L 2494 2500 
+z
+M 4975 -506 
+L 4506 -506 
+L 4506 5050 
+L 4975 5050 
+L 4975 -506 
+z
+M 4631 2444 
+L 3544 2444 
+L 3544 2850 
+L 4631 2850 
+L 4631 2444 
+z
+M 3688 -219 
+L 3238 -219 
+L 3238 4925 
+L 3688 4925 
+L 3688 -219 
+z
+" transform="scale(0.015625)"/>
+     <path id="PortfolioChart-Regular-2f04" d="M 5313 206 
+L 225 206 
+L 225 625 
+L 5313 625 
+L 5313 206 
+z
+M 4825 4081 
+L 675 4081 
+L 675 4488 
+L 4825 4488 
+L 4825 4081 
+z
+M 4813 1738 
+L 688 1738 
+L 688 2138 
+L 4813 2138 
+L 4813 1738 
+z
+M 2044 2088 
+L 1556 2088 
+L 1556 4119 
+L 2044 4119 
+L 2044 2088 
+z
+M 3944 2088 
+L 3463 2088 
+L 3463 4119 
+L 3944 4119 
+L 3944 2088 
+z
+" transform="scale(0.015625)"/>
+     <path id="PortfolioChart-Regular-dd9" d="M 5294 1906 
+L 225 1906 
+L 225 2300 
+L 5294 2300 
+L 5294 1906 
+z
+M 2994 2131 
+L 2519 2131 
+L 2519 3194 
+L 2994 3194 
+L 2994 2131 
+z
+M 4700 2950 
+L 869 2950 
+L 869 3350 
+L 4700 3350 
+L 4700 2950 
+z
+M 4663 4394 
+L 1350 4394 
+L 1350 3106 
+L 869 3106 
+L 869 4788 
+L 4663 4788 
+L 4663 4394 
+z
+M 2756 1500 
+Q 3350 1500 3781 1384 
+Q 4213 1269 4441 1044 
+Q 4669 819 4669 500 
+Q 4669 181 4441 -44 
+Q 4213 -269 3784 -384 
+Q 3356 -500 2756 -506 
+Q 2156 -500 1725 -384 
+Q 1294 -269 1066 -44 
+Q 838 181 838 500 
+Q 838 819 1066 1044 
+Q 1294 1269 1725 1384 
+Q 2156 1500 2756 1500 
+z
+M 2756 1113 
+Q 2313 1113 1994 1041 
+Q 1675 969 1506 831 
+Q 1338 694 1338 500 
+Q 1338 306 1506 168 
+Q 1675 31 1994 -41 
+Q 2313 -113 2756 -113 
+Q 3200 -113 3519 -41 
+Q 3838 31 4006 172 
+Q 4175 313 4175 500 
+Q 4175 694 4006 831 
+Q 3838 969 3516 1041 
+Q 3194 1113 2756 1113 
+z
+" transform="scale(0.015625)"/>
+     <path id="PortfolioChart-Regular-217c" d="M 1800 4844 
+Q 2213 4844 2541 4687 
+Q 2869 4531 3053 4250 
+Q 3238 3969 3238 3613 
+Q 3238 3256 3053 2978 
+Q 2869 2700 2541 2544 
+Q 2213 2388 1800 2388 
+Q 1381 2388 1053 2544 
+Q 725 2700 540 2978 
+Q 356 3256 356 3613 
+Q 356 3969 540 4250 
+Q 725 4531 1053 4687 
+Q 1381 4844 1800 4844 
+z
+M 1800 4431 
+Q 1525 4431 1306 4328 
+Q 1088 4225 963 4037 
+Q 838 3850 838 3613 
+Q 838 3375 963 3187 
+Q 1088 3000 1306 2894 
+Q 1525 2788 1800 2788 
+Q 2075 2788 2294 2894 
+Q 2513 3000 2638 3187 
+Q 2763 3375 2763 3613 
+Q 2763 3850 2638 4037 
+Q 2513 4225 2294 4328 
+Q 2075 4431 1800 4431 
+z
+M 4813 2194 
+L 4325 2194 
+L 4325 5050 
+L 4813 5050 
+L 4813 2194 
+z
+M 4813 588 
+L 1694 588 
+L 1694 -256 
+L 1213 -256 
+L 1213 956 
+L 4325 956 
+L 4325 1531 
+L 1200 1531 
+L 1200 1925 
+L 4813 1925 
+L 4813 588 
+z
+M 5013 -431 
+L 1213 -431 
+L 1213 -38 
+L 5013 -38 
+L 5013 -431 
+z
+" transform="scale(0.015625)"/>
+     <path id="PortfolioChart-Regular-c08" d="M 4719 2956 
+L 925 2956 
+L 925 3356 
+L 4719 3356 
+L 4719 2956 
+z
+M 1413 3181 
+L 925 3181 
+L 925 4838 
+L 1413 4838 
+L 1413 3181 
+z
+M 5294 1894 
+L 225 1894 
+L 225 2300 
+L 5294 2300 
+L 5294 1894 
+z
+M 3044 744 
+L 2556 744 
+L 2556 2044 
+L 3044 2044 
+L 3044 744 
+z
+M 4756 -388 
+L 875 -388 
+L 875 25 
+L 4756 25 
+L 4756 -388 
+z
+M 1363 -169 
+L 875 -169 
+L 875 1238 
+L 1363 1238 
+L 1363 -169 
+z
+" transform="scale(0.015625)"/>
+     <path id="PortfolioChart-Regular-808" d="M 4481 4344 
+L 869 4344 
+L 869 4750 
+L 4481 4750 
+L 4481 4344 
+z
+M 5313 2300 
+L 225 2300 
+L 225 2706 
+L 5313 2706 
+L 5313 2300 
+z
+M 4644 4338 
+Q 4644 3856 4612 3459 
+Q 4581 3063 4463 2550 
+L 3975 2581 
+Q 4063 2938 4100 3247 
+Q 4138 3556 4147 3790 
+Q 4156 4025 4156 4338 
+L 4156 4750 
+L 4644 4750 
+L 4644 4338 
+z
+M 4669 -431 
+L 850 -431 
+L 850 1531 
+L 4669 1531 
+L 4669 -431 
+z
+M 1338 -31 
+L 4181 -31 
+L 4181 1144 
+L 1338 1144 
+L 1338 -31 
+z
+" transform="scale(0.015625)"/>
+     <path id="PortfolioChart-Regular-33d1" d="M 569 1725 
+Q 575 2600 803 3344 
+Q 1031 4088 1469 4719 
+L 1944 4719 
+Q 1731 4406 1543 3909 
+Q 1356 3413 1240 2838 
+Q 1125 2263 1125 1725 
+Q 1125 1188 1240 609 
+Q 1356 31 1543 -466 
+Q 1731 -963 1944 -1275 
+L 1469 -1275 
+Q 1031 -631 803 112 
+Q 575 856 569 1725 
+z
+" transform="scale(0.015625)"/>
+     <path id="PortfolioChart-Regular-33c5" d="M 3063 2013 
+L -50 2013 
+L -50 2506 
+L 3063 2506 
+L 3063 2013 
+z
+" transform="scale(0.015625)"/>
+     <path id="PortfolioChart-Regular-33d2" d="M 1612 1725 
+Q 1606 2600 1378 3344 
+Q 1150 4088 712 4719 
+L 237 4719 
+Q 450 4406 637 3909 
+Q 825 3413 940 2838 
+Q 1056 2263 1056 1725 
+Q 1056 1188 940 609 
+Q 825 31 637 -466 
+Q 450 -963 237 -1275 
+L 712 -1275 
+Q 1150 -631 1378 112 
+Q 1606 856 1612 1725 
+z
+" transform="scale(0.015625)"/>
+    </defs>
+    <use xlink:href="#PortfolioChart-Regular-aae"/>
+    <use xlink:href="#PortfolioChart-Regular-2144" transform="translate(86.421875 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-1c18" transform="translate(172.84375 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-125d" transform="translate(259.265625 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-2" transform="translate(345.6875 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-228b" transform="translate(370.78125 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-214c" transform="translate(457.203125 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-2" transform="translate(543.625 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-3362" transform="translate(568.71875 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-2" transform="translate(594.109375 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-1b38" transform="translate(619.203125 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-2" transform="translate(705.625 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-7f8" transform="translate(730.71875 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-1198" transform="translate(817.140625 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-2f04" transform="translate(903.5625 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-2" transform="translate(989.984375 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-dd9" transform="translate(1015.078125 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-217c" transform="translate(1101.5 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-2" transform="translate(1187.921875 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-c08" transform="translate(1213.015625 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-808" transform="translate(1299.4375 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-2" transform="translate(1385.859375 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-33d1" transform="translate(1410.953125 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-32c9" transform="translate(1445.03125 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-33c5" transform="translate(1504.609375 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-32cd" transform="translate(1551.6875 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-32c9" transform="translate(1614.09375 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-32c9" transform="translate(1673.671875 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-26f" transform="translate(1733.25 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-2c3" transform="translate(1816.65625 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-33d2" transform="translate(1866.265625 0)"/>
+   </g>
+  </g>
+  <g id="text_38">
+   <!-- 동일 EC2 발생기 · 동시 사용자 100명 · 10분 측정 · 버전별 1회 -->
+   <g style="fill: #555555" transform="translate(4.2192 176.547502) scale(0.09 -0.09)">
+    <defs>
+     <path id="PortfolioChart-Regular-40" d="M 500 4525 
+L 3244 4525 
+L 3244 4025 
+L 1063 4025 
+L 1063 2513 
+L 3100 2513 
+L 3100 2019 
+L 1063 2019 
+L 1063 500 
+L 3275 500 
+L 3275 0 
+L 500 0 
+L 500 4525 
+z
+" transform="scale(0.015625)"/>
+     <path id="PortfolioChart-Regular-161c" d="M 944 4013 
+L 2563 4013 
+L 2563 4813 
+L 3050 4813 
+L 3050 2394 
+L 463 2394 
+L 463 4813 
+L 944 4813 
+L 944 4013 
+z
+M 2563 2794 
+L 2563 3631 
+L 944 3631 
+L 944 2794 
+L 2563 2794 
+z
+M 4569 2175 
+L 4081 2175 
+L 4081 5050 
+L 4569 5050 
+L 4569 2175 
+z
+M 5406 3431 
+L 4350 3431 
+L 4350 3844 
+L 5406 3844 
+L 5406 3431 
+z
+M 4569 569 
+L 1519 569 
+L 1519 -269 
+L 1038 -269 
+L 1038 944 
+L 4081 944 
+L 4081 1519 
+L 1025 1519 
+L 1025 1913 
+L 4569 1913 
+L 4569 569 
+z
+M 4775 -444 
+L 1038 -444 
+L 1038 -44 
+L 4775 -44 
+L 4775 -444 
+z
+" transform="scale(0.015625)"/>
+     <path id="PortfolioChart-Regular-1add" d="M 1806 3944 
+Q 1806 3538 1647 3131 
+Q 1488 2725 1191 2400 
+Q 894 2075 500 1906 
+L 231 2288 
+Q 588 2444 856 2716 
+Q 1125 2988 1269 3309 
+Q 1413 3631 1413 3944 
+L 1413 4700 
+L 1806 4700 
+L 1806 3944 
+z
+M 1881 3944 
+Q 1881 3638 2022 3341 
+Q 2163 3044 2422 2806 
+Q 2681 2569 3025 2438 
+L 2769 2063 
+Q 2375 2219 2084 2506 
+Q 1794 2794 1644 3169 
+Q 1494 3544 1494 3944 
+L 1494 4700 
+L 1881 4700 
+L 1881 3944 
+z
+M 4944 1613 
+L 4475 1613 
+L 4475 5044 
+L 4944 5044 
+L 4944 1613 
+z
+M 4631 3144 
+L 3569 3144 
+L 3569 3550 
+L 4631 3550 
+L 4631 3144 
+z
+M 3738 1788 
+L 3275 1788 
+L 3275 4938 
+L 3738 4938 
+L 3738 1788 
+z
+M 3106 1488 
+Q 3681 1488 4103 1372 
+Q 4525 1256 4750 1031 
+Q 4975 806 4975 494 
+Q 4975 188 4750 -34 
+Q 4525 -256 4103 -375 
+Q 3681 -494 3106 -494 
+Q 2531 -494 2109 -375 
+Q 1688 -256 1466 -34 
+Q 1244 188 1244 494 
+Q 1244 806 1466 1031 
+Q 1688 1256 2109 1372 
+Q 2531 1488 3106 1488 
+z
+M 3106 1113 
+Q 2688 1113 2375 1041 
+Q 2063 969 1897 828 
+Q 1731 688 1731 494 
+Q 1731 306 1897 168 
+Q 2063 31 2372 -41 
+Q 2681 -113 3106 -113 
+Q 3531 -113 3840 -41 
+Q 4150 31 4319 168 
+Q 4488 306 4488 494 
+Q 4488 688 4319 828 
+Q 4150 969 3837 1041 
+Q 3525 1113 3106 1113 
+z
+" transform="scale(0.015625)"/>
+     <path id="PortfolioChart-Regular-830" d="M 4819 -506 
+L 4325 -506 
+L 4325 5050 
+L 4819 5050 
+L 4819 -506 
+z
+M 3175 4444 
+Q 3175 3619 2903 2900 
+Q 2631 2181 2050 1578 
+Q 1469 975 563 538 
+L 294 938 
+Q 1100 1319 1631 1834 
+Q 2163 2350 2425 2987 
+Q 2688 3625 2688 4369 
+L 2688 4444 
+L 3175 4444 
+z
+M 2888 4044 
+L 550 4044 
+L 550 4444 
+L 2888 4444 
+L 2888 4044 
+z
+" transform="scale(0.015625)"/>
+     <path id="PortfolioChart-Regular-1aac" d="M 2006 3556 
+Q 2006 2956 1803 2381 
+Q 1600 1806 1247 1362 
+Q 894 919 456 681 
+L 144 1075 
+Q 550 1275 881 1669 
+Q 1213 2063 1409 2563 
+Q 1606 3063 1606 3556 
+L 1606 4569 
+L 2006 4569 
+L 2006 3556 
+z
+M 2088 3556 
+Q 2088 3081 2281 2603 
+Q 2475 2125 2806 1750 
+Q 3138 1375 3525 1181 
+L 3225 788 
+Q 2794 1019 2444 1447 
+Q 2094 1875 1894 2428 
+Q 1694 2981 1694 3556 
+L 1694 4569 
+L 2088 4569 
+L 2088 3556 
+z
+M 4525 -506 
+L 4038 -506 
+L 4038 5050 
+L 4525 5050 
+L 4525 -506 
+z
+M 5456 2369 
+L 4413 2369 
+L 4413 2794 
+L 5456 2794 
+L 5456 2369 
+z
+" transform="scale(0.015625)"/>
+     <path id="PortfolioChart-Regular-20a9" d="M 1969 2113 
+L 1481 2113 
+L 1481 3163 
+L 1969 3163 
+L 1969 2113 
+z
+M 4031 2113 
+L 3544 2113 
+L 3544 3163 
+L 4031 3163 
+L 4031 2113 
+z
+M 5288 1894 
+L 225 1894 
+L 225 2300 
+L 5288 2300 
+L 5288 1894 
+z
+M 2756 1469 
+Q 3356 1469 3784 1356 
+Q 4213 1244 4441 1025 
+Q 4669 806 4669 488 
+Q 4669 175 4441 -44 
+Q 4213 -263 3784 -378 
+Q 3356 -494 2756 -494 
+Q 2156 -494 1725 -378 
+Q 1294 -263 1066 -44 
+Q 838 175 838 488 
+Q 838 806 1066 1025 
+Q 1294 1244 1725 1356 
+Q 2156 1469 2756 1469 
+z
+M 2756 1094 
+Q 2313 1094 1994 1022 
+Q 1675 950 1506 812 
+Q 1338 675 1338 488 
+Q 1338 300 1506 165 
+Q 1675 31 1994 -41 
+Q 2313 -113 2756 -113 
+Q 3194 -113 3516 -41 
+Q 3838 31 4006 165 
+Q 4175 300 4175 488 
+Q 4175 675 4006 812 
+Q 3838 950 3519 1022 
+Q 3200 1094 2756 1094 
+z
+M 2756 4944 
+Q 3363 4944 3803 4822 
+Q 4244 4700 4481 4469 
+Q 4719 4238 4719 3913 
+Q 4719 3594 4481 3362 
+Q 4244 3131 3803 3009 
+Q 3363 2888 2756 2888 
+Q 2150 2888 1706 3009 
+Q 1263 3131 1025 3362 
+Q 788 3594 788 3913 
+Q 788 4238 1025 4469 
+Q 1263 4700 1706 4822 
+Q 2150 4944 2756 4944 
+z
+M 2756 4556 
+Q 2306 4556 1975 4478 
+Q 1644 4400 1469 4256 
+Q 1294 4113 1294 3913 
+Q 1294 3713 1469 3569 
+Q 1644 3425 1975 3347 
+Q 2306 3269 2756 3269 
+Q 3206 3269 3534 3347 
+Q 3863 3425 4041 3569 
+Q 4219 3713 4219 3913 
+Q 4219 4113 4041 4256 
+Q 3863 4400 3534 4478 
+Q 3206 4556 2756 4556 
+z
+" transform="scale(0.015625)"/>
+     <path id="PortfolioChart-Regular-2190" d="M 2013 3344 
+Q 2013 2781 1797 2218 
+Q 1581 1656 1218 1218 
+Q 856 781 431 563 
+L 131 950 
+Q 531 1144 872 1531 
+Q 1213 1919 1419 2400 
+Q 1625 2881 1625 3344 
+L 1625 4263 
+L 2013 4263 
+L 2013 3344 
+z
+M 2106 3344 
+Q 2106 2906 2297 2456 
+Q 2488 2006 2819 1640 
+Q 3150 1275 3550 1088 
+L 3269 700 
+Q 2838 913 2481 1328 
+Q 2125 1744 1919 2275 
+Q 1713 2806 1713 3344 
+L 1713 4263 
+L 2106 4263 
+L 2106 3344 
+z
+M 3356 4069 
+L 331 4069 
+L 331 4475 
+L 3356 4475 
+L 3356 4069 
+z
+M 4525 -506 
+L 4038 -506 
+L 4038 5050 
+L 4525 5050 
+L 4525 -506 
+z
+M 5456 2381 
+L 4413 2381 
+L 4413 2800 
+L 5456 2800 
+L 5456 2381 
+z
+" transform="scale(0.015625)"/>
+     <path id="PortfolioChart-Regular-1485" d="M 4531 3738 
+L 2894 3738 
+L 2894 4144 
+L 4531 4144 
+L 4531 3738 
+z
+M 4538 2631 
+L 2894 2631 
+L 2894 3044 
+L 4538 3044 
+L 4538 2631 
+z
+M 4831 1756 
+L 4338 1756 
+L 4338 5050 
+L 4831 5050 
+L 4831 1756 
+z
+M 3038 2156 
+L 488 2156 
+L 488 4625 
+L 3038 4625 
+L 3038 2156 
+z
+M 975 2556 
+L 2556 2556 
+L 2556 4225 
+L 975 4225 
+L 975 2556 
+z
+M 2988 1594 
+Q 3569 1594 3987 1472 
+Q 4406 1350 4628 1112 
+Q 4850 875 4850 544 
+Q 4850 219 4628 -15 
+Q 4406 -250 3987 -372 
+Q 3569 -494 2988 -494 
+Q 2413 -494 1994 -372 
+Q 1575 -250 1350 -15 
+Q 1125 219 1125 544 
+Q 1125 875 1350 1112 
+Q 1575 1350 1994 1472 
+Q 2413 1594 2988 1594 
+z
+M 2988 1213 
+Q 2563 1213 2253 1131 
+Q 1944 1050 1778 900 
+Q 1613 750 1613 544 
+Q 1613 350 1778 203 
+Q 1944 56 2256 -25 
+Q 2569 -106 2988 -106 
+Q 3413 -106 3722 -25 
+Q 4031 56 4197 200 
+Q 4363 344 4363 544 
+Q 4363 750 4197 900 
+Q 4031 1050 3722 1131 
+Q 3413 1213 2988 1213 
+z
+" transform="scale(0.015625)"/>
+     <path id="PortfolioChart-Regular-1784" d="M 5306 1706 
+L 219 1706 
+L 219 2106 
+L 5306 2106 
+L 5306 1706 
+z
+M 3044 619 
+L 2556 619 
+L 2556 1913 
+L 3044 1913 
+L 3044 619 
+z
+M 4738 -388 
+L 869 -388 
+L 869 25 
+L 4738 25 
+L 4738 -388 
+z
+M 1356 -131 
+L 869 -131 
+L 869 1131 
+L 1356 1131 
+L 1356 -131 
+z
+M 1388 4156 
+L 4138 4156 
+L 4138 4869 
+L 4625 4869 
+L 4625 2650 
+L 900 2650 
+L 900 4869 
+L 1388 4869 
+L 1388 4156 
+z
+M 4138 3050 
+L 4138 3781 
+L 1388 3781 
+L 1388 3050 
+L 4138 3050 
+z
+" transform="scale(0.015625)"/>
+     <path id="PortfolioChart-Regular-2821" d="M 5288 1844 
+L 225 1844 
+L 225 2244 
+L 5288 2244 
+L 5288 1844 
+z
+M 4663 -506 
+L 4169 -506 
+L 4169 844 
+L 788 844 
+L 788 1244 
+L 4663 1244 
+L 4663 -506 
+z
+M 2994 4288 
+L 2513 4288 
+L 2513 5063 
+L 2994 5063 
+L 2994 4288 
+z
+M 2919 4138 
+Q 2919 3700 2619 3362 
+Q 2319 3025 1812 2822 
+Q 1306 2619 688 2550 
+L 525 2938 
+Q 1069 2988 1516 3147 
+Q 1963 3306 2225 3562 
+Q 2488 3819 2488 4138 
+L 2488 4231 
+L 2919 4231 
+L 2919 4138 
+z
+M 3025 4138 
+Q 3025 3819 3287 3562 
+Q 3550 3306 3997 3147 
+Q 4444 2988 4988 2938 
+L 4825 2550 
+Q 4206 2619 3700 2822 
+Q 3194 3025 2894 3362 
+Q 2594 3700 2594 4138 
+L 2594 4231 
+L 3025 4231 
+L 3025 4138 
+z
+M 4775 4094 
+L 750 4094 
+L 750 4488 
+L 4775 4488 
+L 4775 4094 
+z
+" transform="scale(0.015625)"/>
+     <path id="PortfolioChart-Regular-2215" d="M 4488 3194 
+L 3219 3194 
+L 3219 3600 
+L 4488 3600 
+L 4488 3194 
+z
+M 4831 1738 
+L 4338 1738 
+L 4338 5050 
+L 4831 5050 
+L 4831 1738 
+z
+M 2988 1563 
+Q 3569 1563 3987 1441 
+Q 4406 1319 4628 1087 
+Q 4850 856 4850 531 
+Q 4850 206 4628 -25 
+Q 4406 -256 3987 -378 
+Q 3569 -500 2988 -506 
+Q 2413 -500 1994 -378 
+Q 1575 -256 1350 -25 
+Q 1125 206 1125 531 
+Q 1125 856 1350 1087 
+Q 1575 1319 1994 1441 
+Q 2413 1563 2988 1563 
+z
+M 2988 1181 
+Q 2569 1181 2256 1103 
+Q 1944 1025 1778 878 
+Q 1613 731 1613 531 
+Q 1613 338 1778 191 
+Q 1944 44 2256 -34 
+Q 2569 -113 2988 -113 
+Q 3413 -113 3722 -34 
+Q 4031 44 4197 191 
+Q 4363 338 4363 531 
+Q 4363 731 4197 878 
+Q 4031 1025 3722 1103 
+Q 3413 1181 2988 1181 
+z
+M 2069 4025 
+Q 2069 3525 1869 3078 
+Q 1669 2631 1316 2297 
+Q 963 1963 506 1788 
+L 250 2181 
+Q 663 2331 984 2615 
+Q 1306 2900 1484 3269 
+Q 1663 3638 1663 4025 
+L 1663 4488 
+L 2069 4488 
+L 2069 4025 
+z
+M 2156 4031 
+Q 2156 3675 2328 3337 
+Q 2500 3000 2812 2740 
+Q 3125 2481 3525 2338 
+L 3269 1944 
+Q 2819 2106 2478 2422 
+Q 2138 2738 1947 3156 
+Q 1756 3575 1756 4031 
+L 1756 4488 
+L 2156 4488 
+L 2156 4031 
+z
+M 3400 4231 
+L 406 4231 
+L 406 4644 
+L 3400 4644 
+L 3400 4231 
+z
+" transform="scale(0.015625)"/>
+     <path id="PortfolioChart-Regular-1684" d="M 4831 -519 
+L 4344 -519 
+L 4344 5050 
+L 4831 5050 
+L 4831 -519 
+z
+M 4488 2575 
+L 2856 2575 
+L 2856 2981 
+L 4488 2981 
+L 4488 2575 
+z
+M 944 3163 
+L 2531 3163 
+L 2531 4613 
+L 3013 4613 
+L 3013 888 
+L 450 888 
+L 450 4613 
+L 944 4613 
+L 944 3163 
+z
+M 2531 1294 
+L 2531 2769 
+L 944 2769 
+L 944 1294 
+L 2531 1294 
+z
+" transform="scale(0.015625)"/>
+     <path id="PortfolioChart-Regular-2204" d="M 4619 3100 
+L 3194 3100 
+L 3194 3506 
+L 4619 3506 
+L 4619 3100 
+z
+M 4831 969 
+L 4338 969 
+L 4338 5044 
+L 4831 5044 
+L 4831 969 
+z
+M 4988 -388 
+L 1263 -388 
+L 1263 25 
+L 4988 25 
+L 4988 -388 
+z
+M 1756 -175 
+L 1263 -175 
+L 1263 1338 
+L 1756 1338 
+L 1756 -175 
+z
+M 2069 3900 
+Q 2069 3406 1872 2962 
+Q 1675 2519 1322 2187 
+Q 969 1856 506 1681 
+L 250 2081 
+Q 656 2225 978 2503 
+Q 1300 2781 1481 3143 
+Q 1663 3506 1663 3900 
+L 1663 4356 
+L 2069 4356 
+L 2069 3900 
+z
+M 2156 3900 
+Q 2156 3544 2331 3206 
+Q 2506 2869 2815 2606 
+Q 3125 2344 3525 2206 
+L 3269 1813 
+Q 2819 1975 2478 2290 
+Q 2138 2606 1947 3025 
+Q 1756 3444 1756 3900 
+L 1756 4356 
+L 2156 4356 
+L 2156 3900 
+z
+M 3400 4188 
+L 406 4188 
+L 406 4594 
+L 3400 4594 
+L 3400 4188 
+z
+" transform="scale(0.015625)"/>
+     <path id="PortfolioChart-Regular-16c4" d="M 4469 3869 
+L 2869 3869 
+L 2869 4250 
+L 4469 4250 
+L 4469 3869 
+z
+M 4469 2856 
+L 2869 2856 
+L 2869 3244 
+L 4469 3244 
+L 4469 2856 
+z
+M 4825 2144 
+L 4338 2144 
+L 4338 5050 
+L 4825 5050 
+L 4825 2144 
+z
+M 4825 569 
+L 1725 569 
+L 1725 -306 
+L 1238 -306 
+L 1238 944 
+L 4338 944 
+L 4338 1481 
+L 1225 1481 
+L 1225 1875 
+L 4825 1875 
+L 4825 569 
+z
+M 5038 -431 
+L 1238 -431 
+L 1238 -38 
+L 5038 -38 
+L 5038 -431 
+z
+M 994 3988 
+L 2544 3988 
+L 2544 4788 
+L 3025 4788 
+L 3025 2369 
+L 506 2369 
+L 506 4788 
+L 994 4788 
+L 994 3988 
+z
+M 2544 2769 
+L 2544 3600 
+L 994 3600 
+L 994 2769 
+L 2544 2769 
+z
+" transform="scale(0.015625)"/>
+     <path id="PortfolioChart-Regular-308c" d="M 2331 800 
+L 1838 800 
+L 1838 1719 
+L 2331 1719 
+L 2331 800 
+z
+M 4781 -506 
+L 4294 -506 
+L 4294 5050 
+L 4781 5050 
+L 4781 -506 
+z
+M 594 975 
+Q 1550 981 2372 1018 
+Q 3194 1056 3925 1150 
+L 3963 775 
+Q 3138 644 2244 600 
+Q 1350 556 331 556 
+L 256 975 
+L 594 975 
+z
+M 3781 3963 
+L 375 3963 
+L 375 4363 
+L 3781 4363 
+L 3781 3963 
+z
+M 2075 3644 
+Q 2475 3644 2778 3516 
+Q 3081 3388 3250 3156 
+Q 3419 2925 3419 2613 
+Q 3419 2306 3250 2078 
+Q 3081 1850 2778 1722 
+Q 2475 1594 2075 1594 
+Q 1681 1594 1378 1719 
+Q 1075 1844 909 2075 
+Q 744 2306 744 2613 
+Q 744 2925 909 3156 
+Q 1075 3388 1378 3516 
+Q 1681 3644 2075 3644 
+z
+M 2075 3263 
+Q 1825 3263 1625 3181 
+Q 1425 3100 1312 2953 
+Q 1200 2806 1200 2613 
+Q 1200 2425 1312 2281 
+Q 1425 2138 1625 2059 
+Q 1825 1981 2075 1981 
+Q 2331 1981 2531 2056 
+Q 2731 2131 2840 2278 
+Q 2950 2425 2950 2613 
+Q 2950 2806 2840 2953 
+Q 2731 3100 2531 3181 
+Q 2331 3263 2075 3263 
+z
+M 2331 4150 
+L 1838 4150 
+L 1838 5044 
+L 2331 5044 
+L 2331 4150 
+z
+" transform="scale(0.015625)"/>
+    </defs>
+    <use xlink:href="#PortfolioChart-Regular-dd9"/>
+    <use xlink:href="#PortfolioChart-Regular-217c" transform="translate(86.421875 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-2" transform="translate(172.84375 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-40" transform="translate(197.9375 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-29" transform="translate(254.671875 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-32cb" transform="translate(324.015625 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-2" transform="translate(382.703125 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-161c" transform="translate(407.796875 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-1add" transform="translate(494.21875 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-830" transform="translate(580.640625 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-2" transform="translate(667.0625 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-3362" transform="translate(692.15625 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-2" transform="translate(717.546875 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-dd9" transform="translate(742.640625 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-1cdc" transform="translate(829.0625 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-2" transform="translate(915.484375 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-1aac" transform="translate(940.578125 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-20a9" transform="translate(1027 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-2190" transform="translate(1113.421875 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-2" transform="translate(1199.84375 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-32ca" transform="translate(1224.9375 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-32c9" transform="translate(1268.78125 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-32c9" transform="translate(1328.359375 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-1485" transform="translate(1387.9375 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-2" transform="translate(1474.359375 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-3362" transform="translate(1499.453125 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-2" transform="translate(1524.84375 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-32ca" transform="translate(1549.9375 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-32c9" transform="translate(1593.78125 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-1784" transform="translate(1653.359375 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-2" transform="translate(1739.78125 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-2821" transform="translate(1764.875 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-2215" transform="translate(1851.296875 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-2" transform="translate(1937.71875 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-3362" transform="translate(1962.8125 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-2" transform="translate(1988.203125 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-1684" transform="translate(2013.296875 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-2204" transform="translate(2099.71875 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-16c4" transform="translate(2186.140625 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-2" transform="translate(2272.5625 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-32ca" transform="translate(2297.65625 0)"/>
+    <use xlink:href="#PortfolioChart-Regular-308c" transform="translate(2341.5 0)"/>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="pa666e37410">
+   <rect x="4.2192" y="41.7312" width="303.7824" height="108.864"/>
+  </clipPath>
+  <clipPath id="p5866ac341b">
+   <rect x="396.6048" y="47.1744" width="130.7952" height="103.4208"/>
+  </clipPath>
+  <clipPath id="pb9ddfd9204">
+   <rect x="548.496" y="47.1744" width="130.7952" height="103.4208"/>
+  </clipPath>
+  <clipPath id="p135f08d3fe">
+   <rect x="700.3872" y="47.1744" width="130.7952" height="103.4208"/>
+  </clipPath>
+ </defs>
+</svg>
