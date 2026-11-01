@@ -1,4 +1,4 @@
-# ASG로 교체된 서버에도 환경변수를 전달하기: Vault 도입기
+# Vault로 교체 서버에 환경변수 전달하기
 
 서버 장애가 발생했을 때 운영자가 새 EC2를 만들고 앱을 배포하는 과정을 줄이고 싶었습니다. 프로세스를 다시 실행하는 데서 나아가, 서버가 멈춰도 새 서버가 요청을 처리할 수 있도록 복구를 자동화하는 것이 목표였습니다.
 
@@ -18,15 +18,13 @@
 
 이 범위를 자동화하기 위해 Amazon EC2 Auto Scaling의 인스턴스 그룹인 Auto Scaling Group(이하 ASG)을 사용했습니다. ASG는 그룹이 관리하는 인스턴스의 수와 상태를 확인하며, 인스턴스가 사라지거나 비정상으로 판정되면 새 EC2를 만들어 지정한 대수를 유지합니다. 프로세스 재시작은 systemd에, 인스턴스 교체는 ASG에 맡긴 것입니다.
 
-![systemd의 프로세스 재시작과 ASG의 인스턴스 교체 범위](/Users/jeon-wonjun/WooTeCo/woowa-writing/assets/technical_wonel/00-recovery-scope.png)
+![systemd의 프로세스 재시작과 ASG의 인스턴스 교체 범위](assets/technical_wonel/00-recovery-scope.png)
 
 *그림 1. systemd는 같은 EC2에서 앱을 다시 실행하고, ASG는 교체용 EC2를 생성합니다. 새 서버에는 앱과 설정을 준비하는 과정이 필요합니다.*
 
 dev와 prod는 각각 기본 운영 대수를 1대로 정했습니다. 여러 대를 상시 운영하는 비용을 고려해, 우선 장애 후 서버를 자동으로 교체하는 구성을 선택했습니다. 트래픽 증가에 따라 서버를 추가하는 정책은 적용하지 않았으므로 CPU 사용률이 높아지는 것만으로 대수가 늘어나지는 않습니다.
 
 운영 대수가 1대이므로 장애가 발생하면 새 서버의 생성과 배포가 끝날 때까지 서비스가 중단될 수 있습니다. 이 구성의 목표는 운영자가 직접 서버를 다시 만드는 작업을 줄이는 것이었습니다.
-
-ASG 도입 당시 dev에서 Java 프로세스를 강제 종료해 systemd의 재시작을 확인했습니다. ASG 관리 인스턴스를 중지했을 때는 새 EC2 생성과 앱 자동 배포, 요청 처리 재개를 확인했습니다. prod에도 같은 복구 구성을 적용했습니다.
 
 ## 2. 새 서버는 만들어졌지만 앱은 실행되지 않았습니다
 
@@ -38,7 +36,7 @@ ASG는 시작 템플릿에 지정한 서버 이미지인 Amazon Machine Image(AM
 
 문제는 AMI에 담긴 환경변수였습니다. 기존 서버에서 `app.env`를 수정해도 이미 만들어 둔 AMI에는 반영되지 않습니다.
 
-![기존 EC2의 설정 변경과 AMI 기반 교체 서버 사이의 차이](/Users/jeon-wonjun/WooTeCo/woowa-writing/assets/technical_wonel/01-before-ami.png)
+![기존 EC2의 설정 변경과 AMI 기반 교체 서버 사이의 차이](assets/technical_wonel/01-before-ami.png)
 
 *그림 2. 현재 서버에서 수정한 설정과 기존 AMI로 생성한 서버의 설정은 달라질 수 있습니다.*
 
@@ -96,7 +94,7 @@ AMI에는 Java와 EC2에서 배포를 수행하는 CodeDeploy 에이전트 등 �
 
 새 EC2가 생성되면 배포 과정에서 Vault에 인증하고 설정을 조회합니다. 이를 로컬 `app.env`로 저장한 뒤 앱을 실행합니다.
 
-![ASG 신규 인스턴스가 Vault에서 설정을 받아 앱을 실행하는 순서](/Users/jeon-wonjun/WooTeCo/woowa-writing/assets/technical_wonel/02-deploy-flow.png)
+![ASG 신규 인스턴스가 Vault에서 설정을 받아 앱을 실행하는 순서](assets/technical_wonel/02-deploy-flow.png)
 
 *그림 3. 새 서버는 앱 실행 전에 Vault에서 설정을 받아 로컬 파일로 준비합니다.*
 
@@ -142,7 +140,7 @@ Error validating instance:
 instance ID does not belong to the role "jachwi-prod"
 ```
 
-![새 prod 인스턴스의 Vault 인증 실패 로그](/Users/jeon-wonjun/WooTeCo/woowa-writing/assets/technical_wonel/03-vault-auth-failure.png)
+![새 prod 인스턴스의 Vault 인증 실패 로그](assets/technical_wonel/03-vault-auth-failure.png)
 
 *그림 4. 새 인스턴스 ID가 Vault 역할의 허용 대상에 없어 인증이 거절됐습니다.*
 
@@ -164,7 +162,7 @@ Vault의 AWS 인증에는 IAM 방식과 EC2 방식이 있습니다. IAM(Identity
 
 Vault 서버에 환경별 동기화 작업과 이를 주기적으로 실행하는 타이머를 구성했습니다. 약 30초마다 ASG의 실행·시작 중인 인스턴스 목록을 조회하고, 해당 환경의 Vault 역할에 허용 ID를 반영하도록 했습니다. 서버가 교체돼도 현재 ASG에 속한 서버 목록에 맞춰 인증 조건을 갱신하는 방식입니다.
 
-![ASG 인스턴스 목록과 Vault 인증 허용 목록의 동기화](/Users/jeon-wonjun/WooTeCo/woowa-writing/assets/technical_wonel/04-asg-auth-sync.png)
+![ASG 인스턴스 목록과 Vault 인증 허용 목록의 동기화](assets/technical_wonel/04-asg-auth-sync.png)
 
 *그림 5. ASG의 인스턴스 변경을 인증 조건에 반영하고, 새 서버는 제한된 횟수만큼 인증을 재시도합니다.*
 
@@ -194,7 +192,7 @@ ALB는 요청을 대상 서버로 전달하는 로드 밸런서입니다. `healt
 
 prod에서는 기존 서버를 유지하면서 운영 대수를 일시적으로 늘려 새 서버를 확인한 뒤, 기본 대수인 1대로 돌아왔습니다.
 
-![ASG 신규 인스턴스 자동 배포의 수명 주기 이벤트](/Users/jeon-wonjun/WooTeCo/woowa-writing/assets/technical_wonel/05-prod-deployment-success.png)
+![ASG 신규 인스턴스 자동 배포의 수명 주기 이벤트](assets/technical_wonel/05-prod-deployment-success.png)
 
 *그림 6. prod 신규 인스턴스의 배포에서 설정 조회·기동 검증·트래픽 허용 단계가 성공했습니다.*
 
@@ -220,7 +218,7 @@ Vault는 데이터를 암호화해 저장합니다. 서버가 실행 중이어�
 
 이번에 사용한 Shamir 방식은 잠금 해제 키를 여러 조각으로 나누고, 정해진 수 이상의 조각을 입력해 잠금을 해제하는 방식입니다. Vault 프로세스나 서버가 재시작되면 운영자가 이 작업을 수행해야 했습니다. 프로세스가 다시 실행돼도 unseal 전에는 새 앱 서버가 설정을 읽을 수 없었습니다.
 
-![Vault 상태와 dev·prod ASG 동기화 타이머](/Users/jeon-wonjun/WooTeCo/woowa-writing/assets/technical_wonel/06-vault-status-and-timers.jpg)
+![Vault 상태와 dev·prod ASG 동기화 타이머](assets/technical_wonel/06-vault-status-and-timers.jpg)
 
 *그림 7. Vault의 잠금 해제 상태와 dev·prod 동기화 타이머의 실행 상태를 확인한 화면입니다.*
 
