@@ -245,14 +245,14 @@ sequenceDiagram
     App->>Job: 이미지 생성 작업 등록
     App-->>User: 202 Accepted (요청 등록 완료)
 
-    rect rgba(255, 235, 235, 0.25)
+    rect rgba(254, 152, 152, 0.25)
         Note over App,Worker: 변경 전 실패 (기본 Polling 구현)
         Worker->>Job: 작업 조회 후 삭제
         Note over Worker: 처리 중 Worker 중단
         Note over Job,Worker: 작업 정보가 없어 복구 불가
     end
 
-    rect rgba(245, 248, 252, 0.25)
+    rect rgba(120, 178, 255, 0.25)
         Note over App,Worker: 변경 후 (Job Queue 구현)
         Note over Job,Worker: A와 B는 같은 Job의 서로 다른 실행
 
