@@ -1,6 +1,6 @@
 # 엣지 리퀘스트가 뭔데? (Vercel)
 
-<img src="https://github.com/nn98/woowa-writing/blob/nn98/images/lv4/1.png?raw=true" width="400" alt="Vercel 한도 경고 메일">
+<img width="800" src="https://github.com/nn98/woowa-writing/blob/nn98/images/lv4/1.png?raw=true" alt="Vercel 한도 경고 메일">
 
 ## 엣지 리퀘스트
 
@@ -10,7 +10,7 @@
 
 2026-09-07 14:40, 메일을 받고 무척 당혹스러울 수밖에 없었습니다.  
 
-<img src="https://github.com/nn98/woowa-writing/blob/nn98/images/lv4/00.png?raw=true" width="400" alt="당시 사용자 수">
+<img width="800" src="https://github.com/nn98/woowa-writing/blob/nn98/images/lv4/00.png?raw=true" alt="당시 사용자 수">
 
 당시 활성 사용자 3천, 일 최대 사용자 600, DAU는 50도 안 되는 신생 서비스였기 때문입니다.  
 
@@ -25,15 +25,15 @@
 > ### 엣지 리퀘스트가 뭔데?
 > 리퀘스트는 아는데 Edge가 뭐지;
 >
-> <img src="https://github.com/nn98/woowa-writing/blob/nn98/images/lv4/4.png?raw=true" width="400" alt="Edge Request 카운트 지점">
+> <img width="800" src="https://github.com/nn98/woowa-writing/blob/nn98/images/lv4/4.png?raw=true" alt="Edge Request 카운트 지점">
 
 우리 ~~모자라지만~~ 착한 친구 제미나이에게 물으니 `Vercel Edge PoP`[^pop]에 들어온 클라이언트 요청이 엣지 리퀘스트라고 합니다.  
 
-<img src="https://github.com/nn98/woowa-writing/blob/nn98/images/lv4/02.jpg?raw=true" width="400" alt="퍼펙트 언더스탠드">
+<img src="https://github.com/nn98/woowa-writing/blob/nn98/images/lv4/02.jpg?raw=true" alt="퍼펙트 언더스탠드">
 
 _뉘앙스로 봐선 일반적 요청 아닌가? 그냥 리퀘스트라 부르지 왜 Edge를 붙여서 사람 헷갈리게 하지?_ 싶었습니다. 
 
-<img src="https://github.com/nn98/woowa-writing/blob/nn98/images/lv4/2.png?raw=true" width="400" alt="CDN 구조 (출처: ClouDNS)">
+<img width="800" src="https://github.com/nn98/woowa-writing/blob/nn98/images/lv4/2.png?raw=true" alt="CDN 구조 (출처: ClouDNS)">
 
 그 이유를 버셀의 서버 구조에서 찾을 수 있었습니다.  
 
@@ -59,12 +59,12 @@ Vercel의 `Edge Request` 무료 제공량 100만 건 중 한도에 거의 도달
 
 만약 그렇다면 어떻게 응징해야 할지 고민하며 메일에 첨부된 Usage 페이지를 들어가니 예상과 다른 화면이 나왔습니다.
 
-<img src="https://github.com/nn98/woowa-writing/blob/nn98/images/lv4/3.png?raw=true" width="400" alt="Edge Requests 935,144 / 1,000,000">
+<img width="800" src="https://github.com/nn98/woowa-writing/blob/nn98/images/lv4/3.png?raw=true" alt="Edge Requests 935,144 / 1,000,000">
 
 > ### ???
 > 메일은 75%였는데 열어 보니 93만? DAU 50도 안 되는 우리 서비스에?  
 > 
-> <img src="https://github.com/nn98/woowa-writing/blob/nn98/images/lv4/5.png?raw=true" width="400" alt="자동 일시정지 문구">  
+> <img src="https://github.com/nn98/woowa-writing/blob/nn98/images/lv4/5.png?raw=true" alt="자동 일시정지 문구">  
 > ...  
 > <img src="https://github.com/nn98/woowa-writing/blob/nn98/images/lv4/6.png?raw=true" alt="비상">
 
@@ -97,7 +97,7 @@ Vercel의 `Edge Request` 무료 제공량 100만 건 중 한도에 거의 도달
 아무리 CS를 놓고 살았어도 이 상황에 뭐가 필요한지는 자명했습니다. 캐싱.  
 CDN 구조부터가 캐시와 유사했고, 이미 받은 응답을 브라우저 캐시가 재활용하면 Vercel에 요청을 보낼 일도 없었습니다.  
 
-<img src="https://github.com/nn98/woowa-writing/blob/nn98/images/lv4/7.png?raw=true" width="400" alt="캐시 단계별 Edge Request 발생">
+<img width="800" src="https://github.com/nn98/woowa-writing/blob/nn98/images/lv4/7.png?raw=true" alt="캐시 단계별 Edge Request 발생">
 
 위 그림이 이 글의 사실상 핵심입니다.  
 
@@ -112,7 +112,7 @@ CDN 구조부터가 캐시와 유사했고, 이미 받은 응답을 브라우저
 
 그새 리퀘스트 한도는 95%에 육박했고, 당장의 서비스 중지를 막으려고 적용할 수 있는 조치를 모두 실행했습니다.  
 
-<img src="https://github.com/nn98/woowa-writing/blob/nn98/images/lv4/01.gif?raw=true" width="400" alt="당시 내 모습">
+<img src="https://github.com/nn98/woowa-writing/blob/nn98/images/lv4/01.gif?raw=true" alt="당시 내 모습">
 
 | 날짜 | 대상 | 조치 |
 |---|---|---|
@@ -201,8 +201,6 @@ CDN 구조부터가 캐시와 유사했고, 이미 받은 응답을 브라우저
 
 부채가 청구서로 날아오기 전에 미리 다 막기는 어렵습니다.  
 그래도 첫 고지서가 오는 순간 빠르게 대응할 여력과 역량은 키워 두겠습니다.
-
----
 
 [^vercel]: 정적 파일과 서버리스 함수[^serverless]를 올려 주는 호스팅 서비스.
 [^serverless]: 서버를 직접 띄우지 않고 요청이 올 때만 실행되는 코드.
