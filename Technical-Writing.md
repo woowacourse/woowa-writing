@@ -1,6 +1,6 @@
 # AI는 오픈소스 세계를 더럽히고 있다
 
-느날 한 통의 메일을 받았다.
+어느날 한 통의 메일을 받았다.
 ![Screenshot 2026-10-28 at 11.11.59 PM.png](https://techcourse-project-2026.s3.ap-northeast-2.amazonaws.com/rilog/images/originals/49-8259a1ae-f683-4fa1-9cca-f0e1e07486fb.png)
 그 메일에는 미팅 안건과 참여를 요구하는 내용이 담겨있었다.
 django Triage & Review 팀에 합류한지 1년이 넘었다.
