@@ -1,0 +1,108 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1180 470" role="img" aria-label="로그인 전후로 사진이 머무는 곳. 로그인 전에는 사진을 메모리 Blob으로 복사하고 IndexedDB Draft에 저장한다. 소셜 로그인으로 페이지를 떠나면 메모리는 사라지지만 Draft는 남는다. 로그인 후 Draft를 다시 메모리로 복원하고, 제출할 때 사진마다 업로드 요청, S3 PUT, 완료 확인을 거친 뒤 fileId로 지원서를 보낸다." font-family="'IBM Plex Sans KR','Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR',sans-serif">
+  <defs>
+    <marker id="f2-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="10" markerHeight="10" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#151B2C"/></marker>
+    <marker id="f2-m" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="10" markerHeight="10" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#8A93A6"/></marker>
+    <marker id="f2-bl" viewBox="0 0 10 10" refX="2" refY="5" markerWidth="15" markerHeight="15" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#246BFE"/></marker>
+  </defs>
+  <rect width="1180" height="470" fill="#FFFFFF"/>
+
+  <!-- 로그인 구간 -->
+  <rect x="440" y="72" width="100" height="330" fill="#F2F4F8"/>
+  <line x1="440" y1="72" x2="440" y2="402" stroke="#C9CFDA" stroke-dasharray="4 4"/>
+  <line x1="540" y1="72" x2="540" y2="402" stroke="#C9CFDA" stroke-dasharray="4 4"/>
+
+  <!-- 레인 구분선 -->
+  <g stroke="#E6E9F0" stroke-width="1">
+    <line x1="16" y1="80" x2="1164" y2="80"/>
+    <line x1="16" y1="160" x2="1164" y2="160"/>
+    <line x1="16" y1="240" x2="1164" y2="240"/>
+    <line x1="16" y1="320" x2="1164" y2="320"/>
+    <line x1="16" y1="400" x2="1164" y2="400"/>
+  </g>
+
+  <!-- 구간 제목 -->
+  <text x="288" y="40" font-size="13" font-weight="700" fill="#151B2C" text-anchor="middle">로그인 전</text>
+  <text x="288" y="58" font-size="11.5" fill="#667085" text-anchor="middle">이 기기에서 작성</text>
+  <text x="490" y="40" font-size="13" font-weight="700" fill="#151B2C" text-anchor="middle">③ 소셜 로그인</text>
+  <text x="490" y="58" font-size="11.5" fill="#667085" text-anchor="middle">페이지를 떠난다</text>
+  <text x="852" y="40" font-size="13" font-weight="700" fill="#151B2C" text-anchor="middle">로그인 후</text>
+  <text x="852" y="58" font-size="11.5" fill="#667085" text-anchor="middle">복원하고 제출한다</text>
+
+  <!-- 레인 이름 -->
+  <text x="24" y="116" font-size="13" font-weight="700" fill="#151B2C">브라우저 메모리</text>
+  <text x="24" y="134" font-size="11" fill="#667085">페이지가 살아 있는 동안</text>
+  <text x="24" y="196" font-size="13" font-weight="700" fill="#151B2C">IndexedDB</text>
+  <text x="24" y="214" font-size="11" fill="#667085">이 기기에만</text>
+  <text x="24" y="276" font-size="13" font-weight="700" fill="#151B2C">예술in 서버</text>
+  <text x="24" y="294" font-size="11" fill="#667085">로그인해야 허가</text>
+  <text x="24" y="356" font-size="13" font-weight="700" fill="#151B2C">Amazon S3</text>
+  <text x="24" y="374" font-size="11" fill="#667085">private 버킷</text>
+
+  <!-- Draft 막대 -->
+  <rect x="432" y="194" width="718" height="12" rx="3" fill="#DCEAFF" stroke="#B8D5FF"/>
+  <line x1="1150" y1="186" x2="1150" y2="214" stroke="#151B2C" stroke-width="1.5"/>
+  <text x="1085" y="186" font-size="11" fill="#667085" text-anchor="end">성공하면 삭제 →</text>
+  <text x="490" y="228" font-size="11" font-weight="700" fill="#1D5CE5" text-anchor="middle">Draft는 남는다</text>
+
+  <!-- 로그인 전 -->
+  <rect x="144" y="98" width="140" height="44" rx="8" fill="#EEF5FF" stroke="#246BFE" stroke-width="1.5"/>
+  <text x="214" y="117" font-size="13" font-weight="700" fill="#151B2C" text-anchor="middle">① 사진 선택</text>
+  <text x="214" y="134" font-size="11" fill="#1D5CE5" text-anchor="middle">메모리 Blob으로 복사</text>
+  <path d="M284 120 H366 V178" fill="none" stroke="#151B2C" stroke-width="1.4" marker-end="url(#f2-a)"/>
+  <text x="374" y="156" font-size="11" fill="#667085" class="m" font-family="'IBM Plex Mono',Consolas,monospace">put</text>
+  <rect x="300" y="178" width="132" height="44" rx="8" fill="#FFFFFF" stroke="#151B2C" stroke-width="1.2"/>
+  <text x="366" y="197" font-size="12.5" font-weight="700" fill="#151B2C" text-anchor="middle">② Draft 자동 저장</text>
+  <text x="366" y="213" font-size="11" fill="#667085" text-anchor="middle">600ms 뒤 · READY만</text>
+
+  <text x="288" y="280" font-size="12.5" font-weight="700" fill="#98A1B3" text-anchor="middle">요청 없음</text>
+  <text x="288" y="297" font-size="11" fill="#98A1B3" text-anchor="middle">업로드 허가를 받을 수 없다</text>
+  <text x="288" y="364" font-size="12.5" font-weight="700" fill="#98A1B3" text-anchor="middle">객체 없음</text>
+
+  <!-- 로그인 구간 -->
+  <line x1="484" y1="98" x2="496" y2="110" stroke="#DC2626" stroke-width="2.2" stroke-linecap="round"/>
+  <line x1="496" y1="98" x2="484" y2="110" stroke="#DC2626" stroke-width="2.2" stroke-linecap="round"/>
+  <text x="490" y="128" font-size="11" fill="#DC2626" text-anchor="middle">페이지를 떠나면</text>
+  <text x="490" y="144" font-size="11" fill="#DC2626" text-anchor="middle">메모리는 사라진다</text>
+  <rect x="452" y="260" width="76" height="40" rx="8" fill="#FFFFFF" stroke="#151B2C" stroke-width="1.2"/>
+  <text x="490" y="284" font-size="12" font-weight="700" fill="#151B2C" text-anchor="middle">세션 발급</text>
+
+  <!-- 로그인 후 -->
+  <rect x="556" y="98" width="130" height="44" rx="8" fill="#EEF5FF" stroke="#246BFE" stroke-width="1.5"/>
+  <text x="621" y="117" font-size="13" font-weight="700" fill="#151B2C" text-anchor="middle">④ Draft 복원</text>
+  <text x="621" y="134" font-size="11" fill="#1D5CE5" text-anchor="middle">다시 메모리로 복사</text>
+  <line x1="621" y1="194" x2="621" y2="142" stroke="#151B2C" stroke-width="1.4" marker-end="url(#f2-a)"/>
+  <text x="629" y="172" font-size="11" fill="#667085" class="m" font-family="'IBM Plex Mono',Consolas,monospace">get</text>
+
+  <rect x="704" y="98" width="446" height="44" rx="8" fill="#FFFFFF" stroke="#151B2C" stroke-width="1.5"/>
+  <text x="720" y="117" font-size="13" font-weight="700" fill="#151B2C">⑤ 제출</text>
+  <text x="720" y="134" font-size="11" fill="#667085">사진을 한 장씩 올린 뒤, 받은 fileId로 지원서를 보낸다</text>
+
+  <line x1="750" y1="142" x2="750" y2="258" stroke="#151B2C" stroke-width="1.4" marker-end="url(#f2-a)"/>
+  <line x1="860" y1="142" x2="860" y2="325" stroke="#246BFE" stroke-width="3.5" marker-end="url(#f2-bl)"/>
+  <line x1="970" y1="142" x2="970" y2="258" stroke="#151B2C" stroke-width="1.4" marker-end="url(#f2-a)"/>
+  <line x1="1095" y1="142" x2="1095" y2="258" stroke="#151B2C" stroke-width="1.4" marker-end="url(#f2-a)"/>
+
+  <rect x="700" y="258" width="100" height="44" rx="8" fill="#FFFFFF" stroke="#151B2C" stroke-width="1.2"/>
+  <text x="750" y="277" font-size="12.5" font-weight="700" fill="#151B2C" text-anchor="middle">업로드 요청</text>
+  <text x="750" y="293" font-size="10.5" fill="#667085" text-anchor="middle">fileId · URL 발급</text>
+
+  <rect x="810" y="338" width="100" height="44" rx="8" fill="#EEF5FF" stroke="#246BFE" stroke-width="1.5"/>
+  <text x="860" y="357" font-size="12.5" font-weight="700" fill="#1D5CE5" text-anchor="middle">PUT 20MB</text>
+  <text x="860" y="373" font-size="10.5" fill="#667085" text-anchor="middle">presigned URL</text>
+
+  <rect x="920" y="258" width="100" height="44" rx="8" fill="#FFFFFF" stroke="#151B2C" stroke-width="1.2"/>
+  <text x="970" y="277" font-size="12.5" font-weight="700" fill="#151B2C" text-anchor="middle">완료 확인</text>
+  <text x="970" y="293" font-size="10.5" fill="#667085" text-anchor="middle">READY로 전환</text>
+  <path d="M950 302 V360 H912" fill="none" stroke="#8A93A6" stroke-width="1.4" stroke-dasharray="4 3" marker-end="url(#f2-m)"/>
+  <text x="956" y="336" font-size="10.5" fill="#667085" class="m" font-family="'IBM Plex Mono',Consolas,monospace">HEAD</text>
+
+  <rect x="1040" y="258" width="110" height="44" rx="8" fill="#FFFFFF" stroke="#151B2C" stroke-width="1.5"/>
+  <text x="1095" y="277" font-size="12.5" font-weight="700" fill="#151B2C" text-anchor="middle">⑥ 지원서 제출</text>
+  <text x="1095" y="293" font-size="10.5" fill="#667085" text-anchor="middle">fileId만 보낸다</text>
+
+  <!-- 반복 표시와 시간축 -->
+  <path d="M750 408 V414 H970 V408" fill="none" stroke="#98A1B3" stroke-width="1.2"/>
+  <text x="860" y="432" font-size="11.5" fill="#667085" text-anchor="middle">사진마다 반복 · 한 장씩, 최대 3장</text>
+  <text x="24" y="459" font-size="11" font-weight="700" fill="#667085">시간</text>
+  <line x1="60" y1="455" x2="1150" y2="455" stroke="#C9CFDA" stroke-width="1.2" marker-end="url(#f2-m)"/>
+</svg>

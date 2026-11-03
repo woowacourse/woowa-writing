@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 370" role="img" aria-label="원본 File을 fetch body로 넘기면 네트워크 프로세스가 디스크의 임시 파일을 다시 열어 읽다가 NotFoundError, Load failed, 0바이트 PUT으로 실패할 수 있다. 페이지에서 arrayBuffer로 복사한 메모리 Blob을 넘기면 네트워크 프로세스는 받은 바이트를 그대로 보낸다." font-family="'IBM Plex Sans KR','Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR',sans-serif">
+  <defs>
+    <marker id="f3-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="10" markerHeight="10" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#151B2C"/></marker>
+    <marker id="f3-f" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="10" markerHeight="10" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#DC2626"/></marker>
+    <marker id="f3-bl" viewBox="0 0 10 10" refX="2" refY="5" markerWidth="15" markerHeight="15" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#246BFE"/></marker>
+  </defs>
+  <rect width="960" height="370" fill="#FFFFFF"/>
+
+  <!-- 열 제목 -->
+  <text x="205" y="34" font-size="13" font-weight="700" fill="#151B2C" text-anchor="middle">페이지 프로세스</text>
+  <text x="205" y="52" font-size="11" fill="#667085" text-anchor="middle">JavaScript가 도는 곳</text>
+  <text x="480" y="34" font-size="13" font-weight="700" fill="#151B2C" text-anchor="middle">디스크</text>
+  <text x="480" y="52" font-size="11" fill="#667085" text-anchor="middle">임시 파일</text>
+  <text x="765" y="34" font-size="13" font-weight="700" fill="#151B2C" text-anchor="middle">네트워크 프로세스</text>
+  <text x="765" y="52" font-size="11" fill="#667085" text-anchor="middle">실제로 요청을 보내는 곳</text>
+  <line x1="370" y1="64" x2="370" y2="352" stroke="#DDE2EB" stroke-dasharray="3 5"/>
+  <line x1="590" y1="64" x2="590" y2="352" stroke="#DDE2EB" stroke-dasharray="3 5"/>
+
+  <!-- 원본 File -->
+  <text x="40" y="88" font-size="12.5" font-weight="700" fill="#B45309">원본 File을 보낼 때</text>
+  <rect x="40" y="100" width="300" height="56" rx="8" fill="#FFF7ED" stroke="#D97706" stroke-width="1.5"/>
+  <text x="56" y="123" font-size="13" font-weight="700" fill="#151B2C" class="m" font-family="'IBM Plex Mono',Consolas,monospace">File</text>
+  <text x="56" y="143" font-size="11.5" fill="#667085">사진 선택기가 준 디스크 파일 참조</text>
+
+  <line x1="340" y1="128" x2="610" y2="128" stroke="#151B2C" stroke-width="1.5" marker-end="url(#f3-a)"/>
+  <text x="475" y="118" font-size="11" fill="#151B2C" text-anchor="middle" class="m" font-family="'IBM Plex Mono',Consolas,monospace">fetch(url, { body: file })</text>
+
+  <rect x="610" y="100" width="310" height="56" rx="8" fill="#FFFFFF" stroke="#151B2C" stroke-width="1.5"/>
+  <text x="626" y="123" font-size="12.5" font-weight="700" fill="#151B2C">임시 파일을 다시 열어 읽는다</text>
+  <text x="626" y="143" font-size="11" fill="#667085">Safari·iOS 26.5 이후 WebKit에서 비어 버릴 수 있다</text>
+
+  <rect x="410" y="170" width="140" height="42" rx="6" fill="#FFF7ED" stroke="#D97706"/>
+  <text x="480" y="196" font-size="12" font-weight="700" fill="#B45309" text-anchor="middle">임시 파일</text>
+  <line x1="290" y1="156" x2="410" y2="184" stroke="#D97706" stroke-width="1.3" stroke-dasharray="4 3"/>
+  <text x="330" y="190" font-size="11" fill="#B45309" text-anchor="end">가리킨다</text>
+  <line x1="660" y1="156" x2="552" y2="188" stroke="#DC2626" stroke-width="1.6" marker-end="url(#f3-f)"/>
+  <line x1="600" y1="166" x2="612" y2="178" stroke="#DC2626" stroke-width="2.4" stroke-linecap="round"/>
+  <line x1="612" y1="166" x2="600" y2="178" stroke="#DC2626" stroke-width="2.4" stroke-linecap="round"/>
+
+  <text x="680" y="184" font-size="12" fill="#DC2626" class="m" font-family="'IBM Plex Mono',Consolas,monospace">NotFoundError</text>
+  <text x="680" y="202" font-size="12" fill="#DC2626" class="m" font-family="'IBM Plex Mono',Consolas,monospace">TypeError: Load failed</text>
+  <text x="680" y="220" font-size="12" fill="#DC2626">PUT은 200인데 S3엔 0바이트</text>
+
+  <line x1="24" y1="244" x2="936" y2="244" stroke="#E6E9F0"/>
+
+  <!-- 메모리 Blob -->
+  <text x="40" y="276" font-size="12.5" font-weight="700" fill="#1D5CE5">메모리 Blob을 보낼 때</text>
+  <rect x="40" y="288" width="300" height="56" rx="8" fill="#EEF5FF" stroke="#246BFE" stroke-width="1.5"/>
+  <text x="56" y="311" font-size="11.5" fill="#151B2C" class="m" font-family="'IBM Plex Mono',Consolas,monospace">new Blob([await file.arrayBuffer()])</text>
+  <text x="56" y="331" font-size="11.5" fill="#667085">바이트가 페이지 메모리에 있다</text>
+
+  <line x1="340" y1="316" x2="597" y2="316" stroke="#246BFE" stroke-width="3.5" marker-end="url(#f3-bl)"/>
+  <text x="475" y="305" font-size="11" fill="#1D5CE5" text-anchor="middle" class="m" font-family="'IBM Plex Mono',Consolas,monospace">fetch(url, { body: blob })</text>
+
+  <rect x="610" y="288" width="310" height="56" rx="8" fill="#FFFFFF" stroke="#151B2C" stroke-width="1.5"/>
+  <text x="626" y="311" font-size="12.5" font-weight="700" fill="#151B2C">받은 바이트를 그대로 보낸다</text>
+  <text x="626" y="331" font-size="11" fill="#1D5CE5">디스크를 다시 읽지 않는다 → S3에 20MB</text>
+</svg>
