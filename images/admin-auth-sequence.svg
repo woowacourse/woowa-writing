@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="1720" viewBox="0 0 1040 1720" role="img" aria-labelledby="title desc">
+<title id="title">관리자 로그인부터 로그아웃까지</title>
+<desc id="desc">브라우저와 서버 사이의 성공 요청 흐름. CSRF 토큰을 받은 뒤 로그인하고, 세션 쿠키로 관리자 정보를 조회한다. 로그아웃 전에는 CSRF 토큰을 다시 조회하고, 로그아웃 성공 시 서버 세션과 화면의 관리자 정보를 제거한다.</desc>
+<rect width="1040" height="1720" fill="white"/>
+<g font-family="Malgun Gothic, Apple SD Gothic Neo, Noto Sans KR, sans-serif">
+<text x="520" y="48" text-anchor="middle" dominant-baseline="central" font-size="32" font-weight="700" fill="#172b3a">관리자 로그인부터 로그아웃까지</text>
+<text x="520" y="91" text-anchor="middle" dominant-baseline="central" font-size="19" font-weight="400" fill="#526371">세션 쿠키: 로그인 상태 식별  ·  CSRF 토큰: 요청 위조 검사</text>
+<rect x="45" y="125" width="330" height="48" fill="#e8eef4"/>
+<rect x="640" y="125" width="330" height="48" fill="#e8eef4"/>
+<text x="210" y="149" text-anchor="middle" dominant-baseline="central" font-size="22" font-weight="700" fill="#172b3a">브라우저 · 관리자 화면</text>
+<text x="805" y="149" text-anchor="middle" dominant-baseline="central" font-size="22" font-weight="700" fill="#172b3a">서버 · Spring Security</text>
+<line x1="210" y1="173" x2="210" y2="1630" stroke="#9aaab4" stroke-width="1.4" stroke-dasharray="7 6"/>
+<line x1="805" y1="173" x2="805" y2="1630" stroke="#9aaab4" stroke-width="1.4" stroke-dasharray="7 6"/>
+<rect x="30" y="196" width="980" height="38" fill="#eff6ff"/>
+<text x="48" y="215" text-anchor="start" dominant-baseline="central" font-size="21" font-weight="700" fill="#1d4ed8">① 로그인 준비 · CSRF 토큰 발급</text>
+<rect x="386.75" y="246.0" width="240.5" height="28.0" fill="white"/>
+<text x="507" y="260" text-anchor="middle" dominant-baseline="central" font-size="20" font-weight="400" fill="#172b3a">GET /api/admin/auth/csrf</text>
+<line x1="210" y1="282" x2="805" y2="282" stroke="#172b3a" stroke-width="2"/>
+<polygon points="805,282 794,277 794,287" fill="#172b3a"/>
+<rect x="396.5" y="313.5" width="221.0" height="27.0" fill="white"/>
+<text x="507" y="327" text-anchor="middle" dominant-baseline="central" font-size="20" font-weight="400" fill="#1d4ed8">XSRF-TOKEN 쿠키 설정</text>
+<rect x="373.25" y="341.75" width="267.5" height="24.5" fill="white"/>
+<text x="507" y="354" text-anchor="middle" dominant-baseline="central" font-size="18" font-weight="400" fill="#1d4ed8">응답 본문: token · headerName</text>
+<line x1="805" y1="376" x2="210" y2="376" stroke="#1d4ed8" stroke-width="2" stroke-dasharray="7 6"/>
+<polygon points="210,376 221,371 221,381" fill="#1d4ed8"/>
+<rect x="45" y="395" width="330" height="50" fill="#eff6ff"/>
+<text x="210.0" y="420" text-anchor="middle" dominant-baseline="central" font-size="18" font-weight="400" fill="#1d4ed8">쿠키 저장 · 응답에서 CSRF 토큰 읽기</text>
+<rect x="30" y="466" width="980" height="38" fill="#f0fdf4"/>
+<text x="48" y="485" text-anchor="start" dominant-baseline="central" font-size="21" font-weight="700" fill="#166534">② 로그인 · 인증 정보를 서버 세션에 저장</text>
+<rect x="373.25" y="519.0" width="267.5" height="28.0" fill="white"/>
+<text x="507" y="533" text-anchor="middle" dominant-baseline="central" font-size="20" font-weight="400" fill="#172b3a">POST /api/admin/auth/login</text>
+<rect x="255.25" y="547.5" width="503.5" height="25.0" fill="white"/>
+<text x="507" y="560" text-anchor="middle" dominant-baseline="central" font-size="18" font-weight="400" fill="#172b3a">쿠키: XSRF-TOKEN · 헤더: CSRF 토큰 · 본문: 아이디·비밀번호</text>
+<line x1="210" y1="582" x2="805" y2="582" stroke="#172b3a" stroke-width="2"/>
+<polygon points="805,582 794,577 794,587" fill="#172b3a"/>
+<rect x="620" y="600" width="380" height="76" fill="#f0fdf4"/>
+<text x="810.0" y="625" text-anchor="middle" dominant-baseline="central" font-size="18" font-weight="400" fill="#166534">CSRF 검사 · 비밀번호 검증</text>
+<text x="810.0" y="651" text-anchor="middle" dominant-baseline="central" font-size="18" font-weight="400" fill="#166534">세션 ID 변경 · 인증 정보 저장</text>
+<rect x="348.75" y="690.5" width="316.5" height="27.0" fill="white"/>
+<text x="507" y="704" text-anchor="middle" dominant-baseline="central" font-size="20" font-weight="400" fill="#166534">세션 쿠키 설정 · 관리자 정보 응답</text>
+<line x1="805" y1="726" x2="210" y2="726" stroke="#166534" stroke-width="2" stroke-dasharray="7 6"/>
+<polygon points="210,726 221,721 221,731" fill="#166534"/>
+<rect x="30" y="766" width="980" height="38" fill="#f0fdf4"/>
+<text x="48" y="785" text-anchor="start" dominant-baseline="central" font-size="21" font-weight="700" fill="#166534">③ 관리자 API 호출 · 세션으로 계정과 권한 확인</text>
+<rect x="388.75" y="825.0" width="236.5" height="28.0" fill="white"/>
+<text x="507" y="839" text-anchor="middle" dominant-baseline="central" font-size="20" font-weight="400" fill="#172b3a">GET /api/admin/auth/me</text>
+<rect x="448.5" y="853.5" width="117.0" height="25.0" fill="white"/>
+<text x="507" y="866" text-anchor="middle" dominant-baseline="central" font-size="18" font-weight="400" fill="#172b3a">쿠키: 세션 ID</text>
+<line x1="210" y1="888" x2="805" y2="888" stroke="#172b3a" stroke-width="2"/>
+<polygon points="805,888 794,883 794,893" fill="#172b3a"/>
+<rect x="620" y="906" width="380" height="76" fill="#f0fdf4"/>
+<text x="810.0" y="931" text-anchor="middle" dominant-baseline="central" font-size="18" font-weight="400" fill="#166534">세션으로 인증 정보 조회</text>
+<text x="810.0" y="957" text-anchor="middle" dominant-baseline="central" font-size="18" font-weight="400" fill="#166534">ADMIN 역할 검사</text>
+<rect x="381.5" y="994.5" width="251.0" height="27.0" fill="white"/>
+<text x="507" y="1008" text-anchor="middle" dominant-baseline="central" font-size="20" font-weight="400" fill="#172b3a">현재 로그인한 관리자 정보</text>
+<line x1="805" y1="1030" x2="210" y2="1030" stroke="#172b3a" stroke-width="2" stroke-dasharray="7 6"/>
+<polygon points="210,1030 221,1025 221,1035" fill="#172b3a"/>
+<rect x="30" y="1066" width="980" height="38" fill="#eff6ff"/>
+<text x="48" y="1085" text-anchor="start" dominant-baseline="central" font-size="21" font-weight="700" fill="#1d4ed8">④ 로그아웃 준비 · CSRF 토큰 조회</text>
+<rect x="386.75" y="1121.0" width="240.5" height="28.0" fill="white"/>
+<text x="507" y="1135" text-anchor="middle" dominant-baseline="central" font-size="20" font-weight="400" fill="#172b3a">GET /api/admin/auth/csrf</text>
+<rect x="387.0" y="1149.5" width="240.0" height="25.0" fill="white"/>
+<text x="507" y="1162" text-anchor="middle" dominant-baseline="central" font-size="18" font-weight="400" fill="#172b3a">쿠키: 세션 ID · XSRF-TOKEN</text>
+<line x1="210" y1="1184" x2="805" y2="1184" stroke="#172b3a" stroke-width="2"/>
+<polygon points="805,1184 794,1179 794,1189" fill="#172b3a"/>
+<rect x="360.0" y="1225.0" width="294.0" height="26.0" fill="white"/>
+<text x="507" y="1238" text-anchor="middle" dominant-baseline="central" font-size="20" font-weight="400" fill="#1d4ed8">응답 본문: token · headerName</text>
+<line x1="805" y1="1260" x2="210" y2="1260" stroke="#1d4ed8" stroke-width="2" stroke-dasharray="7 6"/>
+<polygon points="210,1260 221,1255 221,1265" fill="#1d4ed8"/>
+<rect x="30" y="1296" width="980" height="38" fill="#fff7ed"/>
+<text x="48" y="1315" text-anchor="start" dominant-baseline="central" font-size="21" font-weight="700" fill="#9a3412">⑤ 로그아웃 · 서버 세션 무효화</text>
+<rect x="366.25" y="1352.0" width="281.5" height="28.0" fill="white"/>
+<text x="507" y="1366" text-anchor="middle" dominant-baseline="central" font-size="20" font-weight="400" fill="#172b3a">POST /api/admin/auth/logout</text>
+<rect x="306.5" y="1379.0" width="401.0" height="28.0" fill="white"/>
+<text x="507" y="1393" text-anchor="middle" dominant-baseline="central" font-size="18" font-weight="400" fill="#172b3a">쿠키: 세션 ID · XSRF-TOKEN  |  헤더: CSRF 토큰</text>
+<line x1="210" y1="1415" x2="805" y2="1415" stroke="#172b3a" stroke-width="2"/>
+<polygon points="805,1415 794,1410 794,1420" fill="#172b3a"/>
+<rect x="620" y="1433" width="380" height="76" fill="#fff7ed"/>
+<text x="810.0" y="1458" text-anchor="middle" dominant-baseline="central" font-size="18" font-weight="400" fill="#9a3412">CSRF·ADMIN 역할 검사</text>
+<text x="810.0" y="1484" text-anchor="middle" dominant-baseline="central" font-size="18" font-weight="400" fill="#9a3412">세션 무효화 · 인증 정보 제거</text>
+<rect x="428.75" y="1526.75" width="156.5" height="22.5" fill="white"/>
+<text x="507" y="1538" text-anchor="middle" dominant-baseline="central" font-size="20" font-weight="400" fill="#9a3412">204 No Content</text>
+<line x1="805" y1="1560" x2="210" y2="1560" stroke="#9a3412" stroke-width="2" stroke-dasharray="7 6"/>
+<polygon points="210,1560 221,1555 221,1565" fill="#9a3412"/>
+<rect x="45" y="1578" width="330" height="50" fill="#fff7ed"/>
+<text x="210.0" y="1603" text-anchor="middle" dominant-baseline="central" font-size="18" font-weight="400" fill="#9a3412">화면의 관리자 정보 제거</text>
+<text x="520" y="1680" text-anchor="middle" dominant-baseline="central" font-size="18" font-weight="400" fill="#526371">성공 경로만 표시  ·  실선: 요청  /  점선: 응답</text>
+</g>
+</svg>
