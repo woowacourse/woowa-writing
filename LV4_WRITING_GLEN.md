@@ -14,7 +14,7 @@
 
 <img width="800" src="https://github.com/nn98/woowa-writing/blob/nn98/images/lv4/00.png?raw=true" alt="당시 사용자 수">
 
-당시 활성 사용자 3천, 일 최대 사용자 600, DAU는 50도 안 되는 신생 서비스였기 때문입니다.  
+당시 전체 활성 사용자 3천, 하루 최대 사용자 600, DAU(Daily Active Users)는 50도 안 되는 신생 서비스였기 때문입니다.  
 
 그때 들었던 합리적 의심은  
 
@@ -37,8 +37,9 @@
 
 <img width="400" src="https://github.com/nn98/woowa-writing/blob/nn98/images/lv4/02.jpg?raw=true" alt="퍼펙트 언더스탠드">
 
-_뉘앙스로 봐선 일반적 요청 아닌가? 그냥 리퀘스트라 부르지 왜 Edge를 붙여서 사람 헷갈리게 하지?_ 싶었습니다.  
-그 이유를 **Vercel의 서버 구조**에서 찾을 수 있었습니다.  
+_뉘앙스로 봐선 일반적 요청 아닌가? 그냥 리퀘스트라 부르지 왜 Edge를 붙여서 사람 헷갈리게 하지?_  
+싶었습니다.  
+그 이유는 **Vercel의 서버 구조**에 있었습니다.  
 
 <br>
 
