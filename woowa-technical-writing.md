@@ -101,11 +101,32 @@ savedAnchor = anchor
 
 ### 새 레이아웃에서 위치 계산하기
 
-문장 ID로 복원할 문단과 목록 인덱스를 찾은 다음, 새 크기의 레이아웃을 기다렸다. `passageText`는 해당 문단의 원문 위치와 표시 위치를 변환하는 객체다.
+문장 ID로 복원할 문단을 찾았다. 화면 밖에 있는 문단도 측정할 수 있도록 먼저 해당 항목으로 이동한 뒤, 그 문단이 새 글자 크기로 측정되기를 기다렸다. 18sp에서 26sp로 바꿔도 새 측정이 끝나기 전까지는 18sp 결과가 남아 있을 수 있다. 그 결과로 줄 번호와 줄의 상단 좌표를 구하면 26sp 화면에서 기준 문자와 다른 줄로 이동할 수 있다.
+
+아래는 측정 결과를 기다리는 부분만 간추린 Kotlin 예제다. `onTextLayout`이 호출될 때 문단 ID로 결과를 저장하고, 그 문단을 그릴 때 적용한 글자 크기를 함께 기록했다. `awaitLayout()`은 상태를 관찰하다가 대상 문단과 요청한 글자 크기가 모두 맞는 결과를 반환한다.
+
+```kotlin
+data class MeasuredLayout(val fontSize: Int, val result: TextLayoutResult)
+
+val layouts = remember { mutableStateMapOf<Long, MeasuredLayout>() }
+
+// 각 PassageItem에 전달하는 콜백
+onTextLayout = { result ->
+    layouts[passage.passageId] = MeasuredLayout(fontSize, result)
+}
+
+suspend fun awaitLayout(passageId: Long, targetFontSize: Int): TextLayoutResult =
+    snapshotFlow {
+        layouts[passageId]?.takeIf { it.fontSize == targetFontSize }?.result
+    }.filterNotNull().first()
+```
+
+측정 결과를 받은 뒤에는 측정한 문자열이 현재 표시 문자열과 같은지도 확인했다. 문단 ID와 크기가 같아도 본문이 바뀌었다면 문자 인덱스가 어긋날 수 있기 때문이다. `passageText`는 현재 문단의 원문 위치를 표시 문자열의 위치로 변환한다.
 
 ```kotlin
 listState.scrollToItem(passageIndex)
 val layout = awaitLayout(passageId, targetFontSize)
+if (layout.layoutInput.text.text != passageText.text) return
 
 val displayOffset = passageText.displayOffsetOf(anchor) ?: return
 val line = layout.getLineForOffset(displayOffset)
@@ -116,9 +137,9 @@ val offsetPx = (
 listState.scrollToItem(passageIndex, offsetPx)
 ```
 
-문단 방식은 저장한 픽셀 거리를 다시 적용했다. 문자 방식은 **같은 원문 위치를 찾고, 그 문자가 포함된 줄을 상단에 놓을 거리를 새로 계산한다.** 실제로 14sp에서는 477px, 26sp에서는 1665px로 이동해 두 경우 모두 기준 줄의 상단 Y가 0px이 됐다.
+글자 크기를 연달아 바꿀 때는 이전 복원 작업을 취소하고, 요청 ID로 최신 복원 요청을 구분했다.
 
-예제는 한 번의 복원이 끝난 뒤 다음 변경을 시작하는 흐름이다. 실제 구현에서는 측정한 글자 크기와 텍스트가 현재 문단에 맞는지 확인했다. 빠른 연속 변경에서는 이전 작업을 취소하고, 요청 ID로 최신 복원 요청을 구분했다.
+문단 방식은 저장한 픽셀 거리를 다시 적용했다. 문자 방식은 **같은 원문 위치를 찾고, 그 문자가 포함된 줄을 상단에 놓을 거리를 새로 계산한다.** 실제로 14sp에서는 477px, 26sp에서는 1665px로 이동해 두 경우 모두 기준 줄의 상단 Y가 0px이 됐다.
 
 ### 스크롤 전까지 기준 고정하기
 
