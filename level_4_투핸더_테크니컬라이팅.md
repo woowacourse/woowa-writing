@@ -427,3 +427,11 @@ GNSS로 위치를 구하는 데 인터넷이 반드시 필요한 것은 아닙�
 그렇다고 네트워크 연결이 도착 판정을 보장해 주지는 않습니다. 전달받은 위치의 정확도와 측정 시각을 확인하고, 판단하기 어려운 상황에서는 사용자가 무엇을 할 수 있을지 함께 정해야 합니다.
 
 처음에는 단순히 위치 API로 좌표를 받아 목적지까지의 거리를 계산하면 될 것이라고 생각했습니다. 하지만 구현을 위해 알아볼수록, 위치 정보는 실제 위치를 추정한 결과이며 언제나 불확실성이 남는다는 점을 알게 되었습니다. 그 한계를 이해하고 서비스에서 사용할 기준을 정하는 것까지가 위치 기반 기능을 만드는 과정이었습니다.
+
+### 참고 자료
+
+- [안드로이드 LocationManager 공식 문서](https://developer.android.com/reference/android/location/LocationManager)
+- [안드로이드 위치 정보 액세스 권한 요청](https://developer.android.com/develop/sensors-and-location/location/permissions?hl=ko)
+- [안드로인드 위치 기반 기능 튜토리얼](https://developer.android.com/courses/pathways/location-based-features-in-android?hl=ko)
+- [삼성 기술 블로그: Android 단말의 위치 데이터 활용 – 기본 개념 및 GPS 위치 제공자의 특성](https://techblog.samsung.com/blog/article/47)
+- [링아웃 프로젝트](https://github.com/woowacourse-teams/2026-ringout)
