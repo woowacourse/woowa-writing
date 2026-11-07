@@ -6,7 +6,7 @@
 
 `LazyColumn`의 기본 동작, 문단 ID와 픽셀 offset, 문장 ID와 문자 위치를 차례로 비교했다. **한 기기의 같은 본문 위치에서 단일 변경을 방식당 6건씩 측정한 결과, 평균 줄 오차는 기본 동작과 문단 방식의 3.17줄에서 문자 방식의 0줄로 줄었다.**
 
-이 글은 Compose에서 긴 콘텐츠를 표시하는 개발자를 위한 글이다. 전자책을 사례로 위치를 표현하는 방법과 복원 기준을 유지하는 시점을 살펴본다.
+이 글은 Compose에서 긴 콘텐츠를 표시하는 개발자를 위한 글이다. Kotlin 문법과 Compose의 상태 관리, `LazyColumn`의 기본 사용법을 알고 있다고 가정한다. 전자책을 사례로 위치를 표현하는 방법과 복원 기준을 유지하는 시점을 살펴본다.
 
 ## 같은 위치에서 같은 기준으로 비교하기
 
@@ -231,7 +231,7 @@ listState.scrollToItem(passageIndex, offsetPx)
 문자 위치를 저장해도 다음 조건은 따로 확인해야 한다.
 
 - **본문 수정:** 같은 문장 ID라도 내용이 바뀌면 문자 인덱스가 달라진다. 본문 버전이나 주변 텍스트로 기준의 유효성을 확인하고, 기준이 삭제됐을 때의 대체 위치를 정해야 한다.
-- **문자 경계:** UTF-16 인덱스는 눈에 보이는 글자 수와 다르다. 현재 구현은 서로게이트 쌍을 보존하지만, 결합 문자와 여러 문자로 된 이모지까지 한 글자로 처리하지는 않는다. 지원할 본문에 맞춰 grapheme cluster 경계도 검토해야 한다.
+- **문자 경계:** UTF-16 인덱스는 눈에 보이는 글자 수와 다르다. 현재 구현은 서로게이트 쌍을 보존하지만, 결합 문자와 여러 문자로 된 이모지까지 한 글자로 처리하지는 않는다. 복원 기준이 눈에 보이는 한 글자의 중간에 걸리지 않는지도 확인해야 한다.
 - **레이아웃 변경:** 줄 간격·여백·글꼴·본문 폭까지 바꾸려면 해당 설정을 반영한 측정 결과를 기다려야 한다. 이미지 로딩처럼 나중에 높이가 달라지는 경우도 별도로 검증해야 한다.
 - **목록 끝:** 아래 내용이 부족하면 기준 줄을 상단에 놓을 만큼 스크롤할 수 없다. 여백을 허용할지, 화면 안에 남으면 충분한지 정해야 한다. 이번 시작 위치는 이 경계에 해당하지 않았다.
 
@@ -245,6 +245,7 @@ listState.scrollToItem(passageIndex, offsetPx)
 
 ## 참고자료
 
+- 화면에 표시한 본문은 헤르만 헤세의 『데미안』을 팀에서 직접 번역한 것이다. 원문은 저작권 보호 기간이 만료된 작품이다.
 - [Android Developers — LazyListState](https://developer.android.com/reference/kotlin/androidx/compose/foundation/lazy/LazyListState)
 - [Android Developers — 목록과 항목 key](https://developer.android.com/develop/ui/compose/lists#item-keys)
 - [Android Developers — LazyListLayoutInfo](https://developer.android.com/reference/kotlin/androidx/compose/foundation/lazy/LazyListLayoutInfo)
