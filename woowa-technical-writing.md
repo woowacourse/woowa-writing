@@ -137,6 +137,14 @@ val offsetPx = (
 listState.scrollToItem(passageIndex, offsetPx)
 ```
 
+`getLineTop(line)`은 **문단의 텍스트 상단**을 0으로 잡았을 때 기준 줄의 위쪽 Y 좌표다. `viewportStartOffset`은 **목록 좌표에서 보이는 영역의 위쪽 경계**다. 이 리더는 목록에 좌우 여백만 두므로 위쪽 경계가 0이다. 목록에 위쪽 `contentPadding`이 20px 있다면 위쪽 경계는 -20px이 된다.
+
+`scrollToItem(index, offsetPx)`에 양수 offset을 주면 문단이 위로 올라간다. 문단 상단이 목록 좌표에서 `-offsetPx`에 놓이면, 기준 줄은 거기에 문단 안의 좌표를 더한 `-offsetPx + getLineTop(line)`에 놓인다. 이 값이 `viewportStartOffset`과 같아야 하므로 `offsetPx = getLineTop(line) - viewportStartOffset`이 된다.
+
+가령 문단 안에서 기준 줄이 80px 아래에 있고 목록 표시 영역 상단이 목록 좌표 -20px에 있다면, 문단을 `80 - (-20) = 100px` 위로 올려 두 위치를 맞춘다.
+
+<img src="image/reading-position-scroll-offset.png" alt="문단을 100px 위로 옮기기 전과 후의 목록 좌표. 문단 상단은 0px에서 -100px로, 기준 줄은 80px에서 -20px로 이동해 목록 표시 영역 상단과 일치한다." width="680">
+
 글자 크기를 연달아 바꿀 때는 이전 복원 작업을 취소하고, 요청 ID로 최신 복원 요청을 구분했다.
 
 문단 방식은 저장한 픽셀 거리를 다시 적용했다. 문자 방식은 **같은 원문 위치를 찾고, 그 문자가 포함된 줄을 상단에 놓을 거리를 새로 계산한다.** 실제로 14sp에서는 477px, 26sp에서는 1665px로 이동해 두 경우 모두 기준 줄의 상단 Y가 0px이 됐다.
@@ -220,5 +228,7 @@ listState.scrollToItem(passageIndex, offsetPx)
 
 - [Android Developers — LazyListState](https://developer.android.com/reference/kotlin/androidx/compose/foundation/lazy/LazyListState)
 - [Android Developers — 목록과 항목 key](https://developer.android.com/develop/ui/compose/lists#item-keys)
+- [Android Developers — LazyListLayoutInfo](https://developer.android.com/reference/kotlin/androidx/compose/foundation/lazy/LazyListLayoutInfo)
 - [Android Developers — TextLayoutResult](https://developer.android.com/reference/kotlin/androidx/compose/ui/text/TextLayoutResult)
 - [Kotlin — Characters](https://kotlinlang.org/docs/characters.html), [Unicode — Text Segmentation](https://www.unicode.org/reports/tr29/)
+- 좌표 도식은 Codex(GPT-6)가 작성한 Python 코드와 Pillow로 제작했다.
