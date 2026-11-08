@@ -135,7 +135,7 @@ PR Description에 AI 사용 여부를 표시하도록 했다.
 
 ![meeting-note.png](https://techcourse-project-2026.s3.ap-northeast-2.amazonaws.com/rilog/images/originals/49-047cc040-4bbc-4ddf-b0a2-9b4a5b3c7d64.png)
 
-결국 django도 신규 기여자가 동시에 열 수 있는 PR의 총개수를 제안하기로 결정했다.
+결국 django도 신규 기여자가 동시에 열 수 있는 PR의 총개수를 제한하기로 결정했다.
 나에게는 정말 이례적인 선택이라고 느껴졌다.
 이렇게나 기여자들을 소중하게 여겼던 오픈소스이자 커뮤니티인 django도 PR 갯수 제한이라는 강한 규칙을 두게 되었다.
 하지만 django는 정말 오랬동안 참아왔다.
