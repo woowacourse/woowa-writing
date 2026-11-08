@@ -21,7 +21,7 @@
 
 ### 1-1. 당시 구조와 대응
 
-커켓몬은 사용자가 입력한 프롬프트로 나만의 몬스터 이미지를 만들고 배틀하는 서비스였습니다. 2025년 행사에서는 35명의 사용자로부터 약 300건의 이미지 생성 요청이 들어왔습니다. 별도 서버인 Worker는 이미지가 없는 `Monster`를 주기적으로 조회하고 생성 결과를 같은 DB에 기록했습니다. 이런 주기적 조회 방식을 Polling이라고 합니다.
+커켓몬은 사용자가 입력한 프롬프트로 나만의 몬스터 이미지를 만들고 배틀하는 서비스였습니다. 2025년 중간 발표에서는 35명의 사용자로부터 약 300건의 이미지 생성 요청이 들어왔습니다. 별도 서버인 Worker는 이미지가 없는 `Monster`를 주기적으로 조회하고 생성 결과를 같은 DB에 기록했습니다. 이런 주기적 조회 방식을 Polling이라고 합니다.
 
 장애 이후에는 생성 대상을 별도의 `Prompt` 테이블로 분리했습니다. 프런트엔드의 디바운스와 계정당 하루 10개 생성 제한도 함께 적용했고 최종 발표에서는 이전과 비슷한 규모의 요청을 처리할 수 있었습니다.
 
@@ -61,6 +61,8 @@ flowchart LR
 
 ## 2. DB Job Queue를 선택한 이유
 
+DB Job Queue는 처리할 Job을 DB 테이블의 행으로 저장하고, Worker가 그 행을 조회해 처리하는 방식입니다. 별도의 메시지 브로커 없이 기존 DB를 큐처럼 사용합니다. 이 글에서는 기본 Polling 구현에 3장의 신뢰성 규칙을 더한 구현을 Job Queue 구현이라고 부릅니다.
+
 DB Job Queue를 선택한 이유는 Job을 보존하면서 `Monster`와 같은 트랜잭션으로 등록할 수 있기 때문입니다. 둘 중 하나만 저장되는 상황도 막아야 했습니다.
 
 당시 Worker는 연구실의 로컬 컴퓨터에서 실행했고 앱 서버에서 직접 호출할 수 없었습니다. RabbitMQ와 같은 추가 인프라도 학습에 드는 시간과 운영 부담 때문에 도입하기 어려웠습니다. 이번 실험에서도 이 제약을 그대로 유지했습니다.
@@ -77,6 +79,58 @@ Job 보존과 등록 원자성 및 운영 비용을 기준으로 네 가지 방�
 방식별 처리량을 측정한 비교는 아닙니다. DB Job Queue를 사용하더라도 Polling 조회 비용과 선점 및 복구 규칙은 직접 관리해야 했습니다.
 
 ## 3. DB Job Queue에 추가한 신뢰성 규칙
+
+다음은 사용자 요청부터 응답까지의 흐름을 기본 Polling 구현과 Job Queue 구현으로 나누어 정리한 시퀀스 다이어그램입니다. 그림에 나오는 선점과 `claimToken`, 처리 기한은 3-4부터 3-6까지에서 차례로 설명합니다.
+
+```mermaid
+sequenceDiagram
+    actor User as 사용자
+
+    box AWS
+        participant App as 앱 서버 (Spring Boot)
+        participant Monster as Monster 테이블
+        participant Job as Job 테이블
+    end
+
+    participant Worker
+
+    User->>App: 이미지 생성 요청
+    App->>Monster: 몬스터 등록 (이미지 없음)
+    App->>Job: 이미지 생성 Job 등록
+    App-->>User: 202 Accepted (요청 등록 완료)
+
+    rect rgba(254, 152, 152, 0.25)
+        Note over App,Worker: 기본 Polling 구현의 실패
+        Worker->>Job: Job 조회 후 삭제
+        Note over Worker: 처리 중 Worker 중단
+        Note over Job,Worker: Job 정보가 없어 복구 불가
+    end
+
+    rect rgba(120, 178, 255, 0.25)
+        Note over App,Worker: Job Queue 구현
+        Note over Job,Worker: A와 B는 같은 Job의 서로 다른 실행
+
+        loop 주기적인 Job 조회 및 처리
+            Worker->>Job: Job 선점 (token A와 처리 기한 기록)
+
+            alt 정상 완료
+                Worker->>Job: 이미지 생성 후 token A로 완료 요청
+                Job-->>Worker: 상태와 claimToken 및 기한 확인 후 성공 전환
+                Worker->>Monster: 생성 이미지 저장
+            else 실행 A 무응답으로 처리 기한 만료
+                Worker->>Job: 만료 Job 복구 후 재선점 (token B)
+                Worker->>Job: 이미지 생성 후 token B로 완료 요청
+                Job-->>Worker: 상태와 claimToken 및 기한 확인 후 성공 전환
+                Worker->>Monster: 실행 B의 결과 저장
+                Worker->>Job: 실행 A의 늦은 완료 요청 (token A)
+                Job-->>Worker: 이전 실행의 결과 거부
+                Note over Monster,Worker: 실행 B의 결과 유지
+            end
+        end
+
+        Note over Monster,Job: Job 완료 처리와 이미지 저장은 같은 트랜잭션
+    end
+```
 
 ### 3-1. 요청 등록과 Job 실행 분리
 
@@ -164,6 +218,20 @@ sequenceDiagram
     MySQL-->>WorkerB: Job 성공과 Monster 이미지 반영
 ```
 
+아래는 완료 처리에 사용한 JPQL입니다.
+
+```sql
+update ImageGenerationJobEntity job
+   set job.status = :succeeded,
+       job.finishedAt = :now,
+       job.claimToken = null,
+       job.deadlineAt = null
+ where job.id = :jobId
+   and job.status = :running
+   and job.claimToken = :token
+   and job.deadlineAt > :now
+```
+
 완료 UPDATE는 `RUNNING` 상태와 현재 `claimToken` 및 `deadlineAt > now`를 함께 검사합니다. 변경한 행이 0개이면 이미지도 갱신하지 않습니다. Job의 성공 전환과 `Monster`의 이미지 저장은 같은 트랜잭션으로 묶어 이미지 갱신이 실패하면 성공 전환도 롤백되도록 했습니다.
 
 ### 3-7. Job 단위 예외 격리
@@ -225,58 +293,6 @@ Worker가 이미지를 생성하는 속도보다 빠르게 요청이 계속 들�
 조회 비용이 업무 DB에 부담을 주면 Polling 간격과 인덱스를 점검하고 작업 전달을 분리할지도 검토해야 합니다. 브로커를 선택하더라도 중복 전달에 대응할 규칙은 필요합니다. [RabbitMQ의 신뢰성 가이드](https://www.rabbitmq.com/docs/reliability)도 장애 뒤 재전달 가능성을 설명합니다.
 
 ## 6. 마치며
-
-다음은 사용자 요청부터 응답까지 그리고 기본 Polling 구현과 Job Queue 구현을 정리한 시퀀스 다이어그램입니다.
-
-```mermaid
-sequenceDiagram
-    actor User as 사용자
-
-    box AWS
-        participant App as 앱 서버 (Spring Boot)
-        participant Monster as Monster 테이블
-        participant Job as Job 테이블
-    end
-
-    participant Worker
-
-    User->>App: 이미지 생성 요청
-    App->>Monster: 몬스터 등록 (이미지 없음)
-    App->>Job: 이미지 생성 Job 등록
-    App-->>User: 202 Accepted (요청 등록 완료)
-
-    rect rgba(254, 152, 152, 0.25)
-        Note over App,Worker: 기본 Polling 구현의 실패
-        Worker->>Job: Job 조회 후 삭제
-        Note over Worker: 처리 중 Worker 중단
-        Note over Job,Worker: Job 정보가 없어 복구 불가
-    end
-
-    rect rgba(120, 178, 255, 0.25)
-        Note over App,Worker: Job Queue 구현
-        Note over Job,Worker: A와 B는 같은 Job의 서로 다른 실행
-
-        loop 주기적인 Job 조회 및 처리
-            Worker->>Job: Job 선점 (token A와 처리 기한 기록)
-
-            alt 정상 완료
-                Worker->>Job: 이미지 생성 후 token A로 완료 요청
-                Job-->>Worker: 상태와 claimToken 및 기한 확인 후 성공 전환
-                Worker->>Monster: 생성 이미지 저장
-            else 실행 A 무응답으로 처리 기한 만료
-                Worker->>Job: 만료 Job 복구 후 재선점 (token B)
-                Worker->>Job: 이미지 생성 후 token B로 완료 요청
-                Job-->>Worker: 상태와 claimToken 및 기한 확인 후 성공 전환
-                Worker->>Monster: 실행 B의 결과 저장
-                Worker->>Job: 실행 A의 늦은 완료 요청 (token A)
-                Job-->>Worker: 이전 실행의 결과 거부
-                Note over Monster,Worker: 실행 B의 결과 유지
-            end
-        end
-
-        Note over Monster,Job: Job 완료 처리와 이미지 저장은 같은 트랜잭션
-    end
-```
 
 이번 작업을 하면서 외부 시스템의 장애가 서비스 전체로 번지지 않도록 경계를 설계하는 방법과 그 중요성을 배웠습니다. 요청 응답과 Job 실행을 분리하고 실패한 Job을 보존해 복구할 수 있게 만드는 과정을 경험했습니다.
 
