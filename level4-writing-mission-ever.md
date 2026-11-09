@@ -23,7 +23,7 @@
 
 그래서 다음 세 가지를 할 수 없었습니다.
 
-- 기존 보안 그룹의 규칙 수정
+- 기존 보안 그룹(인스턴스에 붙는 방화벽)의 규칙 수정
 - 새 보안 그룹 생성
 - IAM(AWS의 권한 관리 서비스) 역할의 권한 정책 수정
 
@@ -57,7 +57,7 @@ Connection to ... port 22 [tcp/ssh] succeeded!
 
 GitHub은 Actions 러너가 사용하는 IP 대역을 [Meta API](https://api.github.com/meta)로 공개하고 있습니다. 그 대역을 보안 그룹에 추가하면 접속은 됩니다.
 
-다만 이 방법에는 문제가 있습니다. **2026년 11월 2일 기준으로** 직접 조회해 보니 공개된 `actions` 대역이 **8,350개**였습니다. 그리고 이 목록은 주기적으로 바뀝니다. GitHub의 러너가 Azure 위에서 동작하기 때문에, 그 대역은 사실상 특정 클라우드의 광범위한 영역입니다. 누구든 그 클라우드에 서버를 하나 띄우면 허용된 출발지 안에 들어올 수 있습니다.
+다만 이 방법에는 문제가 있습니다. **2026년 11월 2일 기준으로** 직접 조회해 보니 공개된 `actions` 대역이 **8,350개**였습니다. 그리고 이 목록은 **주 1회 갱신됩니다.** 러너는 여러 클라우드에 걸쳐 돌기 때문에, 그 대역은 사실상 대형 클라우드 사업자들의 광범위한 영역입니다. 누구든 거기에 서버를 하나 띄우면 허용된 출발지 안에 들어올 수 있습니다. **GitHub 공식 문서도 이 대역을 내부 자원의 허용 목록으로 쓰지 말라고 권고합니다.** 개수가 너무 많다는 이유입니다.
 
 조직이 열 개로 좁혀둔 접근 범위를 저희 팀의 배포 편의를 위해 8천 개 이상으로 넓히는 셈이었습니다. 애초에 저희에게는 보안 그룹을 수정할 권한도 없었고요.
 
@@ -425,10 +425,15 @@ self-hosted runner를 탈락시킬 때 저희는 **"공개 저장소에서는 �
 
 비슷한 환경에서 배포가 막혀 있다면, 배포 스크립트를 고치기 전에 **보안 그룹의 인바운드 규칙과 내 IAM 권한부터 확인해 보시길 권합니다.** 무엇을 못 하는지 알면 할 수 있는 것이 보입니다.
 
+---
+
 ## 참고자료
+
+모든 링크는 2026년 11월 9일에 확인했습니다.
 
 - [CodeDeploy AppSpec file reference](https://docs.aws.amazon.com/codedeploy/latest/userguide/reference-appspec-file.html)
 - [AppSpec 'hooks' section](https://docs.aws.amazon.com/codedeploy/latest/userguide/reference-appspec-file-structure-hooks.html) — 수명 주기 이벤트 목록과 실행 순서
 - [Build specification reference for CodeBuild](https://docs.aws.amazon.com/codebuild/latest/userguide/build-spec-ref.html)
 - [GitHub Actions — Secure use reference](https://docs.github.com/en/actions/security-for-github-actions/security-guides/security-hardening-for-github-actions) — "Hardening for self-hosted runners" 절에 공개 저장소 권고가 있습니다
 - [GitHub Meta API](https://api.github.com/meta) — Actions 러너가 사용하는 IP 대역 목록
+- [GitHub Actions — GitHub-hosted runners reference](https://docs.github.com/en/actions/reference/runners/github-hosted-runners) — 러너 IP 대역과 갱신 주기, 허용 목록 사용에 대한 권고
