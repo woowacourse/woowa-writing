@@ -7,7 +7,7 @@
 저도 의아했습니다.
 설계와 계획은 이미 끝났고, 지금 AI가 하는 작업은 길어도 **30분이면 끝날 단순 구현 작업**이었기 때문입니다.
 
-AI는 총 50분 35초나 걸려서 작업을 마쳤고, 저는 AI에게 "왜 이렇게 작업이 오래 걸린거야?"를 물어봤습니다.
+AI는 총 50분 35초나 걸려서 작업을 마쳤고, 저는 AI에게 "왜 이렇게 작업이 오래 걸린 거야?"를 물어봤습니다.
 
 ![image.png](https://techcourse-project-2026.s3.ap-northeast-2.amazonaws.com/rilog/images/originals/52-0243f177-e494-47b0-a6b7-688a9bebedd2.png)
 
@@ -47,14 +47,18 @@ class ClubServiceTest {
 
 ![image.png](https://techcourse-project-2026.s3.ap-northeast-2.amazonaws.com/rilog/images/originals/52-1e805fb7-76da-42ba-b3fe-3e8bf8553f06.png)
 
+이 도식은 OpenAI 이미지 생성 도구로 만들었습니다.
+
 결론부터 말하자면, 테스트끼리 `ApplicationContext`를 공유하지 못해서 **여러 개의** `ApplicationContext`**를 생성**해야 했기 때문이었습니다.
 
 아래에서 자세히 알아보겠습니다.
 
 ## Context Cache Key
 
-> *Once the TestContext framework loads an* `ApplicationContext`* (or* `WebApplicationContext`*) for a test,* ***that context is cached and reused for all subsequent tests that declare the same unique context configuration within the same test suite.***
-> *테스트에서 TestContext 프레임워크가* `ApplicationContext`*(또는* `WebApplicationContext`*)를 한 번 로드하면, 해당 컨텍스트는 캐시에 저장되며* ***동일한 고유 컨텍스트 설정을 사용하는 이후의 모든 테스트에서 캐시된 컨텍스트를 재사용합니다.***
+> Once the TestContext framework loads an `ApplicationContext` (or `WebApplicationContext`) for a test, **that context is cached and reused for all subsequent tests that declare the same unique context configuration within the same test suite.**
+>
+> 테스트에서 TestContext 프레임워크가 `ApplicationContext`(또는 `WebApplicationContext`)를 한 번 로드하면, 해당 컨텍스트는 캐시에 저장되며 **동일한 고유 컨텍스트 설정을 사용하는 이후의 모든 테스트에서 캐시된 컨텍스트를 재사용합니다.**
+>
 > - [Spring 공식 문서 - 컨텍스트 캐싱](https://docs.spring.io/spring-framework/reference/testing/testcontext-framework/ctx-management/caching.html)
 
 Spring이 애플리케이션을 실행하려면 애플리케이션에 필요한 객체를 만들고 관리하는 공간이 필요합니다.
@@ -115,7 +119,7 @@ class ClubServiceTest {
 > `ApplicationContext`를 몇 번 더 만드는 것만으로 테스트가 이렇게까지 느려질까?
 
 저희의 통합 테스트는 Docker의 MySQL 컨테이너를 사용하고 있었습니다.
-이 때문에, Context에 실제 MySQL을 실행하는 Testcontainers 설정이 포함되어 있어 `ApplicationContext` 생성이 더 오래 걸렸습니다.
+이 때문에, `ApplicationContext`에 실제 MySQL을 실행하는 Testcontainers 설정이 포함되어 있어 `ApplicationContext` 생성이 더 오래 걸렸습니다.
 
 ```java
 @TestConfiguration
@@ -191,7 +195,7 @@ H2를 통해 인메모리 DB로 테스트하면, MySQL 테스트 환경을 준�
   * MySQL에서의 동작을 검증할 수 없다.
 
 H2도 매력적이었지만, 저희는 계속 MySQL로 테스트하기로 결정했습니다.
-테스트 환경과 운영 환경의 DBMS가 달라지면 테스트로 운영 안정성을 보장할 수 없다고 판단했기 때문입니다.
+테스트 환경과 운영 환경의 데이터베이스 관리 시스템(DBMS)이 달라지면 테스트로 운영 안정성을 보장할 수 없다고 판단했기 때문입니다.
 
 ## 3. `@Import`를 통일하자
 
@@ -256,10 +260,10 @@ class CommentServiceTest {
 | --- | --- | --- |
 | 유지보수 (새로운 서비스 테스트가 추가된다면?) | 기존 테스트를 수정할 필요 없음 | 공통 애노테이션을 수정해야 함 |
 | 복잡도 (개발자의 인지부하) | 단순히 `@SpringBootTest` 사용 | 서비스 테스트에만 사용하는 공통 애노테이션을 인지해야 함 |
-| 테스트 초기화 비용 | 빈 로딩 범위가 넓어, 상대적으로 큼 | 지정한 빈만 등록하니, 상대적으로 좁음 |
+| 테스트 초기화 비용 | 빈 로딩 범위가 넓어, 상대적으로 큼 | 로드하는 빈의 범위가 좁아 초기화 비용이 상대적으로 작음 |
 | 무관한 빈의 영향 | 무관한 빈의 초기화가 실패하면 서비스 테스트도 실패함 | 무관한 빈에 영향받지 않음 |
 
-저희는 이제 막 만들어진 신생 애플리케이션을 개발하고 있었습니다.
+저희는 애플리케이션을 이제 막 개발하기 시작한 상태였습니다.
 따라서, "**앞으로의 유지보수에 어떤 방식이 유리한가?**"를 가장 중요한 가치로 설정했습니다.
 
 이에 따라, **구조가 가장 간단하고 유지보수가 간편한 `@SpringBootTest` 방식을 선택**했습니다.
@@ -284,7 +288,7 @@ class CommentServiceTest {
 1. 테스트 속도가 느리다
 2. `ApplicationContext`를 재사용하지 못하고 매번 생성하는 게 문제다
 3. `ApplicationContext`가 생성될 때 MySQL 컨테이너까지 생성하니 더 오래 걸린다
-4. 인메모리 DB를 사용해볼까? → 운영 환경과 테스트 환경을 최대한 일치해야 하니 사용하지 않는다
+4. 인메모리 DB를 사용해볼까? → 운영 환경과 테스트 환경을 최대한 일치시켜야 하니 사용하지 않는다
 5. `@Import`를 통일하자 → 구조가 간단하고 유지보수하기 쉬운 `@SpringBootTest`로 통일하자
 
 다음 내용은 의도적으로 다루지 않았습니다.
