@@ -1,8 +1,8 @@
-# 같은 Instant인데 왜 다를까? 로컬과 CI의 시간 테스트 실패 원인 찾기
+# 같아 보이는 Instant인데 왜 다를까? 로컬과 CI의 시간 테스트 실패 원인 찾기
 
-로컬에서 통과한 테스트가 지속적 통합(Continuous Integration, CI) 환경에서는 실패했습니다. 데이터베이스(Database, DB)에 시간을 저장하고 다시 조회해 비교하는 테스트였습니다. 실패 메시지의 날짜와 시·분·초는 같았지만, 초 이하 자릿수가 달랐습니다.
+로컬에서 통과한 테스트가 지속적 통합(Continuous Integration, CI) 환경에서는 실패하는 경우가 있습니다. 데이터베이스(Database, DB)에 시간을 저장하고 다시 조회해 비교하는 테스트를 생각해 보겠습니다. 실패 메시지의 날짜와 시·분·초가 같아 보여도 초 이하 자릿수는 다를 수 있습니다.
 
-실패한 비교문은 저장 전후의 `Instant` 값이 같은지 확인하고 있었습니다. 같은 순간을 저장했는데 왜 다른 값이 나왔을까요? 확인할 지점은 **애플리케이션에서 만든 시간 정밀도가 저장과 조회를 거쳐도 유지되는가**입니다. Java에서 `Instant`로 표현한 값도 DB를 거치면 초 이하 자릿수가 달라질 수 있습니다.
+이 테스트는 저장 전후의 `Instant` 값이 같은지 확인합니다. 비교가 실패한다면 **저장하고 다시 읽은 뒤에도 시간 값의 정밀도가 유지되는지 확인해야 합니다.** Java에서 `Instant`로 표현한 값도 DB를 거치면 초 이하 자릿수가 달라질 수 있습니다.
 
 이 글에서는 저장 전후의 작은 차이가 테스트 실패로 이어지는 이유를 살펴봅니다. 이어서 로컬과 CI의 차이를 좁히는 방법과 시간 값을 비교할 때의 판단 기준을 정리합니다. Java로 DB 저장·조회 테스트를 작성해 봤다면, 비슷한 실패의 원인을 찾는 데 활용할 수 있습니다.
 
@@ -46,7 +46,15 @@ assertEquals(before, after);
 | 마이크로초 | 1,000,000 | 6자리 | `.123456` |
 | 나노초 | 1,000,000,000 | 9자리 | `.123456789` |
 
-나노초 단위로 표현할 수 있다는 사실이 실제 시계의 정확도를 보장하지는 않습니다. 값을 담는 자료형의 정밀도와 현재 시각을 얻는 시계의 해상도는 별개입니다. Java의 시스템 시계도 환경에서 사용할 수 있는 시계를 사용합니다. [Java 21 Clock 문서](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/time/Clock.html)
+여기서 값의 정밀도와 시계의 해상도, 정확도를 구분해야 합니다.
+
+| 구분 | 이 글에서의 의미 |
+|---|---|
+| 값의 정밀도 | 자료형이나 저장소가 시간 값을 얼마나 작은 단위까지 표현하는지 |
+| 시계의 해상도 | 시계가 반환하는 시간 값으로 구분할 수 있는 최소 시간 간격 |
+| 시계의 정확도 | 시계가 가리키는 시각이 기준 시각에 얼마나 가까운지 |
+
+예를 들어 밀리초 간격으로만 값을 구분하는 시계에서 얻은 시간을 `Instant`에 담아도, 나노초 단위의 시각을 새로 측정한 것은 아닙니다. 나노초 단위로 표현할 수 있다는 사실만으로 기준 시각과의 오차가 작다고 보장할 수도 없습니다. Java의 시스템 시계는 환경에서 사용할 수 있는 시계를 사용하므로, 자료형이 표현하는 단위와 실제 시계가 구분하는 간격을 따로 확인해야 합니다. [Java 21 Clock 문서](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/time/Clock.html)
 
 여기서 로컬과 CI의 결과가 달라질 수 있는 조건을 찾을 수 있습니다. 마이크로초까지만 남기는 저장 경로에서는 밀리초 단위로 맞춘 입력은 유지되지만, 마이크로초보다 작은 부분이 있는 입력은 변환될 수 있습니다. 반대로 입력이 같아도 두 환경의 컬럼 정밀도나 변환 코드가 다르면 조회값이 달라질 수 있습니다. 어느 경우에 해당하는지 알려면 입력과 저장 경로를 나눠 확인해야 합니다.
 
@@ -68,7 +76,7 @@ System.out.println("delta=" + Duration.between(before, after));
 
 `getNano()`는 초 안의 나노초 부분을 확인할 때 사용합니다. 초 경계를 넘는 변화까지 보려면 두 시각 사이의 기간을 함께 확인해야 합니다. `Duration.between()`으로 기간을 구하고, 크기만 필요하면 `abs()`를 적용합니다. [Java 21 Duration 문서](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/time/Duration.html)
 
-진단할 때는 차이의 방향도 남깁니다. 다만 반올림도 원본보다 작은 값을 만들 수 있으므로, 차이의 방향만으로 버림과 반올림을 구분할 수는 없습니다. 자릿수를 줄일 때 올라가거나 내려갈 입력을 각각 넣고 실제 저장 경로의 결과를 확인해야 합니다.
+진단할 때는 차이의 방향도 남깁니다. 다만 반올림도 원본보다 작은 값을 만들 수 있으므로, 차이의 방향만으로 버림과 반올림을 구분할 수는 없습니다. 반올림했을 때 값이 커지는 입력과 작아지는 입력을 각각 넣고, 실제 저장 경로의 결과를 확인해야 합니다.
 
 ### 2단계: 값이 바뀌는 구간을 찾습니다
 
@@ -130,59 +138,17 @@ Instant input = Instant.parse("2026-09-18T10:15:30.123456789Z");
 
 원본을 그대로 보관하는 저장소와 마이크로초 아래를 버리는 저장소를 비교해 보겠습니다. 작은 메모리 저장소를 만들고 변환 여부만 바꾸면, 정밀도가 비교 결과에 미치는 영향을 분리해서 볼 수 있습니다.
 
-다음 코드를 `InstantPrecisionDemo.java`로 저장합니다. `truncatedTo(ChronoUnit.MICROS)`는 마이크로초보다 작은 부분을 버린 새 값을 만듭니다. 원본 `Instant`는 바뀌지 않으므로 반환값을 사용해야 합니다.
+두 저장소의 차이를 만드는 부분은 `save()`입니다. `truncateToMicros`가 `true`이면 마이크로초보다 작은 부분을 버리고, `false`이면 원본을 그대로 보관합니다.
 
 ```java
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-
-public class InstantPrecisionDemo {
-    static class MemoryStore {
-        private final boolean truncateToMicros;
-        private Instant value;
-
-        MemoryStore(boolean truncateToMicros) {
-            this.truncateToMicros = truncateToMicros;
-        }
-
-        void save(Instant input) {
-            value = truncateToMicros
-                    ? input.truncatedTo(ChronoUnit.MICROS)
-                    : input;
-        }
-
-        Instant load() {
-            return value;
-        }
-    }
-
-    public static void main(String[] args) {
-        Instant original =
-                Instant.parse("2026-09-18T10:15:30.123456789Z");
-        MemoryStore preserving = new MemoryStore(false);
-        MemoryStore truncating = new MemoryStore(true);
-        preserving.save(original);
-        truncating.save(original);
-
-        System.out.println("preservingEqual="
-                + original.equals(preserving.load()));
-        System.out.println("truncatingEqual="
-                + original.equals(truncating.load()));
-        System.out.println("stored=" + truncating.load());
-
-        Instant normalized = original.truncatedTo(ChronoUnit.MICROS);
-        truncating.save(normalized);
-        System.out.println("normalizedEqual="
-                + normalized.equals(truncating.load()));
-    }
+void save(Instant input) {
+    value = truncateToMicros
+            ? input.truncatedTo(ChronoUnit.MICROS)
+            : input;
 }
 ```
 
-Java 21에서 다음 명령으로 실행합니다.
-
-```sh
-java InstantPrecisionDemo.java
-```
+`truncatedTo(ChronoUnit.MICROS)`는 원본을 변경하지 않고 변환한 값을 반환합니다. 원본 보존과 버림 경로에 같은 입력을 넣어 비교한 뒤, 저장 전에 정밀도를 맞춘 값도 다시 저장해 보겠습니다. 직접 실행하려면 [부록의 전체 실행 코드](#부록-전체-실행-코드)를 사용합니다.
 
 실행 결과는 다음과 같습니다.
 
@@ -290,6 +256,17 @@ assertEquals(normalized, loaded);
 
 기대값에 무엇을 넣는지도 중요합니다. 원본을 저장한 뒤 조회값과 기대값을 모두 잘라 비교하면, 원래 보존해야 할 정보가 사라져도 테스트가 통과할 수 있습니다. 저장 전에 변환한 값 자체가 서비스의 저장 규칙인지 먼저 확인해야 합니다.
 
+**정밀도를 낮추면 서로 다른 이벤트가 같은 시간 값이 될 수 있습니다.** 예를 들어 다음 두 이벤트는 서로 다른 순간에 발생했습니다.
+
+```text
+A: 2026-09-18T10:15:30.123456100Z
+B: 2026-09-18T10:15:30.123456900Z
+```
+
+마이크로초 아래를 버리면 두 값 모두 `.123456`이 됩니다. 테스트는 단순해질 수 있지만, 두 이벤트를 시간 값만으로 구분할 수 없게 됩니다. 결제 처리나 이벤트 순서처럼 시간의 세밀한 차이가 기능에 영향을 준다면 먼저 필요한 단위를 정해야 합니다.
+
+이벤트 순서가 중요할 때는 시간 정밀도만으로 충분한지도 별도로 검토해야 합니다. 여러 장비에서 생성한 시각에는 시계 차이가 있을 수 있고 같은 시각을 가진 이벤트도 생길 수 있습니다. 정렬을 보장해야 한다면 순번 등 추가 기준이 필요한지 살펴봅니다.
+
 ### 방법 2: DB 컬럼 정밀도를 높입니다
 
 서비스에 마이크로초 단위 구분이 필요한데 컬럼이 밀리초까지만 보관한다면, 애플리케이션에서 값을 줄이는 것보다 컬럼을 수정하는 편이 요구사항에 맞을 수 있습니다.
@@ -335,13 +312,14 @@ assertTrue(difference.compareTo(tolerance) <= 0);
 
 다음 표는 마이크로초 아래를 버리는 정책을 선택했을 때의 검증 예시입니다. 반올림 정책을 쓰는 시스템이라면 그 규칙에 맞는 기대값을 별도로 정해야 합니다.
 
-| 입력의 초 이하 부분 | 확인할 내용 |
-|---|---|
-| `.123456000` | 이미 맞춘 값이 변하지 않는지 확인합니다 |
-| `.123456789` | 버릴 부분을 정책대로 처리하는지 확인합니다 |
-| `.999999999` | 초 경계 직전 값을 처리하는지 확인합니다 |
-| 다음 초의 `.000000000` | 앞의 값과 서로 다른 시각으로 남는지 확인합니다 |
-| 허용 범위보다 큰 차이 | 허용 오차 비교가 오류를 거부하는지 확인합니다 |
+| 입력의 초 이하 부분 | 변환 후 기대값 | 확인할 내용 |
+|---|---|---|
+| `.123456000` | 같은 초의 `.123456` | 이미 맞춘 값이 유지되는지 확인합니다 |
+| `.123456789` | 같은 초의 `.123456` | 마이크로초 아래를 버리는지 확인합니다 |
+| `.999999999` | 같은 초의 `.999999` | 버림에서는 다음 초로 넘어가지 않는지 확인합니다 |
+| 다음 초의 `.000000000` | 다음 초의 `.000000` | 초 경계 양쪽의 값이 서로 다르게 남는지 확인합니다 |
+
+앞의 PostgreSQL 반올림 예제에서는 초 경계 직전 값이 다음 초로 넘어갔지만, 마이크로초 아래를 버리는 이 표의 정책에서는 같은 초에 남습니다. 기대값은 실제로 선택한 변환 규칙에 맞춰 정해야 합니다.
 
 변환을 두 번 적용해도 값이 더 바뀌지 않는지 확인하면, 여러 계층에서 같은 규칙을 적용할 때의 문제를 살피는 데 도움이 됩니다. 가령 마이크로초 단위로 맞춘 값에 같은 변환을 다시 적용했을 때 값이 그대로 남아야 합니다.
 
@@ -357,20 +335,7 @@ assertTrue(difference.compareTo(tolerance) <= 0);
 
 변경 후 실제 DB를 거쳐 다시 읽은 값에도 같은 검증을 적용합니다. 특히 메모리 예제의 버림과 실제 저장 경로의 반올림을 구분해야 합니다. 반복 실행은 현재 시각이나 실행 순서에 따른 불안정성을 찾는 데 도움이 되지만, 매번 같은 입력만 넣는 것으로 경계값 검증을 대신할 수는 없습니다.
 
-## 정밀도를 낮추면 사라지는 정보
-
-정밀도를 맞추는 변경은 정보를 버릴 수 있습니다. 예를 들어 다음 두 이벤트는 서로 다른 순간에 발생했습니다.
-
-```text
-A: 2026-09-18T10:15:30.123456100Z
-B: 2026-09-18T10:15:30.123456900Z
-```
-
-마이크로초 아래를 버리면 두 값 모두 `.123456`이 됩니다. 테스트는 단순해질 수 있지만, 두 이벤트를 시간 값만으로 구분할 수 없게 됩니다. 결제 처리나 이벤트 순서처럼 시간의 세밀한 차이가 기능에 영향을 준다면 먼저 필요한 단위를 정해야 합니다.
-
-이벤트 순서가 중요할 때는 시간 정밀도만으로 충분한지도 별도로 검토해야 합니다. 여러 장비에서 생성한 시각에는 시계 차이가 있을 수 있고 같은 시각을 가진 이벤트도 생길 수 있습니다. 정렬을 보장해야 한다면 순번 등 추가 기준이 필요한지 살펴봅니다.
-
-### 시간대 차이와 정밀도 차이를 나눠 확인합니다
+## 시간대 차이와 정밀도 차이를 나눠 확인하기
 
 초 이하 자릿수 차이를 발견했다고 해서 모든 시간 문제를 정밀도 문제로 처리하지 않습니다. 같은 순간도 표시하는 시간대에 따라 시·분·초가 다르게 보일 수 있습니다. `Instant` 값으로 변환해 비교할 수 있는 경로라면 표시 문자열 대신 그 값을 비교합니다.
 
@@ -385,6 +350,60 @@ B: 2026-09-18T10:15:30.123456900Z
 해결책은 테스트가 통과하는지만 보고 고르지 않습니다. 서비스가 필요한 정밀도, DB가 보존하는 단위와 테스트가 보장할 동작을 맞춰야 합니다. 저장 전 변환, 컬럼 수정, 허용 오차와 검증 범위 조정은 각각 다른 조건에서 선택할 수 있는 방법입니다.
 
 지금 비슷한 실패를 겪고 있다면 저장 직전과 조회 직후의 `Instant` 값부터 나란히 출력해 보세요. 두 값이 어디서 어떻게 달라졌는지 확인하면, 어떤 설정을 바꿔야 하는지 근거를 가지고 판단할 수 있습니다.
+
+## 부록: 전체 실행 코드
+
+다음 코드를 `InstantPrecisionDemo.java`로 저장하면 Java 21에서 외부 라이브러리 없이 실행할 수 있습니다. 본문에서 비교한 원본 보존, 마이크로초 아래 버림, 저장 전 정밀도 변환을 한 번에 확인합니다.
+
+```java
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+
+public class InstantPrecisionDemo {
+    static class MemoryStore {
+        private final boolean truncateToMicros;
+        private Instant value;
+
+        MemoryStore(boolean truncateToMicros) {
+            this.truncateToMicros = truncateToMicros;
+        }
+
+        void save(Instant input) {
+            value = truncateToMicros
+                    ? input.truncatedTo(ChronoUnit.MICROS)
+                    : input;
+        }
+
+        Instant load() {
+            return value;
+        }
+    }
+
+    public static void main(String[] args) {
+        Instant original =
+                Instant.parse("2026-09-18T10:15:30.123456789Z");
+        MemoryStore preserving = new MemoryStore(false);
+        MemoryStore truncating = new MemoryStore(true);
+        preserving.save(original);
+        truncating.save(original);
+
+        System.out.println("preservingEqual="
+                + original.equals(preserving.load()));
+        System.out.println("truncatingEqual="
+                + original.equals(truncating.load()));
+        System.out.println("stored=" + truncating.load());
+
+        Instant normalized = original.truncatedTo(ChronoUnit.MICROS);
+        truncating.save(normalized);
+        System.out.println("normalizedEqual="
+                + normalized.equals(truncating.load()));
+    }
+}
+```
+
+```sh
+java InstantPrecisionDemo.java
+```
 
 ## 참고 자료
 
