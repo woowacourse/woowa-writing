@@ -177,8 +177,6 @@ abstract class MySqlJpaTest {
 이러면 `ApplicationContext`를 새로 생성해도 MySQL 컨테이너는 재사용하니, 지금 `ApplicationContext` 생성이 오래 걸리는 원인 중 하나는 제거할 수 있습니다.
 하지만, 저희는 애당초 `ApplicationContext`를 불필요하게 여러 번 생성하는 게 근본적인 문제라고 판단했기에 Singleton Container Pattern을 고려하지 않았습니다.
 
-...
-
 ## 2. DB를 바꾸면 해결되지 않을까?
 
 저희는 우선 "반드시 MySQL로 테스트해야 할까?"를 고민했습니다.
