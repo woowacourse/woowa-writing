@@ -164,13 +164,11 @@ resource(ResourceSnippetParameters.builder()
 | --- | --- | --- |
 | `test` | 문서화 테스트 실행 | `generated-snippets` |
 | `openapi3` | 스니펫 정보 집계 | `openapi3.yaml` |
-| `verifyOpenApi` | 생성 명세의 경로와 응답 등 확인 | 검증을 통과한 명세 |
+| `verifyOpenApi` | 생성 명세에 도서 검색 경로와 응답 정보가 포함됐는지 확인 | 검증을 통과한 명세 |
 | `stageOpenApiSpec` | 명세를 정적 리소스 경로에 복사 | `static/docs/openapi3.yaml` |
 | `bootJar` | UI와 명세를 실행 JAR에 포함 | 배포할 애플리케이션 |
 
 이 프로젝트에서는 `bootJar`를 실행하면 테스트와 명세 생성, 검증을 거친 뒤 JAR를 만들도록 연결돼 있어요.[^9]
-
-프로젝트에 추가한 `verifyOpenApi`는 생성된 명세에 도서 검색 경로와 응답 정보가 포함됐는지 확인해요.[^2]
 
 `backend` 디렉터리에서 `./gradlew clean test verifyOpenApi`로 테스트와 명세 검증을 수행할 수 있어요. 문서를 포함한 JAR를 만들 때는 `./gradlew clean bootJar`를 실행해요. 이 JAR를 배포하면 `/docs/swagger-ui.html`에서 문서를 읽을 수 있어요.
 
@@ -225,12 +223,40 @@ OpenAPI 변환에는 `com.epages.restdocs-api-spec` 플러그인과 테스트용
 
 ### 재현 코드와 실행 환경
 
-재현 예제는 Java 21, Spring Framework 7.0.8, Spring REST Docs 4.0.1에서 실행했어요. Spring REST Docs의 MockMvc 모듈과 Spring MVC 테스트 의존성을 사용해요.
+재현 예제는 Java 21, Gradle 9.5.1, Spring Framework 7.0.8, Spring REST Docs 4.0.1에서 실행했어요.
 
 <details>
 <summary>5장의 독립 재현 코드와 실행 결과</summary>
 
 고정 JSON을 반환하는 `MockMvc` 컨트롤러에 문서화를 연결한 예제예요. `main()`에서 세 사례를 실행하고, `work/probe-snippets`에 스니펫을 생성해요.
+
+Java 21과 Gradle 9.5.1이 설치된 환경에서 빈 디렉터리에 다음 `build.gradle`을 만들어요.
+
+```groovy
+plugins {
+    id 'application'
+}
+
+repositories {
+    mavenCentral()
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+dependencies {
+    implementation 'org.springframework.restdocs:spring-restdocs-mockmvc:4.0.1'
+}
+
+application {
+    mainClass = 'DocsProbe'
+}
+```
+
+아래 Java 코드를 `src/main/java/DocsProbe.java`에 저장해요.
 
 ```java
 import java.util.*;
@@ -303,6 +329,12 @@ public class DocsProbe {
         }
     }
 }
+```
+
+`build.gradle`이 있는 디렉터리에서 실행해요.
+
+```bash
+gradle run
 ```
 
 실행 결과:
