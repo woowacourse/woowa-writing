@@ -1,3 +1,5 @@
+# 모니터링으로 발견한 API 성능 문제, 반복 조회를 데이터로 개선하기
+
 # 들어가며
 
 기존에는 성능 개선을 할 때 주로 코드를 먼저 살펴보았습니다. 코드에서 반복 쿼리와 같이 성능에 영향을 줄 수 있는 부분을 발견하면 이를 개선하고, 전후 성능을 비교하는 방식이었습니다.
@@ -350,7 +352,7 @@ public List<PostResponse> convertPostResponse(List<Post> posts) {
 
 기존에는 게시물마다 `findPostTagsByPost_Id()`를 호출했지만, 개선 후에는 게시물 ID 목록을 이용해 한 번에 조회하도록 변경했습니다.
 
-`PostTagRepository`에 다음 JPQL을 추가했습니다.
+`PostTagRepository`에 다음 JPQL(Java Persistence Query Language)을 추가했습니다.
 
 ```java
 @Query("""
@@ -439,7 +441,7 @@ List<CategoryPostCount> countPublishedPostsByCategories(
 
 배포 전에 운영 환경과 동일한 데이터를 준비하고 k6를 이용해 개선 전후의 성능을 측정했습니다.
 
-VU를 1로 설정해 요청을 순차적으로 전송했기 때문에 동시 요청 상황은 측정에 포함되지 않습니다.
+VU(Virtual User, 가상 사용자)를 1로 설정해 요청을 순차적으로 전송했기 때문에 동시 요청 상황은 측정에 포함되지 않습니다.
 
 ### 측정 조건
 
