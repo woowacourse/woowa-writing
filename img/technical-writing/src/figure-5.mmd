@@ -1,0 +1,13 @@
+sequenceDiagram
+    participant C as 컨트롤러
+    participant TX as Spring (트랜잭션 관리)
+    participant DB as DB
+    participant CB as 동기화 콜백
+    C->>TX: 서비스 메서드 종료 · 커밋 요청
+    TX->>DB: 커밋 (성공)
+    TX->>CB: afterCommit()
+    CB->>TX: S3Exception이 아닌 RuntimeException 발생
+    TX->>CB: afterCompletion(COMMITTED)
+    Note over TX,CB: afterCompletion의 예외는 로그만 남음
+    TX->>C: afterCommit의 예외를 그대로 전달
+    Note over C: DB는 커밋됐는데 500 응답

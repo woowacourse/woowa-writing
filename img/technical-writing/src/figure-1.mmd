@@ -1,0 +1,18 @@
+sequenceDiagram
+    participant S as 서비스
+    participant DB as DB (트랜잭션)
+    participant S3 as Amazon S3
+    Note over S,DB: @Transactional 시작
+    alt ① 등록
+        S-->>S3: 새 이미지 업로드 (성공)
+        S->>DB: 게시글 저장 → 실패, 롤백
+        Note right of S3: 고아 파일(게시글과 연결되지 않은 이미지)이 남음
+    else ② 수정
+        S-->>S3: 기존 이미지 삭제 (성공)
+        S->>DB: 이미지 주소 교체 → 롤백
+        Note right of S3: DB가 없는 이미지를 가리킴
+    else ③ 삭제
+        S-->>S3: 이미지 삭제 (성공)
+        S->>DB: 게시글 삭제 → 롤백
+        Note right of S3: 게시글은 남고 이미지만 사라짐
+    end

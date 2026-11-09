@@ -1,0 +1,10 @@
+sequenceDiagram
+    participant R as 요청 스레드 (트랜잭션·콜백 정보 있음)
+    participant W as 업로드 스레드 (트랜잭션·콜백 정보 없음)
+    participant S3 as Amazon S3
+    R->>R: 롤백 콜백 등록 (빈 목록)
+    R->>W: 업로드 맡김 (CompletableFuture)
+    Note over W: 이 스레드에서는 콜백 등록 불가
+    W-->>S3: 이미지 업로드
+    W->>R: 주소만 반환
+    R->>R: 주소를 목록에 추가

@@ -1,0 +1,12 @@
+sequenceDiagram
+    participant U as 업로드 요청 10건
+    participant P as 커넥션 풀 (최대 10개)
+    participant S3 as Amazon S3
+    participant O as 다른 API 요청
+    U->>P: 커넥션 10개를 모두 빌림
+    U-->>S3: 업로드 (응답 지연, 최대 60초)
+    O->>P: 커넥션 요청
+    Note over O,P: 남은 커넥션 없음 · 최대 30초 대기
+    P->>O: 예외 (connectionTimeout)
+    S3-->>U: 업로드 완료
+    U->>P: 커넥션 반납
