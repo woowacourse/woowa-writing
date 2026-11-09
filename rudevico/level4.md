@@ -1,12 +1,12 @@
 # HTTP 200이어도 실패하는 테스트: REST Docs로 문서 누락 잡기
 
-책췍 도서 검색 API에 Spring REST Docs를 적용한 경험
+도서 검색 API에 Spring REST Docs를 적용한 경험
 
 남효윤 루드비코
 
 ## 1 REST Docs 도입 배경
 
-API가 정상적으로 응답하더라도 문서에는 새로 추가한 응답 필드가 빠져 있을 수 있습니다. 책췍의 도서 검색 API에는 이런 누락을 테스트에서 발견하고, 문서 설명을 컨트롤러의 요청 처리 코드와 분리하기 위해 Spring REST Docs를 도입했습니다.
+API가 정상적으로 응답하더라도 문서에는 새로 추가한 응답 필드가 빠져 있을 수 있습니다. 저는 운영 중인 서비스의 도서 검색 API에 Spring REST Docs를 도입해 이런 누락을 테스트에서 발견하고, 문서 설명을 컨트롤러의 요청 처리 코드와 분리하고자 했습니다.
 
 기존 컨트롤러 테스트에 요청과 응답의 설명을 추가해 문서를 생성하고, Swagger UI로 제공했습니다.[^1][^2] 이 글에서는 그 과정을 따라가며 REST Docs가 문서의 어떤 부분까지 검증하는지, 문서 생성을 배포에 연결할 때 무엇을 고려해야 하는지 살펴봅니다.
 
@@ -26,7 +26,7 @@ public ResponseEntity<BookSearchResponse> search(
 
 컨트롤러에는 요청 처리와 입력값 검증을 두고, 요청과 응답의 설명은 테스트에 작성했습니다.
 
-`springdoc-openapi`는 Spring 코드와 애노테이션을 바탕으로 OpenAPI 명세를 만들고, Swagger UI는 그 명세를 화면에 보여 줍니다. 책췍에서는 테스트 결과를 바탕으로 만든 명세를 Swagger UI로 제공했습니다.[^2][^5]
+`springdoc-openapi`는 Spring 코드와 애노테이션을 바탕으로 OpenAPI 명세를 만들고, Swagger UI는 그 명세를 화면에 보여 줍니다. 이 프로젝트에서는 테스트 결과를 바탕으로 만든 명세를 Swagger UI로 제공했습니다.[^2][^5]
 
 ## 3 웹 계층 테스트 구성
 
@@ -106,7 +106,7 @@ private static final FieldDescriptor[] BOOK_SEARCH_RESPONSE_FIELDS = {
 
 ## 5 필드 문서화의 검증 범위와 한계
 
-책췍의 검색 응답을 고정 JSON으로 반환하는 별도 예제에서 응답은 그대로 두고 문서화 정의만 바꿔 검증 범위를 확인했습니다. 코드와 실행 환경은 [부록](#부록)에 정리했습니다.
+도서 검색 API의 응답을 고정 JSON으로 반환하는 별도 예제에서 응답은 그대로 두고 문서화 정의만 바꿔 검증 범위를 확인했습니다. 코드와 실행 환경은 [부록](#부록)에 정리했습니다.
 
 | 실행한 변경 | 결과 | 확인한 범위 |
 | --- | --- | --- |
@@ -134,7 +134,7 @@ The following parts of the payload were not documented:
 
 ## 6 스니펫의 OpenAPI 변환과 Swagger UI 배포
 
-스니펫 파일만 생성한 상태에서는 클라이언트 개발자가 읽을 문서 화면이 아직 없습니다. 책췍에서는 ePages의 `restdocs-api-spec`을 사용해 스니펫의 정보를 OpenAPI 3.0.1 명세로 모으고, 그 명세를 Swagger UI에 연결했습니다. Spring REST Docs의 스니펫 생성과 OpenAPI 변환은 서로 다른 단계입니다.[^2][^7]
+스니펫 파일만 생성한 상태에서는 클라이언트 개발자가 읽을 문서 화면이 아직 없습니다. ePages의 `restdocs-api-spec`을 사용해 스니펫의 정보를 OpenAPI 3.0.1 명세로 모으고, 그 명세를 Swagger UI에 연결했습니다. Spring REST Docs의 스니펫 생성과 OpenAPI 변환은 서로 다른 단계입니다.[^2][^7]
 
 [PR #23](https://github.com/woowacourse-teams/2026-chaekchaek/pull/23)에서는 `document()`의 `import`를 ePages의 `MockMvcRestDocumentationWrapper`로 바꾸고, `resource()`에 요약과 태그 등의 정보를 추가했습니다. 응답 필드 배열을 재사용하면서 기존 `responseFields()`도 유지했습니다. 아래는 해당 `resource()` 부분의 핵심만 발췌한 코드입니다.
 
