@@ -14,7 +14,7 @@ AWS 콘솔에서 서버와 네트워크를 구성해 서비스를 배포했다�
 
 **IaC**(Infrastructure as Code)는 인프라 구성을 코드로 정의하고 그 코드를 사용해 자원을 관리하는 방식입니다. 서버 사양과 자원 사이의 연결을 코드에 담고, Git으로 변경 이력을 남기며 코드 리뷰를 하는 개발 방식을 인프라에도 적용할 수 있습니다.
 
-Terraform은 IaC를 구현하는 도구 중 하나로, [2014년 처음 공개될 때부터](https://www.hashicorp.com/en/blog/terraform-announcement) AWS의 서버나 다른 서비스의 DNS처럼 여러 서비스의 자원을 코드로 표현하고 함께 구성하는 것을 목표로 제시했습니다.
+Terraform은 IaC를 구현하는 도구 중 하나입니다. HashiCorp는 [2014년 Terraform을 처음 공개할 때부터](https://www.hashicorp.com/en/blog/terraform-announcement) AWS의 서버나 다른 서비스의 DNS처럼 여러 서비스의 자원을 코드로 표현하고 함께 구성하는 것을 목표로 제시했습니다.
 
 Terraform에서는 “이 서브넷에 이 사양의 EC2가 있어야 한다”처럼 **원하는 결과를 선언**합니다. Terraform은 관리 중인 자원을 확인해 그 구성을 만들기 위한 작업을 계획합니다. 코드 저장만으로 인프라가 바뀌지는 않으며, 계획을 검토하고 적용하는 단계가 따로 있습니다.
 
@@ -26,7 +26,7 @@ Terraform에서는 “이 서브넷에 이 사양의 EC2가 있어야 한다”�
 
 *그림 1. 구성 요소 사이의 관계. 화살표는 실행 순서가 아니라 정보와 요청이 오가는 관계를 나타냅니다.*
 
-그림 제작: AI 도구 활용  |  참고 자료: [Provider](https://developer.hashicorp.com/terraform/language/providers), [State](https://developer.hashicorp.com/terraform/language/state/purpose)
+그림 제작: AI 도구(Codex) 활용  |  참고 자료: [Provider](https://developer.hashicorp.com/terraform/language/providers), [State](https://developer.hashicorp.com/terraform/language/state/purpose)
 
 [**Provider**](https://developer.hashicorp.com/terraform/language/providers)는 Terraform과 서비스의 API를 연결하는 플러그인입니다. AWS Provider는 EC2와 VPC 같은 자원 타입을 제공하며, 이 자원들을 조회하거나 변경하는 기능을 구현합니다. Terraform이 작업을 조율하면 Provider가 서비스별 API를 호출합니다.
 
@@ -52,7 +52,7 @@ Terraform으로 인프라를 관리하는 기본 작업 흐름은 [**Write → P
 
 *그림 2. 예시의 AWS 구성. 상자는 포함 관계, 화살표는 보안 그룹의 연결을 나타냅니다. 생성 순서나 트래픽 경로를 나타내는 그림은 아닙니다.*
 
-그림 제작: AI 도구 활용  |  참고 자료: [AWS VPC](https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html)
+그림 제작: AI 도구(Codex) 활용  |  참고 자료: [AWS VPC](https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html)
 
 이 예시는 네 자원의 관계를 설명하는 발췌이며, 완성된 배포 구성은 아닙니다. 인터넷 접속 경로와 통신 규칙, 애플리케이션 배포, 일부 변수와 Provider 설정은 생략했습니다. 이미지 ID와 인스턴스 ID는 가상 값이고, Plan은 필요한 부분만 재구성했습니다.
 
@@ -97,7 +97,7 @@ resource "aws_instance" "app" {
 
 `subnet_id`와 `vpc_security_group_ids`는 EC2에 연결할 서브넷과 보안 그룹을 참조합니다. `Name` 태그는 이 EC2의 이름을 `prod-app`으로 표시합니다.
 
-[**입력 변수**](https://developer.hashicorp.com/terraform/language/values/variables)인 `var.ami_id`와 `var.instance_type`은 다른 자원의 속성 대신 구성에 전달한 값을 사용합니다. 처음에는 EC2를 시작할 이미지인 [**AMI**](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html)(Amazon Machine Image)의 ID로 `ami-0123456789abcdef0`(가상 값), 사양으로 `t3.micro`를 사용합니다.
+[**입력 변수**](https://developer.hashicorp.com/terraform/language/values/variables)로 전달받은 AMI ID와 사양은 각각 `var.ami_id`와 `var.instance_type`으로 참조합니다. 처음에는 EC2를 시작할 이미지인 [**AMI**](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html)(Amazon Machine Image)의 ID로 `ami-0123456789abcdef0`(가상 값), 사양으로 `t3.micro`를 사용합니다.
 
 ### 참조가 생성 순서로 이어지는 방식
 
@@ -107,7 +107,7 @@ resource "aws_instance" "app" {
 
 *그림 3. 먼저 필요한 자원에서 그것을 참조하는 자원으로 화살표를 그린 의존 관계 도식입니다. Terraform 내부 그래프의 전체 출력은 아닙니다.*
 
-그림 제작: AI 도구 활용  |  참고 자료: [Terraform 참조 규칙](https://developer.hashicorp.com/terraform/language/expressions/references), 본문 코드
+그림 제작: AI 도구(Codex) 활용  |  참고 자료: [Terraform 참조 규칙](https://developer.hashicorp.com/terraform/language/expressions/references), 본문 코드
 
 VPC 다음에는 서브넷과 보안 그룹을 준비하고, 둘을 만든 뒤 EC2를 만들 수 있습니다. 서브넷과 보안 그룹 사이에는 이 코드가 만든 선후 관계가 없습니다. Terraform은 자원 사이의 [의존 관계에 따라 실행 순서를 정합니다](https://developer.hashicorp.com/terraform/internals/graph). `.tf` 파일에 블록을 적은 순서는 실행 순서에 영향을 주지 않습니다.
 
@@ -197,7 +197,7 @@ Plan: 0 to add, 1 to change, 0 to destroy.
 
 ### 이미지를 바꾸는 경우
 
-이번에는 `terraform.tfvars`의 `ami_id` 값을 바꿔, 처음 생성한 EC2에 다른 이미지를 지정한다고 가정하겠습니다. 이 사례에서는 [**EBS**(Elastic Block Store) 볼륨으로 부팅하는 EC2](https://docs.aws.amazon.com/us_en/AWSEC2/latest/UserGuide/ComponentsAMIs.html)에 호환되는 다른 AMI를 지정합니다. EBS는 EC2에 연결하는 블록 스토리지입니다.
+이번에는 `terraform.tfvars`의 `ami_id` 값을 바꿔, 처음 생성한 EC2에 다른 이미지를 지정한다고 가정하겠습니다. 이 사례에서는 [**EBS**](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ComponentsAMIs.html)(Elastic Block Store) 볼륨으로 부팅하는 EC2에 호환되는 다른 AMI를 지정합니다. EBS는 EC2에 연결하는 블록 스토리지입니다.
 
 ```hcl
 ami_id = "ami-0fedcba9876543210"
@@ -223,11 +223,11 @@ Plan: 1 to add, 0 to change, 1 to destroy.
 
 ### 코드 밖에서 설정을 바꾼 경우
 
-코드를 수정하지 않아도 Plan에 변경 작업이 나타날 수 있습니다. AWS 콘솔에서 EC2의 Name 태그를 `prod-app`에서 `manual-name`으로 바꾸었다고 가정하겠습니다. 코드에는 여전히 `prod-app`이 적혀 있습니다.
+코드를 수정하지 않아도 Plan에 변경 작업이 나타날 수 있습니다. AWS 콘솔에서 EC2의 `Name` 태그를 `prod-app`에서 `manual-name`으로 바꾸었다고 가정하겠습니다. 코드에는 여전히 `prod-app`이 적혀 있습니다.
 
 | 코드에서 원하는 값 | AWS에서 조회한 현재 값 | Plan이 제안하는 변경 |
 | --- | --- | --- |
-| `prod-app` | `manual-name` | Name 태그를 `prod-app`으로 수정 |
+| `prod-app` | `manual-name` | `Name` 태그를 `prod-app`으로 수정 |
 
 코드 밖에서 설정을 바꿔 실제 자원과 선언한 구성이 달라지는 현상을 드리프트(drift)라고 합니다. 이 예시의 기본 Plan은 코드에 적힌 값으로 되돌리는 작업을 제안합니다. 콘솔에서 바꾼 이름을 유지하려면 그 의도를 코드에도 반영해야 합니다. 실제 변경은 Apply에서 일어나며, Terraform이 계속 실행되면서 자동으로 복구하는 것은 아닙니다.
 
@@ -256,7 +256,7 @@ Plan: 1 to add, 0 to change, 1 to destroy.
 
 *그림 4. 공통 구성을 재사용하되 환경별 자원과 관리 정보를 구분하는 예시입니다.*
 
-그림 제작: AI 도구 활용  |  참고 자료: [Module](https://developer.hashicorp.com/terraform/language/modules)
+그림 제작: AI 도구(Codex) 활용  |  참고 자료: [Module](https://developer.hashicorp.com/terraform/language/modules)
 
 **기존 코드를 옮길 때:** 하위 Module로 옮기면 자원 주소도 바뀝니다. 같은 실제 자원을 계속 관리하도록 이전 주소와 새 주소를 연결하는 방법은 [Module 리팩터링 문서](https://developer.hashicorp.com/terraform/language/modules/develop/refactoring)를 참고하세요.
 
@@ -270,7 +270,7 @@ Plan: 1 to add, 0 to change, 1 to destroy.
 
 *그림 5. 같은 prod 구성의 작업자가 원격 State를 공유하는 구조입니다. 잠금을 지원하고 사용하도록 구성한 Backend를 가정합니다.*
 
-그림 제작: AI 도구 활용  |  참고 자료: [Backend](https://developer.hashicorp.com/terraform/language/backend), [State 잠금](https://developer.hashicorp.com/terraform/language/state/locking)
+그림 제작: AI 도구(Codex) 활용  |  참고 자료: [Backend](https://developer.hashicorp.com/terraform/language/backend), [State 잠금](https://developer.hashicorp.com/terraform/language/state/locking)
 
 동시 작업도 조정해야 합니다. 지원하는 Backend에서 [**State 잠금**](https://developer.hashicorp.com/terraform/language/state/locking)을 사용하면 State에 영향을 주는 Terraform 작업의 동시 진행을 막을 수 있습니다. 잠금을 얻지 못한 작업은 진행하지 않지만, AWS 콘솔이나 다른 도구의 자원 변경까지 막지는 않습니다.
 
