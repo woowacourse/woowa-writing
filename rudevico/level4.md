@@ -6,19 +6,19 @@
 
 ## 1 REST Docs 도입 배경
 
-저는 책 감상을 기록하고 공유하는 서비스 ‘책췍’에 REST Docs를 적용했어요. 컨트롤러에는 요청 처리 코드를 두고, API 문서 설명은 분리하고 싶었어요. 또 응답 필드를 추가하거나 바꾸면서 문서화를 빠뜨리면 테스트에서 발견할 수 있길 바랐어요.
+저는 책 감상을 기록하고 공유하는 서비스 ‘책췍’에 REST Docs를 적용했습니다. 컨트롤러에는 요청 처리 코드를 두고, API 문서 설명은 분리하고 싶었습니다. 또 응답 필드를 추가하거나 바꾸면서 문서화를 빠뜨리면 테스트에서 발견하고 싶었습니다.
 
-도서 검색 API에는 이미 `MockMvc` 테스트가 있었어요. `MockMvc`는 실제 서버를 띄우지 않고 Spring MVC의 요청 처리와 응답을 테스트하는 도구예요.
+도서 검색 API에는 이미 `MockMvc` 테스트가 있었습니다. `MockMvc`는 실제 서버를 띄우지 않고 Spring MVC의 요청 처리와 응답을 테스트하는 도구입니다.
 
-REST Docs를 이 테스트에 연결하면 문서 설명을 테스트에 작성하고, 테스트 응답과 문서화한 필드 목록을 대조할 수 있었어요. 그래서 기존 `MockMvc` 테스트에 REST Docs를 적용하기로 했어요.[^1][^2]
+REST Docs를 이 테스트에 연결하면 문서 설명을 테스트에 작성하고, 테스트 응답과 문서화한 필드 목록을 대조할 수 있었습니다. 그래서 기존 `MockMvc` 테스트에 REST Docs를 적용하기로 했습니다.[^1][^2]
 
-문서화를 추가하면서 테스트 코드가 늘었고, 배포 과정도 달라졌어요. CD에서 테스트를 생략했다가 문서 조각인 스니펫이 없어 빌드가 실패하기도 했어요.
+문서화를 추가하면서 테스트 코드가 늘었고, 배포 과정도 달라졌습니다. CD에서 테스트를 생략했다가 문서 조각인 스니펫이 없어 빌드가 실패하기도 했습니다.
 
-이 글에서는 도서 검색 API의 문서 생성부터 Swagger UI 배포까지 살펴볼 거예요. 응답 필드의 문서화 누락을 잡는 과정과 검증의 한계, 문서 생성을 배포에 연결하며 겪은 문제를 다뤄요. Spring MVC와 `MockMvc` 테스트, Swagger를 이용한 문서화 경험이 있는 개발자를 대상으로 해요.
+이 글에서는 도서 검색 API의 문서 생성부터 Swagger UI 배포까지 살펴봅니다. 응답 필드의 문서화 누락을 잡는 과정과 검증의 한계, 문서 생성을 배포에 연결하며 겪은 문제를 다룹니다. Spring MVC와 `MockMvc` 테스트, Swagger를 이용한 문서화 경험이 있는 개발자를 대상으로 합니다.
 
 ## 2 컨트롤러의 요청 처리 코드와 문서화 정보
 
-도서 검색은 검색어와 페이지 번호를 받아 결과를 반환해요. 다음은 문서화 이후에도 유지된 검색 메서드예요.[^1]
+도서 검색은 검색어와 페이지 번호를 받아 결과를 반환합니다. 다음은 문서화 이후에도 유지된 검색 메서드입니다.[^1]
 
 ```java
 @GetMapping("/api/v1/books")
@@ -30,13 +30,13 @@ public ResponseEntity<BookSearchResponse> search(
 }
 ```
 
-컨트롤러에는 요청 처리와 입력값 검증을 두고, 요청과 응답의 설명은 테스트에 작성했어요.
+컨트롤러에는 요청 처리와 입력값 검증을 두고, 요청과 응답의 설명은 테스트에 작성했습니다.
 
-`springdoc-openapi`는 Spring 코드와 애노테이션을 바탕으로 OpenAPI 명세를 만들고, Swagger UI는 그 명세를 화면에 보여 줘요. 책췍에서는 테스트 결과를 바탕으로 만든 명세를 Swagger UI로 제공했어요.[^2][^5]
+`springdoc-openapi`는 Spring 코드와 애노테이션을 바탕으로 OpenAPI 명세를 만들고, Swagger UI는 그 명세를 화면에 보여 줍니다. 책췍에서는 테스트 결과를 바탕으로 만든 명세를 Swagger UI로 제공했습니다.[^2][^5]
 
 ## 3 웹 계층 테스트 구성
 
-초기 도입 커밋의 테스트 구성은 다음과 같아요.[^1]
+초기 도입 커밋의 테스트 구성은 다음과 같습니다.[^1]
 
 ```java
 @WebMvcTest(BookController.class)
@@ -50,13 +50,13 @@ class BookControllerTest {
 }
 ```
 
-웹 계층만 구성하고, 검색 서비스는 Mockito 대역으로 바꿔요. 대역이 반환할 값을 정한 뒤 컨트롤러의 요청 처리와 응답 직렬화 결과를 확인해요. 외부 도서 API 연동이나 DB 조회의 정확성은 별도 통합 테스트에서 확인해야 해요.
+웹 계층만 구성하고, 검색 서비스는 Mockito 대역으로 바꿉니다. 대역이 반환할 값을 정한 뒤 컨트롤러의 요청 처리와 응답 직렬화 결과를 확인합니다. 외부 도서 API 연동이나 DB 조회의 정확성은 별도 통합 테스트에서 확인해야 합니다.
 
-`@AutoConfigureRestDocs`는 이 테스트의 요청과 응답을 문서화할 수 있도록 `MockMvc`와 REST Docs를 연결해요.[^4]
+`@AutoConfigureRestDocs`는 이 테스트의 요청과 응답을 문서화할 수 있도록 `MockMvc`와 REST Docs를 연결합니다.[^4]
 
 ## 4 요청과 응답 문서화, 스니펫 생성
 
-기존 검색 성공 테스트는 검색 서비스의 반환값을 준비하고, `query=마션`과 `page=1`로 요청한 뒤 상태 코드와 JSON 값을 확인해요. REST Docs를 도입하면서 이 검증을 지우지 않았어요. 마지막에 `document()`를 연결해 스니펫을 생성했어요. 아래는 추가한 부분을 중심으로 줄인 코드예요.[^1]
+기존 검색 성공 테스트는 검색 서비스의 반환값을 준비하고, `query=마션`과 `page=1`로 요청한 뒤 상태 코드와 JSON 값을 확인합니다. REST Docs를 도입하면서 이 검증을 지우지 않았습니다. 마지막에 `document()`를 연결해 스니펫을 생성했습니다. 아래는 추가한 부분을 중심으로 줄인 코드입니다.[^1]
 
 ```java
 mockMvc.perform(get("/api/v1/books")
@@ -74,7 +74,7 @@ mockMvc.perform(get("/api/v1/books")
     ));
 ```
 
-`queryParameters()`에는 쿼리 파라미터 설명을, `responseFields()`에는 응답 본문의 필드 설명을 전달해요. `BOOK_SEARCH_RESPONSE_FIELDS`는 다음과 같은 `FieldDescriptor` 배열이에요. 아래에는 일부만 발췌했으며, 실제 테스트에는 11개 필드를 모두 정의했어요.
+`queryParameters()`에는 쿼리 파라미터 설명을, `responseFields()`에는 응답 본문의 필드 설명을 전달합니다. `BOOK_SEARCH_RESPONSE_FIELDS`는 다음과 같은 `FieldDescriptor` 배열입니다. 아래에는 일부만 발췌했으며, 실제 테스트에는 11개 필드를 모두 정의했습니다.
 
 ```java
 private static final FieldDescriptor[] BOOK_SEARCH_RESPONSE_FIELDS = {
@@ -90,11 +90,11 @@ private static final FieldDescriptor[] BOOK_SEARCH_RESPONSE_FIELDS = {
 };
 ```
 
-`items[].title`은 배열 안의 도서 제목을 가리켜요. `jsonPath()`의 값 검증과 필드 문서화는 역할이 달라요. 앞의 검증은 준비한 값이 응답에 담겼는지 확인하고, 뒤의 문서화는 실행된 응답과 필드 목록을 대조해요. 설명 문구는 개발자가 직접 작성해요.
+`items[].title`은 배열 안의 도서 제목을 가리킵니다. `jsonPath()`의 값 검증과 필드 문서화는 역할이 다릅니다. 앞의 검증은 준비한 값이 응답에 담겼는지 확인하고, 뒤의 문서화는 실행된 응답과 필드 목록을 대조합니다. 설명 문구는 개발자가 직접 작성합니다.
 
-`backend` 디렉터리에서 `./gradlew test --tests '*BookControllerTest'`를 실행하면 `build/generated-snippets/book-search` 아래에 스니펫이 생성돼요.[^1]
+`backend` 디렉터리에서 `./gradlew test --tests '*BookControllerTest'`를 실행하면 `build/generated-snippets/book-search` 아래에 스니펫이 생성됩니다.[^1]
 
-아래는 같은 응답 구조를 사용한 재현 예제에서 생성한 `response-fields.adoc`의 일부예요.
+아래는 같은 응답 구조를 사용한 재현 예제에서 생성한 `response-fields.adoc`의 일부입니다.
 
 ```asciidoc
 |===
@@ -112,7 +112,7 @@ private static final FieldDescriptor[] BOOK_SEARCH_RESPONSE_FIELDS = {
 
 ## 5 필드 문서화의 검증 범위와 한계
 
-책췍의 검색 응답을 고정 JSON으로 반환하는 별도 예제로 검증 범위를 확인했어요. 응답은 그대로 두고 문서화 정의만 바꿔 테스트했어요. 코드와 실행 환경은 [부록](#부록)에 정리했어요.
+책췍의 검색 응답을 고정 JSON으로 반환하는 별도 예제로 검증 범위를 확인했습니다. 응답은 그대로 두고 문서화 정의만 바꿔 테스트했습니다. 코드와 실행 환경은 [부록](#부록)에 정리했습니다.
 
 | 실행한 변경 | 결과 | 확인한 범위 |
 | --- | --- | --- |
@@ -120,7 +120,7 @@ private static final FieldDescriptor[] BOOK_SEARCH_RESPONSE_FIELDS = {
 | `items[].publisher`의 필드 정의 제거 | 실패 | 응답에 남은 미문서화 필드를 발견 |
 | `title` 설명을 ‘도서 가격’으로 변경 | 통과 | 설명 문장의 의미는 검증하지 않음 |
 
-`publisher`의 필드 정의를 제외한 두 번째 사례에서는 상태 코드 200 검증을 통과했지만, 문서를 생성하는 단계에서 아래 `SnippetException`이 발생했어요. 실패 메시지는 문서화되지 않은 필드가 어디인지 보여 줬어요.
+`publisher`의 필드 정의를 제외한 두 번째 사례에서는 상태 코드 200 검증을 통과했지만, 문서를 생성하는 단계에서 아래 `SnippetException`이 발생했습니다. 실패 메시지는 문서화되지 않은 필드가 어디인지 보여 줬습니다.
 
 ```text
 SnippetException:
@@ -132,17 +132,17 @@ The following parts of the payload were not documented:
 }
 ```
 
-`title`의 설명을 ‘도서 가격’으로 바꿔도 문서 생성은 성공했어요. REST Docs는 설명 문장의 뜻까지 검증하지 않으므로, 설명 문구는 필드 정의와 함께 리뷰해야 해요.
+`title`의 설명을 ‘도서 가격’으로 바꿔도 문서 생성은 성공했습니다. REST Docs는 설명 문장의 뜻까지 검증하지 않으므로, 설명 문구는 필드 정의와 함께 리뷰해야 합니다.
 
-설정도 검증 범위를 바꿔요. 기본 `responseFields()`는 문서에 없는 응답 필드나 `optional`로 표시하지 않은 필수 필드의 누락을 실패로 처리해요. `relaxedResponseFields()`를 사용하면 미문서화 필드가 있어도 허용해요. `optional()`은 해당 필드가 없는 경우를 허용하므로, ‘키가 항상 존재하며 값만 `null`일 수 있다’는 계약을 이것만으로 보장할 수는 없어요.[^6]
+설정도 검증 범위를 바꿉니다. 기본 `responseFields()`는 문서에 없는 응답 필드나 `optional`로 표시하지 않은 필수 필드의 누락을 실패로 처리합니다. `relaxedResponseFields()`를 사용하면 미문서화 필드가 있어도 허용합니다. `optional()`은 해당 필드가 없는 경우를 허용하므로, ‘키가 항상 존재하며 값만 `null`일 수 있다’는 계약을 이것만으로 보장할 수는 없습니다.[^6]
 
-초기 도입 테스트의 `nextPage`는 숫자 2였고, 뒤의 OpenAPI 연결 커밋에서는 `null` 사례와 `optional()`이 추가됐어요. 문서에 ‘마지막 페이지라면 `null`’이라고 적는 것과 그 상황을 실제로 테스트하는 것은 별개예요. 마지막 페이지와 다음 페이지가 있는 경우를 각각 준비하고, 필요한 키 존재 여부와 값 조건도 별도로 검증하는 편이 좋아요.[^1][^2]
+초기 도입 테스트의 `nextPage`는 숫자 2였고, 뒤의 OpenAPI 연결 커밋에서는 `null` 사례와 `optional()`이 추가됐습니다. 문서에 ‘마지막 페이지라면 `null`’이라고 적는 것과 그 상황을 실제로 테스트하는 것은 별개입니다. 마지막 페이지와 다음 페이지가 있는 경우를 각각 준비하고, 필요한 키 존재 여부와 값 조건도 별도로 검증하는 편이 좋습니다.[^1][^2]
 
 ## 6 스니펫의 OpenAPI 변환과 Swagger UI 배포
 
-스니펫 파일만 생성하면 클라이언트 개발자가 읽을 문서 화면은 아직 없어요. 책췍에서는 ePages의 `restdocs-api-spec`을 사용해 스니펫의 정보를 OpenAPI 3.0.1 명세로 모으고, 그 명세를 Swagger UI에 연결했어요. Spring REST Docs의 스니펫 생성과 OpenAPI 변환은 서로 다른 단계예요.[^2][^7]
+스니펫 파일만 생성한 상태에서는 클라이언트 개발자가 읽을 문서 화면이 아직 없습니다. 책췍에서는 ePages의 `restdocs-api-spec`을 사용해 스니펫의 정보를 OpenAPI 3.0.1 명세로 모으고, 그 명세를 Swagger UI에 연결했습니다. Spring REST Docs의 스니펫 생성과 OpenAPI 변환은 서로 다른 단계입니다.[^2][^7]
 
-[PR #23](https://github.com/woowacourse-teams/2026-chaekchaek/pull/23)에서는 `document()`의 `import`를 ePages의 `MockMvcRestDocumentationWrapper`로 바꾸고, `resource()`에 요약과 태그 등의 정보를 추가했어요. 응답 필드 배열을 재사용하면서 기존 `responseFields()`도 유지했어요. 아래는 해당 `resource()` 부분의 핵심만 발췌한 코드예요.
+[PR #23](https://github.com/woowacourse-teams/2026-chaekchaek/pull/23)에서는 `document()`의 `import`를 ePages의 `MockMvcRestDocumentationWrapper`로 바꾸고, `resource()`에 요약과 태그 등의 정보를 추가했습니다. 응답 필드 배열을 재사용하면서 기존 `responseFields()`도 유지했습니다. 아래는 해당 `resource()` 부분의 핵심만 발췌한 코드입니다.
 
 ```java
 import static com.epages.restdocs.apispec
@@ -158,7 +158,7 @@ resource(ResourceSnippetParameters.builder()
     .build())
 ```
 
-생성된 스니펫을 `openapi3` 태스크로 모아 `build/api-spec/openapi3.yaml`을 만들고, Swagger UI와 함께 JAR에 포함했어요. 문서 생성부터 JAR 패키징까지의 흐름은 다음과 같아요.[^2]
+생성된 스니펫을 `openapi3` 태스크로 모아 `build/api-spec/openapi3.yaml`을 만들고, Swagger UI와 함께 JAR에 포함했습니다. 문서 생성부터 JAR 패키징까지의 흐름은 다음과 같습니다.[^2]
 
 | 단계 | 입력 또는 역할 | 다음 단계에 넘기는 것 |
 | --- | --- | --- |
@@ -168,26 +168,26 @@ resource(ResourceSnippetParameters.builder()
 | `stageOpenApiSpec` | 명세를 정적 리소스 경로에 복사 | `static/docs/openapi3.yaml` |
 | `bootJar` | UI와 명세를 실행 JAR에 포함 | 배포할 애플리케이션 |
 
-이 프로젝트에서는 `bootJar`를 실행하면 테스트와 명세 생성, 검증을 거친 뒤 JAR를 만들도록 연결돼 있어요.[^9]
+이 프로젝트에서 `bootJar`를 실행하면 테스트와 명세 생성, 검증을 거친 뒤 JAR를 만듭니다.[^9]
 
-`backend` 디렉터리에서 `./gradlew clean test verifyOpenApi`로 테스트와 명세 검증을 수행할 수 있어요. 문서를 포함한 JAR를 만들 때는 `./gradlew clean bootJar`를 실행해요. 이 JAR를 배포하면 `/docs/swagger-ui.html`에서 문서를 읽을 수 있어요.
+`backend` 디렉터리에서 `./gradlew clean test verifyOpenApi`로 테스트와 명세 검증을 수행할 수 있습니다. 문서를 포함한 JAR를 만들 때는 `./gradlew clean bootJar`를 실행합니다. 이 JAR를 배포하면 `/docs/swagger-ui.html`에서 문서를 읽을 수 있습니다.
 
 ## 7 문서화 코드 증가와 배포 시 테스트 재실행
 
-REST Docs를 적용하면서 컨트롤러는 그대로였지만, 테스트에는 요청과 응답을 설명하는 코드가 추가됐어요.[^1][^2]
+REST Docs를 적용하면서 컨트롤러는 그대로였지만, 테스트에는 요청과 응답을 설명하는 코드가 추가됐습니다.[^1][^2]
 
 | 측정 대상 | 도입 전 | REST Docs 추가 | OpenAPI 연결 |
 | --- | --- | --- | --- |
 | 검색 성공 테스트 메서드 | 38줄 | 46줄 | 60줄 |
 | 검색 컨트롤러 파일 전체 | 26줄 | 26줄 | 26줄 |
 
-문서화 코드는 한 번 작성하고 끝나지 않아요. 응답 필드를 추가하면 테스트 데이터, 값 검증, 필드 설명을 함께 살펴야 해요.
+문서화 코드는 한 번 작성하고 끝나지 않습니다. 응답 필드를 추가하면 테스트 데이터, 값 검증, 필드 설명을 함께 살펴야 합니다.
 
 ### 스니펫 누락에 따른 CD 빌드 실패와 수정
 
-CD에서 `bootJar`를 만들다가 `openapi3` 단계가 실패한 적도 있어요.[^3] 당시 CI와 CD는 서로 다른 실행 환경에서 동작했어요. CI에서 업로드한 파일은 테스트 보고서였고, CD에는 스니펫이나 JAR를 내려받는 단계가 없었어요.[^10]
+CD에서 `bootJar`를 만들다가 `openapi3` 단계가 실패한 적도 있습니다.[^3] 당시 CI와 CD는 서로 다른 실행 환경에서 동작했습니다. CI에서 업로드한 파일은 테스트 보고서였고, CD에는 스니펫이나 JAR를 내려받는 단계가 없었습니다.[^10]
 
-그런데 CD에서는 CI에서 테스트를 마쳤다는 이유로 `-x test` 옵션을 사용했어요. 스니펫을 전달받지도, 테스트로 새로 만들지도 않은 상태라 명세 생성에 필요한 입력이 없었어요.
+그런데 CD에서는 CI에서 테스트를 마쳤다는 이유로 `-x test` 옵션을 사용했습니다. 스니펫을 전달받지도, 테스트로 새로 만들지도 않은 상태라 명세 생성에 필요한 입력이 없었습니다.
 
 ```bash
 # 변경 전
@@ -197,13 +197,13 @@ CD에서 `bootJar`를 만들다가 `openapi3` 단계가 실패한 적도 있어�
 ./gradlew clean bootJar --no-daemon
 ```
 
-[PR #62](https://github.com/woowacourse-teams/2026-chaekchaek/pull/62)에서 CD도 테스트를 실행해 스니펫을 생성하도록 바꾸면서 빌드 실패를 해결했어요. 다만 CI에서 통과한 테스트를 CD에서 다시 실행하게 됐어요.
+[PR #62](https://github.com/woowacourse-teams/2026-chaekchaek/pull/62)에서 CD도 테스트를 실행해 스니펫을 생성하도록 바꾸면서 빌드 실패를 해결했습니다. 다만 CI에서 통과한 테스트를 CD에서 다시 실행하게 됐습니다.
 
 ## 8 적용 결과와 남은 배포 과제
 
-응답에 문서화하지 않은 필드가 있으면 테스트에서 발견할 수 있게 됐어요. 다만 설명의 뜻은 여전히 사람이 검토해야 해요.
+응답에 문서화하지 않은 필드가 있으면 테스트에서 발견할 수 있게 됐습니다. 다만 설명의 뜻은 여전히 사람이 검토해야 합니다.
 
-배포에서는 스니펫 누락을 해결하려고 CD에서도 테스트를 실행하면서 중복 실행이 생겼어요. 이를 줄이기 위해 CI에서 문서를 포함한 JAR를 만들고 검증한 뒤, 같은 산출물을 CD에서 배포하는 방식을 검토할 수 있어요.
+배포에서는 스니펫 누락을 해결하려고 CD에서도 테스트를 실행하면서 중복 실행이 생겼습니다. 이를 줄이기 위해 CI에서 문서를 포함한 JAR를 만들고 검증한 뒤, 같은 산출물을 CD에서 배포하는 방식을 검토할 수 있습니다.
 
 ## 부록
 
@@ -217,20 +217,20 @@ CD에서 `bootJar`를 만들다가 `openapi3` 단계가 실패한 적도 있어�
 
 ### 프로젝트 설정과 실행 환경
 
-본문의 프로젝트 예시는 Java 21, Spring Boot 4.1.0 기준이에요. 전체 테스트와 Gradle 설정은 REST Docs 도입 커밋과 OpenAPI 연결 커밋에서 확인할 수 있어요.[^1][^2]
+본문의 프로젝트 예시는 Java 21, Spring Boot 4.1.0 기준입니다. 전체 테스트와 Gradle 설정은 REST Docs 도입 커밋과 OpenAPI 연결 커밋에서 확인할 수 있습니다.[^1][^2]
 
-OpenAPI 변환에는 `com.epages.restdocs-api-spec` 플러그인과 테스트용 `restdocs-api-spec-mockmvc` 의존성 0.20.1을 사용했어요. 생성 명세는 OpenAPI 3.0.1 형식이에요.[^2][^7]
+OpenAPI 변환에는 `com.epages.restdocs-api-spec` 플러그인과 테스트용 `restdocs-api-spec-mockmvc` 의존성 0.20.1을 사용했습니다. 생성 명세는 OpenAPI 3.0.1 형식입니다.[^2][^7]
 
 ### 재현 코드와 실행 환경
 
-재현 예제는 Java 21, Gradle 9.5.1, Spring Framework 7.0.8, Spring REST Docs 4.0.1에서 실행했어요.
+재현 예제는 Java 21, Gradle 9.5.1, Spring Framework 7.0.8, Spring REST Docs 4.0.1에서 실행했습니다.
 
 <details>
 <summary>5장의 독립 재현 코드와 실행 결과</summary>
 
-고정 JSON을 반환하는 `MockMvc` 컨트롤러에 문서화를 연결한 예제예요. `main()`에서 세 사례를 실행하고, `work/probe-snippets`에 스니펫을 생성해요.
+고정 JSON을 반환하는 `MockMvc` 컨트롤러에 문서화를 연결한 예제입니다. `main()`에서 세 사례를 실행하고, `work/probe-snippets`에 스니펫을 생성합니다.
 
-Java 21과 Gradle 9.5.1이 설치된 환경에서 빈 디렉터리에 다음 `build.gradle`을 만들어요.
+Java 21과 Gradle 9.5.1이 설치된 환경에서 빈 디렉터리에 다음 `build.gradle`을 만듭니다.
 
 ```groovy
 plugins {
@@ -256,7 +256,7 @@ application {
 }
 ```
 
-아래 Java 코드를 `src/main/java/DocsProbe.java`에 저장해요.
+아래 Java 코드를 `src/main/java/DocsProbe.java`에 저장합니다.
 
 ```java
 import java.util.*;
@@ -331,7 +331,7 @@ public class DocsProbe {
 }
 ```
 
-`build.gradle`이 있는 디렉터리에서 실행해요.
+`build.gradle`이 있는 디렉터리에서 실행합니다.
 
 ```bash
 gradle run
