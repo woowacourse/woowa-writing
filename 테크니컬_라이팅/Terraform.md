@@ -1,6 +1,6 @@
 # AWS 예시로 이해하는 Terraform: 필요한 이유와 동작 원리
 
-친구의 프로젝트에 참여하면서 이름만 들어 봤던 Terraform을 직접 다루게 됐습니다. Vercel에 배포한 홈페이지에 도메인을 연결해야 했는데, 이미 Terraform으로 인프라를 관리하던 프로젝트라 DNS 레코드도 코드로 추가해야 했습니다. AI의 도움으로 작업은 해결했지만, 이를 계기로 Terraform이 어떻게 동작하는지 더 알고 싶어졌습니다.
+친구의 프로젝트에 참여하면서 이름만 들어 봤던 Terraform을 직접 다루게 됐습니다. 웹 애플리케이션 배포 플랫폼인 Vercel에 올린 홈페이지에 도메인을 연결해야 했는데, 이미 Terraform으로 인프라를 관리하던 프로젝트라 DNS 레코드도 코드로 추가해야 했습니다. AI의 도움으로 작업은 해결했지만, 이를 계기로 Terraform이 어떻게 동작하는지 더 알고 싶어졌습니다.
 
 [Terraform](https://developer.hashicorp.com/terraform/intro)은 원하는 인프라 구성을 코드로 표현하고, 그 구성에 맞게 자원을 생성하거나 변경하는 도구입니다. **원하는 구성을 코드로 적으면, Terraform은 실제 자원을 어떻게 만들고 계속 관리할까요?**
 
@@ -193,7 +193,7 @@ instance_type = "t3.small"
 Plan: 0 to add, 1 to change, 0 to destroy.
 ```
 
-`~`는 기존 자원을 수정한다는 뜻입니다. 여기서는 EC2를 새로 만들지 않고 기존 인스턴스의 사양을 바꾸므로 ID를 유지합니다. 다만 **기존 자원을 수정한다는 것이 무중단을 뜻하지는 않습니다.** AWS Provider는 이 사양 변경을 위해 [EC2를 정지한 뒤 다시 시작합니다](https://github.com/hashicorp/terraform-provider-aws/blob/main/website/docs/r/instance.html.markdown). Plan을 검토할 때는 작업 종류와 함께 서비스 중단 여부도 확인해야 합니다.
+`~`는 기존 자원을 수정한다는 뜻입니다. 여기서는 EC2를 새로 만들지 않고 기존 인스턴스의 사양을 바꾸므로 ID를 유지합니다. 다만 **기존 자원을 수정한다는 것이 무중단을 뜻하지는 않습니다.** AWS Provider는 이 사양 변경을 위해 [EC2를 정지한 뒤 다시 시작합니다](https://github.com/hashicorp/terraform-provider-aws/blob/main/website/docs/r/instance.html.markdown). Plan의 작업 표시만으로는 서비스 중단 여부를 판단할 수 없으므로, Provider 문서와 실제 서비스 구성도 함께 확인해야 합니다.
 
 ### 이미지를 바꾸는 경우
 
@@ -217,7 +217,7 @@ ami_id = "ami-0fedcba9876543210"
 Plan: 1 to add, 0 to change, 1 to destroy.
 ```
 
-`-/+`는 기존 자원을 삭제하고 새로 생성한다는 뜻입니다. 기존 EC2를 없애고 다른 AMI로 새 EC2를 만들기 때문에 ID도 새로 정해집니다. 이 예시에는 생성과 삭제의 순서를 바꾸는 별도 설정이 없습니다.
+`-/+`는 기존 자원을 먼저 삭제한 뒤 새로 생성한다는 뜻입니다. 이 예시에는 순서를 바꾸는 별도 설정이 없어, 기존 EC2를 삭제한 뒤 다른 AMI로 새 EC2를 만듭니다. ID도 새로 정해집니다. 이 EC2 하나로 서비스를 운영한다면, 기존 인스턴스가 삭제된 뒤 새 인스턴스에서 애플리케이션이 준비될 때까지 서비스가 중단됩니다.
 
 사양을 바꿀 때는 기존 EC2를 수정하도록, AMI를 바꿀 때는 교체하도록 계획했습니다. 어떤 속성을 제자리에서 바꿀 수 있는지는 자원과 Provider의 규칙에 따라 달라지므로, 적용 전에 Plan의 작업 종류와 대상을 확인해야 합니다.
 
@@ -250,7 +250,7 @@ Plan: 1 to add, 0 to change, 1 to destroy.
 | `vpc_cidr` | `10.20.0.0/16` | `10.30.0.0/16` |
 | `subnet_cidr` | `10.20.1.0/24` | `10.30.1.0/24` |
 
-이 예시에서는 prod와 dev용 작업 디렉터리에서 같은 Module을 불러오고, 각각 별도의 State를 사용하도록 설정합니다. 같은 State에서 입력값만 바꾸면 새 환경을 추가하는 대신 기존 환경의 자원을 변경할 수 있습니다. Module 자체가 State를 분리해 주지는 않습니다.
+이 예시에서는 prod와 dev용 작업 디렉터리에서 같은 Module을 불러오고, 각각 별도의 State를 사용하도록 설정합니다. 기존 prod의 State를 사용한 채 dev용 입력값으로 Plan을 만들면, 새 dev 환경을 추가하는 대신 prod 자원을 변경하는 계획이 나올 수 있습니다. 이를 그대로 Apply하면 운영 환경이 의도치 않게 바뀔 수 있습니다. Module 자체가 State를 분리해 주지는 않습니다.
 
 ![](assets/04-environments.png)
 
