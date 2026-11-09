@@ -2,7 +2,7 @@
 
 한창 백엔드 애플리케이션을 개발하던 중 동료가 불만을 제시했습니다.
 
-> *AI가 너무 느려! 쉬운 작업인데 왜 이렇게 오래 걸리는거야?*
+> *AI가 너무 느려! 쉬운 작업인데 왜 이렇게 오래 걸리는 거야?*
 
 저도 의아했습니다.
 설계와 계획은 이미 끝났고, 지금 AI가 하는 작업은 길어도 **30분이면 끝날 단순 구현 작업**이었기 때문입니다.
@@ -14,7 +14,7 @@ AI는 총 50분 35초나 걸려서 작업을 마쳤고, 저는 AI에게 "왜 이
 > *전체 작업 50분 35초 중, 테스트 실행에만 23분 11초를 소모했습니다.*
 
 AI의 답변은 충격적이었습니다.
-저는 **작업 속도가 느린 원인이 AI의 성능이 아니라 코드 구조에 있다** 판단했고, 즉시 테스트 코드를 살펴봤습니다.
+저는 **작업 속도가 느린 원인이 AI의 성능이 아니라 코드 구조에 있다고** 판단했고, 즉시 테스트 코드를 살펴봤습니다.
 
 # 의도는 좋으나 성능은 나쁜 코드
 
@@ -41,7 +41,7 @@ class ClubServiceTest {
 저희의 서비스 테스트는 위처럼 `@DataJpaTest`와 `@Import`를 사용하고 있었습니다.
 테스트에 필요한 빈만 최소한으로 등록해, **테스트가 무관한 빈에 의존하지 않게 만들겠다**는 의도였죠.
 
-이 때, **`@Import`로 서로 다른 빈을 추가**하는게 문제였습니다.
+이때, **`@Import`로 서로 다른 빈을 추가**하는 게 문제였습니다.
 
 # 왜 느렸죠?
 
@@ -59,14 +59,14 @@ class ClubServiceTest {
 
 Spring이 애플리케이션을 실행하려면 애플리케이션에 필요한 객체를 만들고 관리하는 공간이 필요합니다.
 이 공간을 `ApplicationContext`라고 부릅니다.
-Spring은 `ApplicationContext`를 생성할 때 설정을 읽고 필요한 객체를 모두 생성해 의존관계를 연결하는 초기화 작업을 수행하므로, `ApplicationContext`를 생성하는 작업은 다른 작업에 비해 무겁습니다.
+Spring은 `ApplicationContext`를 생성할 때 설정을 읽고 필요한 객체를 모두 생성해 의존 관계를 연결하는 초기화 작업을 수행하므로, `ApplicationContext`를 생성하는 작업은 다른 작업에 비해 무겁습니다.
 
 Spring의 TestContext 프레임워크는 **같은 구성을 사용하는 테스트마다 `ApplicationContext`를 한 번만 만들고 재사용**합니다.
 덕분에, `ApplicationContext`를 띄우는 무거운 작업은 한 번만 수행하면서 여러 테스트를 실행할 수 있죠.
 
 여기서 "같은 구성을 사용하는가?"를 결정하는 기준을 **Context Cache Key**라고 부르고, Context Cache Key는 다음과 같은 설정들로 구성됩니다.
 
-| 구성요소 | 설명 |
+| 구성 요소 | 설명 |
 | --- | --- |
 | `locations` | 컨텍스트를 구성할 XML 등 설정 리소스의 위치 |
 | `classes` | 컨텍스트를 구성할 설정 클래스 목록 |
@@ -79,7 +79,7 @@ Spring의 TestContext 프레임워크는 **같은 구성을 사용하는 테스�
 | `propertySourceProperties` | 테스트에 직접 지정한 프로퍼티 값 |
 | `resourceBasePath` | 웹 애플리케이션 리소스의 기준 경로 |
 
-문제는, `@Import`**로 어떤 빈을 추가했는지까지 Context Cache Key에 반영**된다는거였습니다.
+문제는, `@Import`**로 어떤 빈을 추가했는지까지 Context Cache Key에 반영**된다는 거였습니다.
 
 ```java
 @DataJpaTest
@@ -104,7 +104,7 @@ class ClubServiceTest {
 }
 ```
 
-저희는 서비스 테스트 클래스마다 서로 다른 빈을 `Import`하고 있었으니, 전체 테스트를 돌릴 때 마다 **서비스 테스트 클래스 개수만큼의** `ApplicationContext`**가 추가로 생성**되고 있었습니다.
+저희는 서비스 테스트 클래스마다 서로 다른 빈을 `Import`하고 있었으니, 전체 테스트를 돌릴 때마다 **서비스 테스트 클래스 개수만큼의** `ApplicationContext`**가 추가로 생성**되고 있었습니다.
 
 저희의 경우, 서비스 테스트를 위해 8개의 `ApplicationContext`를 추가로 생성하고 있었습니다.
 
@@ -175,7 +175,7 @@ abstract class MySqlJpaTest {
 이를 Singleton Container Pattern이라고 합니다.
 
 이러면 `ApplicationContext`를 새로 생성해도 MySQL 컨테이너는 재사용하니, 지금 `ApplicationContext` 생성이 오래 걸리는 원인 중 하나는 제거할 수 있습니다.
-하지만, 저희는 애시당초 `ApplicationContext`를 불필요하게 여러 번 생성하는게 근본적인 문제라고 판단했기에 Singleton Container Pattern을 고려하지 않았습니다.
+하지만, 저희는 애당초 `ApplicationContext`를 불필요하게 여러 번 생성하는 게 근본적인 문제라고 판단했기에 Singleton Container Pattern을 고려하지 않았습니다.
 
 ...
 
@@ -197,7 +197,7 @@ H2도 매력적이었지만, 저희는 계속 MySQL로 테스트하기로 결정
 
 ## 3. `@Import`를 통일하자
 
-테스트마다 `@Import` 설정이 달라 `ApplicationContext`를 재사용하지 못하는게 근본적인 문제니, `@Import` 설정을 통일해야 했습니다.
+테스트마다 `@Import` 설정이 달라 `ApplicationContext`를 재사용하지 못하는 게 근본적인 문제니, `@Import` 설정을 통일해야 했습니다.
 
 저희는 다음 2가지 방법 중 어떤 방법을 선택할지 고민했습니다.
 
@@ -265,7 +265,7 @@ class CommentServiceTest {
 따라서, "**앞으로의 유지보수에 어떤 방식이 유리한가?**"를 가장 중요한 가치로 설정했습니다.
 
 이에 따라, **구조가 가장 간단하고 유지보수가 간편한 `@SpringBootTest` 방식을 선택**했습니다.
-이 때, 무관한 빈에 의해 문제가 발생할 가능성은 낮다고 판단했기에, 단점이 크지 않다 판단했습니다.
+이때, 무관한 빈에 의해 문제가 발생할 가능성은 낮다고 판단했기에, 단점이 크지 않다고 판단했습니다.
 
 # 개선 전후 비교
 
@@ -284,7 +284,7 @@ class CommentServiceTest {
 저희의 사고 흐름을 요약하면 다음과 같습니다.
 
 1. 테스트 속도가 느리다
-2. `ApplicationContext`를 재사용하지 못하고 매번 생성하는게 문제다
+2. `ApplicationContext`를 재사용하지 못하고 매번 생성하는 게 문제다
 3. `ApplicationContext`가 생성될 때 MySQL 컨테이너까지 생성하니 더 오래 걸린다
 4. 인메모리 DB를 사용해볼까? → 운영 환경과 테스트 환경을 최대한 일치해야 하니 사용하지 않는다
 5. `@Import`를 통일하자 → 구조가 간단하고 유지보수하기 쉬운 `@SpringBootTest`로 통일하자
