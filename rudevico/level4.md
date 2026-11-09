@@ -108,7 +108,7 @@ private static final FieldDescriptor[] BOOK_SEARCH_RESPONSE_FIELDS = {
 
 문서화 테스트가 통과하면 어디까지 믿을 수 있을까요? 이를 구분하려고 책췍의 초기 검색 응답 구조와 11개 필드 설명을 사용한 별도 재현 예제를 실행했어요. 고정 JSON을 반환하는 `MockMvc` 독립 컨트롤러에 문서화를 연결했으며, 운영 서버나 실제 검색 서비스를 호출한 결과는 아니에요. 기준 사례에서는 11개 필드를 모두 정의했어요. 두 번째 사례는 `fieldWithPath("items[].publisher")`로 시작하는 정의를 제외했고, 세 번째는 목록을 복원한 뒤 `title`의 `.description("도서 제목")`만 `.description("도서 가격")`으로 바꿨어요. 각 사례는 같은 고정 응답을 별도로 문서화했어요.
 
-실행 환경은 Java 21, Spring Framework 7.0.8, Spring REST Docs 4.0.1이에요. [부록의 재현 코드](#재현-코드)에서 고정 응답과 세 가지 변경을 확인할 수 있어요. 상태 코드 200을 확인한 뒤 `queryParameters()`와 `responseFields()`를 연결하고, 동일한 응답에 대해 필드 정의를 제거하거나 설명 문구를 바꿨을 때의 결과를 비교했어요.
+실행 환경은 Java 21, Spring Framework 7.0.8, Spring REST Docs 4.0.1이에요. [부록의 재현 코드](#부록)에서 고정 응답과 세 가지 변경을 확인할 수 있어요. 상태 코드 200을 확인한 뒤 `queryParameters()`와 `responseFields()`를 연결하고, 동일한 응답에 대해 필드 정의를 제거하거나 설명 문구를 바꿨을 때의 결과를 비교했어요.
 
 기준 사례에서 생성된 `response-fields.adoc`의 일부예요. 필드 정의에 적은 경로, 타입, 설명이 문서의 각 열로 이어져요.
 
@@ -236,7 +236,7 @@ PR #62에서는 CD에서 필요한 파일을 다시 만드는 쪽을 선택했�
 
 다음 개선 과제는 이 중복 실행을 줄이는 거예요. CI에서 문서를 포함한 JAR를 만들고 검증한 뒤, 그 산출물을 그대로 배포하는 방식을 검토할 수 있어요. 코드와 문서가 같은 변경을 반영하도록 유지하면서, 이미 확인한 결과를 다음 단계에서도 활용하는 방향이에요.
 
-### 재현 코드
+## 부록
 
 <details>
 <summary>5장의 독립 재현 코드와 실행 결과</summary>
@@ -251,6 +251,7 @@ import org.springframework.restdocs.snippet.SnippetException;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.bind.annotation.*;
+
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
@@ -258,6 +259,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 public class DocsProbe {
+
     @RestController
     static class SearchController {
         @GetMapping(value="/api/v1/books", produces="application/json")
@@ -271,6 +273,7 @@ public class DocsProbe {
             """;
         }
     }
+
     static List<FieldDescriptor> fields(boolean omitPublisher, boolean wrongDescription) {
         var result = new ArrayList<FieldDescriptor>();
         result.add(fieldWithPath("totalCount").type(JsonFieldType.NUMBER).description("검색 결과의 전체 도서 수"));
@@ -286,6 +289,7 @@ public class DocsProbe {
         if (!omitPublisher) result.add(fieldWithPath("items[].publisher").type(JsonFieldType.STRING).description("출판사"));
         return result;
     }
+
     public static void main(String[] args) throws Exception {
         var docs = new ManualRestDocumentation("work/probe-snippets");
         MockMvc mvc = MockMvcBuilders.standaloneSetup(new SearchController())
