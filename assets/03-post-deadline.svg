@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="700" viewBox="0 0 700 220" role="img" aria-labelledby="title">
+<rect x="0" y="0" width="700" height="220" fill="#ffffff"/>
+<title id="title">POST 도중에도 입력의 대기 시간은 흐른다</title>
+<style>text { font-family: 'PingFang SC', 'Microsoft YaHei', 'Noto Sans CJK SC', 'Apple SD Gothic Neo', system-ui, sans-serif; }</style>
+<defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="2" refY="4" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L8,4 L0,8 L2,4 z" fill="#64748b"/></marker></defs>
+<text x="350.0" y="34" text-anchor="middle" font-size="16" font-weight="600" fill="#1e293b">POST 도중에도 입력의 대기 시간은 흐른다</text>
+<path d="M227,89 L239,89" fill="none" stroke="#64748b" stroke-width="1.25" marker-end="url(#arrow)"/>
+<path d="M455,89 L467,89" fill="none" stroke="#64748b" stroke-width="1.25" marker-end="url(#arrow)"/>
+<!-- Box x=22, y=62, right=222, bottom=116; next sibling gap=28. -->
+<rect x="22" y="62" width="200" height="54" rx="6" fill="#dbeafe" stroke="#3b82f6" stroke-width="1"/>
+<text x="122.0" y="84.2" text-anchor="middle" font-size="12" font-weight="400" fill="#1e40af">기존 입력 수용</text>
+<text x="122.0" y="102.2" text-anchor="middle" font-size="12" font-weight="400" fill="#1e40af">550ms</text>
+<!-- Box x=250, y=62, right=450, bottom=116; next sibling gap=28. -->
+<rect x="250" y="62" width="200" height="54" rx="6" fill="#fef3c7" stroke="#f59e0b" stroke-width="1"/>
+<text x="350.0" y="84.2" text-anchor="middle" font-size="12" font-weight="400" fill="#b45309">POST 종료와 최소 간격</text>
+<text x="350.0" y="102.2" text-anchor="middle" font-size="12" font-weight="400" fill="#b45309">1,100ms</text>
+<!-- Box x=478, y=62, right=678, bottom=116; next sibling gap=28. -->
+<rect x="478" y="62" width="200" height="54" rx="6" fill="#fce7f3" stroke="#ec4899" stroke-width="1"/>
+<text x="578.0" y="84.2" text-anchor="middle" font-size="12" font-weight="400" fill="#9d174d">500ms를 다시 기다림</text>
+<text x="578.0" y="102.2" text-anchor="middle" font-size="12" font-weight="400" fill="#9d174d">1,600ms 전송</text>
+<path d="M227,171 L239,171" fill="none" stroke="#64748b" stroke-width="1.25" marker-end="url(#arrow)"/>
+<path d="M455,171 L467,171" fill="none" stroke="#64748b" stroke-width="1.25" marker-end="url(#arrow)"/>
+<!-- Box x=22, y=144, right=222, bottom=198; next sibling gap=28. -->
+<rect x="22" y="144" width="200" height="54" rx="6" fill="#dbeafe" stroke="#3b82f6" stroke-width="1"/>
+<text x="122.0" y="166.2" text-anchor="middle" font-size="12" font-weight="400" fill="#1e40af">수정 후 입력 수용</text>
+<text x="122.0" y="184.2" text-anchor="middle" font-size="12" font-weight="400" fill="#1e40af">550ms</text>
+<!-- Box x=250, y=144, right=450, bottom=198; next sibling gap=28. -->
+<rect x="250" y="144" width="200" height="54" rx="6" fill="#fef3c7" stroke="#f59e0b" stroke-width="1"/>
+<text x="350.0" y="166.2" text-anchor="middle" font-size="12" font-weight="400" fill="#b45309">POST 종료와 최소 간격</text>
+<text x="350.0" y="184.2" text-anchor="middle" font-size="12" font-weight="400" fill="#b45309">1,100ms</text>
+<!-- Box x=478, y=144, right=678, bottom=198; next sibling gap=28. -->
+<rect x="478" y="144" width="200" height="54" rx="6" fill="#d1fae5" stroke="#22c55e" stroke-width="1"/>
+<text x="578.0" y="166.2" text-anchor="middle" font-size="12" font-weight="400" fill="#166534">대기 종료 1,050ms 경과</text>
+<text x="578.0" y="184.2" text-anchor="middle" font-size="12" font-weight="400" fill="#166534">1,100ms 전송</text>
+</svg>

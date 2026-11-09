@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="784" viewBox="0 0 784 138" role="img" aria-labelledby="title">
+<rect x="0" y="0" width="784" height="138" fill="#ffffff"/>
+<title id="title">나중에 도착한 응답이 최신 상태라는 보장은 없다</title>
+<style>text { font-family: 'PingFang SC', 'Microsoft YaHei', 'Noto Sans CJK SC', 'Apple SD Gothic Neo', system-ui, sans-serif; }</style>
+<defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="2" refY="4" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L8,4 L0,8 L2,4 z" fill="#64748b"/></marker></defs>
+<text x="392.0" y="34" text-anchor="middle" font-size="16" font-weight="600" fill="#1e293b">나중에 도착한 응답이 최신 상태라는 보장은 없다</text>
+<path d="M191,89 L203,89" fill="none" stroke="#64748b" stroke-width="1.25" marker-end="url(#arrow)"/>
+<path d="M383,89 L395,89" fill="none" stroke="#64748b" stroke-width="1.25" marker-end="url(#arrow)"/>
+<path d="M575,89 L587,89" fill="none" stroke="#64748b" stroke-width="1.25" marker-end="url(#arrow)"/>
+<!-- Box x=22, y=62, right=186, bottom=116; next sibling gap=28. -->
+<rect x="22" y="62" width="164" height="54" rx="6" fill="#d1fae5" stroke="#22c55e" stroke-width="1"/>
+<text x="104.0" y="84.2" text-anchor="middle" font-size="12" font-weight="400" fill="#166534">A 저장 확인</text>
+<text x="104.0" y="102.2" text-anchor="middle" font-size="12" font-weight="400" fill="#166534">화면 101</text>
+<!-- Box x=214, y=62, right=378, bottom=116; next sibling gap=28. -->
+<rect x="214" y="62" width="164" height="54" rx="6" fill="#fef3c7" stroke="#f59e0b" stroke-width="1"/>
+<text x="296.0" y="84.2" text-anchor="middle" font-size="12" font-weight="400" fill="#b45309">전체 GET 시작</text>
+<text x="296.0" y="102.2" text-anchor="middle" font-size="12" font-weight="400" fill="#b45309">A까지 조회한다고 가정</text>
+<!-- Box x=406, y=62, right=570, bottom=116; next sibling gap=28. -->
+<rect x="406" y="62" width="164" height="54" rx="6" fill="#d1fae5" stroke="#22c55e" stroke-width="1"/>
+<text x="488.0" y="84.2" text-anchor="middle" font-size="12" font-weight="400" fill="#166534">B 저장 확인</text>
+<text x="488.0" y="102.2" text-anchor="middle" font-size="12" font-weight="400" fill="#166534">화면 102</text>
+<!-- Box x=598, y=62, right=762, bottom=116; next sibling gap=28. -->
+<rect x="598" y="62" width="164" height="54" rx="6" fill="#fce7f3" stroke="#ec4899" stroke-width="1"/>
+<text x="680.0" y="84.2" text-anchor="middle" font-size="12" font-weight="400" fill="#9d174d">이전 GET의 101 도착</text>
+<text x="680.0" y="102.2" text-anchor="middle" font-size="12" font-weight="400" fill="#9d174d">적용 보류로 증가분 보존</text>
+</svg>
