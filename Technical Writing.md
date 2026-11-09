@@ -1,18 +1,15 @@
 # S3에 업로드된 이미지는 바로 공개해도 될까?
 
 > Presigned URL 업로드와 서비스 공개 사이에 이미지 검증 파이프라인을 만든 과정을 소개합니다.
-> 
 
-!image-validation-hero.png
+![S3 이미지 업로드와 공개 전 검증을 표현한 대표 이미지](https://pysun.notion.site/image/attachment%3A0eedaaa2-4666-474c-aef7-91dfd1868886%3Aimage-validation-hero.png?table=block&id=541cbeb9-e98e-4e5c-9e00-f10aa9dc3a98&spaceId=e11ea574-f7d4-4d97-8ab8-0c0da4f8dcbc&width=2000&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
-<aside>
-💡
+*출처: ChatGPT로 생성한 AI 이미지입니다.*
 
-이 글의 핵심
-
-S3에 파일이 저장된 시점과 서비스에서 공개할 수 있는 시점은 다릅니다. 실제 파일의 내용과 처리 비용을 검증하고, 처리 결과를 게시물 상태와 연결해야 합니다.
-
-</aside>
+> [!NOTE]
+> **이 글의 핵심**
+>
+> S3에 파일이 저장된 시점과 서비스에서 공개할 수 있는 시점은 다릅니다. 실제 파일의 내용과 처리 비용을 검증하고, 처리 결과를 게시물 상태와 연결해야 합니다.
 
 사진 업로드 기능은 단순해 보입니다. 사용자가 사진을 선택하고 S3에 업로드한 뒤, 게시물에 이미지 주소를 연결하는 흐름입니다. 하지만 파일을 저장하는 일과 다른 사용자에게 보여 주는 일 사이에는 한 가지 질문이 남습니다.
 
@@ -22,7 +19,13 @@ S3에 파일이 저장된 시점과 서비스에서 공개할 수 있는 시점�
 
 이 글에서는 Presigned URL로 직접 업로드한 파일을 어떤 기준으로 검증했는지 살펴봅니다. 확장자·MIME Type·파일 시그니처·이미지 디코딩의 역할을 비교하고, 찰캌에 적용한 검증·변환·상태 관리 흐름을 소개합니다. 마지막으로 이 구조로 해결한 범위와 운영에서 더 확인해야 할 부분을 짚어봅니다.
 
-- 목차
+## 목차
+
+- [1. S3 업로드 성공이 보장하는 범위](#1-s3-업로드-성공이-보장하는-범위)
+- [2. 이미지인지 확인하는 네 가지 방법](#2-이미지인지-확인하는-네-가지-방법)
+- [3. 검증을 통과한 결과만 게시물에 연결하기](#3-검증을-통과한-결과만-게시물에-연결하기)
+- [4. 적용 결과와 추가 검증 과제](#4-적용-결과와-추가-검증-과제)
+- [5. 검증 수준을 정할 때 고려할 점](#5-검증-수준을-정할-때-고려할-점)
 
 ## 1. S3 업로드 성공이 보장하는 범위
 
@@ -32,7 +35,7 @@ S3에 파일이 저장된 시점과 서비스에서 공개할 수 있는 시점�
 
 찰캌에서는 Presigned URL을 이용했습니다. API 서버가 업로드할 객체의 키와 만료 시간 등을 정해 URL을 발급하면, 클라이언트가 그 URL로 S3에 직접 파일을 전송하는 방식입니다. 이미지 바이트가 API 서버를 지나지 않도록 하기 위한 선택이었습니다.
 
-이때 S3 업로드 성공은 허용된 요청으로 객체가 저장됐다는 뜻입니다. 업로드한 데이터가 서비스에서 처리할 수 있는 사진인지까지 확인했다는 뜻은 아닙니다. Presigned URL은 일정 시간 동안 특정 작업을 허용하는 수단입니다. AWS Presigned URL 문서
+이때 S3 업로드 성공은 허용된 요청으로 객체가 저장됐다는 뜻입니다. 업로드한 데이터가 서비스에서 처리할 수 있는 사진인지까지 확인했다는 뜻은 아닙니다. Presigned URL은 일정 시간 동안 특정 작업을 허용하는 수단입니다. [AWS Presigned URL 문서](https://docs.aws.amazon.com/AmazonS3/latest/userguide/using-presigned-url.html)
 
 예를 들어 다음 파일은 서로 다른 이유로 문제가 될 수 있습니다.
 
@@ -66,7 +69,9 @@ S3에 파일이 저장된 시점과 서비스에서 공개할 수 있는 시점�
 
 ## 2. 이미지인지 확인하는 네 가지 방법
 
-!photo-inspection.png
+![사진 파일을 검사하는 과정을 표현한 이미지](https://pysun.notion.site/image/attachment%3A24765edf-9756-47e3-a6c5-29e1a799e2fb%3Aphoto-inspection.png?table=block&id=3105f799-f32d-491b-af12-24ab438803ca&spaceId=e11ea574-f7d4-4d97-8ab8-0c0da4f8dcbc&width=2000&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+
+*출처: ChatGPT로 생성한 AI 이미지입니다.*
 
 ### 확장자: 사용자가 붙인 이름
 
@@ -82,7 +87,7 @@ MIME Type은 데이터 형식을 나타내는 값입니다. HTTP의 `Content-Typ
 
 클라이언트가 `Content-Type: image/webp`를 보내면 WebP를 올리겠다고 선언한 것입니다. 이 값은 파일 내용을 해석한 결과와 다릅니다. 업로더가 다른 바이트를 보내면서도 같은 헤더를 사용할 수 있기 때문입니다.
 
-찰캌의 Presigned PUT은 `Content-Type`을 서명에 포함합니다. 따라서 업로드 요청은 발급 시 정한 헤더 값에 맞춰야 합니다. 하지만 그 값으로 업로드했다는 사실이 실제 WebP임을 보장하지는 않습니다. **헤더를 고정하는 것과 파일 내용을 검사하는 것은 서로 다른 검증입니다.** AWS Presigned 업로드 문서
+찰캌의 Presigned PUT은 `Content-Type`을 서명에 포함합니다. 따라서 업로드 요청은 발급 시 정한 헤더 값에 맞춰야 합니다. 하지만 그 값으로 업로드했다는 사실이 실제 WebP임을 보장하지는 않습니다. **헤더를 고정하는 것과 파일 내용을 검사하는 것은 서로 다른 검증입니다.** [AWS Presigned 업로드 문서](https://docs.aws.amazon.com/AmazonS3/latest/userguide/PresignedUrlUploadObject.html)
 
 여기서 ‘MIME 검증’이라는 표현도 구분할 필요가 있습니다. 요청 헤더를 검사하는지, 바이트를 분석하는 라이브러리로 형식을 추정하는지에 따라 확인하는 대상이 달라집니다.
 
@@ -92,13 +97,13 @@ MIME Type은 데이터 형식을 나타내는 값입니다. HTTP의 `Content-Typ
 
 이 단계는 확장자만 바꾼 파일을 거르는 데 도움이 됩니다. 하지만 일부 패턴이 일치한다고 전체 파일이 올바른 것은 아닙니다. 앞부분만 형식에 맞추거나 뒷부분이 손상된 파일도 있기 때문입니다.
 
-OWASP도 확장자, `Content-Type`, 파일 시그니처 중 하나만 신뢰하지 않고 여러 검사를 함께 적용하도록 안내합니다. 특히 업로더가 지정하는 `Content-Type`과 우회 가능한 시그니처 검사를 단독 보안 기준으로 사용하지 말라고 설명합니다. OWASP File Upload Cheat Sheet
+OWASP도 확장자, `Content-Type`, 파일 시그니처 중 하나만 신뢰하지 않고 여러 검사를 함께 적용하도록 안내합니다. 특히 업로더가 지정하는 `Content-Type`과 우회 가능한 시그니처 검사를 단독 보안 기준으로 사용하지 말라고 설명합니다. [OWASP File Upload Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/File_Upload_Cheat_Sheet.html)
 
 ### 이미지 디코딩: 실제 픽셀로 읽어 보기
 
 이미지 디코딩은 압축되거나 인코딩된 파일을 픽셀 데이터로 해석하는 과정입니다. 이름이나 형식의 단서를 확인하는 데서 나아가, 서비스가 파일의 내용을 실제로 읽을 수 있는지 확인합니다.
 
-여기서 **파일의 형식·가로·세로 정보를 읽는 것과 픽셀 데이터를 디코딩하는 것은 다릅니다.** 이미지 처리기에 따라 파일 정보만 먼저 읽고 픽셀은 나중에 해석할 수 있습니다. 따라서 기본 정보를 읽는 데 성공했더라도, 실제 픽셀을 읽는 과정에서 손상이 드러날 수 있습니다. 이미지 파일 로딩과 픽셀 읽기
+여기서 **파일의 형식·가로·세로 정보를 읽는 것과 픽셀 데이터를 디코딩하는 것은 다릅니다.** 이미지 처리기에 따라 파일 정보만 먼저 읽고 픽셀은 나중에 해석할 수 있습니다. 따라서 기본 정보를 읽는 데 성공했더라도, 실제 픽셀을 읽는 과정에서 손상이 드러날 수 있습니다. [이미지 파일 로딩과 픽셀 읽기](https://pillow.readthedocs.io/en/stable/reference/open_files.html)
 
 찰캌에서는 형식 판별만으로 검증을 끝내지 않고, 실제 디코딩을 거쳐 서비스에서 사용할 결과 이미지를 만들도록 했습니다. 구체적인 구현 방법은 언어와 라이브러리마다 다르지만, **형식 정보만 확인한 상태와 실제 내용을 해석한 상태를 구분해야 한다**는 기준은 같습니다.
 
@@ -145,13 +150,13 @@ JPEG, PNG, WebP를 지원하는 것은 각각 다른 요구사항입니다. 사�
 
 예를 들어 6,000 × 4,000 이미지는 2,400만 픽셀로, 찰캌의 픽셀 상한인 2,500만 픽셀을 통과합니다. 그런데도 픽셀당 4바이트로 계산한 버퍼 하나만 약 96MB, 약 91.6MiB입니다. 이 값은 실제 사용량을 측정한 결과가 아니라 단순 계산입니다. 디코더 내부 버퍼, 회전 과정의 복사본, 인코딩 버퍼까지 포함하면 메모리 사용량은 달라집니다.
 
-!RGBA 버퍼 1개를 픽셀당 4바이트로 계산한 예시입니다. 실제 프로세스 메모리나 성능 개선 측정 결과가 아닙니다.
+![픽셀 수에 따른 RGBA 버퍼 메모리 계산 예시](https://pysun.notion.site/image/attachment%3Ab5b9bd8b-bda7-42a4-a217-3425317f2534%3Amemory-budget.png?table=block&id=63fdd95b-6f5f-4bf7-a425-e80cd91598ee&spaceId=e11ea574-f7d4-4d97-8ab8-0c0da4f8dcbc&width=2000&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
-RGBA 버퍼 1개를 픽셀당 4바이트로 계산한 예시입니다. 실제 프로세스 메모리나 성능 개선 측정 결과가 아닙니다.
+*RGBA 버퍼 1개를 픽셀당 4바이트로 계산한 예시입니다. 실제 프로세스 메모리나 성능 개선 측정 결과가 아닙니다.*
 
 그래서 다운로드할 파일의 바이트 수와 디코딩할 이미지의 픽셀 수를 따로 제한했습니다. 저장소가 알려 주는 객체 크기와 실제 읽은 바이트를 확인하고, 이미지 정보를 읽을 수 있는 단계에서는 픽셀 상한을 검사합니다. 제한을 초과한 입력에 불필요한 다운로드·디코딩·변환 작업을 이어 가지 않기 위해서입니다.
 
-작은 압축 파일이 큰 픽셀 데이터로 확장되는 입력은 처리 자원을 고갈시킬 수 있습니다. 따라서 이미지 처리기의 기본 보호 기능을 유지하면서 서비스의 픽셀 상한과 실행 환경의 메모리·시간 제한을 함께 고려해야 합니다. 픽셀 수가 한도 안에 있어도 처리 시간이 오래 걸리는 입력은 남을 수 있습니다. 이미지 처리기의 자원 고갈 위험과 보호 방법
+작은 압축 파일이 큰 픽셀 데이터로 확장되는 입력은 처리 자원을 고갈시킬 수 있습니다. 따라서 이미지 처리기의 기본 보호 기능을 유지하면서 서비스의 픽셀 상한과 실행 환경의 메모리·시간 제한을 함께 고려해야 합니다. 픽셀 수가 한도 안에 있어도 처리 시간이 오래 걸리는 입력은 남을 수 있습니다. [이미지 처리기의 자원 고갈 위험과 보호 방법](https://pillow.readthedocs.io/en/stable/handbook/security.html)
 
 클라이언트의 용량 검사는 사용자 경험을 위한 사전 검사이며, 서버 측 검증을 대신할 수는 없습니다. 찰캌의 Presigned PUT 구성은 업로드 헤더를 고정하지만 최대 용량을 강제하지는 않습니다. 클라이언트에 용량 상한을 안내하는 것만으로 저장소의 제한이 되는 것은 아닙니다. 따라서 큰 파일이 일단 저장된 뒤 처리 단계에서 거절될 수 있다는 한계가 있습니다.
 
@@ -159,111 +164,113 @@ RGBA 버퍼 1개를 픽셀당 4바이트로 계산한 예시입니다. 실제 �
 
 찰캌은 검증을 통과한 입력을 그대로 결과 이미지 저장 경로로 복사하지 않았습니다. 디코딩한 픽셀을 바탕으로 결과 이미지와 썸네일을 다시 만들었습니다.
 
-!입력 조건 확인부터 디코딩·메타데이터 처리·결과 저장까지 이어지는 검증 흐름입니다.
+![이미지 검증과 변환 판단 흐름도](https://pysun.notion.site/image/attachment%3A449dd371-f5fa-40bb-adc2-49f828912b0b%3Avalidation-flow.png?table=block&id=6b554f89-b34f-4b5a-a150-e9371b78a683&spaceId=e11ea574-f7d4-4d97-8ab8-0c0da4f8dcbc&width=2000&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
-입력 조건 확인부터 디코딩·메타데이터 처리·결과 저장까지 이어지는 검증 흐름입니다.
+*입력 조건 확인부터 디코딩·메타데이터 처리·결과 저장까지 이어지는 검증 흐름입니다.*
 
-- 검증 흐름도 Mermaid 원본
-    
-    ```mermaid
-    flowchart TD
-        INPUT["S3 staging의 입력 파일"] --> SIZE{"파일 크기가 5 MiB 이하입니까?"}
-        SIZE -->|예| FORMAT{"실제 형식이 WebP입니까?"}
-        FORMAT -->|예| PIXELS{"2,500만 픽셀 이하입니까?"}
-        PIXELS -->|예| FRAMES{"단일 프레임입니까?"}
-        FRAMES -->|예| DECODE{"픽셀 디코딩에 성공했습니까?"}
-        DECODE -->|예| EXIF["필요한 EXIF 정보 추출"]
-        EXIF --> ROTATE["EXIF 방향 반영 · RGB 또는 RGBA 정규화"]
-        ROTATE --> ENCODE["메타데이터 없이 WebP 결과와 썸네일 생성"]
-        ENCODE --> STORE["두 결과 파일 저장"]
-        STORE --> SUCCESS["백엔드에 완료 콜백"]
-        SIZE -->|아니요| REJECT["입력 거절 사유를 실패 콜백으로 전달"]
-        FORMAT -->|아니요| REJECT
-        PIXELS -->|아니요| REJECT
-        FRAMES -->|아니요| REJECT
-        DECODE -->|아니요| REJECT
-    ```
-    
+<details>
+<summary>검증 흐름도 Mermaid 원본</summary>
+
+```mermaid
+flowchart TD
+    INPUT["S3 staging의 입력 파일"] --> SIZE{"파일 크기가 5 MiB 이하입니까?"}
+    SIZE -->|예| FORMAT{"실제 형식이 WebP입니까?"}
+    FORMAT -->|예| PIXELS{"2,500만 픽셀 이하입니까?"}
+    PIXELS -->|예| FRAMES{"단일 프레임입니까?"}
+    FRAMES -->|예| DECODE{"픽셀 디코딩에 성공했습니까?"}
+    DECODE -->|예| EXIF["필요한 EXIF 정보 추출"]
+    EXIF --> ROTATE["EXIF 방향 반영 · RGB 또는 RGBA 정규화"]
+    ROTATE --> ENCODE["메타데이터 없이 WebP 결과와 썸네일 생성"]
+    ENCODE --> STORE["두 결과 파일 저장"]
+    STORE --> SUCCESS["백엔드에 완료 콜백"]
+    SIZE -->|아니요| REJECT["입력 거절 사유를 실패 콜백으로 전달"]
+    FORMAT -->|아니요| REJECT
+    PIXELS -->|아니요| REJECT
+    FRAMES -->|아니요| REJECT
+    DECODE -->|아니요| REJECT
+```
+
+</details>
 
 *입력 거절과 결과 이미지 생성 경로를 구분했습니다. 저장이나 콜백의 일시 오류는 아래에서 설명하는 재시도 대상으로 다룹니다.*
 
-EXIF에는 사진의 표시 방향을 알려 주는 정보가 포함될 수 있습니다. 이 정보를 실제 픽셀에 반영하기 전에 메타데이터부터 제거하면 사진이 누워 보일 수 있습니다. 따라서 **방향을 먼저 보정한 뒤 결과 이미지에서 불필요한 메타데이터를 제거**해야 합니다. 사진을 올바르게 표시하는 작업과 부가 정보를 제거하는 작업을 구분한 것입니다. EXIF 방향 정보와 픽셀 보정
+EXIF에는 사진의 표시 방향을 알려 주는 정보가 포함될 수 있습니다. 이 정보를 실제 픽셀에 반영하기 전에 메타데이터부터 제거하면 사진이 누워 보일 수 있습니다. 따라서 **방향을 먼저 보정한 뒤 결과 이미지에서 불필요한 메타데이터를 제거**해야 합니다. 사진을 올바르게 표시하는 작업과 부가 정보를 제거하는 작업을 구분한 것입니다. [EXIF 방향 정보와 픽셀 보정](https://pillow.readthedocs.io/en/stable/reference/ImageOps.html#PIL.ImageOps.exif_transpose)
 
 촬영 위치나 시각은 별도 데이터로 백엔드에 전달했습니다. EXIF가 없다고 사진을 거절하지는 않았습니다. 잘못된 위치나 시각은 해당 값만 버리고 이미지 처리는 계속할 수 있게 했습니다. 추출한 정보의 저장·응답·공개 범위는 이미지 파일과 별개로 관리해야 합니다.
 
 재인코딩은 출력 형식과 포함할 데이터를 서비스가 통제하기 위한 선택이었습니다. 다만 악성 입력을 완전히 무해하게 만든다는 뜻은 아닙니다. 재인코딩에 도달하기 전에 이미 디코더가 입력을 처리하고, 사진에 무엇이 찍혔는지 같은 콘텐츠 문제도 남습니다.
 
-<aside>
-⚖️
-
-재인코딩의 비용
-
-이미 손실 압축된 WebP를 다시 손실 압축하면 추가 손실이 발생할 수 있습니다. 찰캌은 회전 반영과 메타데이터 제거를 포함한 일관된 결과를 얻는 대신 이 비용을 감수했습니다. 사진 원본 보존이 핵심인 서비스라면 다른 판단이 필요합니다.
-
-</aside>
+> [!IMPORTANT]
+> **재인코딩의 비용**
+>
+> 이미 손실 압축된 WebP를 다시 손실 압축하면 추가 손실이 발생할 수 있습니다. 찰캌은 회전 반영과 메타데이터 제거를 포함한 일관된 결과를 얻는 대신 이 비용을 감수했습니다. 사진 원본 보존이 핵심인 서비스라면 다른 판단이 필요합니다.
 
 ### 전체 파이프라인에서 각 구성 요소의 역할을 나눴습니다
 
 실제 처리 흐름은 S3 이벤트에서 SQS를 거쳐 Lambda로 이어집니다. Lambda는 검증·변환·결과 저장을 수행하고 API 서버에 결과를 알립니다. API 서버는 업로드 발급과 상태 관리를 담당합니다.
 
-!Presigned 직접 업로드, S3 이벤트·SQS·Lambda 처리, 결과 저장과 관리자 승인 흐름입니다. AWS Architecture Icons를 사용한 자체 제작 도식이며 실제 콘솔 캡처는 아닙니다.
+![S3·SQS·Lambda 이미지 처리 파이프라인 아키텍처](https://pysun.notion.site/image/attachment%3A497da889-bb34-47a5-8942-d85c12d9e156%3Aarchitecture.png?table=block&id=a38493b6-40f0-49dd-a38b-05fee65b7748&spaceId=e11ea574-f7d4-4d97-8ab8-0c0da4f8dcbc&width=2000&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
-Presigned 직접 업로드, S3 이벤트·SQS·Lambda 처리, 결과 저장과 관리자 승인 흐름입니다. AWS Architecture Icons를 사용한 자체 제작 도식이며 실제 콘솔 캡처는 아닙니다.
+*Presigned 직접 업로드, S3 이벤트·SQS·Lambda 처리, 결과 저장과 관리자 승인 흐름입니다. AWS Architecture Icons를 사용한 자체 제작 도식이며 실제 콘솔 캡처는 아닙니다.*
 
-- 요청 순서와 병렬 처리를 보여 주는 Mermaid 원본
-    
-    ```mermaid
-    sequenceDiagram
-        participant C as 클라이언트
-        participant A as API 서버
-        participant S as S3
-        participant Q as SQS
-        participant L as Lambda
-    
-        C->>A: 업로드 URL 발급 요청
-        A->>A: 업로드 기록 생성 (ISSUED)
-        A-->>C: 업로드 ID와 Presigned PUT URL
-        C->>S: staging 키에 파일 직접 업로드
-        S-->>C: 업로드 응답
-    
-        par 이미지 검증과 변환
-            S-->>Q: 객체 생성 이벤트
-            Q->>L: 이벤트 전달
-            L->>S: 입력 파일 조회
-            L->>L: 형식·크기·픽셀·프레임 검증 및 변환
-            L->>S: 결과 이미지와 썸네일 조건부 저장
-            L->>A: 처리 완료 콜백
-            A->>A: 업로드 기록을 READY로 반영
-        and 게시물 생성
-            C->>A: 업로드 ID로 게시물 생성 요청
-            A->>A: 업로드 소유권과 처리 상태 확인
-        end
-    
-        Note over A: 생성과 처리 결과가 모두 반영되면 PENDING
-        Note over A: 관리자 승인 후 APPROVED 게시물만 피드에 노출
-    ```
-    
+<details>
+<summary>요청 순서와 병렬 처리를 보여 주는 Mermaid 원본</summary>
+
+```mermaid
+sequenceDiagram
+    participant C as 클라이언트
+    participant A as API 서버
+    participant S as S3
+    participant Q as SQS
+    participant L as Lambda
+
+    C->>A: 업로드 URL 발급 요청
+    A->>A: 업로드 기록 생성 (ISSUED)
+    A-->>C: 업로드 ID와 Presigned PUT URL
+    C->>S: staging 키에 파일 직접 업로드
+    S-->>C: 업로드 응답
+
+    par 이미지 검증과 변환
+        S-->>Q: 객체 생성 이벤트
+        Q->>L: 이벤트 전달
+        L->>S: 입력 파일 조회
+        L->>L: 형식·크기·픽셀·프레임 검증 및 변환
+        L->>S: 결과 이미지와 썸네일 조건부 저장
+        L->>A: 처리 완료 콜백
+        A->>A: 업로드 기록을 READY로 반영
+    and 게시물 생성
+        C->>A: 업로드 ID로 게시물 생성 요청
+        A->>A: 업로드 소유권과 처리 상태 확인
+    end
+
+    Note over A: 생성과 처리 결과가 모두 반영되면 PENDING
+    Note over A: 관리자 승인 후 APPROVED 게시물만 피드에 노출
+```
+
+</details>
 
 *이 과정에서는 완료 콜백과 게시물 생성 요청의 도착 순서가 달라질 수 있습니다. staging 키와 결과 키는 저장 경로를 구분한 것이며, 접근 권한은 별도 정책으로 제어해야 합니다.*
 
 다이어그램은 정상적으로 처리되는 경로를 보여 줍니다. 입력이 잘못된 경우에는 완료 콜백 대신 거절 사유를 담은 실패 콜백을 보내고, 일시 오류는 재시도합니다.
 
-!실제 S3 이벤트 알림 설정 중 찰캌 항목만 발췌했습니다. chalkak/staging/ 접두사에서 발생한 모든 객체 생성 이벤트의 대상이 chalkak-image-processing SQS 대기열로 설정되어 있습니다.
+![S3 staging 객체 생성 이벤트의 SQS 알림 설정](https://pysun.notion.site/image/attachment%3A0bd008fb-6cd5-4502-8f81-dd5e79586a44%3As3-staging-sqs-notification.png?table=block&id=65d64330-51ec-4866-85d9-d2360f28a78b&spaceId=e11ea574-f7d4-4d97-8ab8-0c0da4f8dcbc&width=2000&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
-실제 S3 이벤트 알림 설정 중 찰캌 항목만 발췌했습니다. chalkak/staging/ 접두사에서 발생한 모든 객체 생성 이벤트의 대상이 chalkak-image-processing SQS 대기열로 설정되어 있습니다.
+*실제 S3 이벤트 알림 설정 중 찰캌 항목만 발췌했습니다. chalkak/staging/ 접두사에서 발생한 모든 객체 생성 이벤트의 대상이 chalkak-image-processing SQS 대기열로 설정되어 있습니다.*
 
-!실제 AWS 콘솔의 chalkak-image-processor 함수 개요입니다. SQS 트리거가 연결된 것을 확인할 수 있습니다. 2026년 11월 2일 캡처.
+![SQS 트리거를 연결한 Lambda 함수 개요](https://pysun.notion.site/image/attachment%3Afc2e8d85-ce78-4238-83e1-7f91c9274a05%3Alambda-sqs-overview.png?table=block&id=c59526d7-57a6-41d1-b041-8bfc42549fe9&spaceId=e11ea574-f7d4-4d97-8ab8-0c0da4f8dcbc&width=2000&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
-실제 AWS 콘솔의 chalkak-image-processor 함수 개요입니다. SQS 트리거가 연결된 것을 확인할 수 있습니다. 2026년 11월 2일 캡처.
+*실제 AWS 콘솔의 chalkak-image-processor 함수 개요입니다. SQS 트리거가 연결된 것을 확인할 수 있습니다. 2026년 11월 2일 캡처.*
 
-- 실제 SQS 트리거 상세 설정
-    
-    !트리거 활성화, 배치 크기 1, 배치 기간 없음, 배치 항목 실패 보고 비활성 상태입니다. 계정·매핑 식별자는 가렸습니다.
-    
-    트리거 활성화, 배치 크기 1, 배치 기간 없음, 배치 항목 실패 보고 비활성 상태입니다. 계정·매핑 식별자는 가렸습니다.
-    
-    이 화면은 캡처 시점의 실제 설정입니다. 부분 배치 실패 응답을 지원하는 코드와 이벤트 소스 매핑에서 해당 기능을 활성화한 상태는 구분해야 합니다.
-    
+<details>
+<summary>실제 SQS 트리거 상세 설정</summary>
+
+![Lambda의 SQS 트리거 상세 설정](https://pysun.notion.site/image/attachment%3A133e27e4-ed18-4490-a640-80eb401e333b%3Alambda-sqs-trigger-settings.png?table=block&id=cd93a06f-fe39-4e96-958a-199e7ce82dd5&spaceId=e11ea574-f7d4-4d97-8ab8-0c0da4f8dcbc&width=2000&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+
+*트리거 활성화, 배치 크기 1, 배치 기간 없음, 배치 항목 실패 보고 비활성 상태입니다. 계정·매핑 식별자는 가렸습니다.*
+
+이 화면은 캡처 시점의 실제 설정입니다. 부분 배치 실패 응답을 지원하는 코드와 이벤트 소스 매핑에서 해당 기능을 활성화한 상태는 구분해야 합니다.
+
+</details>
 
 ### 이미지 처리 상태와 게시물 공개 상태를 분리했습니다
 
@@ -281,36 +288,38 @@ Presigned 직접 업로드, S3 이벤트·SQS·Lambda 처리, 결과 저장과 �
 
 두 종류의 상태를 나누면 이미지 처리가 끝난 것과 게시물이 공개된 것을 구분할 수 있습니다.
 
-!이미지 처리 완료(READY)와 관리자 승인 후 피드 공개(APPROVED)를 분리한 상태 전이입니다.
+![업로드 처리 상태와 게시물 공개 상태 전이도](https://pysun.notion.site/image/attachment%3A19e21e7a-2516-4e06-b5b8-0809d0b1e3d7%3Astate-flow.png?table=block&id=45817cbd-b584-40ea-b23d-44715c2df15c&spaceId=e11ea574-f7d4-4d97-8ab8-0c0da4f8dcbc&width=2000&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
-이미지 처리 완료(READY)와 관리자 승인 후 피드 공개(APPROVED)를 분리한 상태 전이입니다.
+*이미지 처리 완료(READY)와 관리자 승인 후 피드 공개(APPROVED)를 분리한 상태 전이입니다.*
 
-- 상태 전이도 Mermaid 원본
-    
-    ```mermaid
-    flowchart TD
-        subgraph UPLOAD["업로드 기록"]
-            ISSUED["ISSUED · 처리 결과 미확정"]
-            READY["READY · 처리 완료"]
-            UPLOAD_REJECTED["REJECTED · 처리 거절"]
-            ISSUED -->|검증·변환·결과 저장 성공| READY
-            ISSUED -->|입력 거절 결과 반영| UPLOAD_REJECTED
-        end
-    
-        subgraph POST["게시물"]
-            VALIDATING["VALIDATING · 이미지 처리 대기"]
-            PENDING["PENDING · 관리자 검수 대기"]
-            APPROVED["APPROVED · 피드 공개 대상"]
-            POST_REJECTED["REJECTED · 처리 실패 또는 검수 거절"]
-            VALIDATING -->|이미지 처리 성공| PENDING
-            VALIDATING -->|이미지 처리 거절| POST_REJECTED
-            PENDING -->|관리자 승인| APPROVED
-            PENDING -->|관리자 거절| POST_REJECTED
-        end
-    
-        READY -.->|이미 READY라면 게시물 생성 시 검수 대기로 연결| PENDING
-    ```
-    
+<details>
+<summary>상태 전이도 Mermaid 원본</summary>
+
+```mermaid
+flowchart TD
+    subgraph UPLOAD["업로드 기록"]
+        ISSUED["ISSUED · 처리 결과 미확정"]
+        READY["READY · 처리 완료"]
+        UPLOAD_REJECTED["REJECTED · 처리 거절"]
+        ISSUED -->|검증·변환·결과 저장 성공| READY
+        ISSUED -->|입력 거절 결과 반영| UPLOAD_REJECTED
+    end
+
+    subgraph POST["게시물"]
+        VALIDATING["VALIDATING · 이미지 처리 대기"]
+        PENDING["PENDING · 관리자 검수 대기"]
+        APPROVED["APPROVED · 피드 공개 대상"]
+        POST_REJECTED["REJECTED · 처리 실패 또는 검수 거절"]
+        VALIDATING -->|이미지 처리 성공| PENDING
+        VALIDATING -->|이미지 처리 거절| POST_REJECTED
+        PENDING -->|관리자 승인| APPROVED
+        PENDING -->|관리자 거절| POST_REJECTED
+    end
+
+    READY -.->|이미 READY라면 게시물 생성 시 검수 대기로 연결| PENDING
+```
+
+</details>
 
 *실선은 각 대상의 상태 전이이고, 점선은 먼저 확정된 업로드 결과를 게시물 생성에 반영하는 관계입니다.*
 
@@ -326,17 +335,17 @@ Presigned 직접 업로드, S3 이벤트·SQS·Lambda 처리, 결과 저장과 �
 
 한 번 검증을 통과했더라도 공개하는 바이트가 나중에 바뀐다면 검증의 의미가 줄어듭니다.
 
-Presigned URL은 기본적으로 일회용이 아닙니다. AWS 문서에 따르면 만료 전까지 여러 번 사용할 수 있고, 같은 키로 업로드하면 기존 객체를 교체할 수 있습니다. 검증한 입력 키를 그대로 공개할 때 고려해야 할 조건입니다. AWS Presigned URL 동작
+Presigned URL은 기본적으로 일회용이 아닙니다. AWS 문서에 따르면 만료 전까지 여러 번 사용할 수 있고, 같은 키로 업로드하면 기존 객체를 교체할 수 있습니다. 검증한 입력 키를 그대로 공개할 때 고려해야 할 조건입니다. [AWS Presigned URL 동작](https://docs.aws.amazon.com/AmazonS3/latest/userguide/using-presigned-url.html)
 
-찰캌은 입력을 받는 staging 키와 결과 키를 분리하고, 결과 저장 요청에 `If-None-Match: *`를 사용했습니다. 이 조건은 같은 키에 현재 객체가 이미 있으면 쓰기를 실패시킵니다. 클라이언트에는 결과 키에 쓰는 권한을 주지 않습니다. AWS 조건부 쓰기 문서
+찰캌은 입력을 받는 staging 키와 결과 키를 분리하고, 결과 저장 요청에 `If-None-Match: *`를 사용했습니다. 이 조건은 같은 키에 현재 객체가 이미 있으면 쓰기를 실패시킵니다. 클라이언트에는 결과 키에 쓰는 권한을 주지 않습니다. [AWS 조건부 쓰기 문서](https://docs.aws.amazon.com/AmazonS3/latest/userguide/conditional-writes.html)
 
 중복 처리로 이미 결과가 있을 때는 기존 결과와 이번 결과의 길이·바이트를 비교했습니다. 같으면 남은 단계를 진행하고, 다르면 충돌로 처리해 덮어쓰지 않습니다.
 
 이 조치가 원본 재업로드나 이벤트 순서 문제를 모두 해결하지는 않습니다. 다만 같은 결과 키를 다른 파일로 바꾸는 것을 막고, 이미 저장한 결과를 확인하면서 중단된 작업을 이어 가는 기준이 됩니다.
 
-!실제 S3의 chalkak/ 접두사 아래에서 staging/ 입력 경로와 posts/·signatures/ 결과 경로를 구분해 사용하고 있습니다. 2026년 11월 2일 캡처. 경로 분리 자체가 접근 제어나 덮어쓰기 방지를 증명하지는 않습니다.
+![S3 입력 경로와 결과 경로 구분](https://pysun.notion.site/image/attachment%3Ae0813c2d-5dcd-4b51-9497-fc0b6e48eb44%3As3-staging-results.png?table=block&id=2d0fc30c-b7f6-4349-9f10-c1171a8b9ee7&spaceId=e11ea574-f7d4-4d97-8ab8-0c0da4f8dcbc&width=2000&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
-실제 S3의 chalkak/ 접두사 아래에서 staging/ 입력 경로와 posts/·signatures/ 결과 경로를 구분해 사용하고 있습니다. 2026년 11월 2일 캡처. 경로 분리 자체가 접근 제어나 덮어쓰기 방지를 증명하지는 않습니다.
+*실제 S3의 chalkak/ 접두사 아래에서 staging/ 입력 경로와 posts/·signatures/ 결과 경로를 구분해 사용하고 있습니다. 2026년 11월 2일 캡처. 경로 분리 자체가 접근 제어나 덮어쓰기 방지를 증명하지는 않습니다.*
 
 ### 공개 경로의 권한은 별도로 확인해야 합니다
 
@@ -344,7 +353,7 @@ staging과 결과 키를 구분했다고 접근 제어까지 완성되지는 않
 
 이 부분은 당시 찰캌 구성의 한계였습니다. 제공받은 S3 환경이 공개 읽기였고 팀에서 그 설정을 변경하기 어려웠습니다. API에서는 승인된 게시물만 조회할 수 있도록 제한했습니다. 하지만 S3가 공개 읽기 상태였기 때문에 주소를 아는 사람의 직접 접근까지 막지는 못했습니다. API 조회 제한과 S3 객체 접근 차단은 별개의 문제입니다. 원본까지 전부 차단했다고 주장하려면 별도의 정책 확인이 필요합니다.
 
-목표로 하는 구성은 입력 원본을 비공개로 두고 처리기에 필요한 권한만 허용하며, 서비스 제공 경로에는 검증된 결과만 노출하는 방식입니다. CloudFront를 사용한다면 OAC(Origin Access Control, CloudFront가 비공개 S3 원본에 접근하도록 허용하는 기능)를 적용하는 방법이 있습니다. 다만 OAC는 CloudFront의 원본 접근을 제어하는 기능입니다. 검수 대기 파일의 조회 권한까지 자동으로 판단하지 않으므로 결과 경로의 공개 시점도 따로 설계해야 합니다. AWS CloudFront 원본 접근 제한 문서
+목표로 하는 구성은 입력 원본을 비공개로 두고 처리기에 필요한 권한만 허용하며, 서비스 제공 경로에는 검증된 결과만 노출하는 방식입니다. CloudFront를 사용한다면 OAC(Origin Access Control, CloudFront가 비공개 S3 원본에 접근하도록 허용하는 기능)를 적용하는 방법이 있습니다. 다만 OAC는 CloudFront의 원본 접근을 제어하는 기능입니다. 검수 대기 파일의 조회 권한까지 자동으로 판단하지 않으므로 결과 경로의 공개 시점도 따로 설계해야 합니다. [AWS CloudFront 원본 접근 제한 문서](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/private-content-restricting-access-to-s3.html)
 
 ## 4. 적용 결과와 추가 검증 과제
 
@@ -368,12 +377,15 @@ staging과 결과 키를 구분했다고 접근 제어까지 완성되지는 않
 | EXIF Orientation이 있는 정상 WebP | 방향 보정·재인코딩 | 방향 유지, 결과 EXIF 제거 확인 |
 | 처리 완료 전 게시물 생성 | 상태 전이 | `VALIDATING`, 피드 비노출 |
 | 결과 저장 후 같은 작업 재처리 | 조건부 저장·중복 반영 | 결과 교체와 중복 상태 변경 없음 |
-- 후속 검증 과제 · 실패 입력의 판정과 최종 상태
-    
-    이번에 확보한 실행 기록은 일반 운영 지표와 REPORT 로그입니다. 확장자 위장·손상·픽셀 상한 초과 파일을 특정 업로드 ID로 재현하고, 실패 사유와 최종 REJECTED 상태를 함께 확인한 자료는 확보하지 못했습니다.
-    
-    별도의 테스트 환경에서 입력 파일과 실행 결과를 연결해 기록해야 합니다. 운영 함수의 테스트 실행이나 새 업로드는 수행하지 않았으며, 위 표는 검증 시나리오로 유지합니다.
-    
+
+<details>
+<summary>후속 검증 과제 · 실패 입력의 판정과 최종 상태</summary>
+
+이번에 확보한 실행 기록은 일반 운영 지표와 REPORT 로그입니다. 확장자 위장·손상·픽셀 상한 초과 파일을 특정 업로드 ID로 재현하고, 실패 사유와 최종 REJECTED 상태를 함께 확인한 자료는 확보하지 못했습니다.
+
+별도의 테스트 환경에서 입력 파일과 실행 결과를 연결해 기록해야 합니다. 운영 함수의 테스트 실행이나 새 업로드는 수행하지 않았으며, 위 표는 검증 시나리오로 유지합니다.
+
+</details>
 
 손상 파일은 ‘파일 일부를 잘랐다’는 설명만으로 같은 결과를 보장하기 어렵습니다. 어느 위치를 잘랐는지, 어떤 코덱 버전을 사용하는지에 따라 반응이 달라질 수 있습니다. 테스트 파일과 라이브러리 버전을 함께 고정해야 다시 확인할 수 있습니다.
 
@@ -420,7 +432,7 @@ staging과 결과 키를 구분했다고 접근 제어까지 완성되지는 않
 
 ### 처리기의 취약점과 자원 소모는 남습니다
 
-디코딩은 검증 수단인 동시에 신뢰할 수 없는 입력을 처리하는 작업입니다. 파일 크기와 픽셀 상한을 둬도 모든 CPU·메모리 문제를 없애지는 못합니다. 사용하는 이미지 처리 라이브러리와 코덱의 업데이트, 작업 시간과 메모리 한도, 동시 처리 수를 함께 관리해야 합니다. 이미지 처리 보안 권고
+디코딩은 검증 수단인 동시에 신뢰할 수 없는 입력을 처리하는 작업입니다. 파일 크기와 픽셀 상한을 둬도 모든 CPU·메모리 문제를 없애지는 못합니다. 사용하는 이미지 처리 라이브러리와 코덱의 업데이트, 작업 시간과 메모리 한도, 동시 처리 수를 함께 관리해야 합니다. [이미지 처리 보안 권고](https://pillow.readthedocs.io/en/stable/handbook/security.html)
 
 허용 형식을 줄이면 정책을 설명하고 테스트하기 쉬워집니다. 반대로 지원 범위를 넓히면 코덱과 메타데이터, 애니메이션 처리까지 확인할 대상이 늘어납니다. 서비스에서 실제로 필요한 입력 형식과 운영 환경을 기준으로 범위를 정해야 합니다.
 
@@ -434,28 +446,30 @@ staging과 결과 키를 구분했다고 접근 제어까지 완성되지는 않
 
 ### 운영 중인 함수의 설정과 지표
 
-!실제 Lambda 일반 구성입니다. 메모리 1,024MB, 임시 저장 공간 1,024MB, 제한 시간 1분으로 설정되어 있습니다. 2026년 11월 2일 캡처.
+![Lambda 메모리·임시 저장 공간·제한 시간 설정](https://pysun.notion.site/image/attachment%3Af76eb149-1946-435c-8522-5a93aca18567%3Alambda-resource-settings.png?table=block&id=a51efa94-6277-47e5-b866-a7f5ec0d236f&spaceId=e11ea574-f7d4-4d97-8ab8-0c0da4f8dcbc&width=2000&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
-실제 Lambda 일반 구성입니다. 메모리 1,024MB, 임시 저장 공간 1,024MB, 제한 시간 1분으로 설정되어 있습니다. 2026년 11월 2일 캡처.
+*실제 Lambda 일반 구성입니다. 메모리 1,024MB, 임시 저장 공간 1,024MB, 제한 시간 1분으로 설정되어 있습니다. 2026년 11월 2일 캡처.*
 
-!2026년 11월 2일 오후(KST)에 조회한 최근 1일의 함수 호출, 실행 시간(Duration), 오류 수와 성공률입니다. Duration의 단위는 밀리초입니다.
+![최근 1일의 Lambda 호출·실행 시간·오류·성공률](https://pysun.notion.site/image/attachment%3A0f53bf24-d185-4d4d-ad20-844e031cd890%3Alambda-monitoring-1d.png?table=block&id=b319b58b-ad3e-493d-a4d4-f37d051debf6&spaceId=e11ea574-f7d4-4d97-8ab8-0c0da4f8dcbc&width=2000&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
-2026년 11월 2일 오후(KST)에 조회한 최근 1일의 함수 호출, 실행 시간(Duration), 오류 수와 성공률입니다. Duration의 단위는 밀리초입니다.
+*2026년 11월 2일 오후(KST)에 조회한 최근 1일의 함수 호출, 실행 시간(Duration), 오류 수와 성공률입니다. Duration의 단위는 밀리초입니다.*
 
-!실제 CloudWatch REPORT 로그 발췌입니다. 2026년 11월 2일 14:41:18(KST) 기록에 Duration 4,937.57ms, Max Memory Used 418MB, Init Duration 442.11ms가 표시되어 있습니다. 요청 ID는 가렸습니다.
+![CloudWatch REPORT 실행 시간과 메모리 사용 로그](https://pysun.notion.site/image/attachment%3A70614412-1cbc-4c35-bb25-6bb6cd8967c8%3Alambda-report-memory.png?table=block&id=a783e0b7-5b49-476b-97f8-5c1d6e08c336&spaceId=e11ea574-f7d4-4d97-8ab8-0c0da4f8dcbc&width=2000&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
 
-실제 CloudWatch REPORT 로그 발췌입니다. 2026년 11월 2일 14:41:18(KST) 기록에 Duration 4,937.57ms, Max Memory Used 418MB, Init Duration 442.11ms가 표시되어 있습니다. 요청 ID는 가렸습니다.
+*실제 CloudWatch REPORT 로그 발췌입니다. 2026년 11월 2일 14:41:18(KST) 기록에 Duration 4,937.57ms, Max Memory Used 418MB, Init Duration 442.11ms가 표시되어 있습니다. 요청 ID는 가렸습니다.*
 
-이 REPORT는 단일 로그 사례입니다. 실행 환경이 재사용되면 Max Memory Used는 해당 환경의 여러 호출에서 사용한 최대 메모리를 나타낼 수 있습니다. 따라서 입력 사진의 해상도·크기와 연결해 분석한 값이나 모든 요청의 대표값으로 보지 않습니다. 앞서 계산한 RGBA 픽셀 버퍼의 크기와 실제 실행 환경 메모리도 서로 다른 값입니다. AWS Python Lambda 로그 문서
+이 REPORT는 단일 로그 사례입니다. 실행 환경이 재사용되면 Max Memory Used는 해당 환경의 여러 호출에서 사용한 최대 메모리를 나타낼 수 있습니다. 따라서 입력 사진의 해상도·크기와 연결해 분석한 값이나 모든 요청의 대표값으로 보지 않습니다. 앞서 계산한 RGBA 픽셀 버퍼의 크기와 실제 실행 환경 메모리도 서로 다른 값입니다. [AWS Python Lambda 로그 문서](https://docs.aws.amazon.com/lambda/latest/dg/python-logging.html)
 
 위 화면은 실제 운영 현황의 스냅샷입니다. 이 함수 전체의 집계이므로 입력 형식·해상도·용도와 콜드/웜 실행을 분리한 측정값은 아닙니다. 또한 입력을 정책에 따라 거절하고 정상 종료한 경우는 Lambda 실행 오류와 다르므로, 함수 성공률을 이미지 검증 통과율로 해석하지 않습니다. 전후 성능 개선을 주장하려면 동일 조건의 비교 실험이 추가로 필요합니다.
 
-- 참고 · 같은 기간의 동시 실행 수
-    
-    !동일한 최근 1일 범위에서 조회한 동시 실행 수입니다. 관찰된 최대값은 2이며, 부하 테스트로 확인한 처리 용량을 뜻하지 않습니다.
-    
-    동일한 최근 1일 범위에서 조회한 동시 실행 수입니다. 관찰된 최대값은 2이며, 부하 테스트로 확인한 처리 용량을 뜻하지 않습니다.
-    
+<details>
+<summary>참고 · 같은 기간의 동시 실행 수</summary>
+
+![최근 1일의 Lambda 동시 실행 수](https://pysun.notion.site/image/attachment%3A58a88faf-d88b-4035-b7df-757110073cb0%3Alambda-concurrency-1d.png?table=block&id=f5d25035-e994-445c-be46-ab88016a0e19&spaceId=e11ea574-f7d4-4d97-8ab8-0c0da4f8dcbc&width=2000&userId=&cache=v2&imgBuildSrc=requestProxiedImageUrl)
+
+*동일한 최근 1일 범위에서 조회한 동시 실행 수입니다. 관찰된 최대값은 2이며, 부하 테스트로 확인한 처리 용량을 뜻하지 않습니다.*
+
+</details>
 
 이어지는 글에서는 EC2 동기 처리와 Lambda 분리, S3 직접 트리거와 SQS 경유 방식의 차이를 메모리·CPU·응답시간·실패 복구 관점에서 살펴볼 예정입니다.
 
@@ -463,4 +477,4 @@ staging과 결과 키를 구분했다고 접근 제어까지 완성되지는 않
 
 S3 업로드 성공은 파일이 저장됐다는 신호입니다. 찰캌에서는 그다음에 실제 형식과 픽셀을 확인하고, 자원 한도를 적용하고, 공개할 결과를 다시 만들며, 게시물 상태에 반영하는 과정이 필요했습니다.
 
-이 과정에서 판단 기준도 바뀌었습니다. “확장자가 이미지인가?”에서 시작해, **“서비스가 정한 조건으로 처리한 결과가, 허용한 시점과 경로로만 공개되는가?”**를 확인하게 되었습니다. 이미지 검증 파이프라인은 이 조건을 코드와 상태 전이에 반영하기 위한 구조입니다.
+이 과정에서 판단 기준도 바뀌었습니다. “확장자가 이미지인가?”에서 시작해, **“서비스가 정한 조건으로 처리한 결과가, 허용한 시점과 경로로만 공개되는가?”를** 확인하게 되었습니다. 이미지 검증 파이프라인은 이 조건을 코드와 상태 전이에 반영하기 위한 구조입니다.
