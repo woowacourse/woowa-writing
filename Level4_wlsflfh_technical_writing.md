@@ -105,7 +105,7 @@ PUBLISHED 글만 포함 (DRAFT, PRIVATE X)
 여기까지만 보면, PostgreSQL 이 제공하는 Patial Index가 굉장히 매력적으로 다가온다. 하지만, 조금 더 Rilog. 서비스의 특성을 고려해 생각해 볼 필요가 있다. **결론부터 말하자면, Partial Index라고 무조건 엄청 빨라지는 것은 아니다.**
 - 게시글 조회는 대부분 `PUBLISHED` 상태의 글을 대상으로 이루어질 것으로 예상된다. 그러므로, `PUBLISHED` 게시글을 대상으로 Index 를 거는 것은 자명하다.
 - But, `PUBLISHED`, `DRAFT`, `PRIVATE` 비율을 생각해 봐야 한다.
-    - e.g., Rilog 게시글의 95%가 `PUBLISHED` 라고 가정하면, Partial Index를 만들어도 전체 데이터의 95%를 인덱싱하는 것이다. -> 큰 이득이 없을 수 있다.
+    - e.g. Rilog 게시글의 95%가 `PUBLISHED` 라고 가정하면, Partial Index를 만들어도 전체 데이터의 95%를 인덱싱하는 것이다. -> 큰 이득이 없을 수 있다.
     - PostgreSQL 공식 문서에 의하면, partial index를 전체 테이블 중 유용한 subset만 인덱싱하는 용도로 설명한다. -> **소량의 일부 데이터만을 자주 조회할 때** **Partial Index가 빛난다.**
 
 
@@ -320,7 +320,7 @@ ROW_FORMAT=COMPRESSED;
 
 `COMPRESSED`는 `DYNAMIC`이 제공하는 긴 가변 길이 컬럼의 off-page 저장 특성을 가지면서, **테이블과 인덱스 데이터 자체에 압축을 추가**한다. 그렇다면, 압축이 추가되니깐 Toast랑 이젠 같은가? 하는 생각이 드는데 압축 단위가 다르다.
 - `TOAST = 큰 컬럼을 선택적으로 압축하고 분리하는 메커니즘`
-    - 그 큰 칼럼(e.g., content) **만을** 압축한다.
+    - 그 큰 칼럼(e.g. content) **만을** 압축한다.
 - `DYNAMIC + COMPRESSED = 큰 컬럼은 분리하면서, 저장 page까지 압축하는 메커니즘`
     - 테이블 전체를 압축해버린다. -> **off-page 뿐만 아니라, 메인 page 까지**
 
@@ -338,7 +338,7 @@ ROW_FORMAT=COMPRESSED;
 - Disk I/O ↓
 - Buffer Pool 효율 ↑
 
-하지만, 압축된 파일 조회 시, CPU에서 decompress 과정을 거쳐야 한다는 trade-off가 만들어 진다. 따라서, 압축은 공짜 성능 향상은 아니다. 압축하려는 대상이 얼마나 많이 조회될 지도 생각해봐야 한다는 의미이다.
+하지만, 압축된 파일 조회 시, CPU에서 decompress 과정을 거쳐야 한다는 trade-off가 있다. 따라서, 압축은 공짜 성능 향상은 아니다. 압축하려는 대상이 얼마나 많이 조회될 지도 생각해봐야 한다는 의미이다.
 ```text
 Disk I/O 감소
 저장 공간 감소
@@ -549,3 +549,7 @@ author
 이 경우 `content`가 PostgreSQL `jsonb`인지 MySQL `JSON`인지가 검색 성능에 미치는 영향은 크게 줄어든다. RDB에서는 게시글의 원본 데이터를 관리하고, 검색에 필요한 `title`, `description`, `content` 등을 Elasticsearch에 전달하여 역색인을 구성하면 되기 때문이다.
 
 > 결론: Rilog.에서 초기 검색 범위를 `title + description`으로 한정한다면 PostgreSQL, MySQL 모두 대응 가능하다. 물론, 검색 쪽으로 PostgreSQL이 기능적으로 풍부한 것은 사실이지만, 현재 우리는 그 기능을 충분히 활용하지 않으므로 **MySQL이 더 단순하고 합리적인 선택이라고 판단했다**. 또한, 검색 기능을 고도화할 경우 Elasticsearch를 도입할 가능성이 높다는 점도, 현재 단계에서 이러한 선택을 내리는 데 부담을 줄여주었다.
+
+### 마무리
+
+이번 비교에서 중요했던 건 두 DB의 우열보다, 각자의 장점이 지금 리로그에 얼마나 필요한지였다. PostgreSQL의 Partial Index, TOAST, jsonb는 매력적이지만 현재의 조회 패턴과 검색 범위에서는 결정적인 이유가 되지 않았다. 수정 기록과 인덱스 실험도 함께 검토한 끝에 MySQL로 전환하기로 했다. 다만 발행 상태의 분포나 압축 효과처럼 아직 예상에 기댄 부분은 운영 데이터를 보며 다시 확인해야 한다. 이번에 배운 건 기술의 장점을 나열하는 것보다 우리 서비스에서 그 장점이 필요한 이유를 설명하는 일이 더 중요하다는 점이다.
