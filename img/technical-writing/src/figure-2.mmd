@@ -1,0 +1,5 @@
+flowchart TD
+    A["서비스 메서드 실행 · 반환"] --> B{"flush · 커밋"}
+    B -->|성공| C["afterCommit()"]
+    C --> D["afterCompletion(COMMITTED)"]
+    B -->|실패 · 롤백| E["afterCompletion(ROLLED_BACK)"]

@@ -1,0 +1,19 @@
+sequenceDiagram
+    participant C as 컨트롤러
+    participant TX as Spring (트랜잭션 관리)
+    participant S as 서비스
+    participant DB as DB
+    C->>TX: addImage() 호출
+    TX->>DB: 트랜잭션 시작
+    TX->>S: 메서드 실행
+    rect rgba(120, 120, 120, 0.12)
+        Note over S: try 블록이 지켜보는 구간
+        S-->>S: S3 업로드
+        S->>S: saveAll()
+    end
+    S->>TX: 정상 반환 (catch는 실행되지 않음)
+    TX->>DB: flush · 커밋
+    DB->>TX: 실패
+    TX->>DB: 롤백
+    TX->>C: 예외 전달
+    Note over S: 올린 이미지는 S3에 남음
