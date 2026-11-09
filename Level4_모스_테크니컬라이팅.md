@@ -250,10 +250,6 @@ HTTP 합계에는 각 조건의 마지막 검증용 개인 GET과 전체 GET도 
 
 ## 코드와 실험 근거
 
-코드는 개선 PR #812의 커밋 `5e9870eaf74c039b8cac343e956dcc16dc68f56b`에서 발췌했습니다. 긴 조건은 줄바꿈만 조정했습니다. 이후 리팩터링된 현재 구조와 구분하려고 당시 커밋으로 고정했습니다. 실험 조건과 수치는 아래 기록에서 확인할 수 있습니다.
-
-그림은 [bybit-exchange/svg-diagram](https://github.com/bybit-exchange/svg-diagram)의 SVG 스킬로 제작했습니다. 설명용 시각·숫자 예시와 실기기 결과표는 구분했습니다.
-
 - [PressRepositoryImpl의 대기 종료 시각과 집계 예약 및 응답 보정](https://github.com/woowacourse-teams/2026-pheeeew/blob/5e9870eaf74c039b8cac343e956dcc16dc68f56b/AN/Pheeeew/shared/src/commonMain/kotlin/com/pheeeew/data/repository/PressRepositoryImpl.kt)
 - [PressScreen의 서버 집계와 로컬 증가분 합산](https://github.com/woowacourse-teams/2026-pheeeew/blob/5e9870eaf74c039b8cac343e956dcc16dc68f56b/AN/Pheeeew/shared/src/commonMain/kotlin/com/pheeeew/feature/screens/press/PressScreen.kt)
 - [집계 조회 도중 입력의 묶음 대기 유지 실험](https://github.com/woowacourse-teams/2026-pheeeew/blob/5e9870eaf74c039b8cac343e956dcc16dc68f56b/AN/Pheeeew/measurements/personal-press/799-batch-wait.md)
