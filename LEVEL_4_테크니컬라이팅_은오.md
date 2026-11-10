@@ -85,24 +85,41 @@ private void registerImageCleanup(
 
 ## `flush()` 전후를 4가지 경로로 나누기
 
-콜백을 등록하기 전에 `flush()`를 호출하는 코드도 추가했습니다.
+콜백을 등록하기 전에 `flush()`를 호출하는 코드도 추가했습니다. 이 순서는 실패 구간마다 새 이미지를 정리할 주체를 하나로 정하기 위한 선택이었습니다. 콜백을 먼저 등록한 뒤 `flush()`에서 예외가 발생하면 `catch`와 롤백 콜백이 같은 새 이미지의 삭제를 각각 시도할 수 있습니다. 그래서 `flush()`까지의 실패는 `catch`가 처리하고, 콜백 등록 뒤의 롤백은 `afterCompletion()`이 처리하도록 경계를 나눴습니다.
+
+아래 코드는 S3 업로드부터 DB 변경, 콜백 등록까지 모두 `@Transactional` 메서드 안에서 실행된다는 점을 포함한 전체 흐름입니다.
 
 ```java
-S3ImageStorage.StoredImage uploadedImage = imageUpload.storedImage();
-try {
-  news.update(/* 새 이미지 URL을 포함한 변경 내용 */);
+@Transactional
+public News update(Long id, AdminNewsUpdateRequest request, MultipartFile image) {
+  News news = newsRepository.findById(id)
+      .orElseThrow(() -> new BusinessException(NewsErrorCode.NEWS_NOT_FOUND));
+  String previousImageUrl = news.getImageUrl();
+  S3ImageStorage.StoredImage uploadedImage = uploadImage(image);
 
-  if (uploadedImage != null) {
-    newsRepository.flush();
-    registerImageCleanup(previousImageUrl, uploadedImage);
+  try {
+    news.update(
+        request.title(),
+        request.content(),
+        request.description(),
+        uploadedImage == null ? previousImageUrl : uploadedImage.publicUrl(),
+        request.sourceUrl(),
+        request.category());
+
+    if (uploadedImage != null) {
+      newsRepository.flush();
+      registerImageCleanup(previousImageUrl, uploadedImage);
+    }
+
+    return news;
+  } catch (RuntimeException exception) {
+    deleteUploadedImage(uploadedImage);
+    throw exception;
   }
-
-  return news;
-} catch (RuntimeException exception) {
-  deleteUploadedImage(uploadedImage);
-  throw exception;
 }
 ```
+
+`uploadImage(image)`에서 실제 S3 업로드가 일어납니다. 이 호출도 트랜잭션 메서드 안에 있지만 S3 요청 자체가 DB 트랜잭션에 참여하는 것은 아닙니다. 업로드가 끝난 뒤 `news.update()`로 영속성 컨텍스트의 URL을 바꾸고, `flush()`가 성공해야 콜백을 등록합니다.
 
 JPA는 영속성 컨텍스트의 변경 내용을 커밋 시점까지 DB에 보내지 않을 수 있습니다. [Jakarta Persistence 명세](https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2.pdf)는 `flush()`가 영속성 컨텍스트와 DB의 동기화를 강제한다고 설명합니다. 제약조건 위반처럼 SQL 실행 중 확인되는 오류를 콜백 등록 전에 발견할 수 있습니다.
 
@@ -110,12 +127,14 @@ JPA는 영속성 컨텍스트의 변경 내용을 커밋 시점까지 DB에 보�
 
 애플리케이션 프로세스가 정상적으로 실행 중인 상황을 기준으로 이미지 교체 흐름을 네 경로로 나눠 보았습니다.
 
-| 경로 | 확인되는 시점 | 정리 주체 | 처리 결과 |
+| 경로 | 확인되는 시점 | 정리 주체 | 정리 작업 |
 | --- | --- | --- | --- |
-| S3 업로드 실패 | DB 변경 전 | 업로드 호출 | 요청 종료, 추가 파일 없음 |
-| 업로드 성공 후 `flush()` 실패 | 콜백 등록 전 | `catch` | 새 이미지 삭제 |
-| 콜백 등록 후 트랜잭션 롤백 | `afterCompletion()` | 롤백 콜백 | 새 이미지 삭제 |
-| 트랜잭션 커밋 성공 | `afterCommit()` | 커밋 콜백 | 기존 이미지 삭제 |
+| S3 업로드 실패 | DB 변경 전 | 업로드 호출 | 추가 정리 없음 |
+| 업로드 성공 후 `flush()` 실패 | 콜백 등록 전 | `catch` | 새 이미지 삭제 시도 |
+| 콜백 등록 후 트랜잭션 롤백 | `afterCompletion()` | 롤백 콜백 | 새 이미지 삭제 시도 |
+| 트랜잭션 커밋 성공 | `afterCommit()` | 커밋 콜백 | 기존 이미지 삭제 시도 |
+
+표의 정리 작업은 삭제 성공을 보장한다는 뜻이 아닙니다. S3 삭제가 실패하면 파일이 남을 수 있으며, 이 한계는 뒤에서 다시 다룹니다.
 
 `flush()` 도중 예외가 발생하면 아직 콜백이 등록되지 않은 상태입니다. 이때는 `catch` 블록에서 새 이미지를 바로 삭제합니다. 콜백 등록이 끝난 뒤 트랜잭션이 롤백되면 `afterCompletion()`이 새 이미지를 정리합니다. 각 구간의 정리 주체를 나눠 두니 실패 시점마다 어느 코드가 동작해야 하는지도 확인하기 쉬워졌습니다.
 
@@ -144,9 +163,11 @@ try {
 }
 ```
 
-`initSynchronization()`으로 트랜잭션 동기화를 활성화한 뒤 서비스를 호출합니다. 이 시점에는 기존 이미지가 남아 있어야 하므로 `never()`로 삭제되지 않았음을 확인했습니다. 등록된 `afterCommit()`을 실행한 뒤에는 기존 이미지 삭제 호출을 검증했습니다.
+`initSynchronization()`으로 트랜잭션 동기화를 활성화한 뒤 서비스를 호출합니다. 이 시점에는 기존 이미지가 남아 있어야 하므로 `never()`로 삭제되지 않았음을 확인했습니다. 등록된 `afterCommit()`을 직접 실행한 뒤에는 기존 이미지 삭제 호출을 검증했습니다.
 
-롤백 테스트에서는 `afterCompletion(STATUS_ROLLED_BACK)`을 호출해 새 이미지가 삭제되는지 확인했습니다. `flush()`에서 예외가 발생하는 경우도 별도 테스트로 작성해 콜백 등록 전의 보상 작업까지 검사했습니다.
+이 테스트가 확인하는 범위는 서비스가 올바른 콜백을 등록하는지, 그리고 등록된 콜백이 실행될 때 어떤 이미지를 삭제하는지까지입니다. 실제 DB 커밋을 일으키거나 Spring 트랜잭션 관리자가 커밋 뒤 콜백을 호출하는 과정까지 검증하는 통합 테스트는 아닙니다.
+
+롤백 테스트에서도 같은 방식으로 `afterCompletion(STATUS_ROLLED_BACK)`을 직접 호출해 새 이미지가 삭제되는지 확인했습니다. `flush()`에서 예외가 발생하는 경우는 별도 테스트로 작성해 콜백 등록 전의 보상 작업까지 검사했습니다.
 
 이 변경은 [`871a0648` 커밋](https://github.com/woowacourse-teams/2026-DAYNOMY/commit/871a0648d9e2b75832640ffbfabff59b69f7b1af)에 담겨 있습니다. 구현 코드 31줄과 테스트 코드 70줄을 추가하고 수정했습니다. 테스트 코드가 더 길어진 이유는 결과와 함께 커밋 전, 커밋 후, 롤백 후라는 세 시점을 각각 검증했기 때문입니다.
 
@@ -154,7 +175,34 @@ try {
 
 `TransactionSynchronization`을 적용하면서 DB가 가리키는 이미지를 먼저 보호할 수 있게 되었습니다. 커밋되면 기존 이미지를 정리하고, 롤백되면 새 이미지를 정리합니다. 다만 DB와 S3가 원자성, 일관성, 고립성, 지속성(ACID)을 공유하는 하나의 트랜잭션이 된 것은 아닙니다. DB 처리 결과를 보고 S3 작업의 시점을 맞춘 구조입니다.
 
-DB 커밋 뒤 `afterCommit()`에서 기존 이미지 삭제가 실패해도 DB를 되돌릴 수 없습니다. DAYNOMY는 삭제 예외를 잡아 경고 로그를 남깁니다. 사용자는 새 이미지를 계속 볼 수 있지만 사용하지 않는 기존 파일이 S3에 남을 수 있습니다. 이번 구현에서는 화면에 깨진 이미지를 노출할 위험을 줄이는 쪽에 우선순위를 두었습니다.
+DB 커밋 뒤 `afterCommit()`에서 기존 이미지 삭제가 실패해도 DB를 되돌릴 수 없습니다. DAYNOMY는 `deletePreviousImage()`와 `deleteUploadedImage()` 안에서 S3 삭제 중 발생한 `BusinessException`을 잡아 경고 로그를 남깁니다.
+
+```java
+private void deleteUploadedImage(S3ImageStorage.StoredImage uploadedImage) {
+  if (uploadedImage == null) {
+    return;
+  }
+
+  try {
+    s3ImageStorage.delete(uploadedImage);
+  } catch (BusinessException exception) {
+    log.warn("Failed to clean up uploaded news image: key={}",
+        uploadedImage.relativeKey());
+  }
+}
+
+private void deletePreviousImage(String previousImageUrl) {
+  try {
+    s3ImageStorage.deleteIfManaged(previousImageUrl);
+  } catch (BusinessException exception) {
+    log.warn("Failed to delete previous news image after transaction commit");
+  }
+}
+```
+
+`flush()` 실패를 처리하는 `catch`에서는 `deleteUploadedImage()`를 호출한 뒤 처음 받은 예외를 다시 던집니다. 새 이미지 삭제 중 `BusinessException`이 발생해도 보조 메서드 안에서 경고를 기록하고 반환하므로, 처음 발생한 DB 예외가 호출자에게 그대로 전달됩니다. 다만 현재 코드는 삭제 중 발생한 모든 예외가 아니라 `BusinessException`만 이렇게 처리합니다.
+
+사용자는 새 이미지를 계속 볼 수 있지만 사용하지 않는 기존 파일이 S3에 남을 수 있습니다. 이번 구현에서는 화면에 깨진 이미지를 노출할 위험을 줄이는 쪽에 우선순위를 두었습니다.
 
 현재 구현에서 더 살펴봐야 할 상황도 있습니다.
 
